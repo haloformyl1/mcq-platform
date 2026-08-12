@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  otp       String?
+  otpExpiry DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attempts  TestAttempt[]
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String // Used if not just env var
+  createdAt DateTime @default(now())
+}
+
+model Test {
+  id                 String   @id @default(uuid())
+  title              String
+  description        String?
+  durationMinutes    Int
+  totalQuestions     Int      @default(50)
+  marksPerQuestion   Float    @default(1.0)
+  negativeMarking    Boolean  @default(false)
+  negativeMarks      Float    @default(0.0)
+  randomizeQuestions Boolean  @default(false)
+  randomizeOptions   Boolean  @default(false)
+  status             String   @default("DRAFT") // DRAFT, PUBLISHED, LOCKED, CLOSED
+  unlockAt           DateTime?
+  lockAt             DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  questions Question[]
+  attempts  TestAttempt[]
+}
+
+model Question {
+  id            String   @id @default(uuid())
+  testId        String
+  questionText  String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer String   // "A", "B", "C", "D"
+  explanation   String?
+  difficulty    String   @default("Moderate") // Easy, Moderate, Difficult
+  category      String?
+  imageUrl      String?
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  test          Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  answers       Answer[]
+}
+
+model TestAttempt {
+  id               String    @id @default(uuid())
+  testId           String
+  studentId        String
+  startedAt        DateTime  @default(now())
+  submittedAt      DateTime?
+  status           String    @default("IN_PROGRESS") // IN_PROGRESS, SUBMITTED
+  submissionReason String?   // MANUAL_SUBMISSION, TIME_EXPIRED, TAB_SWITCH, INACTIVITY_240_SECONDS, etc.
+  
+  score            Float?
+  percentage       Float?
+  correctCount     Int?
+  incorrectCount   Int?
+  unansweredCount  Int?
+
+  test             Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
+  student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers          Answer[]
+}
+
+model Answer {
+  id             String      @id @default(uuid())
+  attemptId      String
+  questionId     String
+  selectedAnswer String?     // "A", "B", "C", "D"
+  isCorrect      Boolean?
+  answeredAt     DateTime    @default(now())
+
+  attempt        TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  @@unique([attemptId, questionId])
+}
