@@ -3,7 +3,6 @@ import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
-export const dynamic = 'force-dynamic';
 import { encrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
 
