@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef, use } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, X, Minimize2, Maximize2 } from "lucide-react";
+import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
+import { useProctoring } from "@/hooks/useProctoring";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -77,6 +78,12 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       console.error("Submission failed", e);
     }
   }, [resolvedParams.attemptId, router, isSubmitting]);
+
+  const { warningsLeft, showSlipWarning, setShowSlipWarning, isAiActive } = useProctoring(
+    videoRef,
+    submitTest,
+    !!examData
+  );
 
   useEffect(() => {
     if (!examData) return;
@@ -219,6 +226,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   <div className="flex items-center text-[10px] sm:text-xs text-white font-bold tracking-wider drop-shadow-md">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500 animate-pulse mr-1.5"></div>
                     REC
+                    {isAiActive && <span className="ml-2 text-[9px] text-green-400 bg-black/40 px-1 rounded border border-green-500/30">AI On</span>}
                   </div>
                   <button 
                     onClick={() => setIsCameraMinimized(!isCameraMinimized)} 
@@ -426,6 +434,34 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </div>
         </div>
       )}
+
+      {/* Slip Warning Modal */}
+      {showSlipWarning && !showFullscreenWarning && (
+        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-red-500/50">
+            <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-4">Warning: Eye Tracking</h2>
+            <p className="text-[#a6a6a6] mb-4 text-lg">
+              You looked away from the screen for over 10 seconds. This is a violation of the test rules.
+            </p>
+            <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
+              <p className="text-red-400 font-bold text-xl">
+                {warningsLeft} warning{warningsLeft !== 1 ? 's' : ''} remaining
+              </p>
+              <p className="text-sm text-red-400/80 mt-1">before automatic submission</p>
+            </div>
+            <button 
+              onClick={() => setShowSlipWarning(false)}
+              className="w-full bg-[#262626] hover:bg-[#333333] text-white font-medium py-3 rounded-lg border border-[#404040]"
+            >
+              I Understand, Return to Test
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Submit Confirmation Modal */}
       {showSubmitConfirm && !showFullscreenWarning && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
