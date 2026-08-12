@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, use } from "react";
 import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -15,6 +16,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
   
   const lastActivityTime = useRef(Date.now());
   const examDataRef = useRef<any>(null);
@@ -22,6 +24,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const streamRef = useRef<MediaStream | null>(null);
   
   useEffect(() => {
+    if (window.innerWidth >= 1024) setShowPalette(true);
     const data = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
     if (data) {
       const parsed = JSON.parse(data);
@@ -176,22 +179,29 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           <h1 className="text-xl font-bold tracking-wide">{examData.test.title}</h1>
           <p className="text-sm text-[#a6a6a6]">Question {currentQ + 1} of {questions.length}</p>
         </div>
-        <div className="flex items-center space-x-6">
-          <div className="text-2xl font-mono font-semibold bg-[#262626] px-4 py-2 rounded-lg text-white">
+        <div className="flex items-center space-x-3 sm:space-x-6">
+          <div className="text-xl sm:text-2xl font-mono font-semibold bg-[#262626] px-3 sm:px-4 py-2 rounded-lg text-white">
             {timeLeft}
           </div>
           <button 
             onClick={handleManualSubmit}
             disabled={isSubmitting}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-md shadow-sm disabled:opacity-50"
+            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 sm:px-6 rounded-md shadow-sm disabled:opacity-50"
           >
-            Submit Test
+            Submit
+          </button>
+          <button
+            onClick={() => setShowPalette(!showPalette)}
+            className="p-2 bg-[#262626] hover:bg-[#333333] rounded-md text-white transition-colors"
+            title="Toggle Question Palette"
+          >
+            <Menu size={24} />
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-8">
+      <div className="flex flex-1 overflow-hidden relative">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8">
           <div className="max-w-4xl mx-auto bg-[#161616]/80 border border-[#404040] rounded-xl p-8 shadow-2xl">
             <h2 className="text-xl font-medium mb-6">
               <span className="font-bold mr-2">{currentQ + 1}.</span>
@@ -251,9 +261,20 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </div>
         </main>
 
-        <aside className="w-80 bg-[#161616]/40 border-l border-[#404040] p-6 overflow-y-auto shadow-sm z-10">
-          <h3 className="text-sm font-bold text-[#a6a6a6] uppercase tracking-wider mb-4">Question Palette</h3>
-          <div className="grid grid-cols-5 gap-2">
+        {showPalette && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={() => setShowPalette(false)}
+            />
+            <aside className="fixed inset-y-0 right-0 z-50 w-80 bg-[#161616] border-l border-[#404040] p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[#161616]/40 transition-transform">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-[#a6a6a6] uppercase tracking-wider">Question Palette</h3>
+                <button onClick={() => setShowPalette(false)} className="lg:hidden p-1 text-[#a6a6a6] hover:text-white">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="grid grid-cols-5 gap-2">
             {questions.map((q: any, i: number) => {
               const isAnswered = !!answers[q.id];
               const isMarked = !!markedForReview[q.id];
@@ -293,7 +314,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#262626] border border-[#404040] mr-3"></span> Unanswered</div>
             <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#262626] ring-1 ring-white border border-[#404040] mr-3"></span> Current Question</div>
           </div>
-        </aside>
+            </aside>
+          </>
+        )}
       </div>
 
       {/* Floating Proctoring Camera */}
