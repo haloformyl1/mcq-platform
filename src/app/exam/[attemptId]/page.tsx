@@ -174,28 +174,33 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white select-none font-sans">
-      <header className="bg-[#161616]/40 px-6 py-4 flex justify-between items-center border-b border-[#404040]">
-        <div>
-          <h1 className="text-xl font-bold tracking-wide">{examData.test.title}</h1>
-          <p className="text-sm text-[#a6a6a6]">Question {currentQ + 1} of {questions.length}</p>
-        </div>
-        <div className="flex items-center space-x-3 sm:space-x-6">
-          <div className="text-xl sm:text-2xl font-mono font-semibold bg-[#262626] px-3 sm:px-4 py-2 rounded-lg text-white">
+      <header className="bg-[#161616]/40 p-4 flex flex-col md:flex-row md:justify-between md:items-center border-b border-[#404040] gap-4">
+        <div className="flex justify-between items-start w-full md:w-auto">
+          <div className="pr-2">
+            <h1 className="text-lg md:text-xl font-bold tracking-wide break-words">{examData.test.title}</h1>
+            <p className="text-sm text-[#a6a6a6] mt-1">Question {currentQ + 1} of {questions.length}</p>
+          </div>
+          <div className="text-lg md:text-2xl font-mono font-semibold bg-[#262626] px-3 py-1.5 md:py-2 md:px-4 rounded-lg text-white shrink-0">
             {timeLeft}
           </div>
+        </div>
+        <div className="flex items-center space-x-3 w-full md:w-auto justify-end">
           <button 
             onClick={handleManualSubmit}
             disabled={isSubmitting}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 sm:px-6 rounded-md shadow-sm disabled:opacity-50"
+            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 text-sm md:text-base flex-1 md:flex-none"
           >
             Submit
           </button>
           <button
             onClick={() => setShowPalette(!showPalette)}
-            className="p-2 bg-[#262626] hover:bg-[#333333] rounded-md text-white transition-colors"
+            className="flex items-center justify-center space-x-2 py-2 px-3 md:px-4 bg-[#262626] hover:bg-[#333333] rounded-md text-white transition-colors border border-[#404040] text-sm md:text-base flex-1 md:flex-none"
             title="Toggle Question Palette"
+            aria-label={showPalette ? "Hide question palette" : "Show question palette"}
           >
-            <Menu size={24} />
+            <Menu size={20} />
+            <span className="font-medium hidden sm:inline">{showPalette ? 'Hide Palette' : 'Show Palette'}</span>
+            <span className="font-medium sm:hidden">Questions</span>
           </button>
         </div>
       </header>
@@ -230,18 +235,35 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               })}
             </div>
 
-            <div className="flex justify-between items-center mt-12 pt-6 border-t border-[#404040]">
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-12 pt-6 border-t border-[#404040] gap-4">
+              <div className="flex justify-between w-full sm:hidden order-2 gap-4">
+                <button 
+                  onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
+                  disabled={currentQ === 0}
+                  className="flex-1 px-4 py-3 bg-[#262626] text-[#a6a6a6] font-medium rounded-md hover:bg-[#333333] hover:text-white disabled:opacity-50 transition"
+                >
+                  Previous
+                </button>
+                <button 
+                  onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
+                  disabled={currentQ === questions.length - 1}
+                  className="flex-1 px-4 py-3 bg-[#0099ff] text-white font-medium rounded-md hover:bg-[#007acc] disabled:opacity-50 transition"
+                >
+                  Next
+                </button>
+              </div>
+
               <button 
                 onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
                 disabled={currentQ === 0}
-                className="px-6 py-2 bg-[#262626] text-[#a6a6a6] font-medium rounded-md hover:bg-[#333333] hover:text-white disabled:opacity-50 transition"
+                className="hidden sm:block order-1 px-6 py-2 bg-[#262626] text-[#a6a6a6] font-medium rounded-md hover:bg-[#333333] hover:text-white disabled:opacity-50 transition"
               >
                 Previous
               </button>
               
               <button 
                 onClick={() => setMarkedForReview(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
-                className={`px-6 py-2 font-medium rounded-md border-2 transition-colors duration-150 ${
+                className={`order-1 sm:order-2 px-4 py-3 sm:py-2 font-medium rounded-md border-2 transition-colors duration-150 w-full sm:w-auto text-center ${
                   markedForReview[currentQuestion.id] 
                     ? 'bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/50' 
                     : 'bg-transparent border-[#404040] text-purple-400 hover:bg-[#262626] hover:border-purple-400'
@@ -253,10 +275,15 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button 
                 onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
                 disabled={currentQ === questions.length - 1}
-                className="px-6 py-2 bg-[#0099ff] text-white font-medium rounded-md hover:bg-[#007acc] disabled:opacity-50 transition"
+                className="hidden sm:block order-3 px-6 py-2 bg-[#0099ff] text-white font-medium rounded-md hover:bg-[#007acc] disabled:opacity-50 transition"
               >
                 Next
               </button>
+            </div>
+            
+            {/* Footer added inside main to avoid overlapping content */}
+            <div className="mt-8 text-center text-[#a6a6a6] text-[13px] md:text-sm font-semibold pb-4">
+              Designed & Prepared By- Arghyadeep Roy Contact- 9830507435.
             </div>
           </div>
         </main>
@@ -267,14 +294,19 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               className="fixed inset-0 bg-black/50 z-40 lg:hidden"
               onClick={() => setShowPalette(false)}
             />
-            <aside className="fixed inset-y-0 right-0 z-50 w-80 bg-[#161616] border-l border-[#404040] p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[#161616]/40 transition-transform">
-              <div className="flex justify-between items-center mb-4">
+            <aside className="fixed inset-y-0 right-0 z-50 w-[85vw] sm:w-80 bg-[#161616] border-l border-[#404040] p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[#161616]/40 transition-transform flex flex-col">
+              <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-bold text-[#a6a6a6] uppercase tracking-wider">Question Palette</h3>
-                <button onClick={() => setShowPalette(false)} className="lg:hidden p-1 text-[#a6a6a6] hover:text-white">
-                  <X size={20} />
+                <button 
+                  onClick={() => setShowPalette(false)} 
+                  className="lg:hidden p-2 bg-[#262626] rounded-md text-[#a6a6a6] hover:text-white flex items-center space-x-1"
+                  aria-label="Close palette"
+                >
+                  <X size={16} />
+                  <span className="text-sm font-medium">Close</span>
                 </button>
               </div>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-5 gap-2 sm:gap-3 flex-1 content-start">
             {questions.map((q: any, i: number) => {
               const isAnswered = !!answers[q.id];
               const isMarked = !!markedForReview[q.id];
@@ -298,8 +330,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               return (
                 <button
                   key={q.id}
-                  onClick={() => setCurrentQ(i)}
-                  className={`h-10 w-10 flex items-center justify-center rounded-md text-sm font-medium transition-all ${btnClass}`}
+                  onClick={() => {
+                    setCurrentQ(i);
+                    if (window.innerWidth < 1024) {
+                      setShowPalette(false);
+                    }
+                  }}
+                  className={`h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center rounded-md text-sm font-medium transition-all ${btnClass}`}
+                  aria-label={`Question ${i + 1}`}
                 >
                   {i + 1}
                 </button>
@@ -307,7 +345,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             })}
           </div>
           
-          <div className="mt-8 space-y-3 text-sm text-[#a6a6a6]">
+          <div className="mt-8 space-y-3 text-sm text-[#a6a6a6] pt-6 border-t border-[#404040]">
             <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#0099ff] border border-[#0099ff] mr-3"></span> Answered</div>
             <div className="flex items-center"><span className="w-4 h-4 rounded bg-purple-600 border border-purple-500 mr-3"></span> Answered & Review</div>
             <div className="flex items-center"><span className="w-4 h-4 rounded bg-purple-900/40 border border-purple-500 mr-3"></span> Review (No Answer)</div>

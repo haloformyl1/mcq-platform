@@ -12,11 +12,9 @@ export default function GlobalFooter() {
                            !pathname?.includes("/result/");
 
   if (isExamActivePage) {
-    return (
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 text-[#a6a6a6] text-[13px] md:text-sm font-semibold z-[9999] pointer-events-none w-full text-center">
-        Designed & Prepared By- Arghyadeep Roy Contact- 9830507435.
-      </div>
-    );
+    // Return null during active exam to avoid overlapping test content.
+    // The exam page explicitly includes the footer at the bottom of its scrollable container.
+    return null;
   }
 
   return (
