@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, use } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Minimize2, Maximize2 } from "lucide-react";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -17,6 +17,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
+  const [isCameraMinimized, setIsCameraMinimized] = useState(false);
   
   const lastActivityTime = useRef(Date.now());
   const examDataRef = useRef<any>(null);
@@ -207,13 +208,42 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
       <div className="flex flex-1 overflow-hidden relative">
         <main className="flex-1 overflow-y-auto p-4 sm:p-8">
-          <div className="max-w-4xl mx-auto bg-[#161616]/80 border border-[#404040] rounded-xl p-8 shadow-2xl">
-            <h2 className="text-xl font-medium mb-6">
-              <span className="font-bold mr-2">{currentQ + 1}.</span>
+          <div className="max-w-4xl mx-auto w-full bg-[#161616]/80 border border-[#404040] rounded-xl p-4 sm:p-8 shadow-2xl">
+            {/* Inline Camera Preview (Responsive & Safe) */}
+            <div className="mb-6 flex justify-between items-start gap-4">
+              <h2 className="text-xl font-medium text-[#a6a6a6] pt-1">
+                Question <span className="font-bold text-white text-2xl">{currentQ + 1}</span>
+              </h2>
+              <div className={`transition-all duration-300 bg-black rounded-lg overflow-hidden shadow-lg border border-gray-700 relative flex-shrink-0 ${isCameraMinimized ? 'w-20 sm:w-24' : 'w-28 sm:w-36 md:w-48'}`}>
+                <div className="absolute top-0 left-0 right-0 flex items-center justify-between z-10 bg-gradient-to-b from-black/80 to-transparent p-1.5 sm:p-2">
+                  <div className="flex items-center text-[10px] sm:text-xs text-white font-bold tracking-wider drop-shadow-md">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500 animate-pulse mr-1.5"></div>
+                    REC
+                  </div>
+                  <button 
+                    onClick={() => setIsCameraMinimized(!isCameraMinimized)} 
+                    className="text-white hover:text-gray-300 p-0.5 sm:p-1 bg-black/40 rounded transition-colors" 
+                    title={isCameraMinimized ? "Expand Camera" : "Minimize Camera"}
+                    aria-label={isCameraMinimized ? "Expand Camera" : "Minimize Camera"}
+                  >
+                    {isCameraMinimized ? <Maximize2 size={12} /> : <Minimize2 size={12} />}
+                  </button>
+                </div>
+                <video 
+                  ref={videoRef}
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  className={`w-full object-cover transform -scale-x-100 transition-all duration-300 ${isCameraMinimized ? 'h-7 sm:h-8 opacity-40' : 'h-auto opacity-100'}`}
+                ></video>
+              </div>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-medium mb-8 leading-relaxed">
               {currentQuestion.questionText}
             </h2>
             
-            <div className="space-y-4 mt-8">
+            <div className="space-y-4">
               {['A', 'B', 'C', 'D'].map((opt) => {
                 const optKey = `option${opt}` as keyof typeof currentQuestion;
                 const optText = currentQuestion[optKey];
@@ -355,21 +385,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             </aside>
           </>
         )}
-      </div>
-
-      {/* Floating Proctoring Camera */}
-      <div className="fixed bottom-6 left-6 w-48 bg-black rounded-lg overflow-hidden shadow-2xl border-2 border-gray-800 z-50">
-        <div className="absolute top-2 left-2 flex items-center bg-black/60 px-2 py-1 rounded text-xs text-white font-medium z-10">
-          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse mr-2"></div>
-          Recording
-        </div>
-        <video 
-          ref={videoRef}
-          autoPlay 
-          playsInline 
-          muted 
-          className="w-full h-auto object-cover transform -scale-x-100"
-        ></video>
       </div>
 
       {/* Fullscreen Warning Modal */}
