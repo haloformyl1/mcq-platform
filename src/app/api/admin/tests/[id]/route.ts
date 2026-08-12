@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 // Next.js 15 requires awaiting params
 export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;

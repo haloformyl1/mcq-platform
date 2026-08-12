@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
+export const dynamic = 'force-dynamic';
+
 export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   try {

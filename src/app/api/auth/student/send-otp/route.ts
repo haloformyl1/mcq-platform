@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+
+export const dynamic = 'force-dynamic';
+
+export const dynamic = 'force-dynamic';
 import { sendOTP } from "@/lib/email";
 
 export async function POST(req: Request) {
