@@ -21,7 +21,6 @@ export function useProctoring(
 
     async function initDetector() {
       try {
-        await tf.setBackend('webgl');
         await tf.ready();
         
         detectorRef.current = await blazeface.load();
