@@ -102,6 +102,8 @@ export default function AdminStudentDetails() {
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
   const [overrideUnlock, setOverrideUnlock] = useState<string | null>(null);
   const [overrideLock, setOverrideLock] = useState<string | null>(null);
+  const [savingOverride, setSavingOverride] = useState(false);
+  const [overrideMessage, setOverrideMessage] = useState<string | null>(null);
 
   useEffect(() => {
     // fetch tests for override selection
@@ -113,6 +115,8 @@ export default function AdminStudentDetails() {
 
   const saveOverride = async () => {
     if (!selectedTestId) return;
+    setSavingOverride(true);
+    setOverrideMessage(null);
     try {
       const body: any = { testId: selectedTestId };
       if (overrideUnlock) body.unlockAt = new Date(overrideUnlock).toISOString();
@@ -120,16 +124,25 @@ export default function AdminStudentDetails() {
       const res = await fetch(`/api/admin/students/${id}/override`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(body)
       });
+      const data = await res.json().catch(() => null);
       if (res.ok) {
+        setOverrideMessage('Override saved');
         fetchStudent();
         setSelectedTestId(null);
         setOverrideLock(null);
         setOverrideUnlock(null);
+      } else {
+        console.error('Save override failed', data);
+        setOverrideMessage(data?.error || 'Failed to save override');
       }
     } catch (err) {
       console.error('Failed to save override', err);
+      setOverrideMessage('Failed to save override');
+    } finally {
+      setSavingOverride(false);
     }
   };
 
