@@ -273,8 +273,15 @@ export default function AdminStudentDetails() {
             <input type="datetime-local" value={overrideLock ?? ''} onChange={(e) => setOverrideLock(e.target.value)} className="w-full bg-[#111] border border-[#444] text-gray-100 p-2 rounded" />
           </div>
           <div className="flex items-end">
-            <button onClick={saveOverride} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">Save Override</button>
+            <button onClick={saveOverride} disabled={savingOverride || !selectedTestId} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed">
+              {savingOverride ? 'Saving...' : 'Save Override'}
+            </button>
           </div>
+          {overrideMessage && (
+            <div className="mt-3 text-sm" role="status">
+              <span className="text-gray-300">{overrideMessage}</span>
+            </div>
+          )}
         </div>
         <h2 className="text-lg font-semibold text-gray-200 mb-4">Recent Test History</h2>
         <div className="overflow-x-auto">
