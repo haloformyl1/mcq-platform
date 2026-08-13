@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies();
     const adminSession = cookieStore.get("admin_session")?.value;
     if (!adminSession) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const payload = await decrypt(adminSession);
     if (!payload || !payload.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+    const params = await context.params;
     const studentId = params.id;
     const body = await req.json();
     const { testId, unlockAt, lockAt } = body;
@@ -40,14 +40,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies();
     const adminSession = cookieStore.get("admin_session")?.value;
     if (!adminSession) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const payload = await decrypt(adminSession);
     if (!payload || !payload.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+    const params = await context.params;
     const studentId = params.id;
     const body = await req.json();
     const { testId } = body;
