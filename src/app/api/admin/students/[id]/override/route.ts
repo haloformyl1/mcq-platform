@@ -27,7 +27,12 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
     }
     if (!payload || payload.role !== 'admin') {
       console.warn('Override POST: invalid admin session', { payload });
-      const debug = process.env.NODE_ENV === 'development' ? { payload } : undefined;
+      const masked = adminSession ? `${adminSession.slice(0,6)}...${adminSession.slice(-4)}` : null;
+      const debug = {
+        cookiePresent: !!adminSession,
+        tokenPreview: masked,
+        payload: payload ? { role: payload.role, iat: payload.iat, exp: payload.exp } : null
+      };
       return NextResponse.json({ error: "Unauthorized", debug }, { status: 401 });
     }
     const params = await context.params;
@@ -78,7 +83,12 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     }
     if (!payload || payload.role !== 'admin') {
       console.warn('Override DELETE: invalid admin session', { payload });
-      const debug = process.env.NODE_ENV === 'development' ? { payload } : undefined;
+      const masked = adminSession ? `${adminSession.slice(0,6)}...${adminSession.slice(-4)}` : null;
+      const debug = {
+        cookiePresent: !!adminSession,
+        tokenPreview: masked,
+        payload: payload ? { role: payload.role, iat: payload.iat, exp: payload.exp } : null
+      };
       return NextResponse.json({ error: "Unauthorized", debug }, { status: 401 });
     }
     const params = await context.params;
