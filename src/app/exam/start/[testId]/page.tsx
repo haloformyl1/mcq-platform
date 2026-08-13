@@ -60,6 +60,7 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
             <li><strong className="text-red-400">WARNING:</strong> Do not remove your eyes from the mobile/laptop screen for more than 10 seconds continuously — this is against PIECHEM exam rules. After 5 such warnings, the test may be automatically submitted.</li>
             <li>Your answers are saved automatically when selected.</li>
             <li>Once submitted, you cannot re-attempt the test.</li>
+            <li>If you face any issues during the exam contact us on WhatsApp: <strong className="text-white">7595825568</strong> via another device (not the device you are using to attempt the test).</li>
           </ul>
         </div>
 

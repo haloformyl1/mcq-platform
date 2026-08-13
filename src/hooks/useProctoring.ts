@@ -7,7 +7,7 @@ export function useProctoring(
   onSubmit: (reason: string) => void,
   isTestActive: boolean
 ) {
-  const [warningsLeft, setWarningsLeft] = useState(6); // Starts with 6 warnings before auto-submit
+  const [warningsLeft, setWarningsLeft] = useState(5); // Starts with 5 warnings before auto-submit
   const [showSlipWarning, setShowSlipWarning] = useState(false);
   const [isAiActive, setIsAiActive] = useState(false);
   
@@ -74,12 +74,13 @@ export function useProctoring(
 
     function handleSlip() {
       slipCount.current += 1;
-      const MAX_SLIPS = 7; // 7th slip is auto-submit
-      
+      const MAX_SLIPS = 5; // auto-submit on the 5th slip
+
       if (slipCount.current >= MAX_SLIPS) {
         onSubmit("EXCESSIVE_EYE_SLIP");
       } else {
-        setWarningsLeft(MAX_SLIPS - slipCount.current - 1);
+        // remaining warnings = MAX_SLIPS - slips already recorded
+        setWarningsLeft(MAX_SLIPS - slipCount.current);
         setShowSlipWarning(true);
       }
     }
