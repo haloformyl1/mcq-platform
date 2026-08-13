@@ -14,6 +14,8 @@ model Student {
   name      String?
   otp       String?
   otpExpiry DateTime?
+  status    String   @default("ACTIVE") // ACTIVE, SUSPENDED
+  lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -36,6 +38,7 @@ model Test {
   marksPerQuestion   Float    @default(1.0)
   negativeMarking    Boolean  @default(false)
   negativeMarks      Float    @default(0.0)
+  maximumAttempts    Int      @default(1)
   randomizeQuestions Boolean  @default(false)
   randomizeOptions   Boolean  @default(false)
   status             String   @default("DRAFT") // DRAFT, PUBLISHED, LOCKED, CLOSED
@@ -77,6 +80,7 @@ model TestAttempt {
   submittedAt      DateTime?
   status           String    @default("IN_PROGRESS") // IN_PROGRESS, SUBMITTED
   submissionReason String?   // MANUAL_SUBMISSION, TIME_EXPIRED, TAB_SWITCH, INACTIVITY_240_SECONDS, etc.
+  attemptNumber    Int       @default(1)
   
   score            Float?
   percentage       Float?

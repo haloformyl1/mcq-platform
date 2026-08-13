@@ -1,0 +1,249 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+
+interface StudentDetails {
+  student: {
+    id: string;
+    name: string | null;
+    email: string;
+    status: string;
+    createdAt: string;
+    lastLogin: string | null;
+  };
+  statistics: {
+    totalAttempted: number;
+    totalCompleted: number;
+    averageScore: number;
+    highestScore: number;
+    lowestScore: number;
+  };
+  history: {
+    id: string;
+    testName: string;
+    testId: string;
+    date: string;
+    score: number | null;
+    percentage: number | null;
+    attemptNumber: number;
+    status: string;
+  }[];
+}
+
+export default function AdminStudentDetails() {
+  const [data, setData] = useState<StudentDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [confirmSuspend, setConfirmSuspend] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteInput, setDeleteInput] = useState("");
+  const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+
+  const fetchStudent = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/students/${id}`);
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (res.ok) {
+        setData(await res.json());
+      } else {
+        router.push("/admin/students");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) fetchStudent();
+  }, [id]);
+
+  const toggleStatus = async () => {
+    if (!data) return;
+    const newStatus = data.student.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+    try {
+      const res = await fetch(`/api/admin/students/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        fetchStudent();
+        setConfirmSuspend(false);
+      }
+    } catch (err) {
+      console.error("Failed to update status");
+    }
+  };
+
+  const deleteStudent = async () => {
+    if (deleteInput !== "DELETE") return;
+    try {
+      const res = await fetch(`/api/admin/students/${id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        router.push("/admin/students");
+      }
+    } catch (err) {
+      console.error("Failed to delete");
+    }
+  };
+
+  if (loading || !data) {
+    return <div className="text-gray-400">Loading student details...</div>;
+  }
+
+  const { student, statistics, history } = data;
+
+  return (
+    <div className="space-y-8 pb-12">
+      <div className="flex justify-between items-center">
+        <div>
+          <Link href="/admin/students" className="text-blue-400 hover:underline mb-2 inline-block">
+            &larr; Back to Students
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-100">Student Details</h1>
+        </div>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setConfirmSuspend(true)}
+            className={`px-4 py-2 rounded font-medium ${student.status === "ACTIVE" ? "bg-yellow-600 hover:bg-yellow-700 text-white" : "bg-green-600 hover:bg-green-700 text-white"}`}
+          >
+            {student.status === "ACTIVE" ? "Suspend Student" : "Unsuspend Student"}
+          </button>
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
+          >
+            Delete Student
+          </button>
+        </div>
+      </div>
+
+      {confirmSuspend && (
+        <div className="bg-[#2A2A2A] p-6 rounded-xl border border-yellow-600/50">
+          <h2 className="text-xl font-bold text-gray-100 mb-2">
+            {student.status === "ACTIVE" ? "Suspend Student?" : "Restore Student Access?"}
+          </h2>
+          <p className="text-gray-300 mb-4">
+            {student.status === "ACTIVE"
+              ? "Suspending this student will prevent them from logging into the PIECHeM platform."
+              : "This will allow the student to log in again."}
+          </p>
+          <div className="flex gap-4">
+            <button onClick={() => setConfirmSuspend(false)} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white">Cancel</button>
+            <button onClick={toggleStatus} className={`px-4 py-2 rounded text-white ${student.status === "ACTIVE" ? "bg-yellow-600 hover:bg-yellow-700" : "bg-green-600 hover:bg-green-700"}`}>
+              {student.status === "ACTIVE" ? "Confirm Suspend" : "Restore Access"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="bg-[#2A2A2A] p-6 rounded-xl border border-red-600/50">
+          <h2 className="text-xl font-bold text-red-500 mb-2 uppercase">PERMANENTLY DELETE STUDENT?</h2>
+          <p className="text-gray-300 mb-4 font-bold">WARNING: This action will permanently delete the student's account and associated data from the database.</p>
+          <p className="text-gray-400 mb-4">This includes student profile, login credentials, test attempts, responses, and results. This action cannot be undone.</p>
+          <div className="mb-4">
+            <label className="block text-gray-400 mb-1 text-sm">Type DELETE to confirm:</label>
+            <input
+              type="text"
+              value={deleteInput}
+              onChange={(e) => setDeleteInput(e.target.value)}
+              className="w-full md:w-64 bg-[#111] border border-[#444] text-gray-100 p-2 rounded"
+              placeholder="DELETE"
+            />
+          </div>
+          <div className="flex gap-4">
+            <button onClick={() => { setConfirmDelete(false); setDeleteInput(""); }} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white">Cancel</button>
+            <button 
+              onClick={deleteStudent}
+              disabled={deleteInput !== "DELETE"}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-white"
+            >
+              Permanently Delete Student
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-[#1A1A1A] p-6 rounded-xl border border-[#333]">
+          <h2 className="text-lg font-semibold text-gray-200 mb-4">Account Information</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between"><span className="text-gray-500">Student ID</span> <span className="text-gray-300 font-mono">{student.id}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Name</span> <span className="text-gray-300">{student.name || "N/A"}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Email</span> <span className="text-gray-300">{student.email}</span></div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Status</span>
+              <span className={`px-2 rounded font-medium ${student.status === "ACTIVE" ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"}`}>
+                {student.status}
+              </span>
+            </div>
+            <div className="flex justify-between"><span className="text-gray-500">Registered</span> <span className="text-gray-300">{new Date(student.createdAt).toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Last Login</span> <span className="text-gray-300">{student.lastLogin ? new Date(student.lastLogin).toLocaleString() : "Never"}</span></div>
+          </div>
+        </div>
+
+        <div className="bg-[#1A1A1A] p-6 rounded-xl border border-[#333]">
+          <h2 className="text-lg font-semibold text-gray-200 mb-4">Examination Statistics</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between"><span className="text-gray-500">Total Attempts</span> <span className="text-gray-300">{statistics.totalAttempted}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Completed Tests</span> <span className="text-gray-300">{statistics.totalCompleted}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Average Score</span> <span className="text-gray-300">{statistics.averageScore.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Highest Score</span> <span className="text-gray-300">{statistics.highestScore}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Lowest Score</span> <span className="text-gray-300">{statistics.lowestScore}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-[#1A1A1A] p-6 rounded-xl border border-[#333]">
+        <h2 className="text-lg font-semibold text-gray-200 mb-4">Recent Test History</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-gray-400">
+            <thead className="text-xs text-gray-500 uppercase bg-[#222]">
+              <tr>
+                <th className="px-4 py-3">Test Name</th>
+                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Attempt #</th>
+                <th className="px-4 py-3">Score</th>
+                <th className="px-4 py-3">Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((a) => (
+                <tr key={a.id} className="border-b border-[#333] hover:bg-[#222]">
+                  <td className="px-4 py-3 font-medium text-gray-300">{a.testName}</td>
+                  <td className="px-4 py-3">{new Date(a.date).toLocaleDateString()}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded text-xs ${a.status === "SUBMITTED" ? "bg-green-900/30 text-green-400" : "bg-blue-900/30 text-blue-400"}`}>
+                      {a.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">{a.attemptNumber}</td>
+                  <td className="px-4 py-3">{a.score !== null ? a.score : "-"}</td>
+                  <td className="px-4 py-3">{a.percentage !== null ? `${a.percentage.toFixed(1)}%` : "-"}</td>
+                </tr>
+              ))}
+              {history.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center py-6">No test history.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

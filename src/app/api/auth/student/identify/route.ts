@@ -17,11 +17,16 @@ export async function POST(req: Request) {
         id: true,
         name: true,
         passwordHash: true,
+        status: true,
       }
     });
 
     if (!student) {
       return NextResponse.json({ accountStatus: "NEW", name: null });
+    }
+
+    if (student.status === "SUSPENDED") {
+      return NextResponse.json({ accountStatus: "SUSPENDED", name: student.name, error: "Your account has been suspended. Please contact the administrator for assistance." });
     }
 
     if (student.passwordHash) {

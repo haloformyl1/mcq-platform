@@ -21,7 +21,10 @@ export async function POST(req: Request) {
     });
 
     const cookieStore = await cookies();
-    cookieStore.set("admin_session", sessionToken, {
+    // Use object form for setting cookie to match Next.js cookies API
+    cookieStore.set({
+      name: "admin_session",
+      value: sessionToken,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 day
@@ -29,7 +32,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: "Login failed" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Admin login error:", error);
+    return NextResponse.json({ error: error?.message || "Login failed" }, { status: 500 });
   }
 }

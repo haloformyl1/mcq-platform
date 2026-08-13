@@ -17,6 +17,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const student = await prisma.student.findUnique({ where: { id: payload.id as string } });
+    if (!student) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (student.status === "SUSPENDED") {
+      return NextResponse.json({ error: "Your account has been suspended. Please contact the administrator for assistance." }, { status: 403 });
+    }
+
     const test = await prisma.test.findUnique({
       where: { id: testId },
       include: { questions: { orderBy: { orderIndex: "asc" } } }
@@ -26,18 +34,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
     }
 
-    // Check if already attempted
-    const existingAttempt = await prisma.testAttempt.findFirst({
-      where: { testId, studentId: payload.id as string }
+    // Check for an active IN_PROGRESS attempt
+    const activeAttempt = await prisma.testAttempt.findFirst({
+      where: { testId, studentId: student.id, status: "IN_PROGRESS" }
+    });
+    
+    // Check for completed attempts to enforce limit
+    const latestSubmittedAttempt = await prisma.testAttempt.findFirst({
+      where: { testId, studentId: student.id, status: "SUBMITTED" },
+      orderBy: { startedAt: "desc" }
     });
 
-    if (existingAttempt && existingAttempt.status === "SUBMITTED") {
-      return NextResponse.json({ error: "Test already submitted" }, { status: 400 });
+    const attemptsUsed = latestSubmittedAttempt ? latestSubmittedAttempt.attemptNumber : 0;
+
+    if (!activeAttempt && attemptsUsed >= test.maximumAttempts) {
+      return NextResponse.json({ error: "Attempt Limit Reached" }, { status: 403 });
     }
 
     const serverTime = new Date();
 
-    if (test.status === "LOCKED" && !existingAttempt) {
+    if (test.status === "LOCKED" && !activeAttempt) {
       if (test.unlockAt && serverTime < new Date(test.unlockAt)) {
         return NextResponse.json({ error: "Test has not opened yet" }, { status: 403 });
       }
@@ -46,17 +62,20 @@ export async function POST(req: Request) {
       }
     }
 
-    let attemptId = existingAttempt?.id;
+    let attemptId = activeAttempt?.id;
+    let existingAttemptStartedAt = activeAttempt?.startedAt;
 
-    if (!existingAttempt) {
+    if (!activeAttempt) {
       const newAttempt = await prisma.testAttempt.create({
         data: {
           testId,
-          studentId: payload.id as string,
+          studentId: student.id,
           status: "IN_PROGRESS",
+          attemptNumber: attemptsUsed + 1
         }
       });
       attemptId = newAttempt.id;
+      existingAttemptStartedAt = newAttempt.startedAt;
     }
 
     let displayQuestions = test.questions.map(q => ({
@@ -72,7 +91,7 @@ export async function POST(req: Request) {
     if (test.randomizeQuestions) {
       displayQuestions = displayQuestions.sort(() => Math.random() - 0.5);
     }
-    const endTime = new Date(existingAttempt ? existingAttempt.startedAt.getTime() + test.durationMinutes * 60000 : serverTime.getTime() + test.durationMinutes * 60000);
+    const endTime = new Date(existingAttemptStartedAt!.getTime() + test.durationMinutes * 60000);
 
     return NextResponse.json({
       attemptId,

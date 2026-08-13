@@ -22,6 +22,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
     }
 
+    if (student.status === "SUSPENDED") {
+      return NextResponse.json({ error: "Your account has been suspended. Please contact the administrator for assistance." }, { status: 403 });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, student.passwordHash);
 
     if (!isPasswordValid) {
@@ -41,6 +45,11 @@ export async function POST(req: Request) {
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",
+    });
+
+    await prisma.student.update({
+      where: { id: student.id },
+      data: { lastLogin: new Date() }
     });
 
     return NextResponse.json({ success: true });

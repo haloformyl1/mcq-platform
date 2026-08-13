@@ -4,14 +4,24 @@ import { useState, useEffect } from "react";
 export default function AdminResults() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/results")
-      .then(res => res.json())
+      .then(async res => {
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error(data.error || "Failed to fetch results");
+        }
+
+        return data;
+      })
       .then(data => {
         setResults(data);
-        setLoading(false);
-      });
+      })
+      .catch(error => setError(error.message))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div>Loading...</div>;
@@ -19,6 +29,8 @@ export default function AdminResults() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Test Results</h1>
+
+      {error && <p className="mb-4 text-red-400">{error}</p>}
 
       <div className="bg-[#161616]/60 shadow rounded-lg overflow-hidden border border-[#333333] backdrop-blur-sm">
         <table className="min-w-full divide-y divide-[#333333]">
@@ -32,7 +44,11 @@ export default function AdminResults() {
             </tr>
           </thead>
           <tbody className="bg-transparent divide-y divide-[#333333]">
-            {results.map((result: any) => (
+            {results.length === 0 && !error ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-[#a6a6a6]">No test results are available yet.</td>
+              </tr>
+            ) : results.map((result: any) => (
               <tr key={result.id} className="hover:bg-[#262626]/50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-white">Student</div>

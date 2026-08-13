@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const cookieStore = await cookies();
+    const adminSession = cookieStore.get("admin_session")?.value;
+    const payload = adminSession ? await decrypt(adminSession) : null;
+    if (!payload || payload.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const tests = await prisma.test.findMany({
       orderBy: { createdAt: "desc" },
       include: {

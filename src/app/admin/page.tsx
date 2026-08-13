@@ -4,10 +4,19 @@ import Link from "next/link";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/tests")
-      .then(res => res.json())
+      .then(async res => {
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error(data.error || "Failed to load dashboard statistics");
+        }
+
+        return data;
+      })
       .then(data => {
         setStats({
           totalTests: data.length,
@@ -15,9 +24,11 @@ export default function AdminDashboard() {
           totalQuestions: data.reduce((acc: number, t: any) => acc + t._count.questions, 0),
           totalAttempts: data.reduce((acc: number, t: any) => acc + t._count.attempts, 0),
         });
-      });
+      })
+      .catch(error => setError(error.message));
   }, []);
 
+  if (error) return <div className="text-red-400">{error}</div>;
   if (!stats) return <div>Loading...</div>;
 
   return (

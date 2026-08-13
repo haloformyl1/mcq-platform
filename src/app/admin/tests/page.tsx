@@ -5,12 +5,25 @@ import { useRouter } from "next/navigation";
 
 export default function AdminTests() {
   const [tests, setTests] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchTests = () => {
     fetch("/api/admin/tests")
-      .then(res => res.json())
-      .then(data => setTests(data));
+      .then(async res => {
+        const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error(data.error || "Failed to fetch tests");
+        }
+
+        return data;
+      })
+      .then(data => {
+        setTests(data);
+        setError(null);
+      })
+      .catch(error => setError(error.message));
   };
 
   useEffect(() => {
@@ -42,6 +55,8 @@ export default function AdminTests() {
         </button>
       </div>
 
+      {error && <p className="mb-4 text-red-400">{error}</p>}
+
       <div className="bg-[#161616]/60 shadow rounded-lg overflow-hidden border border-[#333333] backdrop-blur-sm">
         <table className="min-w-full divide-y divide-[#333333]">
           <thead className="bg-[#1a1a1a]/80">
@@ -53,7 +68,11 @@ export default function AdminTests() {
             </tr>
           </thead>
           <tbody className="bg-transparent divide-y divide-[#333333]">
-            {tests.map(test => (
+            {tests.length === 0 && !error ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-[#a6a6a6]">No tests have been created yet.</td>
+              </tr>
+            ) : tests.map(test => (
               <tr key={test.id} className="hover:bg-[#262626]/50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-white">{test.title}</div>

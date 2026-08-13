@@ -32,6 +32,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         marksPerQuestion: parseFloat(data.marksPerQuestion),
         negativeMarking: data.negativeMarking,
         negativeMarks: parseFloat(data.negativeMarks),
+        maximumAttempts: parseInt(data.maximumAttempts) || 1,
         randomizeQuestions: data.randomizeQuestions,
         randomizeOptions: data.randomizeOptions,
         status: data.status,

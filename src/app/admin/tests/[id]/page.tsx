@@ -243,6 +243,11 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             <input type="number" step="0.25" disabled={!test.negativeMarking} className="block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 disabled:bg-[#1a1a1a] disabled:text-[#666666] focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.negativeMarks} onChange={e => setTest({...test, negativeMarks: parseFloat(e.target.value)})} />
           </div>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-[#a6a6a6]">Maximum Attempts Per Student</label>
+          <input type="number" min="1" step="1" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.maximumAttempts || 1} onChange={e => setTest({...test, maximumAttempts: parseInt(e.target.value)})} />
+          <p className="mt-1 text-xs text-[#888888]">Total number of attempts allowed per student, including the first attempt (e.g., 2 = initial attempt + 1 retake).</p>
+        </div>
       </div>
 
       {test.status === "LOCKED" && (

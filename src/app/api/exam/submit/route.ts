@@ -84,6 +84,16 @@ export async function POST(req: Request) {
       }
     });
 
+    // Replace previous result: Delete older submitted attempts for the same test/student.
+    await prisma.testAttempt.deleteMany({
+      where: {
+        studentId: attempt.studentId,
+        testId: attempt.testId,
+        status: "SUBMITTED",
+        id: { not: attemptId }
+      }
+    });
+
     return NextResponse.json({ success: true, result: updatedAttempt });
   } catch (error) {
     return NextResponse.json({ error: "Failed to submit test" }, { status: 500 });
