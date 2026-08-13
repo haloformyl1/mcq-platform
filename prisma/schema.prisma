@@ -10,6 +10,7 @@ datasource db {
 model Student {
   id        String   @id @default(uuid())
   email     String   @unique
+  passwordHash String?
   name      String?
   otp       String?
   otpExpiry DateTime?

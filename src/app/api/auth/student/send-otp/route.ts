@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendOTP } from "@/lib/email";
 
 export const dynamic = 'force-dynamic';
-
-import { sendOTP } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -11,19 +10,29 @@ export async function POST(req: Request) {
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
     }
-    
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    await prisma.student.upsert({
-      where: { email },
-      update: { otp, otpExpiry: expiry, name },
-      create: { email, name, otp, otpExpiry: expiry },
-    });
+    const existingStudent = await prisma.student.findUnique({ where: { email } });
+
+    if (existingStudent) {
+      await prisma.student.update({
+        where: { email },
+        data: { 
+          otp, 
+          otpExpiry: expiry,
+          ...(name ? { name } : {}) 
+        },
+      });
+    } else {
+      if (!name) {
+        return NextResponse.json({ error: "Name is required for new students" }, { status: 400 });
+      }
+      await prisma.student.create({
+        data: { email, name, otp, otpExpiry: expiry },
+      });
+    }
 
     await sendOTP(email, otp);
 
