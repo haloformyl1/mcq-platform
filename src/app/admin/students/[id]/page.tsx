@@ -98,6 +98,41 @@ export default function AdminStudentDetails() {
     }
   };
 
+  const [tests, setTests] = useState<any[]>([]);
+  const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
+  const [overrideUnlock, setOverrideUnlock] = useState<string | null>(null);
+  const [overrideLock, setOverrideLock] = useState<string | null>(null);
+
+  useEffect(() => {
+    // fetch tests for override selection
+    fetch('/api/admin/tests')
+      .then(r => r.json())
+      .then(d => setTests(d || []))
+      .catch(() => setTests([]));
+  }, []);
+
+  const saveOverride = async () => {
+    if (!selectedTestId) return;
+    try {
+      const body: any = { testId: selectedTestId };
+      if (overrideUnlock) body.unlockAt = new Date(overrideUnlock).toISOString();
+      if (overrideLock) body.lockAt = new Date(overrideLock).toISOString();
+      const res = await fetch(`/api/admin/students/${id}/override`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        fetchStudent();
+        setSelectedTestId(null);
+        setOverrideLock(null);
+        setOverrideUnlock(null);
+      }
+    } catch (err) {
+      console.error('Failed to save override', err);
+    }
+  };
+
   if (loading || !data) {
     return <div className="text-gray-400">Loading student details...</div>;
   }
@@ -207,6 +242,27 @@ export default function AdminStudentDetails() {
       </div>
 
       <div className="bg-[#1A1A1A] p-6 rounded-xl border border-[#333]">
+        <h2 className="text-lg font-semibold text-gray-200 mb-4">Per-student Test Override</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className="block text-gray-400 text-sm mb-1">Select Test</label>
+            <select value={selectedTestId ?? ''} onChange={(e) => setSelectedTestId(e.target.value || null)} className="w-full bg-[#111] border border-[#444] text-gray-100 p-2 rounded">
+              <option value="">-- Choose Test --</option>
+              {tests.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-gray-400 text-sm mb-1">Unlock At (student local)</label>
+            <input type="datetime-local" value={overrideUnlock ?? ''} onChange={(e) => setOverrideUnlock(e.target.value)} className="w-full bg-[#111] border border-[#444] text-gray-100 p-2 rounded" />
+          </div>
+          <div>
+            <label className="block text-gray-400 text-sm mb-1">Lock At (student local)</label>
+            <input type="datetime-local" value={overrideLock ?? ''} onChange={(e) => setOverrideLock(e.target.value)} className="w-full bg-[#111] border border-[#444] text-gray-100 p-2 rounded" />
+          </div>
+          <div className="flex items-end">
+            <button onClick={saveOverride} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">Save Override</button>
+          </div>
+        </div>
         <h2 className="text-lg font-semibold text-gray-200 mb-4">Recent Test History</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-400">

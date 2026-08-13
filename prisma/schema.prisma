@@ -20,6 +20,7 @@ model Student {
   updatedAt DateTime @updatedAt
 
   attempts  TestAttempt[]
+  studentOverrides StudentTestOverride[]
 }
 
 model AdminUser {
@@ -49,6 +50,20 @@ model Test {
 
   questions Question[]
   attempts  TestAttempt[]
+  studentOverrides StudentTestOverride[]
+}
+
+model StudentTestOverride {
+  id              String   @id @default(uuid())
+  studentId       String
+  testId          String
+  overrideUnlockAt DateTime?
+  overrideLockAt   DateTime?
+  createdAt       DateTime @default(now())
+
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  test            Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  @@unique([studentId, testId])
 }
 
 model Question {

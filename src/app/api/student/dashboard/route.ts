@@ -45,6 +45,23 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' }
     });
 
+    // Apply per-student overrides: prefer any StudentTestOverride for this student & test
+    const overrides = await prisma.studentTestOverride.findMany({ where: { studentId } });
+    const overridesMap: Record<string, any> = {};
+    overrides.forEach(o => {
+      overridesMap[o.testId] = o;
+    });
+
+    const availableTestsWithOverrides = availableTests.map(t => {
+      const o = overridesMap[t.id];
+      if (!o) return t;
+      return {
+        ...t,
+        unlockAt: o.overrideUnlockAt ?? t.unlockAt,
+        lockAt: o.overrideLockAt ?? t.lockAt
+      };
+    });
+
     const allAttempts = await prisma.testAttempt.findMany({
       where: { studentId },
       include: {
@@ -60,7 +77,7 @@ export async function GET(req: Request) {
     
     return NextResponse.json({
       student,
-      availableTests,
+      availableTests: availableTestsWithOverrides,
       allAttempts
     });
   } catch (error) {
