@@ -114,20 +114,39 @@ export default function AdminStudentDetails() {
   }, []);
 
   const saveOverride = async () => {
-    if (!selectedTestId) return;
+    if (!selectedTestId) {
+      setOverrideMessage('Please select a test to override');
+      return;
+    }
+    // basic validation
+    if (overrideUnlock && overrideLock) {
+      const u = new Date(overrideUnlock);
+      const l = new Date(overrideLock);
+      if (isNaN(u.getTime()) || isNaN(l.getTime())) {
+        setOverrideMessage('Invalid date(s) provided');
+        return;
+      }
+      if (u >= l) {
+        setOverrideMessage('Unlock time must be before Lock time');
+        return;
+      }
+    }
     setSavingOverride(true);
     setOverrideMessage(null);
     try {
       const body: any = { testId: selectedTestId };
       if (overrideUnlock) body.unlockAt = new Date(overrideUnlock).toISOString();
       if (overrideLock) body.lockAt = new Date(overrideLock).toISOString();
-      const res = await fetch(`/api/admin/students/${id}/override`, {
+      const url = `/api/admin/students/${id}/override`;
+      console.log('Saving override', url, body);
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify(body)
       });
       const data = await res.json().catch(() => null);
+      console.log('Override response', res.status, data);
       if (res.ok) {
         setOverrideMessage('Override saved');
         fetchStudent();
@@ -135,12 +154,13 @@ export default function AdminStudentDetails() {
         setOverrideLock(null);
         setOverrideUnlock(null);
       } else {
-        console.error('Save override failed', data);
-        setOverrideMessage(data?.error || 'Failed to save override');
+        const detail = data?.error || (data ? JSON.stringify(data) : res.statusText);
+        console.error('Save override failed', res.status, detail);
+        setOverrideMessage(`Error ${res.status}: ${detail}`);
       }
     } catch (err) {
       console.error('Failed to save override', err);
-      setOverrideMessage('Failed to save override');
+      setOverrideMessage(String(err instanceof Error ? err.message : 'Network error'));
     } finally {
       setSavingOverride(false);
     }
