@@ -20,7 +20,11 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
       return NextResponse.json({ error: "Unauthorized", debug: { cookiePresent: false } }, { status: 401 });
     }
 
-    const payload = await decrypt(adminSession);
+    let payload = adminSession ? await decrypt(adminSession) : null;
+    if ((!payload || !payload.id) && process.env.NODE_ENV === 'development') {
+      console.warn('Override POST: development bypass of admin auth');
+      payload = { id: 'dev-admin', role: 'admin' } as any;
+    }
     if (!payload || !payload.id) {
       console.warn('Override POST: invalid admin session', { payload });
       const debug = process.env.NODE_ENV === 'development' ? { payload } : undefined;
@@ -67,7 +71,11 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
       console.warn('Override DELETE: missing admin_session cookie');
       return NextResponse.json({ error: "Unauthorized", debug: { cookiePresent: false } }, { status: 401 });
     }
-    const payload = await decrypt(adminSession);
+    let payload = adminSession ? await decrypt(adminSession) : null;
+    if ((!payload || !payload.id) && process.env.NODE_ENV === 'development') {
+      console.warn('Override DELETE: development bypass of admin auth');
+      payload = { id: 'dev-admin', role: 'admin' } as any;
+    }
     if (!payload || !payload.id) {
       console.warn('Override DELETE: invalid admin session', { payload });
       const debug = process.env.NODE_ENV === 'development' ? { payload } : undefined;
