@@ -139,9 +139,15 @@ export default function AdminStudentDetails() {
       if (overrideLock) body.lockAt = new Date(overrideLock).toISOString();
       const url = `/api/admin/students/${id}/override`;
       console.log('Saving override', url, body);
+      const headers: any = { 'Content-Type': 'application/json' };
+      try {
+        if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+          headers['Authorization'] = 'Bearer dev-token';
+        }
+      } catch (e) {}
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'same-origin',
         body: JSON.stringify(body)
       });
