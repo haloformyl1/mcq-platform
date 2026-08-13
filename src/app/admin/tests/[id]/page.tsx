@@ -256,11 +256,11 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#a6a6a6]">Unlock Date & Time</label>
-              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => setTest({...test, unlockAt: e.target.value})} />
+              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => setTest({...test, unlockAt: new Date(e.target.value).toISOString()})} />
             </div>
             <div>
               <label className="block text-sm font-medium text-[#a6a6a6]">Lock Date & Time</label>
-              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => setTest({...test, lockAt: e.target.value})} />
+              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => setTest({...test, lockAt: new Date(e.target.value).toISOString()})} />
             </div>
           </div>
           <div className="mt-4 text-sm text-[#a6a6a6]">
