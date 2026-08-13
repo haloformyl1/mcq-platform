@@ -9,9 +9,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id } = await params;
     const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-    const payload = await decrypt(session!);
-    
+    const adminSession = cookieStore.get("admin_session")?.value;
+    const payload = adminSession ? await decrypt(adminSession) : null;
+
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -74,9 +74,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   try {
     const { id } = await params;
     const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-    const payload = await decrypt(session!);
-    
+    const adminSession = cookieStore.get("admin_session")?.value;
+    const payload = adminSession ? await decrypt(adminSession) : null;
+
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

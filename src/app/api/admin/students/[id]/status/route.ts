@@ -11,9 +11,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { status } = await req.json();
     
     const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-    const payload = await decrypt(session!);
-    
+    const adminSession = cookieStore.get("admin_session")?.value;
+    const payload = adminSession ? await decrypt(adminSession) : null;
+
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
