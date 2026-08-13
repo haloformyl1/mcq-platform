@@ -21,18 +21,18 @@ export async function POST(req: Request) {
       id: process.env.ADMIN_ID || 'admin'
     });
 
-    const cookieStore = await cookies();
-    // Use object form for setting cookie to match Next.js cookies API
-    cookieStore.set({
-      name: "admin_session",
+    // Build response and explicitly set cookie on it to ensure Set-Cookie is returned
+    const res = NextResponse.json({ success: true });
+    res.cookies.set({
+      name: 'admin_session',
       value: sessionToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24, // 1 day
-      path: "/",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24,
+      path: '/',
     });
-
-    return NextResponse.json({ success: true });
+    return res;
   } catch (error: any) {
     console.error("Admin login error:", error);
     return NextResponse.json({ error: error?.message || "Login failed" }, { status: 500 });
