@@ -15,9 +15,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid passcode" }, { status: 401 });
     }
 
-    // Create session
+    // Create session (include `id` so older deployed routes that expect payload.id accept it)
     const sessionToken = await encrypt({
       role: "admin",
+      id: process.env.ADMIN_ID || 'admin'
     });
 
     const cookieStore = await cookies();
