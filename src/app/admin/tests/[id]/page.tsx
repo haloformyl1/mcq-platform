@@ -248,6 +248,22 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           <input type="number" min="1" step="1" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.maximumAttempts || 1} onChange={e => setTest({...test, maximumAttempts: parseInt(e.target.value)})} />
           <p className="mt-1 text-xs text-[#888888]">Total number of attempts allowed per student, including the first attempt (e.g., 2 = initial attempt + 1 retake).</p>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-[#a6a6a6]">Shuffle Questions</label>
+          <div className="flex items-center space-x-2 mt-1">
+            <input type="checkbox" checked={test.randomizeQuestions || false} onChange={e => setTest({...test, randomizeQuestions: e.target.checked})} />
+            <span className="text-sm text-[#a6a6a6]">{test.randomizeQuestions ? "Yes - Questions will be shuffled for each attempt" : "No - Questions will appear in the same order"}</span>
+          </div>
+          <p className="mt-1 text-xs text-[#888888]">When enabled, questions will be randomly shuffled each time a student takes the test. The correct answer for each question will remain intact.</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-[#a6a6a6]">Shuffle Answer Options</label>
+          <div className="flex items-center space-x-2 mt-1">
+            <input type="checkbox" checked={test.randomizeOptions || false} onChange={e => setTest({...test, randomizeOptions: e.target.checked})} />
+            <span className="text-sm text-[#a6a6a6]">{test.randomizeOptions ? "Yes - Answer options will be shuffled" : "No - Answer options will appear in the same order"}</span>
+          </div>
+          <p className="mt-1 text-xs text-[#888888]">When enabled, the positions of answer options (A, B, C, D) will be shuffled for each question. The correct answer will automatically move with its option.</p>
+        </div>
       </div>
 
       {test.status === "LOCKED" && (

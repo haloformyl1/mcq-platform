@@ -88,10 +88,62 @@ export async function POST(req: Request) {
       imageUrl: q.imageUrl,
     }));
 
+    // Track shuffling information for answer validation
+    const questionShufflings: Record<string, Record<string, string>> = {};
+
     if (test.randomizeQuestions) {
       displayQuestions = displayQuestions.sort(() => Math.random() - 0.5);
     }
+
+    // Shuffle options for each question if enabled
+    if (test.randomizeOptions) {
+      const options = ['A', 'B', 'C', 'D'];
+      
+      displayQuestions = displayQuestions.map(q => {
+        // Create array of [letter, option_text] pairs
+        const optionPairs: [string, string][] = [
+          ['A', q.optionA],
+          ['B', q.optionB],
+          ['C', q.optionC],
+          ['D', q.optionD],
+        ];
+
+        // Shuffle the pairs
+        for (let i = optionPairs.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [optionPairs[i], optionPairs[j]] = [optionPairs[j], optionPairs[i]];
+        }
+
+        // Create mapping: new position -> original letter
+        const mapping: Record<string, string> = {};
+        optionPairs.forEach((pair, idx) => {
+          mapping[options[idx]] = pair[0]; // "A" -> "C" means display position A contains original option C
+        });
+
+        questionShufflings[q.id] = mapping;
+
+        // Return question with shuffled options (mapping stored server-side, not sent to client)
+        return {
+          ...q,
+          optionA: optionPairs[0][1],
+          optionB: optionPairs[1][1],
+          optionC: optionPairs[2][1],
+          optionD: optionPairs[3][1],
+        };
+      });
+    }
+
     const endTime = new Date(existingAttemptStartedAt!.getTime() + test.durationMinutes * 60000);
+
+    // Store shuffling information in attempt if options were shuffled
+    if (test.randomizeOptions && Object.keys(questionShufflings).length > 0) {
+      await prisma.testAttempt.update({
+        where: { id: attemptId },
+        data: {
+          questionShufflings: questionShufflings as any,
+        }
+      });
+    }
 
     return NextResponse.json({
       attemptId,

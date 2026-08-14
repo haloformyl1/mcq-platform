@@ -49,7 +49,20 @@ export async function POST(req: Request) {
       const answer = answersDict[question.id];
       if (answer && answer.selectedAnswer) {
         unansweredCount--;
-        const isCorrect = answer.selectedAnswer === question.correctAnswer;
+        
+        // Get the actual answer to check against, accounting for option shuffling
+        let answerToCheck = answer.selectedAnswer;
+        
+        // If options were shuffled, map the selected answer back to the original
+        if (attempt.questionShufflings) {
+          const shufflings = attempt.questionShufflings as Record<string, Record<string, string>>;
+          if (shufflings[question.id]) {
+            const mapping = shufflings[question.id];
+            answerToCheck = mapping[answer.selectedAnswer] || answer.selectedAnswer;
+          }
+        }
+        
+        const isCorrect = answerToCheck === question.correctAnswer;
         
         await prisma.answer.update({
           where: { id: answer.id },

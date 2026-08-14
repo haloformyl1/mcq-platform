@@ -102,6 +102,8 @@ model TestAttempt {
   correctCount     Int?
   incorrectCount   Int?
   unansweredCount  Int?
+  
+  questionShufflings Json?   // Stores option shuffling mappings: { questionId: { "A": "C", "B": "A", ... } }
 
   test             Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
   student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
