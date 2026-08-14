@@ -17,10 +17,10 @@ export async function GET() {
     await recalculateAllSubmittedAttempts();
 
     const attempts = await prisma.testAttempt.findMany({
-      orderBy: { submittedAt: "desc" },
+      orderBy: { startedAt: "desc" },
       include: {
-        student: { select: { email: true } },
-        test: { select: { title: true } },
+        student: { select: { id: true, name: true, email: true } },
+        test: { select: { id: true, title: true, totalQuestions: true } },
       }
     });
     return NextResponse.json(attempts);
