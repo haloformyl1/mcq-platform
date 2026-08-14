@@ -98,7 +98,10 @@ export async function GET(req: Request) {
           ]
         }
       },
-      orderBy: { submittedAt: 'desc' },
+      orderBy: [
+        { submittedAt: 'desc' },
+        { startedAt: 'desc' }
+      ],
       select: { testId: true, test: { select: { title: true } } }
     });
 
