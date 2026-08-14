@@ -114,9 +114,17 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                           {['A', 'B', 'C', 'D'].map((opt) => {
-                            const optionText = q[`option${opt}`];
+                            // Check if option shuffling was recorded for this attempt
+                            const shufflings = result.questionShufflings as Record<string, Record<string, string>> | null;
+                            const mapping = shufflings?.[q.id];
+                            
+                            // If options were shuffled:
+                            // mapping[opt] gives the original option key (e.g., mapping["A"] = "C")
+                            const originalKey = mapping ? (mapping[opt] || opt) : opt;
+                            const optionText = q[`option${originalKey}`];
+                            
                             const isSelected = ans.selectedAnswer === opt;
-                            const isCorrectAnswer = q.correctAnswer === opt;
+                            const isCorrectAnswer = q.correctAnswer === originalKey;
                             
                             let optStyle = "border-[#404040] text-[#a6a6a6]";
                             if (isSelected && isCorrectAnswer) optStyle = "border-green-500 bg-green-900/20 text-green-300";
