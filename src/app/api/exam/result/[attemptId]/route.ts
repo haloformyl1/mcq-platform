@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { recalculateAttemptScore } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,9 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
     if (!payload || !payload.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Ensure attempt score is up-to-date with current test keys
+    await recalculateAttemptScore(params.attemptId);
 
     const attempt = await prisma.testAttempt.findUnique({
       where: { id: params.attemptId },

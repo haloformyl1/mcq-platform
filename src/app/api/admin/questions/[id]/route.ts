@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { recalculateTestAttempts } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,15 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         orderIndex: data.orderIndex,
       },
     });
-    return NextResponse.json(question);
+
+    // Automatically recalculate scores for all submitted student attempts of this test
+    const scrutinyResult = await recalculateTestAttempts(question.testId);
+
+    return NextResponse.json({
+      question,
+      totalAttempts: scrutinyResult.totalAttempts,
+      updatedAttempts: scrutinyResult.updatedAttempts
+    });
   } catch (error) {
     return NextResponse.json({ error: "Failed to update question" }, { status: 500 });
   }
@@ -31,7 +40,17 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
 export async function DELETE(req: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   try {
+    const question = await prisma.question.findUnique({
+      where: { id: params.id },
+      select: { testId: true }
+    });
+
     await prisma.question.delete({ where: { id: params.id } });
+
+    if (question) {
+      await recalculateTestAttempts(question.testId);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete question" }, { status: 500 });

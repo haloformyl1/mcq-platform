@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { recalculateAttemptScore } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   try {
+    await recalculateAttemptScore(params.id);
+
     const attempt = await prisma.testAttempt.findUnique({
       where: { id: params.id },
       include: {

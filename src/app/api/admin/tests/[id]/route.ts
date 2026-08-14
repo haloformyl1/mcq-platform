@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { recalculateTestAttempts } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +41,9 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         lockAt: data.lockAt ? new Date(data.lockAt) : null,
       },
     });
+
+    await recalculateTestAttempts(params.id);
+
     return NextResponse.json(test);
   } catch (error) {
     return NextResponse.json({ error: "Failed to update test" }, { status: 500 });
@@ -55,3 +59,4 @@ export async function DELETE(req: Request, context: { params: Promise<{ id: stri
     return NextResponse.json({ error: "Failed to delete test" }, { status: 500 });
   }
 }
+

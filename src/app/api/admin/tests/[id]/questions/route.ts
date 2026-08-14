@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { recalculateTestAttempts } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,9 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
         orderIndex: data.orderIndex || test._count.questions,
       },
     });
+
+    await recalculateTestAttempts(params.id);
+
     return NextResponse.json(question);
   } catch (error) {
     return NextResponse.json({ error: "Failed to add question" }, { status: 500 });

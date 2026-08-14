@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { recalculateStudentAttempts } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,9 @@ export async function GET(req: Request) {
     }
 
     const studentId = payload.id;
+
+    // Recalculate all submitted attempts for this student to guarantee latest scores
+    await recalculateStudentAttempts(studentId);
 
     const student = await prisma.student.findUnique({
       where: { id: studentId },

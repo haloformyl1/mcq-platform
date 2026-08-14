@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { recalculateStudentAttempts } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    await recalculateStudentAttempts(id);
 
     const student = await prisma.student.findUnique({
       where: { id },

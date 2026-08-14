@@ -74,6 +74,18 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
     }
   };
 
+  const reevaluateQuestion = async (qId: string, index: number) => {
+    const res = await fetch(`/api/admin/questions/${qId}/reevaluate`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      alert(`Scrutiny Complete for Q${index}!\n\n${data.message}`);
+    } else {
+      alert("Failed to re-evaluate question scores.");
+    }
+  };
+
   const deleteQuestion = async (id: string) => {
     if (confirm("Delete question?")) {
       await fetch(`/api/admin/questions/${id}`, { method: "DELETE" });
@@ -89,12 +101,16 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
       body: JSON.stringify(editingQuestion),
     });
     if (res.ok) {
-      const updatedQ = await res.json();
+      const data = await res.json();
+      const updatedQ = data.question || data;
       setTest({
         ...test,
         questions: test.questions.map((q: any) => q.id === updatedQ.id ? updatedQ : q)
       });
       setEditingQuestion(null);
+      const updatedCount = data.updatedAttempts ?? 0;
+      const totalCount = data.totalAttempts ?? 0;
+      alert(`Question updated successfully!\n\nScrutiny result: Re-evaluated ${totalCount} student attempt(s), ${updatedCount} score(s) updated within seconds.`);
     } else {
       alert("Failed to update question");
     }
@@ -198,15 +214,27 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
+  const recalculateScores = async () => {
+    if (confirm("Recalculate scores for all submitted attempts of this test?")) {
+      const res = await fetch(`/api/admin/tests/${resolvedParams.id}/recalculate`, { method: "POST" });
+      if (res.ok) {
+        alert("Student scores recalculated successfully!");
+      } else {
+        alert("Failed to recalculate scores.");
+      }
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="space-y-6 pb-20">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Edit Test</h1>
-        <div className="space-x-4">
-          <button onClick={deleteTest} className="text-red-600 hover:text-red-800 font-medium">Delete Test</button>
-          <button onClick={saveSettings} className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Save Settings</button>
+        <div className="flex items-center space-x-3">
+          <button onClick={recalculateScores} className="bg-amber-600/30 text-amber-300 border border-amber-500/40 px-3 py-2 text-sm rounded shadow hover:bg-amber-600/50 transition">Recalculate Scores</button>
+          <button onClick={deleteTest} className="text-red-400 hover:text-red-300 font-medium text-sm px-2">Delete Test</button>
+          <button onClick={saveSettings} className="bg-blue-600 text-white px-4 py-2 text-sm rounded shadow hover:bg-blue-700 font-medium">Save Settings</button>
         </div>
       </div>
 
@@ -337,9 +365,16 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
               </div>
             ) : (
               <>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-start">
                   <h3 className="font-bold text-white whitespace-pre-wrap">Q{i + 1}. {q.questionText}</h3>
-                  <div className="space-x-3 shrink-0 ml-4">
+                  <div className="flex items-center space-x-3 shrink-0 ml-4">
+                    <button 
+                      onClick={() => reevaluateQuestion(q.id, i + 1)} 
+                      className="bg-amber-600/20 text-amber-300 hover:bg-amber-600/40 border border-amber-500/40 px-2.5 py-1 text-xs rounded transition-colors font-medium cursor-pointer"
+                      title="Re-evaluate / Scrutinize student attempt scores for this question"
+                    >
+                      Scrutiny / Re-evaluate
+                    </button>
                     <button onClick={() => setEditingQuestion(q)} className="text-blue-500 hover:text-blue-400 text-sm font-medium transition-colors">Edit</button>
                     <button onClick={() => deleteQuestion(q.id)} className="text-red-500 hover:text-red-400 text-sm font-medium transition-colors">Delete</button>
                   </div>

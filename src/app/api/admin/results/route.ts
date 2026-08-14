@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { recalculateAllSubmittedAttempts } from "@/lib/recalculate";
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,8 @@ export async function GET() {
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    await recalculateAllSubmittedAttempts();
+
     const attempts = await prisma.testAttempt.findMany({
       orderBy: { submittedAt: "desc" },
       include: {
