@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, MinusCircle, ArrowLeft, Clock, User, Award, CheckCircle, HelpCircle } from "lucide-react";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function AdminAttemptDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -31,7 +32,7 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
   }, [resolvedParams.id]);
 
   if (loading) {
-    return <div className="p-8 text-[#0099ff] font-medium animate-pulse">Loading detailed exam scrutiny report...</div>;
+    return <PiFiringLoader fullScreen={true} />;
   }
 
   if (error || !result) {

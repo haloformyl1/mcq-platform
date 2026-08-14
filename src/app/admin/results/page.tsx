@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function AdminResults() {
   const [results, setResults] = useState<any[]>([]);
@@ -25,7 +26,7 @@ export default function AdminResults() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-8 text-[#0099ff] font-medium animate-pulse">Loading test results...</div>;
+  if (loading) return <PiFiringLoader fullScreen={false} />;
 
   return (
     <div className="space-y-6">

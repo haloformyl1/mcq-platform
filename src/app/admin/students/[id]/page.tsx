@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 interface StudentDetails {
   student: {
@@ -173,7 +174,7 @@ export default function AdminStudentDetails() {
   };
 
   if (loading || !data) {
-    return <div className="text-gray-400">Loading student details...</div>;
+    return <PiFiringLoader fullScreen={true} />;
   }
 
   const { student, statistics, history } = data;

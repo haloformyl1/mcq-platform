@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, MinusCircle, ChevronLeft } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function ExamResult({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -21,7 +22,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
       });
   }, [resolvedParams.attemptId, router]);
 
-  if (!result) return <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex items-center justify-center font-sans">Loading...</div>;
+  if (!result) return <PiFiringLoader fullScreen={true} />;
 
   const durationSec = result.submittedAt 
     ? Math.floor((new Date(result.submittedAt).getTime() - new Date(result.startedAt).getTime()) / 1000)

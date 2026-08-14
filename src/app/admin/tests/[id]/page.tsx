@@ -2,6 +2,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function EditTest({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -225,7 +226,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <PiFiringLoader fullScreen={true} />;
 
   return (
     <div className="space-y-6 pb-20">

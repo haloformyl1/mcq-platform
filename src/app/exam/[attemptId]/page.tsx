@@ -6,6 +6,7 @@ import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
 import { useProctoring } from "@/hooks/useProctoring";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -177,7 +178,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     setShowSubmitConfirm(true);
   };
 
-  if (!examData) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (!examData) return <PiFiringLoader fullScreen={true} />;
 
   const questions = examData.questions;
   const currentQuestion = questions[currentQ];

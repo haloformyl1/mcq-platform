@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, Clock, AlertCircle } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -41,12 +42,7 @@ export default function StudentDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex items-center justify-center">
-        <AdminPreviewBanner />
-        <div className="text-xl font-medium animate-pulse text-[#0099ff]">Loading your performance data...</div>
-      </div>
-    );
+    return <PiFiringLoader fullScreen={true} />;
   }
 
   if (!data) {

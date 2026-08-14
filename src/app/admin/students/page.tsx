@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 interface Student {
   id: string;
@@ -99,7 +100,7 @@ export default function AdminStudents() {
         </div>
 
         {loading ? (
-          <div className="text-center py-8 text-gray-400">Loading students...</div>
+          <PiFiringLoader fullScreen={false} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-400">

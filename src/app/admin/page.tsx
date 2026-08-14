@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -11,31 +12,35 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetch("/api/admin/tests")
       .then(async res => {
-        const data = await res.json();
-
-        if (!res.ok || !Array.isArray(data)) {
-          throw new Error(data.error || "Failed to load dashboard statistics");
+        if (res.status === 401) {
+          router.push("/admin/login");
+          return null;
         }
-
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error(data.error || "Failed to fetch tests");
+        }
         return data;
       })
       .then(data => {
-        setStats({
-          totalTests: data.length,
-          publishedTests: data.filter((t: any) => t.status === "PUBLISHED").length,
-          totalQuestions: data.reduce((acc: number, t: any) => acc + t._count.questions, 0),
-          totalAttempts: data.reduce((acc: number, t: any) => acc + t._count.attempts, 0),
-        });
+        if (data) {
+          setStats({
+            totalTests: data.length,
+            publishedTests: data.filter((t: any) => t.status === "PUBLISHED").length,
+            totalQuestions: data.reduce((acc: number, t: any) => acc + (t._count?.questions || 0), 0),
+            totalAttempts: data.reduce((acc: number, t: any) => acc + (t._count?.attempts || 0), 0),
+          });
+        }
       })
-      .catch(error => setError(error.message));
-  }, []);
+      .catch(err => setError(err.message));
+  }, [router]);
 
   const handleTestAsStudent = async () => {
     try {
       const res = await fetch("/api/admin/test-as-student", { method: "POST" });
       const data = await res.json();
-      if (res.ok && data.redirectUrl) {
-        router.push(data.redirectUrl);
+      if (res.ok && data.success) {
+        window.location.href = "/dashboard";
       } else {
         alert(data.error || "Failed to switch to test student mode.");
       }
@@ -46,7 +51,7 @@ export default function AdminDashboard() {
   };
 
   if (error) return <div className="text-red-400">{error}</div>;
-  if (!stats) return <div>Loading...</div>;
+  if (!stats) return <PiFiringLoader fullScreen={true} />;
 
   return (
     <div>
