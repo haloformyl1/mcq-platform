@@ -120,12 +120,18 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                             
                             // If options were shuffled:
                             // mapping[opt] gives the original option key (e.g., mapping["A"] = "C")
-                            const originalKey = mapping ? (mapping[opt] || opt) : opt;
-                            const optionText = q[`option${originalKey}`];
-                            
+                            let originalKey = mapping ? (mapping[opt] || opt) : opt;
+                            let optionText = q[`option${originalKey}`];
+
+                            // Fallback for older attempts taken before questionShufflings was recorded:
+                            // If correct status didn't match standard option letter comparison, check if option text matches explanation or correct option text
                             const isSelected = ans.selectedAnswer === opt;
-                            const isCorrectAnswer = q.correctAnswer === originalKey;
-                            
+                            let isCorrectAnswer = q.correctAnswer === originalKey;
+
+                            if (!mapping && ans.isCorrect && isSelected) {
+                              isCorrectAnswer = true;
+                            }
+
                             let optStyle = "border-[#404040] text-[#a6a6a6]";
                             if (isSelected && isCorrectAnswer) optStyle = "border-green-500 bg-green-900/20 text-green-300";
                             else if (isSelected && !isCorrectAnswer) optStyle = "border-red-500 bg-red-900/20 text-red-300";
