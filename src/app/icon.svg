@@ -1,0 +1,39 @@
+<svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hexGradFav" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="50%" stop-color="#0066ff" />
+      <stop offset="100%" stop-color="#7b2cbf" />
+    </linearGradient>
+    <linearGradient id="coreGradFav" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3a7bd5" />
+      <stop offset="100%" stop-color="#00d2ff" />
+    </linearGradient>
+    <radialGradient id="glowFav" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#00f2fe" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  {/* Outer Hexagon */}
+  <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" fill="#061325" stroke="url(#hexGradFav)" stroke-width="6" stroke-linejoin="round" />
+
+  {/* Molecular Corner Nodes */}
+  <circle cx="50" cy="6" r="4" fill="#00f2fe" />
+  <circle cx="88" cy="28" r="4" fill="#0066ff" />
+  <circle cx="88" cy="72" r="4" fill="#7b2cbf" />
+  <circle cx="50" cy="94" r="4" fill="#00f2fe" />
+  <circle cx="12" cy="72" r="4" fill="#0066ff" />
+  <circle cx="12" cy="28" r="4" fill="#7b2cbf" />
+
+  {/* Stylized Pie & Orbital Symbol */}
+  <path d="M50 50 L50 24 A26 26 0 1 1 24 50 Z" fill="url(#coreGradFav)" opacity="0.9" />
+  <path d="M54 46 L76 46 A26 26 0 0 0 54 24 Z" fill="#00f2fe" />
+
+  {/* Core Glow */}
+  <circle cx="50" cy="50" r="7" fill="#ffffff" />
+  <circle cx="50" cy="50" r="14" fill="url(#glowFav)" />
+
+  {/* Orbital Ring */}
+  <ellipse cx="50" cy="50" rx="32" ry="14" fill="none" stroke="#00f2fe" stroke-width="2" stroke-dasharray="5 3" transform="rotate(-30 50 50)" opacity="0.8" />
+</svg>
