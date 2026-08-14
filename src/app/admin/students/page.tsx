@@ -127,8 +127,20 @@ export default function AdminStudents() {
                         {student.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{new Date(student.createdAt).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">{student.lastLogin ? new Date(student.lastLogin).toLocaleDateString() : "-"}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="text-gray-200">{new Date(student.createdAt).toLocaleDateString()}</div>
+                      <div className="text-xs text-[#737373]">{new Date(student.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {student.lastLogin ? (
+                        <>
+                          <div className="text-gray-200">{new Date(student.lastLogin).toLocaleDateString()}</div>
+                          <div className="text-xs text-[#737373]">{new Date(student.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        </>
+                      ) : (
+                        <span className="text-[#737373]">-</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">{student._count.attempts}</td>
                     <td className="px-4 py-3">
                       <Link href={`/admin/students/${student.id}`} className="text-blue-400 hover:text-blue-300">

@@ -25,8 +25,9 @@ export async function GET(req: Request) {
     // Recalculate all submitted attempts for this student to guarantee latest scores
     await recalculateStudentAttempts(studentId);
 
-    const student = await prisma.student.findUnique({
+    const student = await prisma.student.update({
       where: { id: studentId },
+      data: { lastLogin: new Date() },
       select: { email: true, name: true }
     });
 
