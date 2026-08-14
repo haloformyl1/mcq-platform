@@ -23,6 +23,13 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
     const attempt = await prisma.testAttempt.findUnique({
       where: { id: params.attemptId },
       include: {
+        student: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
         test: {
           select: {
             id: true,
