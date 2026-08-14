@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
 import { useProctoring } from "@/hooks/useProctoring";
+import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -24,7 +25,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const examDataRef = useRef<any>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  
+
   useEffect(() => {
     if (window.innerWidth >= 1024) setShowPalette(true);
     const data = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
@@ -182,6 +183,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white select-none font-sans">
+      <AdminPreviewBanner />
       <header className="bg-[#161616]/40 p-4 flex flex-col md:flex-row md:justify-between md:items-center border-b border-[#404040] gap-4">
         <div className="flex justify-between items-start w-full md:w-auto">
           <div className="pr-2">

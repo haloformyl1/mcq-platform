@@ -2,6 +2,7 @@
 
 import { useState, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 
 export default function ExamInstructions({ params }: { params: Promise<{ testId: string }> }) {
   const resolvedParams = use(params);
@@ -46,8 +47,9 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black py-12 px-4 sm:px-6 lg:px-8 flex justify-center text-white font-sans">
-      <div className="max-w-2xl w-full bg-[#161616]/80 rounded-lg p-8 border border-[#404040]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center text-white font-sans">
+      <AdminPreviewBanner />
+      <div className="max-w-2xl w-full bg-[#161616]/80 rounded-lg p-8 border border-[#404040] mt-6">
         <h1 className="text-3xl font-bold mb-6 text-white tracking-wide">Test Instructions</h1>
         
         <div className="prose mb-8">

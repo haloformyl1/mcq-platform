@@ -16,6 +16,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push("/admin/login");
   };
 
+  const handleTestAsStudent = async () => {
+    try {
+      const res = await fetch("/api/admin/test-as-student", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else {
+        alert(data.error || "Failed to switch to test student mode.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error switching to student mode.");
+    }
+  };
+
   const navItems = [
     { name: "Dashboard", href: "/admin" },
     { name: "Tests", href: "/admin/tests" },
@@ -50,7 +65,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               </div>
             </div>
-            <div>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleTestAsStudent}
+                className="bg-amber-600/80 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-amber-500/30"
+              >
+                <span>🎓 Test as Student</span>
+              </button>
               <button
                 onClick={handleLogout}
                 className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"

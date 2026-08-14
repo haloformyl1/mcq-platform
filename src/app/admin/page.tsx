@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/admin/tests")
@@ -27,6 +29,21 @@ export default function AdminDashboard() {
       })
       .catch(error => setError(error.message));
   }, []);
+
+  const handleTestAsStudent = async () => {
+    try {
+      const res = await fetch("/api/admin/test-as-student", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else {
+        alert(data.error || "Failed to switch to test student mode.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error switching to student mode.");
+    }
+  };
 
   if (error) return <div className="text-red-400">{error}</div>;
   if (!stats) return <div>Loading...</div>;
@@ -53,13 +70,19 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="flex space-x-4">
-        <Link href="/admin/tests" className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
+      <div className="flex flex-wrap gap-4 items-center">
+        <Link href="/admin/tests" className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 font-medium">
           Manage Tests
         </Link>
-        <Link href="/admin/results" className="bg-gray-600 text-white px-4 py-2 rounded shadow hover:bg-gray-700">
+        <Link href="/admin/results" className="bg-gray-600 text-white px-4 py-2 rounded shadow hover:bg-gray-700 font-medium">
           View Results
         </Link>
+        <button
+          onClick={handleTestAsStudent}
+          className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded shadow transition font-medium flex items-center space-x-2"
+        >
+          <span>🎓 Test Site as Student</span>
+        </button>
       </div>
     </div>
   );

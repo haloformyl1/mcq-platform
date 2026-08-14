@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, Clock, AlertCircle } from 'lucide-react';
+import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -41,6 +42,7 @@ export default function StudentDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex items-center justify-center">
+        <AdminPreviewBanner />
         <div className="text-xl font-medium animate-pulse text-[#0099ff]">Loading your performance data...</div>
       </div>
     );
@@ -49,6 +51,7 @@ export default function StudentDashboard() {
   if (!data) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex flex-col items-center justify-center p-4">
+        <AdminPreviewBanner />
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-xl font-bold mb-4">Unable to load dashboard</h2>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#262626] rounded-md hover:bg-[#333333]">Retry</button>
@@ -82,6 +85,8 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white font-sans pb-20">
+      <AdminPreviewBanner />
+
       {/* Header */}
       <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
