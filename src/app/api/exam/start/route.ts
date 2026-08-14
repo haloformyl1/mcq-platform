@@ -30,7 +30,17 @@ export async function POST(req: Request) {
       include: { questions: { orderBy: { orderIndex: "asc" } } }
     });
 
-    if (!test || (test.status !== "PUBLISHED" && test.status !== "LOCKED")) {
+    // Check for student-specific test override
+    const override = await prisma.studentTestOverride.findUnique({
+      where: {
+        studentId_testId: {
+          studentId: student.id,
+          testId: testId,
+        }
+      }
+    });
+
+    if (!test || (test.status !== "PUBLISHED" && test.status !== "LOCKED" && !override)) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
     }
 
@@ -53,11 +63,15 @@ export async function POST(req: Request) {
 
     const serverTime = new Date();
 
-    if (test.status === "LOCKED" && !activeAttempt) {
-      if (test.unlockAt && serverTime < new Date(test.unlockAt)) {
+    // Prefer student override unlockAt and lockAt if present
+    const effectiveUnlockAt = override?.overrideUnlockAt ?? test.unlockAt;
+    const effectiveLockAt = override?.overrideLockAt ?? test.lockAt;
+
+    if (!activeAttempt) {
+      if (effectiveUnlockAt && serverTime < new Date(effectiveUnlockAt)) {
         return NextResponse.json({ error: "Test has not opened yet" }, { status: 403 });
       }
-      if (test.lockAt && serverTime >= new Date(test.lockAt)) {
+      if (effectiveLockAt && serverTime >= new Date(effectiveLockAt)) {
         return NextResponse.json({ error: "New attempts for this test are no longer accepted." }, { status: 403 });
       }
     }
