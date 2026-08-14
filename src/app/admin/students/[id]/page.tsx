@@ -33,6 +33,28 @@ interface StudentDetails {
   }[];
 }
 
+function formatWhatsAppLastSeen(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return "Never";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "Never";
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const targetDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  const diffDays = Math.round((today.getTime() - targetDay.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return `Today at ${timeStr}`;
+  } else if (diffDays === 1) {
+    return `Yesterday at ${timeStr}`;
+  } else {
+    const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    return `${dateStr} at ${timeStr}`;
+  }
+}
+
 export default function AdminStudentDetails() {
   const [data, setData] = useState<StudentDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -265,7 +287,7 @@ export default function AdminStudentDetails() {
               </span>
             </div>
             <div className="flex justify-between"><span className="text-gray-500">Registered</span> <span className="text-gray-300">{new Date(student.createdAt).toLocaleString()}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Last Login</span> <span className="text-gray-300">{student.lastLogin ? new Date(student.lastLogin).toLocaleString() : "Never"}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Last Seen</span> <span className="text-[#00e5ff] font-medium">{formatWhatsAppLastSeen(student.lastLogin)}</span></div>
           </div>
         </div>
 

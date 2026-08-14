@@ -5,6 +5,28 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PiFiringLoader from "@/components/PiFiringLoader";
 
+function formatWhatsAppLastSeen(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return "-";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "-";
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const targetDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  const diffDays = Math.round((today.getTime() - targetDay.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return `Today at ${timeStr}`;
+  } else if (diffDays === 1) {
+    return `Yesterday at ${timeStr}`;
+  } else {
+    const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    return `${dateStr} at ${timeStr}`;
+  }
+}
+
 interface Student {
   id: string;
   name: string | null;
@@ -111,7 +133,7 @@ export default function AdminStudents() {
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Registered</th>
-                  <th className="px-4 py-3">Last Login</th>
+                  <th className="px-4 py-3">Last Seen</th>
                   <th className="px-4 py-3">Tests</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
@@ -131,15 +153,8 @@ export default function AdminStudents() {
                       <div className="text-gray-200">{new Date(student.createdAt).toLocaleDateString()}</div>
                       <div className="text-xs text-[#737373]">{new Date(student.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {student.lastLogin ? (
-                        <>
-                          <div className="text-gray-200">{new Date(student.lastLogin).toLocaleDateString()}</div>
-                          <div className="text-xs text-[#737373]">{new Date(student.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                        </>
-                      ) : (
-                        <span className="text-[#737373]">-</span>
-                      )}
+                    <td className="px-4 py-3 whitespace-nowrap text-[#00e5ff] font-medium text-xs">
+                      {formatWhatsAppLastSeen(student.lastLogin)}
                     </td>
                     <td className="px-4 py-3">{student._count.attempts}</td>
                     <td className="px-4 py-3">
