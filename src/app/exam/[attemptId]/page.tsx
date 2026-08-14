@@ -185,10 +185,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white select-none font-sans">
       <AdminPreviewBanner />
       <header className="bg-[#161616]/40 p-4 flex flex-col md:flex-row md:justify-between md:items-center border-b border-[#404040] gap-4">
-        <div className="flex justify-between items-start w-full md:w-auto">
+        <div className="flex justify-between items-center w-full md:w-auto gap-3">
+          <img src="/piechem-logo.png" alt="PIECHEM Logo" className="h-7 sm:h-8 w-auto object-contain shrink-0" />
           <div className="pr-2">
             <h1 className="text-lg md:text-xl font-bold tracking-wide break-words">{examData.test.title}</h1>
-            <p className="text-sm text-[#a6a6a6] mt-1">Question {currentQ + 1} of {questions.length}</p>
+            <p className="text-sm text-[#a6a6a6] mt-0.5">Question {currentQ + 1} of {questions.length}</p>
           </div>
           <div className="text-lg md:text-2xl font-mono font-semibold bg-[#262626] px-3 py-1.5 md:py-2 md:px-4 rounded-lg text-white shrink-0">
             {timeLeft}

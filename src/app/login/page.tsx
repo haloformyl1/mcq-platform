@@ -222,17 +222,8 @@ export default function StudentLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black relative font-sans text-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* Header with PIECHEM logo */}
-      <header className="absolute top-0 left-0 w-full p-6 sm:p-8 flex items-center space-x-4">
-        <div className="relative flex items-center justify-center w-[56px] h-[56px] rounded-full bg-[#e0f2fe] border-[1.5px] border-[#0284c7]">
-          <div className="absolute w-[28px] h-[28px] border-[1.5px] border-[#0284c7] rotate-45"></div>
-          <svg className="absolute w-5 h-5 text-[#0f283d] z-10" viewBox="0 0 24 24" fill="currentColor" style={{ transform: 'rotate(-15deg)' }}>
-            <path d="M11 2A10 10 0 1 0 22 13h-11V2z" />
-            <path d="M13.5 2.5a9.5 9.5 0 0 1 8 8h-8v-8z" />
-          </svg>
-        </div>
-        <h1 className="text-white text-2xl sm:text-[28px] font-black tracking-wide font-sans mt-1">
-          PIECHEM
-        </h1>
+      <header className="absolute top-0 left-0 w-full p-6 sm:p-8 flex items-center">
+        <img src="/piechem-logo.png" alt="PIECHEM Logo" className="h-10 sm:h-12 w-auto object-contain" />
       </header>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-[450px] mt-10">

@@ -32,6 +32,9 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black py-12 px-4 sm:px-6 lg:px-8 text-white font-sans">
       <div className="max-w-3xl mx-auto bg-[#161616]/80 shadow-2xl rounded-lg p-8 border border-[#404040]">
+        <div className="flex justify-center mb-6">
+          <img src="/piechem-logo.png" alt="PIECHEM Logo" className="h-10 sm:h-12 w-auto object-contain" />
+        </div>
         <h1 className="text-3xl font-bold mb-2 text-center tracking-wide">Test Completed</h1>
         <h2 className="text-xl text-[#a6a6a6] mb-8 text-center">{result.test.title}</h2>
         
