@@ -1,10 +1,14 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 
 export default function AdminLogin() {
-  const [passcode, setPasscode] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -13,17 +17,24 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const res = await fetch("/api/auth/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ passcode }),
-    });
-    setLoading(false);
-    if (res.ok) {
-      router.push("/admin");
-    } else {
+
+    try {
+      const res = await fetch("/api/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
       const data = await res.json();
-      setError(data.error || "Invalid passcode");
+      setLoading(false);
+
+      if (res.ok) {
+        router.push("/admin");
+      } else {
+        setError(data.error || "Invalid username or password");
+      }
+    } catch (err) {
+      setLoading(false);
+      setError("Authentication failed. Please check connection.");
     }
   };
 
@@ -35,48 +46,83 @@ export default function AdminLogin() {
       </header>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-[450px] mt-10">
-        <h2 className="mt-6 text-center text-[32px] leading-tight font-bold tracking-tight text-white">
+        <div className="flex justify-center mb-3">
+          <div className="p-3 bg-cyan-950/60 border border-cyan-500/30 rounded-2xl text-cyan-400 shadow-lg">
+            <ShieldCheck className="w-8 h-8" />
+          </div>
+        </div>
+        <h2 className="text-center text-[28px] sm:text-[32px] leading-tight font-bold tracking-tight text-white">
           Admin Portal
         </h2>
-        <p className="mt-2 text-center text-[#a6a6a6] text-[16px]">
-          Enter your passcode to continue
+        <p className="mt-2 text-center text-[#a6a6a6] text-[15px]">
+          Enter your admin credentials to access control panel
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[450px]">
-        <div className="py-8 px-4 sm:px-10">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-[450px]">
+        <div className="py-8 px-4 sm:px-10 bg-[#161616]/70 border border-[#333333] rounded-2xl backdrop-blur-md shadow-2xl">
           {error && (
-            <div className="mb-4 bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-md">
+            <div className="mb-6 bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm font-medium">
               {error}
             </div>
           )}
-          <form className="space-y-6" onSubmit={handleLogin}>
+
+          <form className="space-y-5" onSubmit={handleLogin}>
+            {/* Username Input */}
             <div className="relative">
               <input
-                id="passcode"
-                name="passcode"
-                type="password"
+                id="username"
+                name="username"
+                type="text"
                 required
                 placeholder=" "
-                className="peer w-full bg-[#161616]/80 text-white border border-[#404040] rounded-md pt-6 pb-2 px-4 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition appearance-none text-[16px] tracking-widest font-mono text-center"
-                value={passcode}
-                onChange={(e) => setPasscode(e.target.value)}
+                className="peer w-full bg-[#1e293b]/50 text-white border border-[#404040] rounded-xl pt-6 pb-2 px-4 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition appearance-none text-[15px]"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
               <label 
-                htmlFor="passcode" 
-                className="absolute left-4 top-4 text-[#8c8c8c] text-[16px] transition-all peer-placeholder-shown:text-[16px] peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-[12px] cursor-text pointer-events-none w-full text-left"
+                htmlFor="username" 
+                className="absolute left-4 top-2 text-[12px] text-[#8c8c8c] transition-all peer-placeholder-shown:text-[15px] peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-[12px] cursor-text pointer-events-none"
               >
-                Admin Passcode
+                Username or Email
               </label>
+            </div>
+
+            {/* Password Input */}
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder=" "
+                className="peer w-full bg-[#1e293b]/50 text-white border border-[#404040] rounded-xl pt-6 pb-2 pl-4 pr-12 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition appearance-none text-[15px]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <label 
+                htmlFor="password" 
+                className="absolute left-4 top-2 text-[12px] text-[#8c8c8c] transition-all peer-placeholder-shown:text-[15px] peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-[12px] cursor-text pointer-events-none"
+              >
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-4 text-[#8c8c8c] hover:text-white transition focus:outline-none"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
 
             <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#0099ff] hover:bg-[#007acc] text-white font-semibold text-[16px] py-4 px-4 rounded-md transition duration-200 mt-2 disabled:opacity-70"
+                className="w-full bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-semibold text-[15px] py-3.5 px-4 rounded-xl transition duration-200 shadow-lg disabled:opacity-70 mt-2"
               >
-                {loading ? "Authenticating..." : "Login"}
+                {loading ? "Authenticating..." : "Login to Admin Portal"}
               </button>
             </div>
           </form>
