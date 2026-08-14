@@ -56,7 +56,7 @@ export default function StudentDashboard() {
     );
   }
 
-  const { student, availableTests, allAttempts } = data;
+  const { student, availableTests, allAttempts, lastExamTopStudents, lastExamTitle } = data;
   const completedAttempts = allAttempts.filter((a: any) => a.status === 'SUBMITTED');
   
   // Analytics Calculations
@@ -136,6 +136,71 @@ export default function StudentDashboard() {
             <Medal className="w-12 h-12 text-[#0099ff] mx-auto mb-4 opacity-80" />
             <h2 className="text-2xl font-bold mb-2">Start Your Performance Journey</h2>
             <p className="text-[#a6a6a6] mb-6">You haven't completed any tests yet. Take your first test to unlock powerful analytics!</p>
+          </div>
+        )}
+
+        {/* Top 2 Performers of Last Exam (Excluding Admin) */}
+        {lastExamTopStudents && lastExamTopStudents.length > 0 && (
+          <div className="bg-gradient-to-r from-[#0d2a3e]/90 via-[#0a1e2b]/90 to-[#122838]/90 border border-[#0099ff]/30 p-5 rounded-xl backdrop-blur-md shadow-xl space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#0099ff]/20 pb-3">
+              <div className="flex items-center gap-2.5">
+                <Trophy className="w-5 h-5 text-amber-400 animate-pulse shrink-0" />
+                <span className="text-sm font-bold text-white uppercase tracking-wider">
+                  Top Performers — {lastExamTitle || "Last Exam"}
+                </span>
+              </div>
+              <span className="text-xs text-[#7dd3fc] bg-[#0099ff]/10 px-3 py-1 rounded-full border border-[#0099ff]/30 font-medium">
+                Ranked by Score & Avg Accuracy
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {lastExamTopStudents.map((st: any) => (
+                <div
+                  key={st.rank}
+                  className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all ${
+                    st.rank === 1
+                      ? "bg-gradient-to-r from-amber-950/40 via-[#1e190e]/60 to-[#2a210d]/50 border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.15)]"
+                      : "bg-gradient-to-r from-slate-900/60 via-[#16202c]/60 to-[#0e1620]/50 border-slate-400/40 shadow-md"
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-base shrink-0 border ${
+                        st.rank === 1
+                          ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 shadow-[0_0_10px_#f59e0b]"
+                          : "bg-gradient-to-br from-slate-300 to-slate-500 text-black border-slate-200"
+                      }`}
+                    >
+                      #{st.rank}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-white text-base truncate flex items-center gap-2">
+                        <span>{st.name}</span>
+                        {st.rank === 1 && (
+                          <span className="text-[11px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/40 font-semibold shrink-0">
+                            👑 1st Rank
+                          </span>
+                        )}
+                        {st.rank === 2 && (
+                          <span className="text-[11px] bg-slate-400/20 text-slate-300 px-2 py-0.5 rounded border border-slate-400/40 font-semibold shrink-0">
+                            🥈 2nd Rank
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-[#a6a6a6] mt-0.5 flex items-center gap-2">
+                        <span>Avg Accuracy: <strong className="text-[#00e5ff] font-bold">{st.accuracy}%</strong></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <div className="text-xl font-extrabold text-white">{st.score} <span className="text-xs font-normal text-[#a6a6a6]">pts</span></div>
+                    <div className="text-xs font-bold text-blue-400">{st.percentage?.toFixed(1)}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
