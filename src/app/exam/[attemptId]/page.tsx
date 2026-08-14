@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
 import { useProctoring } from "@/hooks/useProctoring";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
+import PiechemLogo from "@/components/PiechemLogo";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -186,7 +187,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       <AdminPreviewBanner />
       <header className="bg-[#161616]/40 p-4 flex flex-col md:flex-row md:justify-between md:items-center border-b border-[#404040] gap-4">
         <div className="flex justify-between items-center w-full md:w-auto gap-3">
-          <img src="/piechem-logo.png" alt="PIECHEM Logo" className="h-7 sm:h-8 w-auto object-contain shrink-0" />
+          <PiechemLogo size="sm" showText={false} />
           <div className="pr-2">
             <h1 className="text-lg md:text-xl font-bold tracking-wide break-words">{examData.test.title}</h1>
             <p className="text-sm text-[#a6a6a6] mt-0.5">Question {currentQ + 1} of {questions.length}</p>

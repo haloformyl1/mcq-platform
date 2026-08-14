@@ -6,6 +6,7 @@ import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, Clock, AlertCircle } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
+import PiechemLogo from "@/components/PiechemLogo";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -91,11 +92,7 @@ export default function StudentDashboard() {
       <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center space-x-4">
-            <img src="/piechem-logo.png" alt="PIECHEM Logo" className="h-8 sm:h-9 w-auto object-contain" />
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-wide">Student Dashboard</h1>
-              <p className="text-[#a6a6a6] text-sm mt-0.5">Welcome back, <span className="text-white font-medium capitalize">{studentName}</span></p>
-            </div>
+            <PiechemLogo size="md" />
           </div>
           <button onClick={handleLogout} className="flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626]">
             <LogOut className="w-4 h-4 mr-2" />

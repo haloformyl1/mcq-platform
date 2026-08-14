@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
+import PiechemLogo from "@/components/PiechemLogo";
 
 type LoginState = 
   | "EMAIL_ENTRY"
@@ -223,7 +224,7 @@ export default function StudentLogin() {
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black relative font-sans text-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* Header with PIECHEM logo */}
       <header className="absolute top-0 left-0 w-full p-6 sm:p-8 flex items-center">
-        <img src="/piechem-logo.png" alt="PIECHEM Logo" className="h-10 sm:h-12 w-auto object-contain" />
+        <PiechemLogo size="lg" />
       </header>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-[450px] mt-10">
