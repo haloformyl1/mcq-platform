@@ -36,20 +36,10 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         return;
       }
     }
-    if (test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED") {
-      if (!test.lockAt) {
-        alert("Please select an expiration date and time.");
-        return;
-      }
-    }
-    const statusToSave = test.status === "SCHEDULE_EXPIRED" ? "SCHEDULE_EXPIRED" : test.status;
     await fetch(`/api/admin/tests/${resolvedParams.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...test,
-        status: statusToSave
-      }),
+      body: JSON.stringify(test),
     });
     alert("Settings saved!");
   };
@@ -260,7 +250,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             <option value="DRAFT">DRAFT</option>
             <option value="PUBLISHED">PUBLISHED</option>
             <option value="LOCKED">LOCKED</option>
-            <option value="EXPIRED">SCHEDULE EXPIRED</option>
+            <option value="EXPIRED">EXPIRED</option>
           </select>
         </div>
         <div>
@@ -305,22 +295,9 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
 
-      {(test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED") && (
-        <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-red-900/50 backdrop-blur-sm">
-          <h2 className="text-lg font-bold mb-4 text-red-400 flex items-center gap-2">
-            <span>⌛ Scheduled Expiration Settings</span>
-          </h2>
-          <div>
-            <label className="block text-sm font-medium text-[#a6a6a6]">Expiration Date & Time</label>
-            <input type="datetime-local" className="mt-1 block w-full max-w-md bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => setTest({...test, lockAt: e.target.value ? new Date(e.target.value).toISOString() : null})} />
-            <p className="mt-2 text-xs text-[#a6a6a6]">Select the exact date and time when this test will automatically expire. Once expired, students will need admin approval to take it.</p>
-          </div>
-        </div>
-      )}
-
       {test.status === "LOCKED" && (
-        <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm">
-          <h2 className="text-lg font-bold mb-4">Scheduled Access Window</h2>
+        <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm space-y-4">
+          <h2 className="text-lg font-bold">Scheduled Access Window</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#a6a6a6]">Unlock Date & Time</label>
@@ -341,6 +318,24 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
               }} />
             </div>
           </div>
+
+          <div className="pt-2 border-t border-[#333333]">
+            <label className="flex items-center space-x-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded bg-[#262626] border-[#404040] text-amber-500 focus:ring-amber-500"
+                checked={test.autoExpireOnLock ?? true}
+                onChange={e => setTest({ ...test, autoExpireOnLock: e.target.checked })}
+              />
+              <span className="text-sm font-semibold text-amber-300">
+                ⌛ Schedule Expiry: Automatically expire test when lock time arrives
+              </span>
+            </label>
+            <p className="mt-1 text-xs text-[#888888] pl-6.5">
+              When checked, the test will automatically move into the Expired Tests section once the Lock Date & Time passes, requiring admin approval for any new attempt.
+            </p>
+          </div>
+
           <div className="mt-4 text-sm text-[#a6a6a6]">
             <p>Students can start this test only during the configured access window.</p>
             <p className="mt-1 text-yellow-400">Note: Students who have already started the test will be allowed to continue their active attempt even after the lock time.</p>
