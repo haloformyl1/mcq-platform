@@ -221,15 +221,15 @@ export default function StudentDashboard() {
           };
 
           const currentAvailableTests: any[] = [];
-          const upcomingLiveTests: any[] = [];
+          const upcomingTests: any[] = [];
           const expiredTests: any[] = [];
 
           availableTests.forEach((test: any) => {
             if (test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED" || test.status === "CLOSED") {
               const lockDate = test.lockAt ? new Date(test.lockAt) : null;
               if (lockDate && now < lockDate) {
-                // Scheduled to expire in future: place in Upcoming/Live tests
-                upcomingLiveTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", lockDate });
+                // Scheduled to expire in future: currently LIVE so place in Current Available Tests
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
               } else if (test.hasIndividualAccess) {
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
               } else {
@@ -243,17 +243,17 @@ export default function StudentDashboard() {
               const lockDate = test.lockAt ? new Date(test.lockAt) : null;
 
               if (unlockDate && now < unlockDate) {
-                // Scheduled unlock coming soon -> Box 1
-                upcomingLiveTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
+                // Scheduled unlock coming soon -> Box 1 (Upcoming Tests ONLY)
+                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
               } else if (lockDate && now < lockDate) {
-                // Currently unlocked scheduled test -> Box 1
-                upcomingLiveTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
+                // Currently unlocked & live -> Box 2 (Current Available Tests)
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
               } else {
-                // Lock window expired on a scheduled test -> stays in Box 1 (Live/Scheduled Section) with Locked status unless student has override
+                // Lock window expired on a scheduled test
                 if (test.hasIndividualAccess) {
                   currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
                 } else {
-                  upcomingLiveTests.push({ ...test, category: "UPCOMING_LOCKED", lockState: "AFTER_LOCK", unlockDate, lockDate });
+                  expiredTests.push({ ...test, category: "EXPIRED", lockState: "AFTER_LOCK", unlockDate, lockDate });
                 }
               }
             }
@@ -405,40 +405,41 @@ export default function StudentDashboard() {
           // 3. Locked tests: Display for 24 hours after locking
           const bannerItems: any[] = [];
 
-          upcomingLiveTests.forEach((t: any) => {
-            if (t.unlockDate) {
-              const unlock = new Date(t.unlockDate);
+          availableTests.forEach((t: any) => {
+            const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
+            const lock = t.lockAt ? new Date(t.lockAt) : null;
+
+            if (unlock) {
               const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
               if (now >= bannerStart && now < unlock) {
                 bannerItems.push({
                   type: "UPCOMING",
                   test: t,
-                  message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockDate)}</strong>. Please prepare to attempt the test!`
+                  message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
                 });
-              } else if (now >= unlock && t.lockDate && now < new Date(t.lockDate)) {
+              } else if (now >= unlock && lock && now < lock) {
                 bannerItems.push({
                   type: "LIVE_EXPIRING",
                   test: t,
-                  message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockDate)}</strong>. Please attempt the test before it closes!`
+                  message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>. Please attempt the test before it closes!`
                 });
               }
-            } else if (t.lockDate && now < new Date(t.lockDate)) {
+            } else if (lock && now < lock) {
               bannerItems.push({
                 type: "LIVE_EXPIRING",
                 test: t,
-                message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockDate)}</strong>.`
+                message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
               });
             }
 
             // Check if test locked within the last 24 hours
-            if (t.lockDate) {
-              const lock = new Date(t.lockDate);
+            if (lock) {
               const postLock24h = new Date(lock.getTime() + 24 * 60 * 60 * 1000);
               if (now >= lock && now < postLock24h) {
                 bannerItems.push({
                   type: "RECENTLY_LOCKED",
                   test: t,
-                  message: `⌛ Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> was live until <strong class="text-red-300 font-mono">${formatDateTime(t.lockDate)}</strong> and has now concluded. If you missed submitting your test in time, please contact the Admin to request access.`
+                  message: `⌛ Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> was live until <strong class="text-red-300 font-mono">${formatDateTime(t.lockAt)}</strong> and has now concluded. If you missed submitting your test in time, please contact the Admin to request access.`
                 });
               }
             }
@@ -469,22 +470,22 @@ export default function StudentDashboard() {
                 </div>
               )}
 
-              {/* 1. Box 1: Upcoming / Live Tests (Always at Top) */}
+              {/* 1. Box 1: Upcoming Tests (Always at Top) */}
               <div className="bg-[#121212]/90 border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(245,158,11,0.08)] space-y-4">
                 <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
                   <div className="flex items-center gap-3">
-                    <span className="p-2 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-700/50 text-base">⏰</span>
-                    <h2 className="text-xl font-bold text-white tracking-wide">Upcoming / Live Tests</h2>
+                    <span className="p-2 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-700/50 text-base">🔒</span>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Upcoming Tests</h2>
                   </div>
                   <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold">
-                    {upcomingLiveTests.length} Scheduled / Live
+                    {upcomingTests.length} Scheduled
                   </span>
                 </div>
-                {upcomingLiveTests.length === 0 ? (
-                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No upcoming or scheduled live tests at the moment.</p>
+                {upcomingTests.length === 0 ? (
+                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No upcoming tests scheduled at the moment.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {upcomingLiveTests.map(test => renderTestCard(test))}
+                    {upcomingTests.map(test => renderTestCard(test))}
                   </div>
                 )}
               </div>
