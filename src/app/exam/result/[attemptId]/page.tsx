@@ -57,30 +57,30 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black py-10 px-4 sm:px-6 lg:px-8 text-white font-sans">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6 pb-24 md:pb-8">
         
         {/* Top Header & Logo */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#161616]/70 border border-[#333333] p-4 rounded-xl backdrop-blur-md">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#161616]/70 border border-[#333333] p-4 rounded-xl backdrop-blur-md">
+          <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
             <PiechemLogo size="sm" />
-            <div>
-              <div className="text-xs font-semibold text-blue-400 uppercase tracking-widest">Exam Scrutiny & Performance</div>
-              <h1 className="text-lg font-bold text-white">{result.test.title}</h1>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] sm:text-xs font-semibold text-blue-400 uppercase tracking-widest truncate">Exam Scrutiny & Performance</div>
+              <h1 className="text-base sm:text-lg font-bold text-white break-words line-clamp-2 leading-tight">{result.test.title}</h1>
             </div>
           </div>
-          <Link href="/dashboard" className="flex items-center gap-2 text-xs bg-[#222222] hover:bg-[#333333] text-white px-4 py-2 rounded-lg border border-[#404040] transition font-medium">
+          <Link href="/dashboard" className="w-full sm:w-auto text-center flex items-center justify-center gap-2 text-xs bg-[#222222] hover:bg-[#333333] text-white px-4 py-2.5 rounded-lg border border-[#404040] transition font-medium">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
         </div>
 
         {/* Overview Header & Timing Stats Grid */}
-        <div className="bg-[#161616]/80 border border-[#333333] p-6 rounded-xl backdrop-blur-md space-y-6 shadow-xl">
+        <div className="bg-[#161616]/80 border border-[#333333] p-4 sm:p-6 rounded-xl backdrop-blur-md space-y-6 shadow-xl">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-[#2d2d2d] pb-4">
-            <div>
-              <span className="text-xs font-semibold uppercase text-blue-400 tracking-wider">Exam Scrutiny Report</span>
-              <h2 className="text-2xl font-bold text-white mt-0.5">{result.test.title}</h2>
+            <div className="min-w-0">
+              <span className="text-[10px] sm:text-xs font-semibold uppercase text-blue-400 tracking-wider">Exam Scrutiny Report</span>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mt-0.5 break-words line-clamp-2 leading-tight">{result.test.title}</h2>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                 result.status === 'SUBMITTED' ? 'bg-green-900/40 text-green-300 border border-green-700/50' : 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50'
               }`}>
@@ -135,7 +135,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
         </div>
 
         {/* 4 Score Breakdown Cards Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-[#161616]/80 p-5 rounded-xl border border-[#333333] backdrop-blur-md text-center">
             <div className="text-xs font-medium text-[#a6a6a6] mb-1">Final Score</div>
             <div className="text-3xl font-extrabold text-white">{result.score}</div>
@@ -164,20 +164,20 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
         </div>
 
         {/* Question-by-Question Scrutiny Header & Filter */}
-        <div className="bg-[#161616]/80 border border-[#333333] p-4 rounded-xl backdrop-blur-md flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="bg-[#161616]/80 border border-[#333333] p-4 rounded-xl backdrop-blur-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-bold text-white">Question-by-Question Scrutiny</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Question-by-Question Scrutiny</h3>
             <span className="text-xs bg-[#262626] border border-[#404040] text-[#a6a6a6] px-2.5 py-0.5 rounded-full font-mono">
               Showing {filteredAnswers.length} of {result.answers.length}
             </span>
           </div>
 
-          <div className="flex space-x-1.5 bg-[#1a1a1a] p-1 rounded-lg border border-[#333333]">
+          <div className="flex flex-wrap gap-1.5 bg-[#1a1a1a] p-1 rounded-lg border border-[#333333] w-full sm:w-auto">
             {(['All', 'Correct', 'Incorrect', 'Unanswered'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-center ${
                   filter === f 
                     ? 'bg-blue-600 text-white shadow-md' 
                     : 'text-[#a6a6a6] hover:text-white hover:bg-[#262626]'
@@ -203,7 +203,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
               return (
                 <div 
                   key={ans.id || idx} 
-                  className={`p-5 rounded-xl border backdrop-blur-md transition-all ${
+                  className={`p-4 sm:p-5 rounded-xl border backdrop-blur-md transition-all ${
                     status === 'correct' 
                       ? 'border-green-900/50 bg-green-950/10' 
                       : status === 'incorrect' 
@@ -219,12 +219,12 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start gap-4 mb-3">
-                        <p className="font-semibold text-base text-white leading-relaxed">
+                      <div className="flex justify-between items-start gap-2 mb-3">
+                        <p className="font-semibold text-sm sm:text-base text-white leading-relaxed break-words">
                           <span className="text-blue-400 font-bold mr-2">Q{idx + 1}.</span>
                           {q.questionText}
                         </p>
-                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shrink-0 ${
+                        <span className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shrink-0 ${
                           status === 'correct' ? 'bg-green-900/40 text-green-300 border border-green-700' :
                           status === 'incorrect' ? 'bg-red-900/40 text-red-300 border border-red-700' :
                           'bg-gray-800 text-gray-400 border border-gray-700'
@@ -234,7 +234,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                       </div>
 
                       {/* Options Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-4">
                         {['A', 'B', 'C', 'D'].map((opt) => {
                           const shufflings = result.questionShufflings as Record<string, Record<string, string>> | null;
                           const mapping = shufflings?.[q.id];
@@ -258,12 +258,12 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                           }
 
                           return (
-                            <div key={opt} className={`p-3 rounded-lg border text-sm flex items-center justify-between gap-3 ${optStyle}`}>
+                            <div key={opt} className={`p-3 rounded-lg border text-sm flex items-center justify-between gap-2 break-words ${optStyle}`}>
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <span className="font-bold w-6 h-6 flex items-center justify-center rounded bg-black/40 text-xs shrink-0 border border-white/10">
                                   {opt}
                                 </span>
-                                <span className="truncate">{optionText}</span>
+                                <span className="break-words leading-snug">{optionText}</span>
                               </div>
                               {isSelected && (
                                 <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-black/40 shrink-0">
@@ -277,7 +277,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
 
                       {/* Explanation */}
                       {q.explanation && (
-                        <div className="mt-3 p-3.5 rounded-lg bg-[#222222] border border-[#333333] text-xs text-[#cccccc]">
+                        <div className="mt-3 p-3.5 rounded-lg bg-[#222222] border border-[#333333] text-xs text-[#cccccc] break-words">
                           <span className="font-bold text-white block mb-1">Explanation:</span>
                           {q.explanation}
                         </div>

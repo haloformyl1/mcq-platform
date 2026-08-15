@@ -236,7 +236,7 @@ export default function StudentDashboard() {
                 return (
                   <div key={test.id} className="bg-[#1a1a1a] border border-[#333333] rounded-xl overflow-hidden flex flex-col hover:border-[#4d4d4d] transition duration-300 shadow-lg relative">
                     <div className="p-5 flex-1">
-                      <h3 className="text-lg font-bold text-white mb-3 line-clamp-2 pr-12">{test.title}</h3>
+                      <h3 className="text-base sm:text-lg font-bold text-white mb-3 break-words leading-snug">{test.title}</h3>
                       
                       <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                         <div className="flex items-center text-[#a6a6a6]">
