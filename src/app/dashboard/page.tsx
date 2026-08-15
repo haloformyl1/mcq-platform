@@ -332,13 +332,13 @@ export default function StudentDashboard() {
             </section>
 
             {/* Recent Performance Cards */}
-            <section className="bg-[#161616]/60 border border-[#333333] rounded-xl p-6 backdrop-blur-sm flex flex-col">
-              <h2 className="text-xl font-bold mb-4">Recent Performance</h2>
+            <section className="bg-[#161616]/60 border border-[#333333] rounded-xl p-5 sm:p-6 backdrop-blur-sm flex flex-col">
+              <h2 className="text-lg sm:text-xl font-bold mb-4">Recent Performance</h2>
               <div className="space-y-3 flex-1 overflow-y-auto pr-1">
                 {recentAttempts.map((attempt: any) => (
-                  <Link key={attempt.id} href={`/exam/result/${attempt.id}`} className="block bg-[#1a1a1a] border border-[#333333] p-4 rounded-lg hover:border-[#4d4d4d] transition group">
-                    <p className="font-semibold text-white mb-1 line-clamp-1 group-hover:text-[#0099ff] transition-colors">{attempt.test.title}</p>
-                    <div className="flex justify-between items-center text-sm">
+                  <Link key={attempt.id} href={`/exam/result/${attempt.id}`} className="block bg-[#1a1a1a] border border-[#333333] p-3.5 sm:p-4 rounded-lg hover:border-[#4d4d4d] transition group">
+                    <p className="font-semibold text-xs sm:text-sm text-white mb-2 break-words line-clamp-2 leading-snug group-hover:text-[#0099ff] transition-colors">{attempt.test.title}</p>
+                    <div className="flex justify-between items-center text-xs sm:text-sm pt-1 border-t border-[#262626]">
                       <span className="text-[#a6a6a6]">{new Date(attempt.submittedAt).toLocaleDateString()}</span>
                       <span className={`font-bold ${attempt.percentage >= 80 ? 'text-green-400' : attempt.percentage >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
                         {attempt.percentage?.toFixed(1)}%
