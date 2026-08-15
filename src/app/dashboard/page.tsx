@@ -312,16 +312,14 @@ export default function StudentDashboard() {
                   </div>
                   
                   {/* Status Banner */}
-                  <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333]">
+                  <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333] overflow-hidden relative">
                     {isUpcomingStage && test.unlockDate && (
-                      <div className="flex items-start text-amber-300">
-                        <span className="font-medium mr-1.5 shrink-0">🔒 Unlock At:</span>
-                        <span className="leading-tight font-mono font-semibold">{formatDateTime(test.unlockDate)}</span>
+                      <div className="animate-marquee whitespace-nowrap text-amber-300 font-medium">
+                        <span>🔒 Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
                       </div>
                     )}
                     {isLiveStage && test.lockDate && (
-                      <div className="flex items-center text-green-400 font-medium">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-ping mr-2"></span>
+                      <div className="animate-marquee whitespace-nowrap text-green-400 font-medium">
                         <span>🔥 Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
                       </div>
                     )}
@@ -332,9 +330,8 @@ export default function StudentDashboard() {
                       </div>
                     )}
                     {isLockedStage && (
-                      <div className="flex items-start text-red-400">
-                        <span className="font-medium mr-1.5 shrink-0">⚠️ Not Available:</span>
-                        <span className="leading-tight">Please contact Admin to request live access.</span>
+                      <div className="animate-marquee whitespace-nowrap text-red-400 font-medium">
+                        <span>⚠️ Not Available: Please contact Admin to request live access.</span>
                       </div>
                     )}
                     {activeAttempt && (
