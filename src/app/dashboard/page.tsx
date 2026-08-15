@@ -100,7 +100,7 @@ export default function StudentDashboard() {
             <a href="tel:9830507435" className="font-semibold text-cyan-400 hover:underline">9830507435</a>
           </div>
 
-          <button onClick={handleLogout} className="flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
+          <button onClick={handleLogout} className="hidden md:flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
             <LogOut className="w-4 h-4 mr-2" />
             Logout
           </button>
@@ -686,6 +686,17 @@ export default function StudentDashboard() {
           </section>
         )}
       </main>
+
+      {/* Mobile-Only Bottom Logout Footer Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#121212]/95 backdrop-blur-lg border-t border-[#333333] px-4 py-2.5 flex justify-center items-center shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
+        <button
+          onClick={handleLogout}
+          className="w-full max-w-xs flex items-center justify-center text-sm font-semibold text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 py-2 px-4 rounded-lg transition-all shadow-md active:scale-95"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout from Account
+        </button>
+      </div>
     </div>
   );
 }
