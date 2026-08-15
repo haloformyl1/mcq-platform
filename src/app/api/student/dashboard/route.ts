@@ -165,12 +165,15 @@ export async function GET(req: Request) {
         }
       }
 
-      // Sort by score desc, then by accuracy desc
+      // Sort by score desc, then by accuracy desc, then by name alphabetically asc
       const sorted = Array.from(studentMap.values()).sort((a, b) => {
         if (b.score !== a.score) {
           return b.score - a.score;
         }
-        return b.accuracy - a.accuracy;
+        if (b.accuracy !== a.accuracy) {
+          return b.accuracy - a.accuracy;
+        }
+        return a.name.localeCompare(b.name);
       });
 
       lastExamTopStudents = sorted.slice(0, 2).map((st, idx) => ({

@@ -88,7 +88,7 @@ export async function POST(req: Request) {
       data: {
         status: "SUBMITTED",
         submittedAt: new Date(),
-        submissionReason: reason,
+        submissionReason: reason || "MANUAL_SUBMISSION",
         score,
         percentage,
         correctCount,
