@@ -344,8 +344,8 @@ export default function StudentDashboard() {
 
                 <div className="p-4 bg-[#111111] border-t border-[#333333]">
                   {isUpcomingStage ? (
-                    <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-400/70 bg-amber-950/40 border border-amber-800/40 cursor-not-allowed">
-                      🔒 Unlocks At {formatDateTime(test.unlockDate)}
+                    <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow">
+                      🎯 Best of Luck!
                     </button>
                   ) : isLockedStage ? (
                     test.userRequestStatus === "PENDING" ? (
