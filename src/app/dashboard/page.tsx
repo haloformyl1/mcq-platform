@@ -101,33 +101,33 @@ export default function StudentDashboard() {
         
         {/* Top Summary Cards */}
         {testsTaken > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-[#161616]/60 border border-[#333333] p-6 rounded-xl flex items-center gap-4 backdrop-blur-sm">
-              <div className="p-3 bg-blue-900/30 rounded-lg text-blue-400"><BookOpen className="w-6 h-6" /></div>
-              <div>
-                <p className="text-sm font-medium text-[#a6a6a6]">Tests Taken</p>
-                <p className="text-2xl font-bold text-white">{testsTaken}</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
+              <div className="p-2.5 sm:p-3 bg-blue-900/30 rounded-lg text-blue-400 shrink-0"><BookOpen className="w-5 h-5 sm:w-6 sm:h-6" /></div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Tests Taken</p>
+                <p className="text-lg sm:text-2xl font-bold text-white leading-tight">{testsTaken}</p>
               </div>
             </div>
-            <div className="bg-[#161616]/60 border border-[#333333] p-6 rounded-xl flex items-center gap-4 backdrop-blur-sm">
-              <div className="p-3 bg-green-900/30 rounded-lg text-green-400"><TrendingUp className="w-6 h-6" /></div>
-              <div>
-                <p className="text-sm font-medium text-[#a6a6a6]">Average Score</p>
-                <p className="text-2xl font-bold text-white">{avgScore}%</p>
+            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
+              <div className="p-2.5 sm:p-3 bg-green-900/30 rounded-lg text-green-400 shrink-0"><TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" /></div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Average Score</p>
+                <p className="text-base sm:text-2xl font-bold text-white leading-tight">{avgScore}%</p>
               </div>
             </div>
-            <div className="bg-[#161616]/60 border border-[#333333] p-6 rounded-xl flex items-center gap-4 backdrop-blur-sm">
-              <div className="p-3 bg-purple-900/30 rounded-lg text-purple-400"><Trophy className="w-6 h-6" /></div>
-              <div>
-                <p className="text-sm font-medium text-[#a6a6a6]">Best Score</p>
-                <p className="text-2xl font-bold text-white">{bestScore}%</p>
+            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
+              <div className="p-2.5 sm:p-3 bg-purple-900/30 rounded-lg text-purple-400 shrink-0"><Trophy className="w-5 h-5 sm:w-6 sm:h-6" /></div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Best Score</p>
+                <p className="text-base sm:text-2xl font-bold text-white leading-tight">{bestScore}%</p>
               </div>
             </div>
-            <div className="bg-[#161616]/60 border border-[#333333] p-6 rounded-xl flex items-center gap-4 backdrop-blur-sm">
-              <div className="p-3 bg-amber-900/30 rounded-lg text-amber-400"><Target className="w-6 h-6" /></div>
-              <div>
-                <p className="text-sm font-medium text-[#a6a6a6]">Avg. Accuracy</p>
-                <p className="text-2xl font-bold text-white">{avgAccuracy}%</p>
+            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
+              <div className="p-2.5 sm:p-3 bg-amber-900/30 rounded-lg text-amber-400 shrink-0"><Target className="w-5 h-5 sm:w-6 sm:h-6" /></div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Avg. Accuracy</p>
+                <p className="text-base sm:text-2xl font-bold text-white leading-tight">{avgAccuracy}%</p>
               </div>
             </div>
           </div>
@@ -354,11 +354,49 @@ export default function StudentDashboard() {
         {/* Result Tracker Table */}
         {testsTaken > 0 && (
           <section className="bg-[#161616]/60 border border-[#333333] rounded-xl overflow-hidden backdrop-blur-sm">
-            <div className="p-6 border-b border-[#333333] flex justify-between items-center">
-              <h2 className="text-xl font-bold">Result Tracker</h2>
-              <span className="text-sm text-[#a6a6a6]">Showing last {last25Attempts.length} tests</span>
+            <div className="p-4 sm:p-6 border-b border-[#333333] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+              <h2 className="text-lg sm:text-xl font-bold">Result Tracker</h2>
+              <span className="text-xs sm:text-sm text-[#a6a6a6]">Showing last {last25Attempts.length} tests</span>
             </div>
-            <div className="overflow-x-auto">
+
+            {/* Dedicated Mobile Card View (md:hidden) */}
+            <div className="md:hidden p-4 space-y-3">
+              {last25Attempts.map((attempt: any) => (
+                <div key={attempt.id} className="bg-[#1a1a1a] border border-[#333333] p-4 rounded-lg space-y-3">
+                  <div className="text-sm font-semibold text-white break-words line-clamp-2 leading-snug">
+                    {attempt.test.title}
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-[#a6a6a6] pt-1 border-t border-[#262626]">
+                    <div>
+                      <span>Date: </span>
+                      <span className="text-white font-medium">{new Date(attempt.submittedAt).toLocaleDateString()}</span>
+                    </div>
+                    <div>
+                      <span>Score: </span>
+                      <span className="text-white font-bold text-sm">{attempt.score}</span>
+                      <span className={`ml-1.5 px-2 py-0.5 rounded-full font-bold text-[11px] ${
+                        attempt.percentage >= 80 ? 'bg-green-900/40 text-green-300 border border-green-700/50' : 
+                        attempt.percentage >= 60 ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50' : 
+                        'bg-red-900/40 text-red-300 border border-red-700/50'
+                      }`}>
+                        {attempt.percentage?.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center text-xs pt-1">
+                    <div className="font-mono text-[#a6a6a6]">
+                      <span className="text-green-400 font-bold">{attempt.correctCount}</span> C / <span className="text-red-400 font-bold">{attempt.incorrectCount}</span> I / <span className="text-[#a6a6a6] font-bold">{attempt.unansweredCount}</span> U
+                    </div>
+                    <Link href={`/exam/result/${attempt.id}`} className="inline-flex items-center text-xs font-semibold text-[#0099ff] bg-[#0099ff]/10 hover:bg-[#0099ff]/20 px-3 py-1.5 rounded-md border border-[#0099ff]/30 transition-colors">
+                      View Result <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (hidden md:block) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-[#333333]">
                 <thead className="bg-[#1a1a1a]">
                   <tr>
