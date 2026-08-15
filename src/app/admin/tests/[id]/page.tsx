@@ -255,8 +255,8 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           <select className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.status} onChange={e => setTest({...test, status: e.target.value})}>
             <option value="DRAFT">DRAFT</option>
             <option value="PUBLISHED">PUBLISHED</option>
-            <option value="LOCKED">LOCKED</option>
-            <option value="EXPIRED">SCHEDULE EXPIRED</option>
+            <option value="LOCKED">SCHEDULED (LOCKED)</option>
+            <option value="EXPIRED">EXPIRED (CLOSED NOW)</option>
           </select>
         </div>
         <div>
