@@ -40,7 +40,7 @@ export async function GET(req: Request) {
 
     const availableTests = await prisma.test.findMany({
       where: { 
-        status: { in: ["PUBLISHED", "LOCKED", "EXPIRED"] }
+        status: { in: ["PUBLISHED", "LOCKED", "EXPIRED", "SCHEDULE_EXPIRED"] }
       },
       select: {
         id: true,

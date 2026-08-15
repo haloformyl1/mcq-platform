@@ -238,31 +238,31 @@ export default function StudentDashboard() {
           const expiredTests: any[] = [];
 
           availableTests.forEach((test: any) => {
-            if (test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED" || test.status === "CLOSED") {
-              const lockDate = test.lockAt ? new Date(test.lockAt) : null;
+            const lockDate = test.lockAt ? new Date(test.lockAt) : null;
+            const unlockDate = test.unlockAt ? new Date(test.unlockAt) : null;
+
+            if (test.status === "SCHEDULE_EXPIRED" || test.status === "EXPIRED" || test.status === "CLOSED") {
               if (lockDate && now < lockDate) {
-                // Scheduled to expire in future: currently LIVE so place in Current Available Tests
+                // Before scheduled expiration: currently LIVE & available for all students!
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
               } else if (test.hasIndividualAccess) {
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
               } else {
+                // Scheduled expiration date has passed -> Expired & requires admin approval
                 expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
               }
             } else if (test.status === "PUBLISHED") {
-              // Always available published test
-              currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS" });
+              if (lockDate && now >= lockDate && !test.hasIndividualAccess) {
+                expiredTests.push({ ...test, category: "EXPIRED", lockState: "AFTER_LOCK", lockDate });
+              } else {
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate });
+              }
             } else if (test.status === "LOCKED") {
-              const unlockDate = test.unlockAt ? new Date(test.unlockAt) : null;
-              const lockDate = test.lockAt ? new Date(test.lockAt) : null;
-
               if (unlockDate && now < unlockDate) {
-                // Scheduled unlock coming soon -> Box 1 (Upcoming Tests ONLY)
                 upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
               } else if (lockDate && now < lockDate) {
-                // Currently unlocked & live -> Box 2 (Current Available Tests)
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
               } else {
-                // Lock window expired on a scheduled test
                 if (test.hasIndividualAccess) {
                   currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
                 } else {
