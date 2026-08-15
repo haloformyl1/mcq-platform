@@ -319,7 +319,7 @@ export default function StudentDashboard() {
                     {isLiveStage && test.lockDate && (
                       <div className="flex items-center text-green-400 font-medium">
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-ping mr-2"></span>
-                        <span>🔥 Live until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
+                        <span>🔥 Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
                       </div>
                     )}
                     {isLiveStage && !test.lockDate && (
