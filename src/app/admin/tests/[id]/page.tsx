@@ -16,7 +16,8 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
     fetch(`/api/admin/tests/${resolvedParams.id}`)
       .then(res => res.json())
       .then(data => {
-        setTest(data);
+        const isScheduleExpiry = data.autoExpireOnLock ?? (!!data.lockAt && !data.unlockAt);
+        setTest({ ...data, autoExpireOnLock: isScheduleExpiry });
         setLoading(false);
       });
   }, [resolvedParams.id]);
