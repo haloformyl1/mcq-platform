@@ -82,14 +82,18 @@ export default function AdminTests() {
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                     test.status === 'PUBLISHED' ? 'bg-green-900/30 text-green-400 border border-green-800' : 
                     test.status === 'LOCKED' ? 'bg-blue-900/30 text-blue-400 border border-blue-800' :
-                    'bg-gray-800 text-gray-300 border border-gray-700'
+                    test.status === 'SCHEDULE_EXPIRED' || test.status === 'SCHEDULE EXPIRED' ? (
+                      test.lockAt && new Date() < new Date(test.lockAt) ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-red-900/30 text-red-400 border border-red-800'
+                    ) : 'bg-gray-800 text-gray-300 border border-gray-700'
                   }`}>
-                    {test.status}
+                    {test.status === 'SCHEDULE_EXPIRED' ? (
+                      test.lockAt && new Date() < new Date(test.lockAt) ? 'SCHEDULE EXPIRED (ACTIVE)' : 'EXPIRED'
+                    ) : test.status}
                   </span>
-                  {test.status === 'LOCKED' && test.unlockAt && test.lockAt && (
+                  {(test.status === 'LOCKED' || test.status === 'SCHEDULE_EXPIRED') && test.lockAt && (
                     <div className="text-[10px] text-[#8c8c8c] mt-1 space-y-0.5">
-                      <div><span className="text-blue-400">Unlock:</span> {new Date(test.unlockAt).toLocaleString()}</div>
-                      <div><span className="text-orange-400">Lock:</span> {new Date(test.lockAt).toLocaleString()}</div>
+                      {test.unlockAt && <div><span className="text-blue-400">Unlock:</span> {new Date(test.unlockAt).toLocaleString()}</div>}
+                      <div><span className="text-orange-400">Expires:</span> {new Date(test.lockAt).toLocaleString()}</div>
                     </div>
                   )}
                 </td>

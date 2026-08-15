@@ -40,7 +40,13 @@ export async function POST(req: Request) {
       }
     });
 
-    if (!test || (test.status !== "PUBLISHED" && test.status !== "LOCKED" && !override)) {
+    if (!test) {
+      return NextResponse.json({ error: "Test not available" }, { status: 400 });
+    }
+
+    const isScheduleExpiredActive = test.status === "SCHEDULE_EXPIRED" && test.lockAt && new Date() < new Date(test.lockAt);
+
+    if (test.status !== "PUBLISHED" && test.status !== "LOCKED" && !isScheduleExpiredActive && !override) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
     }
 

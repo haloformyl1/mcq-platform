@@ -42,10 +42,14 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         return;
       }
     }
+    const statusToSave = test.status === "SCHEDULE_EXPIRED" ? "SCHEDULE_EXPIRED" : test.status;
     await fetch(`/api/admin/tests/${resolvedParams.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(test),
+      body: JSON.stringify({
+        ...test,
+        status: statusToSave
+      }),
     });
     alert("Settings saved!");
   };
@@ -255,8 +259,8 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           <select className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.status} onChange={e => setTest({...test, status: e.target.value})}>
             <option value="DRAFT">DRAFT</option>
             <option value="PUBLISHED">PUBLISHED</option>
-            <option value="LOCKED">SCHEDULED (LOCKED)</option>
-            <option value="EXPIRED">EXPIRED (CLOSED NOW)</option>
+            <option value="LOCKED">LOCKED</option>
+            <option value="EXPIRED">SCHEDULE EXPIRED</option>
           </select>
         </div>
         <div>
