@@ -260,7 +260,8 @@ export default function StudentDashboard() {
             } else if (test.status === "LOCKED") {
               if (unlockDate && now < unlockDate) {
                 upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
-              } else if (lockDate && now < lockDate) {
+              } else if (!lockDate || now < lockDate) {
+                // Unlocked (or no unlock required) & lockDate in future -> LIVE & Available
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
               } else {
                 if (test.hasIndividualAccess) {
