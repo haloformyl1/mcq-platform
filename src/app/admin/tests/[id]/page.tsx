@@ -36,6 +36,12 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         return;
       }
     }
+    if (test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED") {
+      if (!test.lockAt) {
+        alert("Please select an expiration date and time.");
+        return;
+      }
+    }
     await fetch(`/api/admin/tests/${resolvedParams.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -250,7 +256,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             <option value="DRAFT">DRAFT</option>
             <option value="PUBLISHED">PUBLISHED</option>
             <option value="LOCKED">LOCKED</option>
-            <option value="CLOSED">CLOSED</option>
+            <option value="EXPIRED">SCHEDULE EXPIRED</option>
           </select>
         </div>
         <div>
@@ -295,17 +301,40 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
 
+      {(test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED") && (
+        <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-red-900/50 backdrop-blur-sm">
+          <h2 className="text-lg font-bold mb-4 text-red-400 flex items-center gap-2">
+            <span>⌛ Scheduled Expiration Settings</span>
+          </h2>
+          <div>
+            <label className="block text-sm font-medium text-[#a6a6a6]">Expiration Date & Time</label>
+            <input type="datetime-local" className="mt-1 block w-full max-w-md bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => setTest({...test, lockAt: e.target.value ? new Date(e.target.value).toISOString() : null})} />
+            <p className="mt-2 text-xs text-[#a6a6a6]">Select the exact date and time when this test will automatically expire. Once expired, students will need admin approval to take it.</p>
+          </div>
+        </div>
+      )}
+
       {test.status === "LOCKED" && (
         <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm">
           <h2 className="text-lg font-bold mb-4">Scheduled Access Window</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-[#a6a6a6]">Unlock Date & Time</label>
-              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => setTest({...test, unlockAt: new Date(e.target.value).toISOString()})} />
+              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => {
+                const val = e.target.value;
+                if (!val) { setTest({...test, unlockAt: null}); return; }
+                const d = new Date(val);
+                if (!isNaN(d.getTime())) setTest({...test, unlockAt: d.toISOString()});
+              }} />
             </div>
             <div>
               <label className="block text-sm font-medium text-[#a6a6a6]">Lock Date & Time</label>
-              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => setTest({...test, lockAt: new Date(e.target.value).toISOString()})} />
+              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => {
+                const val = e.target.value;
+                if (!val) { setTest({...test, lockAt: null}); return; }
+                const d = new Date(val);
+                if (!isNaN(d.getTime())) setTest({...test, lockAt: d.toISOString()});
+              }} />
             </div>
           </div>
           <div className="mt-4 text-sm text-[#a6a6a6]">

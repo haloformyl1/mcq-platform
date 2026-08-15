@@ -40,7 +40,7 @@ export async function GET(req: Request) {
 
     const availableTests = await prisma.test.findMany({
       where: { 
-        status: { in: ["PUBLISHED", "LOCKED"] }
+        status: { in: ["PUBLISHED", "LOCKED", "EXPIRED"] }
       },
       select: {
         id: true,
@@ -64,13 +64,25 @@ export async function GET(req: Request) {
       overridesMap[o.testId] = o;
     });
 
+    // Fetch access requests made by this student
+    const requests = await prisma.testAccessRequest.findMany({ where: { studentId } });
+    const requestsMap: Record<string, any> = {};
+    requests.forEach(r => {
+      requestsMap[r.testId] = r;
+    });
+
     const availableTestsWithOverrides = availableTests.map(t => {
       const o = overridesMap[t.id];
-      if (!o) return t;
-      return {
+      const r = requestsMap[t.id];
+      const base = o ? {
         ...t,
-        unlockAt: o.overrideUnlockAt ?? t.unlockAt,
-        lockAt: o.overrideLockAt ?? t.lockAt
+        unlockAt: (o.overrideUnlockAt !== null && o.overrideUnlockAt !== undefined) ? o.overrideUnlockAt : t.unlockAt,
+        lockAt: (o.overrideLockAt !== null && o.overrideLockAt !== undefined) ? o.overrideLockAt : t.lockAt
+      } : t;
+      return {
+        ...base,
+        hasIndividualAccess: !!o,
+        userRequestStatus: r ? r.status : null
       };
     });
 

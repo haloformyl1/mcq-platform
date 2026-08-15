@@ -21,6 +21,7 @@ model Student {
 
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
+  accessRequests TestAccessRequest[]
 }
 
 model AdminUser {
@@ -44,7 +45,7 @@ model Test {
   maximumAttempts    Int      @default(1)
   randomizeQuestions Boolean  @default(false)
   randomizeOptions   Boolean  @default(false)
-  status             String   @default("DRAFT") // DRAFT, PUBLISHED, LOCKED, CLOSED
+  status             String   @default("DRAFT") // DRAFT, PUBLISHED, LOCKED, EXPIRED
   unlockAt           DateTime?
   lockAt             DateTime?
   createdAt          DateTime @default(now())
@@ -53,6 +54,7 @@ model Test {
   questions Question[]
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
+  accessRequests TestAccessRequest[]
 }
 
 model StudentTestOverride {
@@ -65,6 +67,21 @@ model StudentTestOverride {
 
   student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   test            Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  @@unique([studentId, testId])
+}
+
+model TestAccessRequest {
+  id        String   @id @default(uuid())
+  studentId String
+  testId    String
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  message   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  test      Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+
   @@unique([studentId, testId])
 }
 

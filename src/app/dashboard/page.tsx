@@ -204,108 +204,336 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        {/* Available Tests */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Available Tests</h2>
-          </div>
-          {availableTests.length === 0 ? (
-            <p className="text-[#a6a6a6] bg-[#161616]/40 p-4 rounded-lg border border-[#333333]">No tests available at the moment.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {availableTests.map((test: any) => {
-                const hasAttempted = allAttempts.some((a: any) => a.testId === test.id && a.status === 'SUBMITTED');
-                const activeAttempt = allAttempts.find((a: any) => a.testId === test.id && a.status === 'IN_PROGRESS');
-                
-                let isLocked = false;
-                let lockedMessage = "";
-                let lockedState = "AVAILABLE"; // AVAILABLE, BEFORE_UNLOCK, AFTER_LOCK
+        {/* Categorized Tests Sections */}
+        {(() => {
+          const formatDateTime = (dateObj: Date) => {
+            const pad = (n: number) => n.toString().padStart(2, '0');
+            const day = pad(dateObj.getDate());
+            const month = pad(dateObj.getMonth() + 1);
+            const year = dateObj.getFullYear();
+            let hours = dateObj.getHours();
+            const minutes = pad(dateObj.getMinutes());
+            const seconds = pad(dateObj.getSeconds());
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            return `${day}/${month}/${year} ${pad(hours)}:${minutes}:${seconds} ${ampm}`;
+          };
 
-                if (test.status === "LOCKED") {
-                  if (test.unlockAt && now < new Date(test.unlockAt)) {
-                    isLocked = true;
-                    lockedState = "BEFORE_UNLOCK";
-                    lockedMessage = `Opens: ${new Date(test.unlockAt).toLocaleString()}`;
-                  } else if (test.lockAt && now >= new Date(test.lockAt)) {
-                    isLocked = true;
-                    lockedState = "AFTER_LOCK";
-                    lockedMessage = `Access closed: ${new Date(test.lockAt).toLocaleString()}`;
-                  }
+          const currentAvailableTests: any[] = [];
+          const upcomingLiveTests: any[] = [];
+          const expiredTests: any[] = [];
+
+          availableTests.forEach((test: any) => {
+            if (test.status === "EXPIRED" || test.status === "SCHEDULE_EXPIRED" || test.status === "CLOSED") {
+              const lockDate = test.lockAt ? new Date(test.lockAt) : null;
+              if (lockDate && now < lockDate) {
+                // Scheduled to expire in future: place in Upcoming/Live tests
+                upcomingLiveTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", lockDate });
+              } else if (test.hasIndividualAccess) {
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+              } else {
+                expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
+              }
+            } else if (test.status === "PUBLISHED") {
+              // Always available published test
+              currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS" });
+            } else if (test.status === "LOCKED") {
+              const unlockDate = test.unlockAt ? new Date(test.unlockAt) : null;
+              const lockDate = test.lockAt ? new Date(test.lockAt) : null;
+
+              if (unlockDate && now < unlockDate) {
+                // Scheduled unlock coming soon -> Box 1
+                upcomingLiveTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
+              } else if (lockDate && now < lockDate) {
+                // Currently unlocked scheduled test -> Box 1
+                upcomingLiveTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
+              } else {
+                // Lock window expired on a scheduled test -> stays in Box 1 (Live/Scheduled Section) with Locked status unless student has override
+                if (test.hasIndividualAccess) {
+                  currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+                } else {
+                  upcomingLiveTests.push({ ...test, category: "UPCOMING_LOCKED", lockState: "AFTER_LOCK", unlockDate, lockDate });
                 }
+              }
+            }
+          });
 
-                return (
-                  <div key={test.id} className="bg-[#1a1a1a] border border-[#333333] rounded-xl overflow-hidden flex flex-col hover:border-[#4d4d4d] transition duration-300 shadow-lg relative">
-                    <div className="p-5 flex-1">
-                      <h3 className="text-base sm:text-lg font-bold text-white mb-3 break-words leading-snug">{test.title}</h3>
-                      
-                      <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                        <div className="flex items-center text-[#a6a6a6]">
-                          <span className="font-semibold text-white mr-2">{test.totalQuestions}</span> Qs
-                        </div>
-                        <div className="flex items-center text-[#a6a6a6]">
-                          <Clock className="w-4 h-4 mr-1.5 opacity-70" />
-                          <span className="font-semibold text-white mr-1">{test.durationMinutes}</span> min
-                        </div>
-                        <div className="flex items-center text-[#a6a6a6]">
-                          <span className="font-semibold text-white mr-1">{test.totalQuestions * test.marksPerQuestion}</span> Marks
-                        </div>
-                        {test.negativeMarking && (
-                          <div className="flex items-center text-red-400">
-                            -{test.negativeMarks} per wrong
-                          </div>
-                        )}
-                      </div>
-                      
-                      {test.status === "LOCKED" && (
-                        <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333]">
-                          {lockedState === "BEFORE_UNLOCK" && (
-                            <div className="flex items-start text-[#a6a6a6]">
-                              <span className="text-orange-400 font-medium mr-1.5 flex-shrink-0">🔒 Locked</span>
-                              <span className="leading-tight">{lockedMessage}</span>
-                            </div>
-                          )}
-                          {lockedState === "AFTER_LOCK" && !activeAttempt && (
-                            <div className="flex items-start text-[#a6a6a6]">
-                              <span className="text-red-400 font-medium mr-1.5 flex-shrink-0">🔒 Closed</span>
-                              <span className="leading-tight">{lockedMessage}</span>
-                            </div>
-                          )}
-                          {lockedState === "AVAILABLE" && (
-                            <div className="flex items-start text-[#a6a6a6]">
-                              <span className="text-green-400 font-medium mr-1.5 flex-shrink-0">🟢 Available</span>
-                              <span className="leading-tight">Open until {new Date(test.lockAt).toLocaleString()}</span>
-                            </div>
-                          )}
-                          {activeAttempt && lockedState === "AFTER_LOCK" && (
-                            <div className="flex items-start text-yellow-400">
-                              <span className="font-medium mr-1.5 flex-shrink-0">▶ Active</span>
-                              <span className="leading-tight">You can continue your attempt</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
+          const renderTestCard = (test: any) => {
+            const hasAttempted = allAttempts.some((a: any) => a.testId === test.id && a.status === 'SUBMITTED');
+            const activeAttempt = allAttempts.find((a: any) => a.testId === test.id && a.status === 'IN_PROGRESS');
+
+            const isUpcomingStage = test.lockState === "BEFORE_UNLOCK";
+            const isLiveStage = test.lockState === "SCHEDULED_OPEN" || test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "INDIVIDUAL_ACCESS_GRANTED";
+            const isLockedStage = test.lockState === "AFTER_LOCK" || test.lockState === "EXPIRED_STATUS";
+
+            return (
+              <div key={test.id} className={`bg-[#1a1a1a] border rounded-xl overflow-hidden flex flex-col transition duration-300 shadow-lg relative ${isLiveStage ? 'border-[#0099ff]/60 hover:border-[#0099ff] shadow-[0_0_15px_rgba(0,153,255,0.15)]' : isUpcomingStage ? 'border-amber-500/40 hover:border-amber-500' : 'border-[#333333] hover:border-[#4d4d4d]'}`}>
+                <div className="p-5 flex-1">
+                  <div className="flex justify-between items-start gap-2 mb-3">
+                    <h3 className="text-base sm:text-lg font-bold text-white break-words leading-snug flex-1 min-w-0">{test.title}</h3>
+                    {isLiveStage && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-green-950/80 text-green-400 border border-green-700/60 shrink-0 whitespace-nowrap">
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+                        LIVE TEST
+                      </span>
+                    )}
+                    {isUpcomingStage && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60 shrink-0 whitespace-nowrap animate-pulse">
+                        🔒 UPCOMING
+                      </span>
+                    )}
+                    {isLockedStage && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-950/80 text-red-400 border border-red-800/60 shrink-0 whitespace-nowrap">
+                        🔒 LOCKED
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                    <div className="flex items-center text-[#a6a6a6]">
+                      <span className="font-semibold text-white mr-2">{test.totalQuestions}</span> Qs
                     </div>
-                    <div className="p-4 bg-[#111111] border-t border-[#333333]">
-                      {activeAttempt ? (
-                        <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-[0_0_15px_rgba(202,138,4,0.3)]">
-                          Continue Test
-                        </Link>
-                      ) : hasAttempted ? (
-                        <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-[#262626] border border-[#404040] hover:bg-[#333333] transition">
-                          Take Again / View
-                        </Link>
-                      ) : (
-                        <Link href={isLocked ? '#' : `/exam/start/${test.id}`} className={`block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white transition ${isLocked ? 'bg-[#262626] text-[#666666] cursor-not-allowed border border-[#333333]' : 'bg-[#0099ff] hover:bg-[#007acc] shadow-[0_0_15px_rgba(0,153,255,0.3)]'}`}>
-                          {isLocked && lockedState === "BEFORE_UNLOCK" ? 'Not Available Yet' : isLocked && lockedState === "AFTER_LOCK" ? 'No Longer Available' : 'Start Test'}
-                        </Link>
-                      )}
+                    <div className="flex items-center text-[#a6a6a6]">
+                      <Clock className="w-4 h-4 mr-1.5 opacity-70" />
+                      <span className="font-semibold text-white mr-1">{test.durationMinutes}</span> min
+                    </div>
+                    <div className="flex items-center text-[#a6a6a6]">
+                      <span className="font-semibold text-white mr-1">{test.totalQuestions * test.marksPerQuestion}</span> Marks
+                    </div>
+                    {test.negativeMarking && (
+                      <div className="flex items-center text-red-400">
+                        -{test.negativeMarks} per wrong
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Status Banner */}
+                  <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333]">
+                    {isUpcomingStage && test.unlockDate && (
+                      <div className="flex items-start text-amber-300">
+                        <span className="font-medium mr-1.5 shrink-0">🔒 Unlock At:</span>
+                        <span className="leading-tight font-mono font-semibold">{formatDateTime(test.unlockDate)}</span>
+                      </div>
+                    )}
+                    {isLiveStage && test.lockDate && (
+                      <div className="flex items-center text-green-400 font-medium">
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-ping mr-2"></span>
+                        <span>🔥 Live until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
+                      </div>
+                    )}
+                    {isLiveStage && !test.lockDate && (
+                      <div className="flex items-center text-green-400 font-medium">
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span>
+                        <span>🟢 Available Anytime</span>
+                      </div>
+                    )}
+                    {isLockedStage && (
+                      <div className="flex items-start text-red-400">
+                        <span className="font-medium mr-1.5 shrink-0">⚠️ Not Available:</span>
+                        <span className="leading-tight">Please contact Admin to request live access.</span>
+                      </div>
+                    )}
+                    {activeAttempt && (
+                      <div className="mt-1 flex items-center text-yellow-400 font-semibold">
+                        <span>▶ Active attempt in progress</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-4 bg-[#111111] border-t border-[#333333]">
+                  {isUpcomingStage ? (
+                    <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-400/70 bg-amber-950/40 border border-amber-800/40 cursor-not-allowed">
+                      🔒 Unlocks At {formatDateTime(test.unlockDate)}
+                    </button>
+                  ) : isLockedStage ? (
+                    test.userRequestStatus === "PENDING" ? (
+                      <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 cursor-not-allowed">
+                        ⏳ Request Pending Admin Review
+                      </button>
+                    ) : test.userRequestStatus === "APPROVED" || test.hasIndividualAccess ? (
+                      <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                        {activeAttempt ? 'Continue Test (Access Granted)' : hasAttempted ? 'Take Again (Access Granted)' : 'Start Test (Access Granted)'}
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch("/api/student/request-access", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ testId: test.id })
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              alert("Your request to live this test has been sent to the Admin!");
+                              window.location.reload();
+                            } else {
+                              alert(data.error || "Failed to submit request");
+                            }
+                          } catch (e) {
+                            alert("Error sending request");
+                          }
+                        }}
+                        className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.25)] flex items-center justify-center gap-1.5"
+                      >
+                        📩 Request Admin to Live Test
+                      </button>
+                    )
+                  ) : activeAttempt ? (
+                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-[0_0_15px_rgba(202,138,4,0.3)]">
+                      Continue Test
+                    </Link>
+                  ) : hasAttempted ? (
+                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-[#262626] border border-[#404040] hover:bg-[#333333] transition">
+                      Take Again / View
+                    </Link>
+                  ) : (
+                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-[#0099ff] hover:bg-[#007acc] transition shadow-[0_0_15px_rgba(0,153,255,0.3)]">
+                      Start Test
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          };
+
+          // Filter tests qualifying for moving announcement banner:
+          // 1. Upcoming tests: Display on the unlock day AND 1 day prior to unlock
+          // 2. Live tests: Display if live and scheduled to expire soon
+          // 3. Locked tests: Display for 24 hours after locking
+          const bannerItems: any[] = [];
+
+          upcomingLiveTests.forEach((t: any) => {
+            if (t.unlockDate) {
+              const unlock = new Date(t.unlockDate);
+              const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
+              if (now >= bannerStart && now < unlock) {
+                bannerItems.push({
+                  type: "UPCOMING",
+                  test: t,
+                  message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockDate)}</strong>. Please prepare to attempt the test!`
+                });
+              } else if (now >= unlock && t.lockDate && now < new Date(t.lockDate)) {
+                bannerItems.push({
+                  type: "LIVE_EXPIRING",
+                  test: t,
+                  message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockDate)}</strong>. Please attempt the test before it closes!`
+                });
+              }
+            } else if (t.lockDate && now < new Date(t.lockDate)) {
+              bannerItems.push({
+                type: "LIVE_EXPIRING",
+                test: t,
+                message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockDate)}</strong>.`
+              });
+            }
+
+            // Check if test locked within the last 24 hours
+            if (t.lockDate) {
+              const lock = new Date(t.lockDate);
+              const postLock24h = new Date(lock.getTime() + 24 * 60 * 60 * 1000);
+              if (now >= lock && now < postLock24h) {
+                bannerItems.push({
+                  type: "RECENTLY_LOCKED",
+                  test: t,
+                  message: `⌛ Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> was live until <strong class="text-red-300 font-mono">${formatDateTime(t.lockDate)}</strong> and has now concluded. If you missed submitting your test in time, please contact the Admin to request access.`
+                });
+              }
+            }
+          });
+
+          return (
+            <div className="space-y-10">
+              {/* Moving Announcement Banner */}
+              {bannerItems.length > 0 && (
+                <div className="bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <span className="shrink-0 text-xs font-bold bg-amber-500 text-black px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow">
+                      <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                      ANNOUNCEMENT
+                    </span>
+                    <div className="flex-1 overflow-hidden relative">
+                      <div className="animate-marquee whitespace-nowrap inline-block text-sm font-semibold text-amber-200">
+                        {bannerItems.map((item: any) => (
+                          <span
+                            key={item.test.id}
+                            className="mr-16"
+                            dangerouslySetInnerHTML={{ __html: item.message }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              )}
+
+              {/* 1. Box 1: Upcoming / Live Tests (Always at Top) */}
+              <div className="bg-[#121212]/90 border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(245,158,11,0.08)] space-y-4">
+                <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="p-2 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-700/50 text-base">⏰</span>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Upcoming / Live Tests</h2>
+                  </div>
+                  <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold">
+                    {upcomingLiveTests.length} Scheduled / Live
+                  </span>
+                </div>
+                {upcomingLiveTests.length === 0 ? (
+                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No upcoming or scheduled live tests at the moment.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {upcomingLiveTests.map(test => renderTestCard(test))}
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Box 2: Current Available Tests */}
+              <div className="bg-[#121212]/90 border border-[#0099ff]/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(0,153,255,0.08)] space-y-4">
+                <div className="flex items-center justify-between border-b border-[#0099ff]/20 pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-3.5 w-3.5 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500"></span>
+                    </span>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Current Available Tests</h2>
+                  </div>
+                  <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold">
+                    {currentAvailableTests.length} Available
+                  </span>
+                </div>
+                {currentAvailableTests.length === 0 ? (
+                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No current published tests available.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {currentAvailableTests.map(test => renderTestCard(test))}
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Box 3: Expired Tests */}
+              <div className="bg-[#121212]/90 border border-red-900/40 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(239,68,68,0.05)] space-y-4">
+                <div className="flex items-center justify-between border-b border-red-900/30 pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="p-2 rounded-lg bg-red-950/80 text-red-400 border border-red-800/50 text-base">⌛</span>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Expired Tests</h2>
+                  </div>
+                  <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-800 font-mono font-bold">
+                    {expiredTests.length} Expired
+                  </span>
+                </div>
+                {expiredTests.length === 0 ? (
+                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No expired tests.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {expiredTests.map(test => renderTestCard(test))}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </section>
+          );
+        })()}
 
         {/* Performance Overview (Only if tests taken) */}
         {testsTaken > 0 && (
