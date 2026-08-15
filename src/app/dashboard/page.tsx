@@ -86,11 +86,21 @@ export default function StudentDashboard() {
 
       {/* Header */}
       <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
+        <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
+          <div className="flex items-center space-x-4 shrink-0">
             <PiechemLogo size="md" />
           </div>
-          <button onClick={handleLogout} className="flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626]">
+
+          {/* Center Badge */}
+          <div className="hidden sm:flex px-3.5 py-1.5 rounded-full bg-[#121824]/90 backdrop-blur-md border border-[#334155]/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-xs text-slate-300 font-medium tracking-wide items-center justify-center gap-1.5">
+            <span className="text-slate-400">Designed & Prepared by</span>
+            <span className="font-semibold text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">Arghyadeep Roy</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-slate-400">Contact:</span>
+            <a href="tel:9830507435" className="font-semibold text-cyan-400 hover:underline">9830507435</a>
+          </div>
+
+          <button onClick={handleLogout} className="flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
             <LogOut className="w-4 h-4 mr-2" />
             Logout
           </button>
