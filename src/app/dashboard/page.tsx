@@ -92,11 +92,11 @@ export default function StudentDashboard() {
           </div>
 
           {/* Center Badge */}
-          <div className="hidden sm:flex px-3.5 py-1.5 rounded-full bg-[#121824]/90 backdrop-blur-md border border-[#334155]/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-xs text-slate-300 font-medium tracking-wide items-center justify-center gap-1.5">
-            <span className="text-slate-400">Designed & Prepared by</span>
+          <div className="flex px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-[#121824]/90 backdrop-blur-md border border-[#334155]/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-[10px] sm:text-xs text-slate-300 font-medium tracking-wide items-center justify-center gap-1 sm:gap-1.5 text-center">
+            <span className="text-slate-400 hidden xs:inline">Designed & Prepared by</span>
             <span className="font-semibold text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">Arghyadeep Roy</span>
             <span className="text-slate-500">•</span>
-            <span className="text-slate-400">Contact:</span>
+            <span className="text-slate-400 hidden xs:inline">Contact:</span>
             <a href="tel:9830507435" className="font-semibold text-cyan-400 hover:underline">9830507435</a>
           </div>
 
