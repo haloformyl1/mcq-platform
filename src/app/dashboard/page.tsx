@@ -252,11 +252,8 @@ export default function StudentDashboard() {
                 expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
               }
             } else if (test.status === "PUBLISHED") {
-              if (lockDate && now >= lockDate && !test.hasIndividualAccess) {
-                expiredTests.push({ ...test, category: "EXPIRED", lockState: "AFTER_LOCK", lockDate });
-              } else {
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate });
-              }
+              // PUBLISHED tests are always LIVE and available to all students
+              currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
             } else if (test.status === "LOCKED") {
               if (unlockDate && now < unlockDate) {
                 upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
