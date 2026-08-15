@@ -206,7 +206,10 @@ export default function StudentDashboard() {
 
         {/* Categorized Tests Sections */}
         {(() => {
-          const formatDateTime = (dateObj: Date) => {
+          const formatDateTime = (dateInput: Date | string | null | undefined) => {
+            if (!dateInput) return "";
+            const dateObj = dateInput instanceof Date ? dateInput : new Date(dateInput);
+            if (isNaN(dateObj.getTime())) return "";
             const pad = (n: number) => n.toString().padStart(2, '0');
             const day = pad(dateObj.getDate());
             const month = pad(dateObj.getMonth() + 1);
