@@ -49,6 +49,8 @@ model Test {
   unlockAt           DateTime?
   lockAt             DateTime?
   postLockHoldMinutes Int     @default(4320) // Default 72 hours (4320 minutes)
+  aiProctoringEnabled Boolean @default(true)
+  maxProctoringWarnings Int   @default(5)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -114,7 +116,7 @@ model TestAttempt {
   startedAt        DateTime  @default(now())
   submittedAt      DateTime?
   status           String    @default("IN_PROGRESS") // IN_PROGRESS, SUBMITTED
-  submissionReason String?   // MANUAL_SUBMISSION, TIME_EXPIRED, TAB_SWITCH, INACTIVITY_240_SECONDS, etc.
+  submissionReason String?   // MANUAL_SUBMISSION, TIME_EXPIRED, TAB_SWITCH, INACTIVITY_240_SECONDS, PROCTORING_VIOLATION, etc.
   attemptNumber    Int       @default(1)
   
   score            Float?
@@ -128,6 +130,7 @@ model TestAttempt {
   test             Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
   student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
   answers          Answer[]
+  proctoringViolations ProctoringViolation[]
 }
 
 model Answer {
@@ -142,4 +145,17 @@ model Answer {
   question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
   
   @@unique([attemptId, questionId])
+}
+
+model ProctoringViolation {
+  id              String      @id @default(uuid())
+  attemptId       String
+  violationType   String      // CELL_PHONE, MULTIPLE_FACES, NO_FACE, LOOKING_AWAY, TAB_SWITCH
+  warningNumber   Int
+  message         String
+  snapshotBase64  String?     @db.Text
+  confidenceScore Float?
+  timestamp       DateTime    @default(now())
+
+  attempt         TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 }

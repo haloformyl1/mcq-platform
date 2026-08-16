@@ -7,6 +7,7 @@ import { useProctoring } from "@/hooks/useProctoring";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import WebcamProctor from "@/components/WebcamProctor";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -504,6 +505,15 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             </div>
           </div>
         </div>
+      )}
+
+      {/* AI Webcam & Device Proctoring Widget */}
+      {examData && (examData.test?.aiProctoringEnabled ?? true) && (
+        <WebcamProctor
+          attemptId={resolvedParams.attemptId}
+          maxWarnings={examData.test?.maxProctoringWarnings || 5}
+          onMaxWarningsExceeded={(reason) => submitTest(reason)}
+        />
       )}
     </div>
   );

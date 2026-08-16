@@ -31,6 +31,9 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
           include: {
             question: true
           }
+        },
+        proctoringViolations: {
+          orderBy: { timestamp: 'asc' }
         }
       }
     });

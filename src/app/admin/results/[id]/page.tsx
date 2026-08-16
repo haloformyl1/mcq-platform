@@ -178,6 +178,80 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
+      {/* AI Proctoring Integrity Audit Report */}
+      <div className="bg-[#121212] border border-blue-900/40 rounded-xl p-5 shadow-lg space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#262626] pb-3">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl">🤖</span>
+            <div>
+              <h2 className="text-lg font-bold text-white">AI Proctoring Integrity Audit</h2>
+              <p className="text-xs text-[#a6a6a6]">Webcam vision logs, device detection, and camera evidence snapshots captured during exam</p>
+            </div>
+          </div>
+          <div>
+            {(!result.proctoringViolations || result.proctoringViolations.length === 0) ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-950 text-green-400 border border-green-700">
+                🟢 HIGH TRUST (0 Violations)
+              </span>
+            ) : result.proctoringViolations.length <= 2 ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-950 text-amber-300 border border-amber-700">
+                🟡 MODERATE RISK ({result.proctoringViolations.length} Violations)
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-950 text-red-400 border border-red-800 animate-pulse">
+                🔴 HIGH RISK / FLAGGED ({result.proctoringViolations.length} Violations)
+              </span>
+            )}
+          </div>
+        </div>
+
+        {(!result.proctoringViolations || result.proctoringViolations.length === 0) ? (
+          <div className="bg-[#181818] p-4 rounded-lg text-xs text-slate-400 border border-[#262626] text-center">
+            No proctoring violations recorded for this attempt. Student completed the exam with a clean webcam record.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {result.proctoringViolations.map((v: any) => (
+              <div key={v.id} className="bg-[#1a1a1a] border border-[#333333] rounded-lg p-3 space-y-2 flex flex-col justify-between">
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 uppercase tracking-wider">
+                      ⚠️ {v.violationType.replace('_', ' ')}
+                    </span>
+                    <span className="text-[10px] font-mono text-[#a6a6a6]">
+                      Warning {v.warningNumber}
+                    </span>
+                  </div>
+                  <p className="text-xs text-white font-medium line-clamp-2">{v.message}</p>
+                  <p className="text-[10px] text-[#888888] font-mono">
+                    Logged: {new Date(v.timestamp).toLocaleString()}
+                  </p>
+                </div>
+
+                {v.snapshotBase64 ? (
+                  <div className="pt-2">
+                    <p className="text-[10px] text-slate-400 mb-1">Captured Camera Snapshot:</p>
+                    <img
+                      src={v.snapshotBase64}
+                      alt="Proctoring violation snapshot"
+                      className="w-full h-32 object-cover rounded border border-[#404040] hover:scale-[1.02] transition cursor-pointer"
+                      onClick={() => {
+                        const w = window.open("");
+                        if (w) {
+                          w.document.write(`<title>Evidence Snapshot</title><body style="background:#000;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><img src="${v.snapshotBase64}" style="max-width:90vw;max-height:90vh;border-radius:12px;border:3px solid #f59e0b;"/></body>`);
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-gray-500 italic pt-2">No camera snapshot available</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Filter Tabs Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#161616] p-4 rounded-lg border border-[#333333]">
         <h2 className="text-lg font-bold text-white flex items-center gap-2">

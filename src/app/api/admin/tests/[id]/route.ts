@@ -60,6 +60,8 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         unlockAt: unlockAt,
         lockAt: lockAt,
         postLockHoldMinutes: typeof data.postLockHoldMinutes !== 'undefined' && !isNaN(parseInt(data.postLockHoldMinutes)) ? parseInt(data.postLockHoldMinutes) : 4320,
+        aiProctoringEnabled: typeof data.aiProctoringEnabled === 'boolean' ? data.aiProctoringEnabled : true,
+        maxProctoringWarnings: parseInt(data.maxProctoringWarnings) || 5,
       },
     });
 
