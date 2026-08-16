@@ -385,7 +385,7 @@ export default function StudentDashboard() {
                     )}
                     {isHoldingStage && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-950/80 text-orange-400 border border-orange-700/60 shrink-0 whitespace-nowrap">
-                        🔒 LOCKED
+                        ⌛ CONCLUDED
                       </span>
                     )}
                     {isLockedStage && (
@@ -433,7 +433,7 @@ export default function StudentDashboard() {
                     )}
                     {isHoldingStage && test.autoLiveDate && (
                       <div className="animate-marquee whitespace-nowrap text-orange-300 font-medium">
-                        <span>🔒 Locked at {formatDateTime(test.lockDate)} • Auto-lives under Other Available Tests at: <strong className="font-mono font-semibold text-green-400">{formatDateTime(test.autoLiveDate)}</strong></span>
+                        <span>⌛ Concluded at {formatDateTime(test.lockDate)} • Auto-lives under Other Available Tests at: <strong className="font-mono font-semibold text-green-400">{formatDateTime(test.autoLiveDate)}</strong></span>
                       </div>
                     )}
                     {isLockedStage && (
