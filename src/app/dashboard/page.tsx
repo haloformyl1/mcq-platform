@@ -287,12 +287,12 @@ export default function StudentDashboard() {
                     {isLiveStage && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-green-950/80 text-green-400 border border-green-700/60 shrink-0 whitespace-nowrap">
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
-                        LIVE TEST
+                        LIVE NOW
                       </span>
                     )}
                     {isUpcomingStage && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60 shrink-0 whitespace-nowrap animate-pulse">
-                        🔒 LOCKED
+                        🔒 UPCOMING
                       </span>
                     )}
                     {isLockedStage && (
