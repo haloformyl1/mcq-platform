@@ -78,9 +78,9 @@ export default function AdminResults() {
                   <div className="flex justify-between items-center text-xs text-[#a6a6a6] pt-1">
                     <div>
                       <span className="text-[#737373]">Score: </span>
-                      <span className="font-bold text-white text-base">{result.score ?? '-'}</span>
-                      {result.percentage !== undefined && (
-                        <span className="text-blue-400 font-semibold ml-1.5">({result.percentage.toFixed(1)}%)</span>
+                      <span className="font-bold text-white text-base">{result.score != null ? result.score : '-'}</span>
+                      {result.percentage != null && (
+                        <span className="text-blue-400 font-semibold ml-1.5">({Number(result.percentage).toFixed(1)}%)</span>
                       )}
                     </div>
                     <div className="text-right">
@@ -147,8 +147,8 @@ export default function AdminResults() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {result.status === 'SUBMITTED' ? (
                           <div>
-                            <div className="text-sm font-bold text-white">{result.score}</div>
-                            <div className="text-xs text-blue-400 font-medium">{result.percentage?.toFixed(1)}%</div>
+                            <div className="text-sm font-bold text-white">{result.score != null ? result.score : '-'}</div>
+                            <div className="text-xs text-blue-400 font-medium">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : ''}</div>
                           </div>
                         ) : (
                           <span className="text-sm text-[#a6a6a6]">-</span>

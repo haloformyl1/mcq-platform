@@ -286,7 +286,7 @@ export default function StudentDashboard() {
 
                   <div className="text-right shrink-0">
                     <div className="text-xl font-extrabold text-white">{st.score} <span className="text-xs font-normal text-[#a6a6a6]">pts</span></div>
-                    <div className="text-xs font-bold text-blue-400">{st.percentage?.toFixed(1)}%</div>
+                    <div className="text-xs font-bold text-blue-400">{st.percentage != null ? `${Number(st.percentage).toFixed(1)}%` : '-'}</div>
                   </div>
                 </div>
               ))}
@@ -638,8 +638,8 @@ export default function StudentDashboard() {
                     <p className="font-semibold text-xs sm:text-sm text-white mb-2 break-words line-clamp-2 leading-snug group-hover:text-[#0099ff] transition-colors">{attempt.test.title}</p>
                     <div className="flex justify-between items-center text-xs sm:text-sm pt-1 border-t border-[#262626]">
                       <span className="text-[#a6a6a6]">{new Date(attempt.submittedAt).toLocaleDateString()}</span>
-                      <span className={`font-bold ${attempt.percentage >= 80 ? 'text-green-400' : attempt.percentage >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
-                        {attempt.percentage?.toFixed(1)}%
+                      <span className={`font-bold ${(attempt.percentage ?? 0) >= 80 ? 'text-green-400' : (attempt.percentage ?? 0) >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                        {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
                       </span>
                     </div>
                   </Link>
@@ -673,11 +673,11 @@ export default function StudentDashboard() {
                       <span>Score: </span>
                       <span className="text-white font-bold text-sm">{attempt.score}</span>
                       <span className={`ml-1.5 px-2 py-0.5 rounded-full font-bold text-[11px] ${
-                        attempt.percentage >= 80 ? 'bg-green-900/40 text-green-300 border border-green-700/50' : 
-                        attempt.percentage >= 60 ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50' : 
+                        (attempt.percentage ?? 0) >= 80 ? 'bg-green-900/40 text-green-300 border border-green-700/50' : 
+                        (attempt.percentage ?? 0) >= 60 ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50' : 
                         'bg-red-900/40 text-red-300 border border-red-700/50'
                       }`}>
-                        {attempt.percentage?.toFixed(1)}%
+                        {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
                       </span>
                     </div>
                   </div>
@@ -720,11 +720,11 @@ export default function StudentDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={`px-2.5 py-0.5 rounded-full font-medium ${
-                          attempt.percentage >= 80 ? 'bg-green-900/30 text-green-400 border border-green-800' : 
-                          attempt.percentage >= 60 ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' : 
+                          (attempt.percentage ?? 0) >= 80 ? 'bg-green-900/30 text-green-400 border border-green-800' : 
+                          (attempt.percentage ?? 0) >= 60 ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' : 
                           'bg-red-900/30 text-red-400 border border-red-800'
                         }`}>
-                          {attempt.percentage?.toFixed(1)}%
+                          {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

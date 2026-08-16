@@ -156,8 +156,8 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-[#161616] p-4 rounded-lg border border-[#333333] text-center">
           <div className="text-xs text-[#a6a6a6] mb-1">Final Score</div>
-          <div className="text-2xl font-black text-white">{result.score}</div>
-          <div className="text-xs font-bold text-blue-400 mt-0.5">{result.percentage?.toFixed(1)}%</div>
+          <div className="text-2xl font-black text-white">{result.score != null ? result.score : '-'}</div>
+          <div className="text-xs font-bold text-blue-400 mt-0.5">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : '-'}</div>
         </div>
         <div className="bg-green-950/20 p-4 rounded-lg border border-green-900/40 text-center">
           <div className="text-xs text-green-400 mb-1">Correct Answers</div>

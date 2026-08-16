@@ -296,7 +296,7 @@ export default function AdminStudentDetails() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-gray-500">Total Attempts</span> <span className="text-gray-300">{statistics.totalAttempted}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Completed Tests</span> <span className="text-gray-300">{statistics.totalCompleted}</span></div>
-            <div className="flex justify-between"><span className="text-gray-500">Average Score</span> <span className="text-gray-300">{statistics.averageScore.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Average Score</span> <span className="text-gray-300">{statistics?.averageScore != null ? Number(statistics.averageScore).toFixed(2) : "0.00"}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Highest Score</span> <span className="text-gray-300">{statistics.highestScore}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Lowest Score</span> <span className="text-gray-300">{statistics.lowestScore}</span></div>
           </div>
@@ -357,7 +357,7 @@ export default function AdminStudentDetails() {
                   </td>
                   <td className="px-4 py-3">{a.attemptNumber}</td>
                   <td className="px-4 py-3">{a.score !== null ? a.score : "-"}</td>
-                  <td className="px-4 py-3">{a.percentage !== null ? `${a.percentage.toFixed(1)}%` : "-"}</td>
+                  <td className="px-4 py-3">{a.percentage != null ? `${Number(a.percentage).toFixed(1)}%` : "-"}</td>
                 </tr>
               ))}
               {history.length === 0 && (
