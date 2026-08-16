@@ -59,7 +59,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         status: status,
         unlockAt: unlockAt,
         lockAt: lockAt,
-        postLockHoldMinutes: parseInt(data.postLockHoldMinutes) || 4320,
+        postLockHoldMinutes: typeof data.postLockHoldMinutes !== 'undefined' && !isNaN(parseInt(data.postLockHoldMinutes)) ? parseInt(data.postLockHoldMinutes) : 4320,
       },
     });
 

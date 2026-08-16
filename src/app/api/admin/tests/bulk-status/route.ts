@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     let parsedUnlockAt: Date | null = unlockAt ? new Date(unlockAt) : null;
     let parsedLockAt: Date | null = lockAt ? new Date(lockAt) : null;
     let finalStatus = status;
-    let holdMinutes = parseInt(postLockHoldMinutes) || 4320;
+    let holdMinutes = typeof postLockHoldMinutes !== 'undefined' && !isNaN(parseInt(postLockHoldMinutes)) ? parseInt(postLockHoldMinutes) : 4320;
 
     if (status === "LIVE" || status === "PUBLISHED") {
       finalStatus = "LIVE";

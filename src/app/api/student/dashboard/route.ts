@@ -52,7 +52,8 @@ export async function GET(req: Request) {
         negativeMarks: true,
         status: true,
         unlockAt: true,
-        lockAt: true
+        lockAt: true,
+        postLockHoldMinutes: true
       },
       orderBy: { createdAt: 'desc' }
     });
