@@ -192,10 +192,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   setShowProctoringModal(true);
                   fetchProctoringSettings();
                 }}
-                className="text-red-400 hover:bg-[#262626] hover:text-white p-2 rounded-md transition border border-red-900/40 hover:border-red-500/50 flex items-center space-x-1"
+                className="bg-red-950/60 hover:bg-red-900/80 text-red-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-red-500/40"
                 title="Security Protocols & Proctoring Rules"
               >
-                <Shield size={18} />
+                <Shield size={16} />
+                <span>Security Protocols</span>
               </button>
               <button
                 onClick={() => {
