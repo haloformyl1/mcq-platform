@@ -10,6 +10,7 @@ export default function AdminTests() {
   const [bulkStatus, setBulkStatus] = useState<string>("");
   const [bulkUnlockAt, setBulkUnlockAt] = useState<string>("");
   const [bulkLockAt, setBulkLockAt] = useState<string>("");
+  const [bulkHoldMinutes, setBulkHoldMinutes] = useState<number>(4320);
   const [isApplying, setIsApplying] = useState<boolean>(false);
   const router = useRouter();
 
@@ -104,6 +105,7 @@ export default function AdminTests() {
           status: bulkStatus,
           unlockAt: bulkUnlockAt ? new Date(bulkUnlockAt).toISOString() : null,
           lockAt: bulkLockAt ? new Date(bulkLockAt).toISOString() : null,
+          postLockHoldMinutes: bulkHoldMinutes,
         }),
       });
 
@@ -227,6 +229,24 @@ export default function AdminTests() {
                   Re-Lock: {formatDateTimeDisplay(bulkLockAt)}
                 </p>
               )}
+            </div>
+            <div className="sm:col-span-2 pt-2 border-t border-[#333333]">
+              <label className="block text-xs font-semibold text-[#a6a6a6]">
+                ⏳ Post-Lock Holding Controller (Duration to stay in Upcoming section before auto-re-releasing to Other Available Tests)
+              </label>
+              <select
+                className="mt-1 block w-full sm:w-1/2 bg-[#262626] border border-[#404040] text-white rounded-md p-1.5 text-xs focus:ring-blue-500 focus:border-blue-500"
+                value={bulkHoldMinutes}
+                onChange={e => setBulkHoldMinutes(parseInt(e.target.value))}
+              >
+                <option value={5}>5 Minutes (Testing)</option>
+                <option value={30}>30 Minutes</option>
+                <option value={60}>1 Hour</option>
+                <option value={720}>12 Hours</option>
+                <option value={1440}>24 Hours</option>
+                <option value={2880}>48 Hours</option>
+                <option value={4320}>72 Hours (Default)</option>
+              </select>
             </div>
           </div>
         )}

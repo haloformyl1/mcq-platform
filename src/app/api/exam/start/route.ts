@@ -73,12 +73,16 @@ export async function POST(req: Request) {
     const effectiveUnlockAt = override?.overrideUnlockAt ?? test.unlockAt;
     const effectiveLockAt = override?.overrideLockAt ?? test.lockAt;
 
-    if (!activeAttempt) {
+    if (!activeAttempt && !override) {
       if (effectiveUnlockAt && serverTime < new Date(effectiveUnlockAt)) {
         return NextResponse.json({ error: "Test has not opened yet" }, { status: 403 });
       }
       if (effectiveLockAt && serverTime >= new Date(effectiveLockAt)) {
-        return NextResponse.json({ error: "New attempts for this test are no longer accepted." }, { status: 403 });
+        const holdMinutes = test.postLockHoldMinutes ?? 4320;
+        const autoLiveDate = new Date(new Date(effectiveLockAt).getTime() + holdMinutes * 60 * 1000);
+        if (serverTime < autoLiveDate) {
+          return NextResponse.json({ error: "New attempts for this test are currently locked." }, { status: 403 });
+        }
       }
     }
 

@@ -48,6 +48,7 @@ model Test {
   status             String   @default("DRAFT") // DRAFT, PUBLISHED, LOCKED, EXPIRED
   unlockAt           DateTime?
   lockAt             DateTime?
+  postLockHoldMinutes Int     @default(4320) // Default 72 hours (4320 minutes)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

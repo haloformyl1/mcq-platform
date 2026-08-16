@@ -335,18 +335,25 @@ export default function StudentDashboard() {
               // LIVE/PUBLISHED tests are always LIVE and available to all students
               currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
             } else if (test.status === "UPCOMING" || test.status === "LOCKED") {
+              const holdMinutes = test.postLockHoldMinutes ?? 4320;
+              const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
+
               if (unlockDate && now < unlockDate) {
-                // Before unlock time -> inside Upcoming / Current Tests section (LOCKED badge)
-                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
+                // Stage 1: Before unlock time -> inside Upcoming / Current Tests section (UPCOMING badge)
+                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate, autoLiveDate });
               } else if (!lockDate || now < lockDate) {
-                // Unlocked & active live window -> stays in Upcoming / Current Tests section with LIVE TEST badge & enabled button!
-                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
-              } else {
+                // Stage 2: Active scheduled live window -> inside Upcoming / Current Tests section (LIVE NOW badge & enabled button!)
+                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "SCHEDULED_OPEN", unlockDate, lockDate, autoLiveDate });
+              } else if (autoLiveDate && now < autoLiveDate) {
+                // Stage 3: Post-lock holding period (5m to 72h) -> STAYS inside Upcoming / Current Tests section (LOCKED badge)
                 if (test.hasIndividualAccess) {
-                  currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+                  currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED", unlockDate, lockDate, autoLiveDate });
                 } else {
-                  expiredTests.push({ ...test, category: "EXPIRED", lockState: "AFTER_LOCK", unlockDate, lockDate });
+                  upcomingTests.push({ ...test, category: "UPCOMING", lockState: "POST_LOCK_HOLDING", unlockDate, lockDate, autoLiveDate });
                 }
+              } else {
+                // Stage 4: After post-lock holding duration passes -> Automatically transitions to LIVE under Other Available Tests section!
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", unlockDate, lockDate, autoLiveDate });
               }
             }
           });
@@ -356,23 +363,29 @@ export default function StudentDashboard() {
             const activeAttempt = allAttempts.find((a: any) => a.testId === test.id && a.status === 'IN_PROGRESS');
 
             const isUpcomingStage = test.lockState === "BEFORE_UNLOCK";
-            const isLiveStage = test.lockState === "SCHEDULED_OPEN" || test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "INDIVIDUAL_ACCESS_GRANTED";
+            const isLiveStage = test.lockState === "SCHEDULED_OPEN" || test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE" || test.lockState === "INDIVIDUAL_ACCESS_GRANTED";
+            const isHoldingStage = test.lockState === "POST_LOCK_HOLDING";
             const isLockedStage = test.lockState === "AFTER_LOCK" || test.lockState === "EXPIRED_STATUS";
 
             return (
-              <div key={test.id} className={`bg-[#1a1a1a] border rounded-xl overflow-hidden flex flex-col transition duration-300 shadow-lg relative ${isLiveStage ? 'border-[#0099ff]/60 hover:border-[#0099ff] shadow-[0_0_15px_rgba(0,153,255,0.15)]' : isUpcomingStage ? 'border-amber-500/40 hover:border-amber-500' : 'border-[#333333] hover:border-[#4d4d4d]'}`}>
+              <div key={test.id} className={`bg-[#1a1a1a] border rounded-xl overflow-hidden flex flex-col transition duration-300 shadow-lg relative ${isLiveStage ? 'border-[#0099ff]/60 hover:border-[#0099ff] shadow-[0_0_15px_rgba(0,153,255,0.15)]' : isUpcomingStage ? 'border-amber-500/40 hover:border-amber-500' : isHoldingStage ? 'border-orange-500/50 hover:border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.15)]' : 'border-[#333333] hover:border-[#4d4d4d]'}`}>
                 <div className="p-5 flex-1">
                   <div className="flex justify-between items-start gap-2 mb-3">
                     <h3 className="text-base sm:text-lg font-bold text-white break-words leading-snug flex-1 min-w-0">{test.title}</h3>
                     {isLiveStage && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-green-950/80 text-green-400 border border-green-700/60 shrink-0 whitespace-nowrap">
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
-                        LIVE NOW
+                        {test.lockState === "AUTO_RELEASED_LIVE" ? "LIVE TEST" : "LIVE NOW"}
                       </span>
                     )}
                     {isUpcomingStage && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60 shrink-0 whitespace-nowrap animate-pulse">
                         🔒 UPCOMING
+                      </span>
+                    )}
+                    {isHoldingStage && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-950/80 text-orange-400 border border-orange-700/60 shrink-0 whitespace-nowrap">
+                        🔒 LOCKED
                       </span>
                     )}
                     {isLockedStage && (
@@ -407,15 +420,20 @@ export default function StudentDashboard() {
                         <span>🔒 Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
                       </div>
                     )}
-                    {isLiveStage && test.lockDate && (
+                    {isLiveStage && test.lockState === "SCHEDULED_OPEN" && test.lockDate && (
                       <div className="animate-marquee whitespace-nowrap text-green-400 font-medium">
                         <span>🔥 Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
                       </div>
                     )}
-                    {isLiveStage && !test.lockDate && (
+                    {isLiveStage && (test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE") && (
                       <div className="flex items-center text-green-400 font-medium">
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span>
-                        <span>🟢 Available Anytime</span>
+                        <span>🟢 Auto-Released Live Test</span>
+                      </div>
+                    )}
+                    {isHoldingStage && test.autoLiveDate && (
+                      <div className="animate-marquee whitespace-nowrap text-orange-300 font-medium">
+                        <span>🔒 Locked at {formatDateTime(test.lockDate)} • Auto-lives under Other Available Tests at: <strong className="font-mono font-semibold text-green-400">{formatDateTime(test.autoLiveDate)}</strong></span>
                       </div>
                     )}
                     {isLockedStage && (
@@ -436,6 +454,36 @@ export default function StudentDashboard() {
                     <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow">
                       🎯 Best of Luck!
                     </button>
+                  ) : isHoldingStage ? (
+                    test.userRequestStatus === "PENDING" ? (
+                      <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 cursor-not-allowed">
+                        ⏳ Request Pending Admin Review
+                      </button>
+                    ) : (
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch("/api/student/request-access", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ testId: test.id })
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              alert("Your request to live this test has been sent to the Admin!");
+                              window.location.reload();
+                            } else {
+                              alert(data.error || "Failed to submit request.");
+                            }
+                          } catch (err) {
+                            alert("Something went wrong requesting access.");
+                          }
+                        }}
+                        className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 transition shadow-[0_0_15px_rgba(249,115,22,0.3)] flex items-center justify-center gap-1.5"
+                      >
+                        📩 Request Admin to Live Test
+                      </button>
+                    )
                   ) : isLockedStage ? (
                     test.userRequestStatus === "PENDING" ? (
                       <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 cursor-not-allowed">

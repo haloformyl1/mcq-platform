@@ -368,11 +368,34 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             </div>
           </div>
 
+          <div className="pt-2 border-t border-[#333333]">
+            <label className="block text-sm font-medium text-[#a6a6a6]">
+              ⏳ Post-Lock Holding Controller (Duration to stay in Upcoming section before auto-re-releasing to Other Available Tests)
+            </label>
+            <select
+              className="mt-1 block w-full md:w-1/2 bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]"
+              value={test.postLockHoldMinutes ?? 4320}
+              onChange={e => setTest({ ...test, postLockHoldMinutes: parseInt(e.target.value) })}
+            >
+              <option value={5}>5 Minutes (Testing)</option>
+              <option value={30}>30 Minutes</option>
+              <option value={60}>1 Hour</option>
+              <option value={720}>12 Hours</option>
+              <option value={1440}>24 Hours</option>
+              <option value={2880}>48 Hours</option>
+              <option value={4320}>72 Hours (Default)</option>
+            </select>
+            <p className="mt-1 text-xs text-[#888888]">
+              After re-lock time passes, the test will stay locked in the Upcoming / Current Tests section for this exact duration, then automatically transition to LIVE under <em>Other Available Tests</em>.
+            </p>
+          </div>
+
           <div className="mt-4 text-xs text-[#a6a6a6] space-y-1 bg-[#111111] p-3 rounded border border-[#262626]">
-            <p className="font-semibold text-white">Lifecycle Stages when status is set to UPCOMING:</p>
-            <p>1. 🔒 <strong>Before Unlock Time:</strong> Test status displays as <strong>LOCKED</strong> and stays in <em>Upcoming Tests</em> section.</p>
-            <p>2. 🟢 <strong>Between Unlock & Re-Lock Time:</strong> Test status dynamically displays as <strong>LIVE</strong> and moves to <em>Current Available Tests</em> section.</p>
-            <p>3. ⌛ <strong>After Re-Lock Time:</strong> Test status dynamically displays as <strong>EXPIRED</strong> and moves to <em>Expired Tests</em> section.</p>
+            <p className="font-semibold text-white">4-Stage Automated Lifecycle when status is set to UPCOMING:</p>
+            <p>1. 🔒 <strong>Before Unlock Time:</strong> Displays as <strong>UPCOMING</strong> in <em>Upcoming / Current Tests</em> (button disabled).</p>
+            <p>2. 🟢 <strong>Active Scheduled Window:</strong> Displays as <strong>LIVE NOW</strong> in <em>Upcoming / Current Tests</em> (students can take test).</p>
+            <p>3. 🔒 <strong>Post-Lock Holding Period:</strong> Stays in <em>Upcoming / Current Tests</em> as <strong>LOCKED</strong> for configured duration ({test.postLockHoldMinutes ? (test.postLockHoldMinutes >= 60 ? `${test.postLockHoldMinutes / 60} hour(s)` : `${test.postLockHoldMinutes} minute(s)`) : '72 hours'}).</p>
+            <p>4. 🟢 <strong>Auto-Re-Release Stage:</strong> Automatically moves to <em>Other Available Tests</em> as a <strong>LIVE TEST</strong> (students can attempt test again).</p>
           </div>
         </div>
       )}

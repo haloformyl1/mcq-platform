@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { testIds, status, unlockAt, lockAt } = await req.json();
+    const { testIds, status, unlockAt, lockAt, postLockHoldMinutes } = await req.json();
 
     if (!Array.isArray(testIds) || testIds.length === 0) {
       return NextResponse.json({ error: "No tests selected for bulk update." }, { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     let parsedUnlockAt: Date | null = unlockAt ? new Date(unlockAt) : null;
     let parsedLockAt: Date | null = lockAt ? new Date(lockAt) : null;
     let finalStatus = status;
+    let holdMinutes = parseInt(postLockHoldMinutes) || 4320;
 
     if (status === "LIVE" || status === "PUBLISHED") {
       finalStatus = "LIVE";
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
         status: finalStatus,
         unlockAt: parsedUnlockAt,
         lockAt: parsedLockAt,
+        postLockHoldMinutes: holdMinutes,
       },
     });
 
