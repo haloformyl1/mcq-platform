@@ -8,6 +8,7 @@ import { useAudioProctoring } from "@/hooks/useAudioProctoring";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import MobileEnvironmentScanner from "@/components/MobileEnvironmentScanner";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -23,6 +24,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [isCameraMinimized, setIsCameraMinimized] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [needsMobileScan, setNeedsMobileScan] = useState(false);
+
   const [proctoringSettings, setProctoringSettings] = useState<any>({
     enforceFullscreen: true,
     enableAiProctoring: true,
@@ -31,7 +35,8 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     tabSwitchAction: "AUTO_SUBMIT",
     enableAudioProctoring: true,
     audioNoiseDelaySeconds: 10,
-    maxAudioWarnings: 3
+    maxAudioWarnings: 3,
+    enableMobileEnvironmentScan: true
   });
 
   useEffect(() => {
@@ -40,6 +45,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       .then(data => {
         if (data && !data.error) {
           setProctoringSettings(data);
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 1024);
+          setIsMobileDevice(isMobile);
+          if (isMobile && data.enableMobileEnvironmentScan !== false) {
+            setNeedsMobileScan(true);
+          }
         }
       })
       .catch(e => console.error(e));
@@ -446,6 +456,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </>
         )}
       </div>
+
+      {/* Mobile 360 Pre-Exam Scanner */}
+      {needsMobileScan && (
+        <MobileEnvironmentScanner
+          onComplete={() => setNeedsMobileScan(false)}
+          onCancel={() => router.push('/dashboard')}
+        />
+      )}
 
       {/* Fullscreen Warning Modal */}
       {showFullscreenWarning && (

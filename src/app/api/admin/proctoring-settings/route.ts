@@ -22,7 +22,8 @@ export async function GET() {
           tabSwitchAction: "AUTO_SUBMIT",
           enableAudioProctoring: true,
           audioNoiseDelaySeconds: 10,
-          maxAudioWarnings: 3
+          maxAudioWarnings: 3,
+          enableMobileEnvironmentScan: true
         }
       });
     }
@@ -55,7 +56,8 @@ export async function POST(req: Request) {
         tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
         enableAudioProctoring: Boolean(data.enableAudioProctoring),
         audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
-        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3
+        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3,
+        enableMobileEnvironmentScan: Boolean(data.enableMobileEnvironmentScan)
       },
       create: {
         id: "default",
@@ -66,7 +68,8 @@ export async function POST(req: Request) {
         tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
         enableAudioProctoring: Boolean(data.enableAudioProctoring),
         audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
-        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3
+        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3,
+        enableMobileEnvironmentScan: Boolean(data.enableMobileEnvironmentScan)
       }
     });
 

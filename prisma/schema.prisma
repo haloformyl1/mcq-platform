@@ -145,14 +145,15 @@ model Answer {
 }
 
 model ProctoringSetting {
-  id                      String   @id @default("default")
-  enforceFullscreen       Boolean  @default(true)
-  enableAiProctoring      Boolean  @default(true)
-  faceAbsenceDelaySeconds Int      @default(10)
-  maxAllowedWarnings      Int      @default(5)
-  tabSwitchAction         String   @default("AUTO_SUBMIT") // AUTO_SUBMIT, WARNING, ALLOW
-  enableAudioProctoring   Boolean  @default(true)
-  audioNoiseDelaySeconds  Int      @default(10)
-  maxAudioWarnings        Int      @default(3)
-  updatedAt               DateTime @updatedAt
+  id                           String   @id @default("default")
+  enforceFullscreen            Boolean  @default(true)
+  enableAiProctoring           Boolean  @default(true)
+  faceAbsenceDelaySeconds      Int      @default(10)
+  maxAllowedWarnings           Int      @default(5)
+  tabSwitchAction              String   @default("AUTO_SUBMIT") // AUTO_SUBMIT, WARNING, ALLOW
+  enableAudioProctoring        Boolean  @default(true)
+  audioNoiseDelaySeconds       Int      @default(10)
+  maxAudioWarnings             Int      @default(3)
+  enableMobileEnvironmentScan  Boolean  @default(true)
+  updatedAt                    DateTime @updatedAt
 }
