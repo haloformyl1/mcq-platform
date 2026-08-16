@@ -400,6 +400,126 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         </div>
       )}
 
+      {/* 🛡️ AI Proctoring & Violation Allowance Controller Card */}
+      <div className="bg-[#161616]/90 p-6 rounded-lg shadow border border-red-500/40 backdrop-blur-sm space-y-5">
+        <div className="flex items-center justify-between border-b border-[#333333] pb-3">
+          <div className="flex items-center space-x-2.5">
+            <span className="p-2 bg-red-950 text-red-400 rounded-lg border border-red-800 font-bold text-sm">🛡️</span>
+            <div>
+              <h2 className="text-lg font-bold text-white">AI Proctoring Allowance & Violation Rules Controller</h2>
+              <p className="text-xs text-[#a6a6a6]">Customize exact warning limits per violation type and set the time duration required for the 1st eye slip warning.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* 1. Time Duration for 1st Eye Slip Warning */}
+          <div className="bg-[#111111] p-4 rounded-lg border border-[#2a2a2a] space-y-2">
+            <label className="block text-xs font-bold text-amber-300">
+              ⏱️ Time Duration for 1st Eye Slip / Looking Away Warning
+            </label>
+            <select
+              className="w-full bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-amber-500 focus:border-amber-500"
+              value={test.eyeSlipDurationSeconds ?? 10}
+              onChange={e => setTest({ ...test, eyeSlipDurationSeconds: parseInt(e.target.value) })}
+            >
+              <option value={3}>3 Seconds (Strict)</option>
+              <option value={5}>5 Seconds</option>
+              <option value={10}>10 Seconds (Default)</option>
+              <option value={15}>15 Seconds</option>
+              <option value={20}>20 Seconds</option>
+              <option value={30}>30 Seconds (Relaxed)</option>
+            </select>
+            <p className="text-[11px] text-[#888888]">
+              Continuous time student must look away or be missing before 1st warning triggers.
+            </p>
+          </div>
+
+          {/* 2. Cell Phone Warning Limit */}
+          <div className="bg-[#111111] p-4 rounded-lg border border-[#2a2a2a] space-y-2">
+            <label className="block text-xs font-bold text-red-400">
+              📱 Cell Phone Warnings Allowed
+            </label>
+            <select
+              className="w-full bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-red-500 focus:border-red-500"
+              value={test.maxPhoneWarnings ?? 1}
+              onChange={e => setTest({ ...test, maxPhoneWarnings: parseInt(e.target.value) })}
+            >
+              <option value={1}>1 Warning (Auto-submit on 1st detection)</option>
+              <option value={2}>2 Warnings</option>
+              <option value={3}>3 Warnings</option>
+              <option value={5}>5 Warnings</option>
+              <option value={0}>0 (Disabled)</option>
+            </select>
+            <p className="text-[11px] text-[#888888]">
+              Number of cell phone detections allowed before instant exam submission.
+            </p>
+          </div>
+
+          {/* 3. Multiple Person Warning Limit */}
+          <div className="bg-[#111111] p-4 rounded-lg border border-[#2a2a2a] space-y-2">
+            <label className="block text-xs font-bold text-orange-400">
+              👥 Multiple Person Warnings Allowed
+            </label>
+            <select
+              className="w-full bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-orange-500 focus:border-orange-500"
+              value={test.maxMultiPersonWarnings ?? 1}
+              onChange={e => setTest({ ...test, maxMultiPersonWarnings: parseInt(e.target.value) })}
+            >
+              <option value={1}>1 Warning (Auto-submit on 1st detection)</option>
+              <option value={2}>2 Warnings</option>
+              <option value={3}>3 Warnings</option>
+              <option value={5}>5 Warnings</option>
+              <option value={0}>0 (Disabled)</option>
+            </select>
+            <p className="text-[11px] text-[#888888]">
+              Number of multi-person detections allowed before instant submission.
+            </p>
+          </div>
+
+          {/* 4. Eye Slip Warning Limit */}
+          <div className="bg-[#111111] p-4 rounded-lg border border-[#2a2a2a] space-y-2">
+            <label className="block text-xs font-bold text-amber-400">
+              👁️ Eye Slip Warnings Allowed
+            </label>
+            <select
+              className="w-full bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-amber-500 focus:border-amber-500"
+              value={test.maxEyeSlipWarnings ?? 3}
+              onChange={e => setTest({ ...test, maxEyeSlipWarnings: parseInt(e.target.value) })}
+            >
+              <option value={1}>1 Warning</option>
+              <option value={2}>2 Warnings</option>
+              <option value={3}>3 Warnings (Default)</option>
+              <option value={5}>5 Warnings</option>
+              <option value={0}>0 (Disabled)</option>
+            </select>
+            <p className="text-[11px] text-[#888888]">
+              Number of eye slip warnings allowed before auto-submit.
+            </p>
+          </div>
+
+          {/* 5. Total Cumulative Warning Limit */}
+          <div className="bg-[#111111] p-4 rounded-lg border border-[#2a2a2a] space-y-2">
+            <label className="block text-xs font-bold text-cyan-400">
+              🚨 Total Cumulative Warnings Limit
+            </label>
+            <select
+              className="w-full bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-cyan-500 focus:border-cyan-500"
+              value={test.maxTotalWarnings ?? 3}
+              onChange={e => setTest({ ...test, maxTotalWarnings: parseInt(e.target.value) })}
+            >
+              <option value={1}>1 Total Warning</option>
+              <option value={2}>2 Total Warnings</option>
+              <option value={3}>3 Total Warnings (Default)</option>
+              <option value={5}>5 Total Warnings</option>
+            </select>
+            <p className="text-[11px] text-[#888888]">
+              Total combined warnings across all types before instant exam disqualification.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-8 flex justify-between items-center">
         <h2 className="text-xl font-bold">Questions ({test.questions?.length || 0})</h2>
         <div className="space-x-2">

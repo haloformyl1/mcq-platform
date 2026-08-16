@@ -50,6 +50,11 @@ model Test {
   unlockAt           DateTime?
   lockAt             DateTime?
   postLockHoldMinutes Int     @default(4320) // Default 72 hours (4320 minutes)
+  eyeSlipDurationSeconds Int   @default(10)   // Duration for 1st eye slip warning (3s, 5s, 10s, 15s, 20s, 30s)
+  maxPhoneWarnings       Int   @default(1)    // Max allowed cell phone warnings before auto-submit
+  maxMultiPersonWarnings Int   @default(1)    // Max allowed multiple person warnings before auto-submit
+  maxEyeSlipWarnings     Int   @default(3)    // Max allowed eye slip warnings before auto-submit
+  maxTotalWarnings       Int   @default(3)    // Total cumulative warnings allowed before auto-submit
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

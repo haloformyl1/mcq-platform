@@ -53,7 +53,12 @@ export async function GET(req: Request) {
         status: true,
         unlockAt: true,
         lockAt: true,
-        postLockHoldMinutes: true
+        postLockHoldMinutes: true,
+        eyeSlipDurationSeconds: true,
+        maxPhoneWarnings: true,
+        maxMultiPersonWarnings: true,
+        maxEyeSlipWarnings: true,
+        maxTotalWarnings: true
       },
       orderBy: { createdAt: 'desc' }
     });

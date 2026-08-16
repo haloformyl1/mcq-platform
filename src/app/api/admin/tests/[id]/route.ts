@@ -60,6 +60,11 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         unlockAt: unlockAt,
         lockAt: lockAt,
         postLockHoldMinutes: typeof data.postLockHoldMinutes !== 'undefined' && !isNaN(parseInt(data.postLockHoldMinutes)) ? parseInt(data.postLockHoldMinutes) : 4320,
+        eyeSlipDurationSeconds: typeof data.eyeSlipDurationSeconds !== 'undefined' ? parseInt(data.eyeSlipDurationSeconds) : 10,
+        maxPhoneWarnings: typeof data.maxPhoneWarnings !== 'undefined' ? parseInt(data.maxPhoneWarnings) : 1,
+        maxMultiPersonWarnings: typeof data.maxMultiPersonWarnings !== 'undefined' ? parseInt(data.maxMultiPersonWarnings) : 1,
+        maxEyeSlipWarnings: typeof data.maxEyeSlipWarnings !== 'undefined' ? parseInt(data.maxEyeSlipWarnings) : 3,
+        maxTotalWarnings: typeof data.maxTotalWarnings !== 'undefined' ? parseInt(data.maxTotalWarnings) : 3,
       },
     });
 

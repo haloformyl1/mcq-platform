@@ -121,6 +121,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
               <button
                 onClick={() => {
+                  router.push("/admin/tests");
+                }}
+                className="bg-red-950/60 hover:bg-red-900/80 text-red-300 px-2.5 py-1.5 rounded-md text-xs font-semibold transition border border-red-800 flex items-center space-x-1"
+                title="Configure AI Proctoring Allowance Rules per test"
+              >
+                <Shield size={14} className="text-red-400" />
+                <span>🛡️ Proctoring Rules</span>
+              </button>
+              <button
+                onClick={() => {
                   setModalError("");
                   setModalSuccess("");
                   setShowPasswordModal(true);

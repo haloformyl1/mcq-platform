@@ -93,6 +93,13 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       studentName: examData.student?.name,
       studentEmail: examData.student?.email,
       testTitle: examData.test?.title
+    } : undefined,
+    examData?.test ? {
+      eyeSlipDurationSeconds: examData.test.eyeSlipDurationSeconds,
+      maxPhoneWarnings: examData.test.maxPhoneWarnings,
+      maxMultiPersonWarnings: examData.test.maxMultiPersonWarnings,
+      maxEyeSlipWarnings: examData.test.maxEyeSlipWarnings,
+      maxTotalWarnings: examData.test.maxTotalWarnings,
     } : undefined
   );
 

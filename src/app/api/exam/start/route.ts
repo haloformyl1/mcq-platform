@@ -172,9 +172,15 @@ export async function POST(req: Request) {
     return NextResponse.json({
       attemptId,
       test: {
+        id: test.id,
         title: test.title,
         durationMinutes: test.durationMinutes,
         totalQuestions: test.totalQuestions,
+        eyeSlipDurationSeconds: test.eyeSlipDurationSeconds ?? 10,
+        maxPhoneWarnings: test.maxPhoneWarnings ?? 1,
+        maxMultiPersonWarnings: test.maxMultiPersonWarnings ?? 1,
+        maxEyeSlipWarnings: test.maxEyeSlipWarnings ?? 3,
+        maxTotalWarnings: test.maxTotalWarnings ?? 3,
       },
       questions: displayQuestions,
       serverTime: serverTime.toISOString(),

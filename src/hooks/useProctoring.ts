@@ -12,21 +12,38 @@ export interface ProctoringAttemptInfo {
   testTitle?: string;
 }
 
+export interface ProctoringRules {
+  eyeSlipDurationSeconds?: number;
+  maxPhoneWarnings?: number;
+  maxMultiPersonWarnings?: number;
+  maxEyeSlipWarnings?: number;
+  maxTotalWarnings?: number;
+}
+
 export function useProctoring(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   onSubmit: (reason: string) => void,
   isTestActive: boolean,
-  attemptInfo?: ProctoringAttemptInfo
+  attemptInfo?: ProctoringAttemptInfo,
+  proctoringRules?: ProctoringRules
 ) {
-  const MAX_WARNINGS = 3;
+  const eyeSlipDurationSeconds = proctoringRules?.eyeSlipDurationSeconds ?? 10;
+  const maxPhoneWarnings = proctoringRules?.maxPhoneWarnings ?? 1;
+  const maxMultiPersonWarnings = proctoringRules?.maxMultiPersonWarnings ?? 1;
+  const maxEyeSlipWarnings = proctoringRules?.maxEyeSlipWarnings ?? 3;
+  const maxTotalWarnings = proctoringRules?.maxTotalWarnings ?? 3;
 
-  const [warningsLeft, setWarningsLeft] = useState(MAX_WARNINGS);
+  const [warningsLeft, setWarningsLeft] = useState(maxTotalWarnings);
   const [showSlipWarning, setShowSlipWarning] = useState(false);
   const [violationType, setViolationType] = useState<string>("PROCTORING_VIOLATION");
   const [violationMessage, setViolationMessage] = useState<string>("");
   const [isAiActive, setIsAiActive] = useState(false);
 
-  const warningCount = useRef(0);
+  const totalWarningCount = useRef(0);
+  const phoneWarningCount = useRef(0);
+  const multiPersonWarningCount = useRef(0);
+  const eyeSlipWarningCount = useRef(0);
+
   const continuousSlipStartTime = useRef<number | null>(null);
   const faceDetectorRef = useRef<blazeface.BlazeFaceModel | null>(null);
   const objectDetectorRef = useRef<cocoSsd.ObjectDetection | null>(null);
@@ -85,17 +102,39 @@ export function useProctoring(
       if (now - lastViolationTime.current < 4000) return;
       lastViolationTime.current = now;
 
-      warningCount.current += 1;
-      const currentWarningNum = warningCount.current;
-      const remaining = Math.max(0, MAX_WARNINGS - currentWarningNum);
+      let isMaxReached = false;
+      totalWarningCount.current += 1;
+      const currentTotal = totalWarningCount.current;
 
+      if (type === "CELL_PHONE_DETECTED") {
+        phoneWarningCount.current += 1;
+        if (maxPhoneWarnings > 0 && phoneWarningCount.current >= maxPhoneWarnings) {
+          isMaxReached = true;
+        }
+      } else if (type === "MULTIPLE_PERSONS_DETECTED") {
+        multiPersonWarningCount.current += 1;
+        if (maxMultiPersonWarnings > 0 && multiPersonWarningCount.current >= maxMultiPersonWarnings) {
+          isMaxReached = true;
+        }
+      } else if (type === "EYE_SLIP") {
+        eyeSlipWarningCount.current += 1;
+        if (maxEyeSlipWarnings > 0 && eyeSlipWarningCount.current >= maxEyeSlipWarnings) {
+          isMaxReached = true;
+        }
+      }
+
+      if (currentTotal >= maxTotalWarnings) {
+        isMaxReached = true;
+      }
+
+      const remaining = Math.max(0, maxTotalWarnings - currentTotal);
       setWarningsLeft(remaining);
       setViolationType(type);
       setViolationMessage(message);
 
       const snapshotBase64 = captureSnapshot();
 
-      // Send violation to backend API immediately
+      // Send violation log to backend API immediately
       if (attemptInfo?.attemptId) {
         fetch("/api/exam/proctoring-violation", {
           method: "POST",
@@ -107,12 +146,12 @@ export function useProctoring(
             violationType: type,
             message: message,
             snapshotBase64: snapshotBase64,
-            warningNumber: currentWarningNum,
+            warningNumber: currentTotal,
           }),
         }).catch(err => console.error("Violation reporting failed:", err));
       }
 
-      if (currentWarningNum >= MAX_WARNINGS) {
+      if (isMaxReached) {
         onSubmit(type);
       } else {
         setShowSlipWarning(true);
@@ -136,8 +175,8 @@ export function useProctoring(
         const videoEl = videoRef.current;
         const now = Date.now();
 
-        // 1. Immediate Cell Phone Detection via COCO-SSD
-        if (objectDetectorRef.current) {
+        // 1. Cell Phone Detection via COCO-SSD (if allowed > 0)
+        if (objectDetectorRef.current && maxPhoneWarnings !== 0) {
           const predictions = await objectDetectorRef.current.detect(videoEl);
           const phoneObj = predictions.find(
             p => (p.class === 'cell phone' || p.class === 'mobile phone' || p.class === 'phone') && p.score >= 0.40
@@ -151,24 +190,26 @@ export function useProctoring(
           }
         }
 
-        // 2. Face Detection & Multiple Person Check via BlazeFace
+        // 2. Face Detection via BlazeFace
         if (faceDetectorRef.current) {
           const faces = await faceDetectorRef.current.estimateFaces(videoEl, false);
 
-          if (faces.length > 1) {
+          if (faces.length > 1 && maxMultiPersonWarnings !== 0) {
             reportViolation(
               "MULTIPLE_PERSONS_DETECTED",
               `Multiple people (${faces.length} faces) detected in camera frame.`
             );
-          } else if (faces.length === 0) {
-            // No face detected / looking away continuous 10s check
+          } else if (faces.length === 0 && maxEyeSlipWarnings !== 0) {
+            // Missing face / looking away check based on configured eyeSlipDurationSeconds
+            const requiredThresholdMs = eyeSlipDurationSeconds * 1000;
+
             if (continuousSlipStartTime.current === null) {
               continuousSlipStartTime.current = now;
-            } else if (now - continuousSlipStartTime.current >= 10000) {
+            } else if (now - continuousSlipStartTime.current >= requiredThresholdMs) {
               continuousSlipStartTime.current = null;
               reportViolation(
-                "EYE_SLIP_10S",
-                "You looked away or face was missing from screen for over 10 seconds."
+                "EYE_SLIP",
+                `You looked away or face was missing from screen for over ${eyeSlipDurationSeconds} seconds.`
               );
             }
           } else {
@@ -193,7 +234,17 @@ export function useProctoring(
       isTrackingRef.current = false;
       clearTimeout(timeoutId);
     };
-  }, [videoRef, isTestActive, onSubmit, attemptInfo]);
+  }, [
+    videoRef,
+    isTestActive,
+    onSubmit,
+    attemptInfo,
+    eyeSlipDurationSeconds,
+    maxPhoneWarnings,
+    maxMultiPersonWarnings,
+    maxEyeSlipWarnings,
+    maxTotalWarnings,
+  ]);
 
   return {
     warningsLeft,
