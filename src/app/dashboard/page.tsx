@@ -507,14 +507,14 @@ export default function StudentDashboard() {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500"></span>
                     </span>
-                    <h2 className="text-xl font-bold text-white tracking-wide">Live Tests</h2>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Other Available Tests</h2>
                   </div>
                   <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold">
-                    {currentAvailableTests.length} Live
+                    {currentAvailableTests.length} Available
                   </span>
                 </div>
                 {currentAvailableTests.length === 0 ? (
-                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No live tests available.</p>
+                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No other available tests at the moment.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {currentAvailableTests.map(test => renderTestCard(test))}
