@@ -80,6 +80,63 @@ export default function StudentDashboard() {
 
   const studentName = student.name || student.email.split('@')[0];
 
+  const formatDateTime = (dateInput: Date | string | null | undefined) => {
+    if (!dateInput) return "";
+    const dateObj = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (isNaN(dateObj.getTime())) return "";
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const day = pad(dateObj.getDate());
+    const month = pad(dateObj.getMonth() + 1);
+    const year = dateObj.getFullYear();
+    let hours = dateObj.getHours();
+    const minutes = pad(dateObj.getMinutes());
+    const seconds = pad(dateObj.getSeconds());
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${day}/${month}/${year} ${pad(hours)}:${minutes}:${seconds} ${ampm}`;
+  };
+
+  const bannerItems: any[] = [];
+  (availableTests || []).forEach((t: any) => {
+    const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
+    const lock = t.lockAt ? new Date(t.lockAt) : null;
+
+    if (unlock) {
+      const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
+      if (now >= bannerStart && now < unlock) {
+        bannerItems.push({
+          type: "UPCOMING",
+          test: t,
+          message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
+        });
+      } else if (now >= unlock && lock && now < lock) {
+        bannerItems.push({
+          type: "LIVE_EXPIRING",
+          test: t,
+          message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>. Please attempt the test before it closes!`
+        });
+      }
+    } else if (lock && now < lock) {
+      bannerItems.push({
+        type: "LIVE_EXPIRING",
+        test: t,
+        message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
+      });
+    }
+
+    if (lock) {
+      const postLock24h = new Date(lock.getTime() + 24 * 60 * 60 * 1000);
+      if (now >= lock && now < postLock24h) {
+        bannerItems.push({
+          type: "RECENTLY_LOCKED",
+          test: t,
+          message: `⌛ Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> was live until <strong class="text-red-300 font-mono">${formatDateTime(t.lockAt)}</strong> and has now concluded. If you missed submitting your test in time, please contact the Admin to request access.`
+        });
+      }
+    }
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white font-sans pb-20">
       <AdminPreviewBanner />
@@ -108,6 +165,29 @@ export default function StudentDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* Moving Announcement Banner (Placed at the very top of main) */}
+        {bannerItems.length > 0 && (
+          <div className="bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <span className="shrink-0 text-xs font-bold bg-amber-500 text-black px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow">
+                <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                ANNOUNCEMENT
+              </span>
+              <div className="flex-1 overflow-hidden relative">
+                <div className="animate-marquee whitespace-nowrap inline-block text-sm font-semibold text-amber-200">
+                  {bannerItems.map((item: any) => (
+                    <span
+                      key={item.test.id}
+                      className="mr-16"
+                      dangerouslySetInnerHTML={{ __html: item.message }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Top Summary Cards */}
         {testsTaken > 0 ? (
@@ -408,76 +488,8 @@ export default function StudentDashboard() {
             );
           };
 
-          // Filter tests qualifying for moving announcement banner:
-          // 1. Upcoming tests: Display on the unlock day AND 1 day prior to unlock
-          // 2. Live tests: Display if live and scheduled to expire soon
-          // 3. Locked tests: Display for 24 hours after locking
-          const bannerItems: any[] = [];
-
-          availableTests.forEach((t: any) => {
-            const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
-            const lock = t.lockAt ? new Date(t.lockAt) : null;
-
-            if (unlock) {
-              const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
-              if (now >= bannerStart && now < unlock) {
-                bannerItems.push({
-                  type: "UPCOMING",
-                  test: t,
-                  message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
-                });
-              } else if (now >= unlock && lock && now < lock) {
-                bannerItems.push({
-                  type: "LIVE_EXPIRING",
-                  test: t,
-                  message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>. Please attempt the test before it closes!`
-                });
-              }
-            } else if (lock && now < lock) {
-              bannerItems.push({
-                type: "LIVE_EXPIRING",
-                test: t,
-                message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
-              });
-            }
-
-            // Check if test locked within the last 24 hours
-            if (lock) {
-              const postLock24h = new Date(lock.getTime() + 24 * 60 * 60 * 1000);
-              if (now >= lock && now < postLock24h) {
-                bannerItems.push({
-                  type: "RECENTLY_LOCKED",
-                  test: t,
-                  message: `⌛ Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> was live until <strong class="text-red-300 font-mono">${formatDateTime(t.lockAt)}</strong> and has now concluded. If you missed submitting your test in time, please contact the Admin to request access.`
-                });
-              }
-            }
-          });
-
           return (
             <div className="space-y-10">
-              {/* Moving Announcement Banner */}
-              {bannerItems.length > 0 && (
-                <div className="bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <span className="shrink-0 text-xs font-bold bg-amber-500 text-black px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow">
-                      <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                      ANNOUNCEMENT
-                    </span>
-                    <div className="flex-1 overflow-hidden relative">
-                      <div className="animate-marquee whitespace-nowrap inline-block text-sm font-semibold text-amber-200">
-                        {bannerItems.map((item: any) => (
-                          <span
-                            key={item.test.id}
-                            className="mr-16"
-                            dangerouslySetInnerHTML={{ __html: item.message }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* 1. Box 1: Upcoming Tests (Always at Top) */}
               <div className="bg-[#121212]/90 border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(245,158,11,0.08)] space-y-4">
