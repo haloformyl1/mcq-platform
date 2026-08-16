@@ -26,7 +26,7 @@ export default function AdminDashboard() {
         if (data) {
           setStats({
             totalTests: data.length,
-            publishedTests: data.filter((t: any) => t.status === "PUBLISHED").length,
+            publishedTests: data.filter((t: any) => t.status === "PUBLISHED" || t.status === "LIVE").length,
             totalQuestions: data.reduce((acc: number, t: any) => acc + (t._count?.questions || 0), 0),
             totalAttempts: data.reduce((acc: number, t: any) => acc + (t._count?.attempts || 0), 0),
           });
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
           <p className="text-3xl font-bold text-white mt-2">{stats.totalTests}</p>
         </div>
         <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm">
-          <p className="text-[#a6a6a6] text-sm font-medium">Published Tests</p>
+          <p className="text-[#a6a6a6] text-sm font-medium">Live Tests</p>
           <p className="text-3xl font-bold text-white mt-2">{stats.publishedTests}</p>
         </div>
         <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm">

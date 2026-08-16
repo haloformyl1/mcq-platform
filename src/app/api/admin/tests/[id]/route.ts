@@ -23,6 +23,26 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
   const params = await context.params;
   try {
     const data = await req.json();
+
+    let status = data.status;
+    let unlockAt = data.unlockAt ? new Date(data.unlockAt) : null;
+    let lockAt = data.lockAt ? new Date(data.lockAt) : null;
+
+    if (status === "LIVE" || status === "PUBLISHED") {
+      unlockAt = null;
+      lockAt = null;
+    } else if (status === "UPCOMING" || status === "LOCKED") {
+      if (!unlockAt) {
+        return NextResponse.json({ error: "Unlock Date & Time is required for UPCOMING status." }, { status: 400 });
+      }
+      if (!lockAt) {
+        return NextResponse.json({ error: "Re-Lock Date & Time is required for UPCOMING status." }, { status: 400 });
+      }
+      if (lockAt <= unlockAt) {
+        return NextResponse.json({ error: "Re-Lock Date & Time must be later than Unlock Date & Time." }, { status: 400 });
+      }
+    }
+
     const test = await prisma.test.update({
       where: { id: params.id },
       data: {
@@ -36,9 +56,9 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         maximumAttempts: parseInt(data.maximumAttempts) || 1,
         randomizeQuestions: data.randomizeQuestions,
         randomizeOptions: data.randomizeOptions,
-        status: data.status,
-        unlockAt: data.unlockAt ? new Date(data.unlockAt) : null,
-        lockAt: data.lockAt ? new Date(data.lockAt) : null,
+        status: status,
+        unlockAt: unlockAt,
+        lockAt: lockAt,
       },
     });
 

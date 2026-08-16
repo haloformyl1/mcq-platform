@@ -17,27 +17,40 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
       .then(res => res.json())
       .then(data => {
         const isScheduleExpiry = data.autoExpireOnLock ?? (!!data.lockAt && !data.unlockAt);
-        setTest({ ...data, autoExpireOnLock: isScheduleExpiry });
+        let normalizedStatus = data.status;
+        if (data.status === "PUBLISHED") normalizedStatus = "LIVE";
+        if (data.status === "LOCKED") normalizedStatus = "UPCOMING";
+        setTest({ ...data, status: normalizedStatus, autoExpireOnLock: isScheduleExpiry });
         setLoading(false);
       });
   }, [resolvedParams.id]);
 
   const saveSettings = async () => {
-    if (test.status === "LOCKED") {
-      if (!test.lockAt) {
-        alert("Please select a lock date and time.");
+    let testToSave = { ...test };
+    if (testToSave.status === "LIVE" || testToSave.status === "PUBLISHED") {
+      testToSave.unlockAt = null;
+      testToSave.lockAt = null;
+    } else if (testToSave.status === "UPCOMING" || testToSave.status === "LOCKED") {
+      if (!testToSave.unlockAt) {
+        alert("Please select an Unlock Date & Time.");
         return;
       }
-      if (test.unlockAt && test.lockAt && new Date(test.lockAt) <= new Date(test.unlockAt)) {
-        alert("Lock date and time must be later than the unlock date and time.");
+      if (!testToSave.lockAt) {
+        alert("Please select a Re-Lock Date & Time.");
+        return;
+      }
+      if (new Date(testToSave.lockAt) <= new Date(testToSave.unlockAt)) {
+        alert("Re-Lock Date & Time must be later than the Unlock Date & Time.");
         return;
       }
     }
+
     await fetch(`/api/admin/tests/${resolvedParams.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(test),
+      body: JSON.stringify(testToSave),
     });
+    setTest(testToSave);
     alert("Settings saved!");
   };
 
@@ -223,6 +236,23 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
     }
   };
 
+  const formatDateTimeDisplay = (dateInput: string | Date | null | undefined) => {
+    if (!dateInput) return "";
+    const dateObj = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (isNaN(dateObj.getTime())) return "";
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const day = pad(dateObj.getDate());
+    const month = pad(dateObj.getMonth() + 1);
+    const year = dateObj.getFullYear();
+    let hours = dateObj.getHours();
+    const minutes = pad(dateObj.getMinutes());
+    const seconds = pad(dateObj.getSeconds());
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${day}/${month}/${year} ${pad(hours)}:${minutes}:${seconds} ${ampm}`;
+  };
+
   if (loading) return <PiFiringLoader fullScreen={true} />;
 
   return (
@@ -245,15 +275,15 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           <label className="block text-sm font-medium text-[#a6a6a6]">Status</label>
           <select className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.status} onChange={e => {
             const newStatus = e.target.value;
-            if (newStatus === "PUBLISHED") {
-              setTest({ ...test, status: newStatus, lockAt: null, unlockAt: null });
+            if (newStatus === "LIVE" || newStatus === "PUBLISHED") {
+              setTest({ ...test, status: "LIVE", lockAt: null, unlockAt: null });
             } else {
               setTest({ ...test, status: newStatus });
             }
           }}>
             <option value="DRAFT">DRAFT</option>
-            <option value="PUBLISHED">PUBLISHED</option>
-            <option value="LOCKED">LOCKED</option>
+            <option value="LIVE">LIVE</option>
+            <option value="UPCOMING">UPCOMING</option>
             <option value="EXPIRED">EXPIRED</option>
           </select>
         </div>
@@ -299,62 +329,50 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
 
-      {test.status === "LOCKED" && (
+      {(test.status === "UPCOMING" || test.status === "LOCKED") && (
         <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm space-y-4">
-          <h2 className="text-lg font-bold">Scheduled Access Window</h2>
-          
-          <div className="pt-1">
-            <label className="flex items-center space-x-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded bg-[#262626] border-[#404040] text-amber-500 focus:ring-amber-500"
-                checked={test.autoExpireOnLock ?? false}
-                onChange={e => {
-                  const checked = e.target.checked;
-                  if (checked) {
-                    setTest({ ...test, autoExpireOnLock: true, unlockAt: null });
-                  } else {
-                    setTest({ ...test, autoExpireOnLock: false });
-                  }
-                }}
-              />
-              <span className="text-sm font-semibold text-amber-300">
-                ⌛ Schedule Expiry: Automatically expire test when lock time arrives
-              </span>
-            </label>
-            <p className="mt-1 text-xs text-[#888888] pl-6.5">
-              When checked, the test is available immediately and will automatically move into the Expired Tests section once the Expiration Date & Time passes.
-            </p>
-          </div>
+          <h2 className="text-lg font-bold text-amber-400">Scheduled Upcoming Access Window</h2>
+          <p className="text-xs text-[#a6a6a6]">
+            Configure when this test will unlock for students, and when it will automatically re-lock (expire).
+          </p>
 
-          <div className={`grid ${test.autoExpireOnLock ? 'grid-cols-1 max-w-md' : 'grid-cols-2'} gap-4 pt-2 border-t border-[#333333]`}>
-            {!test.autoExpireOnLock && (
-              <div>
-                <label className="block text-sm font-medium text-[#a6a6a6]">Unlock Date & Time</label>
-                <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => {
-                  const val = e.target.value;
-                  if (!val) { setTest({...test, unlockAt: null}); return; }
-                  const d = new Date(val);
-                  if (!isNaN(d.getTime())) setTest({...test, unlockAt: d.toISOString()});
-                }} />
-              </div>
-            )}
+          <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#333333]">
             <div>
-              <label className="block text-sm font-medium text-[#a6a6a6]">
-                {test.autoExpireOnLock ? "Expiration Date & Time" : "Lock Date & Time"}
-              </label>
+              <label className="block text-sm font-medium text-[#a6a6a6]">Unlock Date & Time</label>
+              <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => {
+                const val = e.target.value;
+                if (!val) { setTest({...test, unlockAt: null}); return; }
+                const d = new Date(val);
+                if (!isNaN(d.getTime())) setTest({...test, unlockAt: d.toISOString()});
+              }} />
+              {test.unlockAt && (
+                <p className="mt-1 text-xs text-amber-300 font-mono">
+                  Selected: {formatDateTimeDisplay(test.unlockAt)}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#a6a6a6]">Re-Lock Date & Time</label>
               <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => {
                 const val = e.target.value;
                 if (!val) { setTest({...test, lockAt: null}); return; }
                 const d = new Date(val);
                 if (!isNaN(d.getTime())) setTest({...test, lockAt: d.toISOString()});
               }} />
+              {test.lockAt && (
+                <p className="mt-1 text-xs text-orange-400 font-mono">
+                  Selected: {formatDateTimeDisplay(test.lockAt)}
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="mt-4 text-sm text-[#a6a6a6]">
-            <p>{test.autoExpireOnLock ? "Students can take this test until the expiration time arrives." : "Students can start this test only during the configured access window."}</p>
-            <p className="mt-1 text-yellow-400">Note: Students who have already started the test will be allowed to continue their active attempt even after the lock/expiry time.</p>
+          <div className="mt-4 text-xs text-[#a6a6a6] space-y-1 bg-[#111111] p-3 rounded border border-[#262626]">
+            <p className="font-semibold text-white">Lifecycle Stages when status is set to UPCOMING:</p>
+            <p>1. 🔒 <strong>Before Unlock Time:</strong> Test status displays as <strong>LOCKED</strong> and stays in <em>Upcoming Tests</em> section.</p>
+            <p>2. 🟢 <strong>Between Unlock & Re-Lock Time:</strong> Test status dynamically displays as <strong>LIVE</strong> and moves to <em>Current Available Tests</em> section.</p>
+            <p>3. ⌛ <strong>After Re-Lock Time:</strong> Test status dynamically displays as <strong>EXPIRED</strong> and moves to <em>Expired Tests</em> section.</p>
           </div>
         </div>
       )}

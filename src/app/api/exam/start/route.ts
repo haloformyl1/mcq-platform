@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
     const isScheduleExpiredActive = test.status === "SCHEDULE_EXPIRED" && test.lockAt && new Date() < new Date(test.lockAt);
 
-    if (test.status !== "PUBLISHED" && test.status !== "LOCKED" && !isScheduleExpiredActive && !override) {
+    if (test.status !== "LIVE" && test.status !== "PUBLISHED" && test.status !== "UPCOMING" && test.status !== "LOCKED" && !isScheduleExpiredActive && !override) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
     }
 

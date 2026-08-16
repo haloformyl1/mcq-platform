@@ -251,14 +251,14 @@ export default function StudentDashboard() {
                 // Scheduled expiration date has passed -> Expired & requires admin approval
                 expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
               }
-            } else if (test.status === "PUBLISHED") {
-              // PUBLISHED tests are always LIVE and available to all students
+            } else if (test.status === "LIVE" || test.status === "PUBLISHED") {
+              // LIVE/PUBLISHED tests are always LIVE and available to all students
               currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
-            } else if (test.status === "LOCKED") {
+            } else if (test.status === "UPCOMING" || test.status === "LOCKED") {
               if (unlockDate && now < unlockDate) {
                 upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
               } else if (!lockDate || now < lockDate) {
-                // Unlocked (or no unlock required) & lockDate in future -> LIVE & Available
+                // Unlocked & before re-lock date -> LIVE & Available
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
               } else {
                 if (test.hasIndividualAccess) {
@@ -291,12 +291,12 @@ export default function StudentDashboard() {
                     )}
                     {isUpcomingStage && (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60 shrink-0 whitespace-nowrap animate-pulse">
-                        🔒 UPCOMING
+                        🔒 LOCKED
                       </span>
                     )}
                     {isLockedStage && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-950/80 text-red-400 border border-red-800/60 shrink-0 whitespace-nowrap">
-                        🔒 LOCKED
+                        ⌛ EXPIRED
                       </span>
                     )}
                   </div>
