@@ -31,7 +31,7 @@ export default function MobileEnvironmentScanner({ onComplete, onCancel }: Props
     async function initBackCameraAndModel() {
       try {
         await tf.ready();
-        modelRef.current = await cocoSsd.load();
+        modelRef.current = await cocoSsd.load({ base: 'mobilenet_v2' });
         setModelLoaded(true);
 
         let stream: MediaStream;
@@ -74,21 +74,39 @@ export default function MobileEnvironmentScanner({ onComplete, onCancel }: Props
     setDetectedItem(null);
 
     try {
-      if (modelRef.current && videoRef.current.readyState >= 2) {
-        // Run AI object detection on video frame
-        const predictions = await modelRef.current.detect(videoRef.current);
-        
-        // Target unauthorized electronic devices
-        const forbiddenClasses = ['laptop', 'tv', 'cell phone', 'keyboard', 'monitor'];
-        const found = predictions.find((p) =>
-          forbiddenClasses.includes(p.class.toLowerCase()) && p.score > 0.45
-        );
+      if (!modelRef.current) {
+        // Attempt fast reload if not loaded
+        await tf.ready();
+        modelRef.current = await cocoSsd.load({ base: 'mobilenet_v2' });
+      }
 
-        if (found) {
-          setIsScanning(false);
-          setDetectedItem(found.class.toUpperCase());
-          return;
+      // Sample 5 consecutive frames over 1.5s for maximum accuracy
+      const forbiddenClasses = [
+        'laptop', 'tv', 'cell phone', 'keyboard', 'monitor', 
+        'mouse', 'remote', 'book', 'clock', 'tablet'
+      ];
+      
+      let foundItem: string | null = null;
+
+      for (let i = 0; i < 5; i++) {
+        if (videoRef.current && videoRef.current.readyState >= 2 && modelRef.current) {
+          const predictions = await modelRef.current.detect(videoRef.current);
+          const match = predictions.find(
+            (p) => forbiddenClasses.includes(p.class.toLowerCase()) && p.score > 0.25
+          );
+
+          if (match) {
+            foundItem = match.class.toUpperCase();
+            break;
+          }
         }
+        await new Promise((res) => setTimeout(res, 250));
+      }
+
+      if (foundItem) {
+        setIsScanning(false);
+        setDetectedItem(foundItem);
+        return;
       }
 
       // Angle verified clean!
