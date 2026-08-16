@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
 import { useProctoring } from "@/hooks/useProctoring";
+import { useAudioProctoring } from "@/hooks/useAudioProctoring";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -27,7 +28,10 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     enableAiProctoring: true,
     faceAbsenceDelaySeconds: 10,
     maxAllowedWarnings: 5,
-    tabSwitchAction: "AUTO_SUBMIT"
+    tabSwitchAction: "AUTO_SUBMIT",
+    enableAudioProctoring: true,
+    audioNoiseDelaySeconds: 10,
+    maxAudioWarnings: 3
   });
 
   useEffect(() => {
@@ -66,9 +70,12 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       }
     }
 
-    if (proctoringSettings.enableAiProctoring) {
-      // Request camera access for proctoring
-      navigator.mediaDevices.getUserMedia({ video: true })
+    if (proctoringSettings.enableAiProctoring || proctoringSettings.enableAudioProctoring) {
+      // Request camera and microphone access for proctoring
+      navigator.mediaDevices.getUserMedia({
+        video: proctoringSettings.enableAiProctoring ?? true,
+        audio: proctoringSettings.enableAudioProctoring ?? true
+      })
         .then(stream => {
           streamRef.current = stream;
           if (videoRef.current) {
@@ -76,8 +83,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           }
         })
         .catch(err => {
-          console.error("Camera access denied or failed", err);
-          alert("Camera access is required for proctoring this exam. Please allow camera permissions.");
+          console.error("Camera/Microphone access denied or failed", err);
         });
     }
 
@@ -86,7 +92,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [resolvedParams.attemptId, router, proctoringSettings.enforceFullscreen, proctoringSettings.enableAiProctoring]);
+  }, [resolvedParams.attemptId, router, proctoringSettings.enforceFullscreen, proctoringSettings.enableAiProctoring, proctoringSettings.enableAudioProctoring]);
 
   const submitTest = useCallback(async (reason: string) => {
     if (isSubmitting) return;
@@ -111,6 +117,15 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     proctoringSettings.faceAbsenceDelaySeconds ?? 10,
     proctoringSettings.maxAllowedWarnings ?? 5,
     proctoringSettings.enableAiProctoring ?? true
+  );
+
+  const { audioWarningsLeft, showAudioWarning, setShowAudioWarning } = useAudioProctoring(
+    streamRef.current,
+    submitTest,
+    !!examData,
+    proctoringSettings.audioNoiseDelaySeconds ?? 10,
+    proctoringSettings.maxAudioWarnings ?? 3,
+    proctoringSettings.enableAudioProctoring ?? true
   );
 
   useEffect(() => {
@@ -481,7 +496,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">Warning: Eye Tracking</h2>
             <p className="text-[#a6a6a6] mb-4 text-lg">
-              You looked away from the screen for over 10 seconds. This is a violation of the test rules.
+              You looked away from the screen for over {proctoringSettings.faceAbsenceDelaySeconds ?? 10} seconds. This is a violation of the test rules.
             </p>
             <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
               <p className="text-red-400 font-bold text-xl">
@@ -491,6 +506,33 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             </div>
             <button 
               onClick={() => setShowSlipWarning(false)}
+              className="w-full bg-[#262626] hover:bg-[#333333] text-white font-medium py-3 rounded-lg border border-[#404040]"
+            >
+              I Understand, Return to Test
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Audio Noise Warning Modal */}
+      {showAudioWarning && !showFullscreenWarning && (
+        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-red-500/50">
+            <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-4">Warning: Microphone Audio Detection</h2>
+            <p className="text-[#a6a6a6] mb-4 text-lg">
+              Continuous background sound / speech was detected for over {proctoringSettings.audioNoiseDelaySeconds ?? 10} seconds. Please maintain complete silence.
+            </p>
+            <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
+              <p className="text-red-400 font-bold text-xl">
+                {audioWarningsLeft} warning{audioWarningsLeft !== 1 ? 's' : ''} remaining
+              </p>
+              <p className="text-sm text-red-400/80 mt-1">before automatic submission</p>
+            </div>
+            <button 
+              onClick={() => setShowAudioWarning(false)}
               className="w-full bg-[#262626] hover:bg-[#333333] text-white font-medium py-3 rounded-lg border border-[#404040]"
             >
               I Understand, Return to Test

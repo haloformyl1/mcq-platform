@@ -29,7 +29,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     enableAiProctoring: true,
     faceAbsenceDelaySeconds: 10,
     maxAllowedWarnings: 5,
-    tabSwitchAction: "AUTO_SUBMIT"
+    tabSwitchAction: "AUTO_SUBMIT",
+    enableAudioProctoring: true,
+    audioNoiseDelaySeconds: 10,
+    maxAudioWarnings: 3
   });
 
   const fetchProctoringSettings = async () => {
@@ -43,7 +46,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           enableAiProctoring: data.enableAiProctoring ?? true,
           faceAbsenceDelaySeconds: data.faceAbsenceDelaySeconds ?? 10,
           maxAllowedWarnings: data.maxAllowedWarnings ?? 5,
-          tabSwitchAction: data.tabSwitchAction ?? "AUTO_SUBMIT"
+          tabSwitchAction: data.tabSwitchAction ?? "AUTO_SUBMIT",
+          enableAudioProctoring: data.enableAudioProctoring ?? true,
+          audioNoiseDelaySeconds: data.audioNoiseDelaySeconds ?? 10,
+          maxAudioWarnings: data.maxAudioWarnings ?? 3
         });
       }
     } catch (e) {
@@ -439,6 +445,62 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <option value="WARNING">⚠️ Issue Warning (Count towards Max Warnings limit)</option>
                     <option value="ALLOW">🟢 Allow Tab Switching (No penalty)</option>
                   </select>
+                </div>
+
+                {/* 4. Microphone AI Sound Detection Protocol */}
+                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white">4. Microphone AI Sound Detection Protocol</h4>
+                      <p className="text-xs text-[#888888]">Detect background talking/sound via microphone for over 10s</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={proctoringForm.enableAudioProctoring}
+                        onChange={(e) => setProctoringForm({ ...proctoringForm, enableAudioProctoring: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#333333] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                  </div>
+
+                  {proctoringForm.enableAudioProctoring && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">
+                          Continuous Sound Warning Delay
+                        </label>
+                        <select
+                          value={proctoringForm.audioNoiseDelaySeconds}
+                          onChange={(e) => setProctoringForm({ ...proctoringForm, audioNoiseDelaySeconds: parseInt(e.target.value) })}
+                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
+                        >
+                          <option value={5}>5 Seconds</option>
+                          <option value={10}>10 Seconds (Default)</option>
+                          <option value={15}>15 Seconds</option>
+                          <option value={20}>20 Seconds</option>
+                          <option value={30}>30 Seconds</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">
+                          Max Allowed Sound Warnings before Auto-Submit
+                        </label>
+                        <select
+                          value={proctoringForm.maxAudioWarnings}
+                          onChange={(e) => setProctoringForm({ ...proctoringForm, maxAudioWarnings: parseInt(e.target.value) })}
+                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
+                        >
+                          <option value={1}>1 Warning (Strict)</option>
+                          <option value={2}>2 Warnings</option>
+                          <option value={3}>3 Warnings (Default)</option>
+                          <option value={5}>5 Warnings</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-2 border-t border-[#333333]">

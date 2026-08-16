@@ -19,7 +19,10 @@ export async function GET() {
           enableAiProctoring: true,
           faceAbsenceDelaySeconds: 10,
           maxAllowedWarnings: 5,
-          tabSwitchAction: "AUTO_SUBMIT"
+          tabSwitchAction: "AUTO_SUBMIT",
+          enableAudioProctoring: true,
+          audioNoiseDelaySeconds: 10,
+          maxAudioWarnings: 3
         }
       });
     }
@@ -49,7 +52,10 @@ export async function POST(req: Request) {
         enableAiProctoring: Boolean(data.enableAiProctoring),
         faceAbsenceDelaySeconds: parseInt(data.faceAbsenceDelaySeconds) || 10,
         maxAllowedWarnings: parseInt(data.maxAllowedWarnings) || 5,
-        tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT"
+        tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
+        enableAudioProctoring: Boolean(data.enableAudioProctoring),
+        audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
+        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3
       },
       create: {
         id: "default",
@@ -57,7 +63,10 @@ export async function POST(req: Request) {
         enableAiProctoring: Boolean(data.enableAiProctoring),
         faceAbsenceDelaySeconds: parseInt(data.faceAbsenceDelaySeconds) || 10,
         maxAllowedWarnings: parseInt(data.maxAllowedWarnings) || 5,
-        tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT"
+        tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
+        enableAudioProctoring: Boolean(data.enableAudioProctoring),
+        audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
+        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3
       }
     });
 
