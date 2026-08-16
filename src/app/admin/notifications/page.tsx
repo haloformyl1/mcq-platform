@@ -6,8 +6,6 @@ import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function AdminNotifications() {
   const [requests, setRequests] = useState<any[]>([]);
-  const [violations, setViolations] = useState<any[]>([]);
-  const [selectedSnapshot, setSelectedSnapshot] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
@@ -20,8 +18,7 @@ export default function AdminNotifications() {
         return data;
       })
       .then(data => {
-        setRequests(Array.isArray(data.requests) ? data.requests : Array.isArray(data) ? data : []);
-        setViolations(Array.isArray(data.violations) ? data.violations : []);
+        setRequests(data);
         setError(null);
       })
       .catch(err => setError(err.message))
@@ -175,89 +172,6 @@ export default function AdminNotifications() {
             </table>
           </div>
         </section>
-      )}
-      {/* AI Proctoring Incidents Section */}
-      <section className="space-y-4 pt-6 border-t border-[#333333]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-red-500 animate-pulse" />
-            <span>AI Proctoring Incidents & Photo Evidence</span>
-            <span className="text-xs bg-red-950 text-red-400 px-2.5 py-0.5 rounded-full border border-red-800 font-mono font-bold">
-              {violations.length} Violation{violations.length !== 1 ? 's' : ''} Logged
-            </span>
-          </h2>
-        </div>
-
-        {violations.length === 0 ? (
-          <div className="bg-[#161616]/60 p-6 text-center text-[#a6a6a6] rounded-xl border border-[#333333]">
-            No proctoring violations recorded yet. All exam sessions clean!
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {violations.map((v: any) => {
-              const studentName = v.student?.name || v.student?.email?.split('@')[0] || "Student";
-              const isPhone = v.violationType === "CELL_PHONE_DETECTED";
-              const isMultiPerson = v.violationType === "MULTIPLE_PERSONS_DETECTED";
-
-              return (
-                <div key={v.id} className="bg-[#161616]/90 border border-red-500/40 rounded-xl p-4 space-y-3 shadow-lg hover:border-red-500 transition">
-                  <div className="flex justify-between items-start gap-2 border-b border-[#262626] pb-2">
-                    <div>
-                      <h3 className="font-bold text-white text-base">{studentName}</h3>
-                      <p className="text-xs text-blue-400 font-mono">ID: {v.studentId}</p>
-                      <p className="text-xs text-[#a6a6a6]">{v.student?.email}</p>
-                    </div>
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
-                      isPhone ? 'bg-red-950 text-red-300 border-red-700' : isMultiPerson ? 'bg-orange-950 text-orange-300 border-orange-700' : 'bg-amber-950 text-amber-300 border-amber-700'
-                    }`}>
-                      {isPhone ? '📱 CELL PHONE' : isMultiPerson ? '👥 MULTI-PERSON' : '👁️ EYE SLIP'}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-cyan-300 font-medium truncate">
-                    Test: <strong className="text-white">{v.test?.title}</strong>
-                  </p>
-
-                  <p className="text-xs text-red-300 font-semibold bg-red-950/40 p-2 rounded border border-red-900/60">
-                    Warning {v.warningNumber} of 3: {v.message}
-                  </p>
-
-                  {/* Snapshot Photo Preview */}
-                  {v.snapshotBase64 ? (
-                    <div className="relative group rounded-lg overflow-hidden border border-gray-700 bg-black cursor-pointer" onClick={() => setSelectedSnapshot(v.snapshotBase64)}>
-                      <img src={v.snapshotBase64} alt="Violation Snapshot" className="w-full h-36 object-cover group-hover:opacity-80 transition" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/60 transition text-xs font-bold text-white">
-                        🔍 Click to Enlarge Snapshot
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-[#777777] bg-[#111111] p-3 rounded text-center border border-[#222222]">
-                      No image snapshot captured
-                    </div>
-                  )}
-
-                  <div className="text-[11px] text-[#888888] flex items-center justify-between pt-1 border-t border-[#262626]">
-                    <span>{new Date(v.createdAt).toLocaleString()}</span>
-                    <span className="font-mono text-amber-400 font-bold">Attempt: {v.attemptId.slice(0, 8)}...</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* Snapshot Enlarge Modal */}
-      {selectedSnapshot && (
-        <div className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4" onClick={() => setSelectedSnapshot(null)}>
-          <div className="bg-[#161616] p-4 rounded-xl border border-red-500/60 max-w-3xl w-full space-y-3 relative" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center border-b border-[#333333] pb-2">
-              <h3 className="text-base font-bold text-red-400">📸 Violation Webcam Snapshot Evidence</h3>
-              <button onClick={() => setSelectedSnapshot(null)} className="text-[#a6a6a6] hover:text-white text-sm font-bold">✕ Close</button>
-            </div>
-            <img src={selectedSnapshot} alt="Snapshot Evidence" className="w-full max-h-[70vh] object-contain rounded border border-gray-800 bg-black" />
-          </div>
-        </div>
       )}
     </div>
   );

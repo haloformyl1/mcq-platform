@@ -150,57 +150,6 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
-        {/* AI Proctoring Violation Audit Trail */}
-        {result.proctoringViolations && result.proctoringViolations.length > 0 && (
-          <div className="bg-[#161616]/90 border border-red-500/40 p-5 rounded-xl space-y-4 shadow-lg">
-            <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span className="p-1.5 bg-red-950 text-red-400 rounded-md border border-red-800 text-xs">⚠️</span>
-                <span>AI Proctoring Violation Audit Trail</span>
-              </h3>
-              <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-700 font-mono font-bold">
-                {result.proctoringViolations.length} Warning(s) Triggered
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {result.proctoringViolations.map((v: any) => {
-                const isPhone = v.violationType === "CELL_PHONE_DETECTED";
-                const isMulti = v.violationType === "MULTIPLE_PERSONS_DETECTED";
-
-                return (
-                  <div key={v.id} className="bg-[#1e1e1e] border border-red-900/60 rounded-lg p-3 space-y-2 text-xs">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-amber-400">Warning {v.warningNumber} of 3</span>
-                      <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
-                        isPhone ? 'bg-red-950 text-red-300 border border-red-700' : isMulti ? 'bg-orange-950 text-orange-300 border border-orange-700' : 'bg-amber-950 text-amber-300 border border-amber-700'
-                      }`}>
-                        {isPhone ? '📱 CELL PHONE' : isMulti ? '👥 MULTI-PERSON' : '👁️ EYE SLIP'}
-                      </span>
-                    </div>
-
-                    <p className="text-white font-medium">{v.message}</p>
-
-                    {v.snapshotBase64 ? (
-                      <div className="rounded overflow-hidden border border-gray-800 bg-black">
-                        <img src={v.snapshotBase64} alt="Snapshot Evidence" className="w-full h-32 object-cover" />
-                      </div>
-                    ) : (
-                      <div className="text-[11px] text-[#777777] bg-[#111111] p-2 rounded text-center">
-                        No snapshot image
-                      </div>
-                    )}
-
-                    <div className="text-[10px] text-[#888888] pt-1 border-t border-[#262626]">
-                      Logged at: {new Date(v.createdAt).toLocaleTimeString()}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Score Summary Metrics Cards */}

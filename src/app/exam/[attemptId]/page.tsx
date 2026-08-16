@@ -22,6 +22,24 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [isCameraMinimized, setIsCameraMinimized] = useState(false);
+  const [proctoringSettings, setProctoringSettings] = useState<any>({
+    enforceFullscreen: true,
+    enableAiProctoring: true,
+    faceAbsenceDelaySeconds: 10,
+    maxAllowedWarnings: 5,
+    tabSwitchAction: "AUTO_SUBMIT"
+  });
+
+  useEffect(() => {
+    fetch("/api/admin/proctoring-settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data && !data.error) {
+          setProctoringSettings(data);
+        }
+      })
+      .catch(e => console.error(e));
+  }, []);
   
   const lastActivityTime = useRef(Date.now());
   const examDataRef = useRef<any>(null);
@@ -40,31 +58,35 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       router.push("/dashboard");
     }
     
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => console.warn("Fullscreen denied by browser"));
-    } else if ((document.documentElement as any).webkitRequestFullscreen) {
-      (document.documentElement as any).webkitRequestFullscreen();
+    if (proctoringSettings.enforceFullscreen) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => console.warn("Fullscreen denied by browser"));
+      } else if ((document.documentElement as any).webkitRequestFullscreen) {
+        (document.documentElement as any).webkitRequestFullscreen();
+      }
     }
 
-    // Request camera access for proctoring
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      })
-      .catch(err => {
-        console.error("Camera access denied or failed", err);
-        alert("Camera access is required for proctoring this exam. Please allow camera permissions.");
-      });
+    if (proctoringSettings.enableAiProctoring) {
+      // Request camera access for proctoring
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        })
+        .catch(err => {
+          console.error("Camera access denied or failed", err);
+          alert("Camera access is required for proctoring this exam. Please allow camera permissions.");
+        });
+    }
 
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [resolvedParams.attemptId, router]);
+  }, [resolvedParams.attemptId, router, proctoringSettings.enforceFullscreen, proctoringSettings.enableAiProctoring]);
 
   const submitTest = useCallback(async (reason: string) => {
     if (isSubmitting) return;
@@ -82,25 +104,13 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     }
   }, [resolvedParams.attemptId, router, isSubmitting]);
 
-  const { warningsLeft, showSlipWarning, setShowSlipWarning, violationType, violationMessage, isAiActive } = useProctoring(
+  const { warningsLeft, showSlipWarning, setShowSlipWarning, isAiActive } = useProctoring(
     videoRef,
     submitTest,
     !!examData,
-    examData ? {
-      attemptId: resolvedParams.attemptId,
-      studentId: examData.student?.id || examData.attempt?.studentId || "",
-      testId: examData.test?.id || "",
-      studentName: examData.student?.name,
-      studentEmail: examData.student?.email,
-      testTitle: examData.test?.title
-    } : undefined,
-    examData?.test ? {
-      eyeSlipDurationSeconds: examData.test.eyeSlipDurationSeconds,
-      maxPhoneWarnings: examData.test.maxPhoneWarnings,
-      maxMultiPersonWarnings: examData.test.maxMultiPersonWarnings,
-      maxEyeSlipWarnings: examData.test.maxEyeSlipWarnings,
-      maxTotalWarnings: examData.test.maxTotalWarnings,
-    } : undefined
+    proctoringSettings.faceAbsenceDelaySeconds ?? 10,
+    proctoringSettings.maxAllowedWarnings ?? 5,
+    proctoringSettings.enableAiProctoring ?? true
   );
 
   useEffect(() => {
@@ -131,12 +141,13 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
     const handleVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
+        if (proctoringSettings.tabSwitchAction === "ALLOW") return;
         submitTest("TAB_SWITCH");
       }
     };
     
     const handleBlur = () => {
-      // Don't auto-submit if the fullscreen warning is showing, as they might have just hit escape
+      if (proctoringSettings.tabSwitchAction === "ALLOW") return;
       submitTest("WINDOW_BLUR");
     };
 
@@ -468,11 +479,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              {violationType === "CELL_PHONE_DETECTED" ? "📱 Cell Phone Detected!" : violationType === "MULTIPLE_PERSONS_DETECTED" ? "👥 Multiple Persons Detected!" : "⚠️ AI Proctoring Warning"}
-            </h2>
-            <p className="text-amber-200 mb-4 text-base bg-red-950/40 p-3 rounded border border-red-800/60 font-semibold">
-              {violationMessage || "Violation detected. Photo snapshot captured and sent to Admin."}
+            <h2 className="text-2xl font-bold text-white mb-4">Warning: Eye Tracking</h2>
+            <p className="text-[#a6a6a6] mb-4 text-lg">
+              You looked away from the screen for over 10 seconds. This is a violation of the test rules.
             </p>
             <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
               <p className="text-red-400 font-bold text-xl">

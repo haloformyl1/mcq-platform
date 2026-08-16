@@ -11,14 +11,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showProctoringModal, setShowProctoringModal] = useState(false);
-
-  const [eyeSlipDurationSeconds, setEyeSlipDurationSeconds] = useState(10);
-  const [maxPhoneWarnings, setMaxPhoneWarnings] = useState(1);
-  const [maxMultiPersonWarnings, setMaxMultiPersonWarnings] = useState(1);
-  const [maxEyeSlipWarnings, setMaxEyeSlipWarnings] = useState(3);
-  const [maxTotalWarnings, setMaxTotalWarnings] = useState(3);
-
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newUsername, setNewUsername] = useState("");
@@ -26,40 +18,63 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [modalError, setModalError] = useState("");
   const [modalSuccess, setModalSuccess] = useState("");
 
-  const [procLoading, setProcLoading] = useState(false);
-  const [procSuccess, setProcSuccess] = useState("");
-  const [procError, setProcError] = useState("");
+  const [showProctoringModal, setShowProctoringModal] = useState(false);
+  const [proctoringLoading, setProctoringLoading] = useState(false);
+  const [proctoringSaving, setProctoringSaving] = useState(false);
+  const [proctoringSuccess, setProctoringSuccess] = useState("");
+  const [proctoringError, setProctoringError] = useState("");
 
-  const handleSaveProctoringRules = async (e: React.FormEvent) => {
+  const [proctoringForm, setProctoringForm] = useState({
+    enforceFullscreen: true,
+    enableAiProctoring: true,
+    faceAbsenceDelaySeconds: 10,
+    maxAllowedWarnings: 5,
+    tabSwitchAction: "AUTO_SUBMIT"
+  });
+
+  const fetchProctoringSettings = async () => {
+    setProctoringLoading(true);
+    try {
+      const res = await fetch("/api/admin/proctoring-settings");
+      const data = await res.json();
+      if (res.ok) {
+        setProctoringForm({
+          enforceFullscreen: data.enforceFullscreen ?? true,
+          enableAiProctoring: data.enableAiProctoring ?? true,
+          faceAbsenceDelaySeconds: data.faceAbsenceDelaySeconds ?? 10,
+          maxAllowedWarnings: data.maxAllowedWarnings ?? 5,
+          tabSwitchAction: data.tabSwitchAction ?? "AUTO_SUBMIT"
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setProctoringLoading(false);
+    }
+  };
+
+  const handleSaveProctoringSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProcLoading(true);
-    setProcError("");
-    setProcSuccess("");
-
+    setProctoringSaving(true);
+    setProctoringSuccess("");
+    setProctoringError("");
     try {
       const res = await fetch("/api/admin/proctoring-settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eyeSlipDurationSeconds,
-          maxPhoneWarnings,
-          maxMultiPersonWarnings,
-          maxEyeSlipWarnings,
-          maxTotalWarnings,
-        })
+        body: JSON.stringify(proctoringForm)
       });
       const data = await res.json();
-      setProcLoading(false);
-
       if (res.ok) {
-        setProcSuccess(data.message || "Proctoring rules applied successfully!");
-        setTimeout(() => setShowProctoringModal(false), 2000);
+        setProctoringSuccess("Security protocols updated successfully!");
+        setTimeout(() => setProctoringSuccess(""), 3000);
       } else {
-        setProcError(data.error || "Failed to update proctoring rules");
+        setProctoringError(data.error || "Failed to save settings");
       }
     } catch (err) {
-      setProcLoading(false);
-      setProcError("Network error while updating rules");
+      setProctoringError("Network error. Failed to save.");
+    } finally {
+      setProctoringSaving(false);
     }
   };
 
@@ -166,15 +181,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
               <button
                 onClick={() => {
-                  setProcError("");
-                  setProcSuccess("");
                   setShowProctoringModal(true);
+                  fetchProctoringSettings();
                 }}
-                className="bg-red-950/60 hover:bg-red-900/80 text-red-300 px-2.5 py-1.5 rounded-md text-xs font-semibold transition border border-red-800 flex items-center space-x-1"
-                title="Configure AI Proctoring Allowance Rules globally for all tests"
+                className="text-red-400 hover:bg-[#262626] hover:text-white p-2 rounded-md transition border border-red-900/40 hover:border-red-500/50 flex items-center space-x-1"
+                title="Security Protocols & Proctoring Rules"
               >
-                <Shield size={14} className="text-red-400" />
-                <span>🛡️ Proctoring Rules</span>
+                <Shield size={18} />
               </button>
               <button
                 onClick={() => {
@@ -296,10 +309,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      {/* Global AI Proctoring Allowance Rules Modal */}
+      {/* Global Security Protocols & Proctoring Rules Modal */}
       {showProctoringModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#161616] border border-red-500/50 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#161616] border border-red-500/50 rounded-2xl w-full max-w-xl p-6 shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setShowProctoringModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-[#262626]"
@@ -308,138 +321,144 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
 
             <div className="flex items-center space-x-3 border-b border-[#333333] pb-4">
-              <div className="p-3 bg-red-950/80 border border-red-700 rounded-xl text-red-400">
+              <div className="p-2.5 bg-red-950/60 border border-red-500/40 rounded-xl text-red-400">
                 <Shield className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Global AI Proctoring Allowance & Rules</h3>
-                <p className="text-xs text-gray-400">Modify violation allowance limits and 1st warning duration for all tests.</p>
+                <h3 className="text-lg font-bold text-white">Security Protocols & Proctoring Rules</h3>
+                <p className="text-xs text-gray-400">Configure global examination anti-cheating enforcement</p>
               </div>
             </div>
 
-            {procError && (
+            {proctoringError && (
               <div className="bg-red-500/10 border border-red-500/40 text-red-400 p-3 rounded-xl text-xs font-medium">
-                {procError}
+                {proctoringError}
               </div>
             )}
 
-            {procSuccess && (
+            {proctoringSuccess && (
               <div className="bg-green-500/10 border border-green-500/40 text-green-400 p-3 rounded-xl text-xs font-medium flex items-center space-x-2">
                 <Check className="w-4 h-4" />
-                <span>{procSuccess}</span>
+                <span>{proctoringSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleSaveProctoringRules} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* 1st Warning Time Duration */}
-                <div className="bg-[#111111] p-3.5 rounded-xl border border-[#2a2a2a] space-y-1.5">
-                  <label className="block text-xs font-bold text-amber-300">
-                    ⏱️ 1st Eye Slip Warning Duration
-                  </label>
+            {proctoringLoading ? (
+              <div className="py-12 text-center text-sm text-gray-400">Loading current security protocols...</div>
+            ) : (
+              <form onSubmit={handleSaveProctoringSettings} className="space-y-5">
+                {/* 1. Fullscreen Protocol */}
+                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white">1. Fullscreen Mode Protocol</h4>
+                      <p className="text-xs text-[#888888]">Force browser fullscreen mode when student starts exam</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={proctoringForm.enforceFullscreen}
+                        onChange={(e) => setProctoringForm({ ...proctoringForm, enforceFullscreen: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#333333] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* 2. Webcam AI Proctoring */}
+                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white">2. Webcam AI Face Detection Protocol</h4>
+                      <p className="text-xs text-[#888888]">Detect face presence & eye movement using AI vision</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={proctoringForm.enableAiProctoring}
+                        onChange={(e) => setProctoringForm({ ...proctoringForm, enableAiProctoring: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#333333] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                  </div>
+
+                  {proctoringForm.enableAiProctoring && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">
+                          Face Absence Warning Delay
+                        </label>
+                        <select
+                          value={proctoringForm.faceAbsenceDelaySeconds}
+                          onChange={(e) => setProctoringForm({ ...proctoringForm, faceAbsenceDelaySeconds: parseInt(e.target.value) })}
+                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
+                        >
+                          <option value={5}>5 Seconds</option>
+                          <option value={10}>10 Seconds (Default)</option>
+                          <option value={15}>15 Seconds</option>
+                          <option value={20}>20 Seconds</option>
+                          <option value={30}>30 Seconds</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">
+                          Max Allowed Warnings before Auto-Submit
+                        </label>
+                        <select
+                          value={proctoringForm.maxAllowedWarnings}
+                          onChange={(e) => setProctoringForm({ ...proctoringForm, maxAllowedWarnings: parseInt(e.target.value) })}
+                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
+                        >
+                          <option value={1}>1 Warning (Strict)</option>
+                          <option value={2}>2 Warnings</option>
+                          <option value={3}>3 Warnings</option>
+                          <option value={5}>5 Warnings (Default)</option>
+                          <option value={10}>10 Warnings</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Tab Switch / App Minimization Protocol */}
+                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-white">3. Tab Switch / App Minimization Action</h4>
+                    <p className="text-xs text-[#888888]">Specify action when student switches window or minimizes browser</p>
+                  </div>
+
                   <select
-                    className="w-full bg-[#262626] border border-[#404040] text-white text-xs rounded-lg p-2 focus:ring-amber-500"
-                    value={eyeSlipDurationSeconds}
-                    onChange={e => setEyeSlipDurationSeconds(parseInt(e.target.value))}
+                    value={proctoringForm.tabSwitchAction}
+                    onChange={(e) => setProctoringForm({ ...proctoringForm, tabSwitchAction: e.target.value })}
+                    className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2.5 text-xs focus:ring-red-500 font-medium"
                   >
-                    <option value={3}>3 Seconds (Strict)</option>
-                    <option value={5}>5 Seconds</option>
-                    <option value={10}>10 Seconds (Default)</option>
-                    <option value={15}>15 Seconds</option>
-                    <option value={20}>20 Seconds</option>
-                    <option value={30}>30 Seconds (Relaxed)</option>
+                    <option value="AUTO_SUBMIT">🚨 Auto-Submit Exam Immediately (Default)</option>
+                    <option value="WARNING">⚠️ Issue Warning (Count towards Max Warnings limit)</option>
+                    <option value="ALLOW">🟢 Allow Tab Switching (No penalty)</option>
                   </select>
                 </div>
 
-                {/* Cell Phone Warnings */}
-                <div className="bg-[#111111] p-3.5 rounded-xl border border-[#2a2a2a] space-y-1.5">
-                  <label className="block text-xs font-bold text-red-400">
-                    📱 Cell Phone Warnings Allowed
-                  </label>
-                  <select
-                    className="w-full bg-[#262626] border border-[#404040] text-white text-xs rounded-lg p-2 focus:ring-red-500"
-                    value={maxPhoneWarnings}
-                    onChange={e => setMaxPhoneWarnings(parseInt(e.target.value))}
+                <div className="flex justify-end space-x-3 pt-2 border-t border-[#333333]">
+                  <button
+                    type="button"
+                    onClick={() => setShowProctoringModal(false)}
+                    className="px-4 py-2 text-xs font-medium text-gray-300 bg-[#262626] hover:bg-[#333333] rounded-xl transition"
                   >
-                    <option value={1}>1 Warning (Auto-submit on 1st detection)</option>
-                    <option value={2}>2 Warnings</option>
-                    <option value={3}>3 Warnings</option>
-                    <option value={5}>5 Warnings</option>
-                    <option value={0}>0 (Disabled)</option>
-                  </select>
-                </div>
-
-                {/* Multi-Person Warnings */}
-                <div className="bg-[#111111] p-3.5 rounded-xl border border-[#2a2a2a] space-y-1.5">
-                  <label className="block text-xs font-bold text-orange-400">
-                    👥 Multiple Person Warnings Allowed
-                  </label>
-                  <select
-                    className="w-full bg-[#262626] border border-[#404040] text-white text-xs rounded-lg p-2 focus:ring-orange-500"
-                    value={maxMultiPersonWarnings}
-                    onChange={e => setMaxMultiPersonWarnings(parseInt(e.target.value))}
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={proctoringSaving}
+                    className="px-5 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-500 rounded-xl transition disabled:opacity-50 shadow-lg"
                   >
-                    <option value={1}>1 Warning (Auto-submit on 1st detection)</option>
-                    <option value={2}>2 Warnings</option>
-                    <option value={3}>3 Warnings</option>
-                    <option value={5}>5 Warnings</option>
-                    <option value={0}>0 (Disabled)</option>
-                  </select>
+                    {proctoringSaving ? "Saving Security Rules..." : "Save Security Protocols"}
+                  </button>
                 </div>
-
-                {/* Eye Slip Warnings */}
-                <div className="bg-[#111111] p-3.5 rounded-xl border border-[#2a2a2a] space-y-1.5">
-                  <label className="block text-xs font-bold text-amber-400">
-                    👁️ Eye Slip Warnings Allowed
-                  </label>
-                  <select
-                    className="w-full bg-[#262626] border border-[#404040] text-white text-xs rounded-lg p-2 focus:ring-amber-500"
-                    value={maxEyeSlipWarnings}
-                    onChange={e => setMaxEyeSlipWarnings(parseInt(e.target.value))}
-                  >
-                    <option value={1}>1 Warning</option>
-                    <option value={2}>2 Warnings</option>
-                    <option value={3}>3 Warnings (Default)</option>
-                    <option value={5}>5 Warnings</option>
-                    <option value={0}>0 (Disabled)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Total Combined Warnings */}
-              <div className="bg-[#111111] p-3.5 rounded-xl border border-[#2a2a2a] space-y-1.5">
-                <label className="block text-xs font-bold text-cyan-400">
-                  🚨 Total Cumulative Warnings Allowed Before Auto-Submit
-                </label>
-                <select
-                  className="w-full bg-[#262626] border border-[#404040] text-white text-xs rounded-lg p-2 focus:ring-cyan-500"
-                  value={maxTotalWarnings}
-                  onChange={e => setMaxTotalWarnings(parseInt(e.target.value))}
-                >
-                  <option value={1}>1 Total Warning</option>
-                  <option value={2}>2 Total Warnings</option>
-                  <option value={3}>3 Total Warnings (Default)</option>
-                  <option value={5}>5 Total Warnings</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-3 border-t border-[#333333]">
-                <button
-                  type="button"
-                  onClick={() => setShowProctoringModal(false)}
-                  className="px-4 py-2 text-xs font-medium text-gray-300 bg-[#262626] hover:bg-[#333333] rounded-xl transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={procLoading}
-                  className="px-5 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-500 rounded-xl transition disabled:opacity-50 flex items-center space-x-1.5"
-                >
-                  <span>{procLoading ? "Applying..." : "Save & Apply to All Tests"}</span>
-                </button>
-              </div>
-            </form>
+              </form>
+            )}
           </div>
         </div>
       )}

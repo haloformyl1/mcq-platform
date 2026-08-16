@@ -5,28 +5,17 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
-    const [requests, violations] = await Promise.all([
-      prisma.testAccessRequest.findMany({
-        include: {
-          student: { select: { id: true, name: true, email: true } },
-          test: { select: { id: true, title: true, status: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-      }),
-      prisma.proctoringViolation.findMany({
-        include: {
-          student: { select: { id: true, name: true, email: true } },
-          test: { select: { id: true, title: true } },
-          attempt: { select: { id: true, startedAt: true } }
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 100
-      })
-    ]);
+    const requests = await prisma.testAccessRequest.findMany({
+      include: {
+        student: { select: { id: true, name: true, email: true } },
+        test: { select: { id: true, title: true, status: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
 
-    return NextResponse.json({ requests, violations });
+    return NextResponse.json(requests);
   } catch (error) {
-    console.error("Fetch notifications error:", error);
+    console.error("Fetch requests error:", error);
     return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 });
   }
 }
