@@ -256,10 +256,11 @@ export default function StudentDashboard() {
               currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
             } else if (test.status === "UPCOMING" || test.status === "LOCKED") {
               if (unlockDate && now < unlockDate) {
+                // Before unlock time -> inside Upcoming / Current Tests section (LOCKED badge)
                 upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate });
               } else if (!lockDate || now < lockDate) {
-                // Unlocked & before re-lock date -> LIVE & Available
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
+                // Unlocked & active live window -> stays in Upcoming / Current Tests section with LIVE TEST badge & enabled button!
+                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "SCHEDULED_OPEN", unlockDate, lockDate });
               } else {
                 if (test.hasIndividualAccess) {
                   currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
@@ -483,14 +484,14 @@ export default function StudentDashboard() {
                 <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
                   <div className="flex items-center gap-3">
                     <span className="p-2 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-700/50 text-base">🔒</span>
-                    <h2 className="text-xl font-bold text-white tracking-wide">Upcoming Tests</h2>
+                    <h2 className="text-xl font-bold text-white tracking-wide">Upcoming / Current Tests</h2>
                   </div>
                   <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold">
                     {upcomingTests.length} Scheduled
                   </span>
                 </div>
                 {upcomingTests.length === 0 ? (
-                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No upcoming tests scheduled at the moment.</p>
+                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No upcoming / current tests scheduled at the moment.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {upcomingTests.map(test => renderTestCard(test))}
