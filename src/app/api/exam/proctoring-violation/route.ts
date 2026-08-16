@@ -1,61 +1,50 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
-import { decrypt } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await decrypt(session);
-    if (!payload || !payload.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { attemptId, violationType, warningNumber, message, snapshotBase64, confidenceScore } = await req.json();
+    const { attemptId, studentId, testId, violationType, message, snapshotBase64, warningNumber } = await req.json();
 
     if (!attemptId || !violationType) {
-      return NextResponse.json({ error: "Missing attemptId or violationType" }, { status: 400 });
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Verify attempt belongs to student
-    const attempt = await prisma.testAttempt.findUnique({
-      where: { id: attemptId },
-      include: { test: true }
-    });
+    // Lookup attempt if studentId or testId are missing from client call
+    let targetStudentId = studentId;
+    let targetTestId = testId;
 
-    if (!attempt || attempt.studentId !== payload.id) {
-      return NextResponse.json({ error: "Invalid attempt" }, { status: 403 });
+    if (!targetStudentId || !targetTestId) {
+      const attempt = await prisma.testAttempt.findUnique({
+        where: { id: attemptId },
+        select: { studentId: true, testId: true }
+      });
+      if (attempt) {
+        targetStudentId = targetStudentId || attempt.studentId;
+        targetTestId = targetTestId || attempt.testId;
+      }
+    }
+
+    if (!targetStudentId || !targetTestId) {
+      return NextResponse.json({ error: "Attempt or student not found" }, { status: 404 });
     }
 
     const violation = await prisma.proctoringViolation.create({
       data: {
-        attemptId: attemptId,
-        violationType: violationType,
-        warningNumber: parseInt(warningNumber) || 1,
-        message: message || "Proctoring Warning Issued",
+        attemptId,
+        studentId: targetStudentId,
+        testId: targetTestId,
+        violationType: violationType || "PROCTORING_VIOLATION",
+        message: message || "Proctoring violation detected",
         snapshotBase64: snapshotBase64 || null,
-        confidenceScore: parseFloat(confidenceScore) || null,
+        warningNumber: Number(warningNumber) || 1,
       }
     });
 
-    const maxWarnings = attempt.test.maxProctoringWarnings || 5;
-    const shouldAutoSubmit = violation.warningNumber >= maxWarnings;
-
-    return NextResponse.json({
-      success: true,
-      violationId: violation.id,
-      warningNumber: violation.warningNumber,
-      maxWarnings,
-      shouldAutoSubmit
-    });
+    return NextResponse.json({ success: true, violationId: violation.id });
   } catch (error) {
     console.error("Error logging proctoring violation:", error);
-    return NextResponse.json({ error: "Failed to record proctoring log" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to record proctoring violation" }, { status: 500 });
   }
 }

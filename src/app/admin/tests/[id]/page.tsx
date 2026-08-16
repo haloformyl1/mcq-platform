@@ -327,44 +327,6 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           </div>
           <p className="mt-1 text-xs text-[#888888]">When enabled, the positions of answer options (A, B, C, D) will be shuffled for each question. The correct answer will automatically move with its option.</p>
         </div>
-
-        <div className="md:col-span-2 bg-[#121212] p-4 rounded-xl border border-blue-900/40 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-blue-400 flex items-center gap-2">
-              🤖 AI Webcam & Device Proctoring
-            </h3>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={test.aiProctoringEnabled ?? true}
-                onChange={e => setTest({ ...test, aiProctoringEnabled: e.target.checked })}
-                className="w-4 h-4 text-blue-600 rounded bg-[#262626] border-[#404040]"
-              />
-              <span className="text-sm font-semibold text-white">
-                {test.aiProctoringEnabled ?? true ? "Enabled" : "Disabled"}
-              </span>
-            </label>
-          </div>
-          <p className="text-xs text-[#888888]">
-            When enabled, real-time AI webcam vision models detect Cell Phones, Multiple People, No Face, Off-Screen Gaze, and Tab Switching during the exam.
-          </p>
-          {(test.aiProctoringEnabled ?? true) && (
-            <div className="pt-2 border-t border-[#262626]">
-              <label className="block text-xs font-semibold text-[#a6a6a6]">Max Warning Limit Before Auto-Submit</label>
-              <input
-                type="number"
-                min="1"
-                max="10"
-                className="mt-1 block w-full md:w-1/3 bg-[#262626] border border-[#404040] text-white rounded-md p-2 text-sm focus:ring-[#3b82f6]"
-                value={test.maxProctoringWarnings ?? 5}
-                onChange={e => setTest({ ...test, maxProctoringWarnings: parseInt(e.target.value) || 5 })}
-              />
-              <p className="mt-1 text-[11px] text-[#888888]">
-                Student exam will automatically submit on the {test.maxProctoringWarnings ?? 5}th violation warning.
-              </p>
-            </div>
-          )}
-        </div>
       </div>
 
       {(test.status === "UPCOMING" || test.status === "LOCKED") && (

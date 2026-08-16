@@ -150,6 +150,57 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
+
+        {/* AI Proctoring Violation Audit Trail */}
+        {result.proctoringViolations && result.proctoringViolations.length > 0 && (
+          <div className="bg-[#161616]/90 border border-red-500/40 p-5 rounded-xl space-y-4 shadow-lg">
+            <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <span className="p-1.5 bg-red-950 text-red-400 rounded-md border border-red-800 text-xs">⚠️</span>
+                <span>AI Proctoring Violation Audit Trail</span>
+              </h3>
+              <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-700 font-mono font-bold">
+                {result.proctoringViolations.length} Warning(s) Triggered
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {result.proctoringViolations.map((v: any) => {
+                const isPhone = v.violationType === "CELL_PHONE_DETECTED";
+                const isMulti = v.violationType === "MULTIPLE_PERSONS_DETECTED";
+
+                return (
+                  <div key={v.id} className="bg-[#1e1e1e] border border-red-900/60 rounded-lg p-3 space-y-2 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-amber-400">Warning {v.warningNumber} of 3</span>
+                      <span className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                        isPhone ? 'bg-red-950 text-red-300 border border-red-700' : isMulti ? 'bg-orange-950 text-orange-300 border border-orange-700' : 'bg-amber-950 text-amber-300 border border-amber-700'
+                      }`}>
+                        {isPhone ? '📱 CELL PHONE' : isMulti ? '👥 MULTI-PERSON' : '👁️ EYE SLIP'}
+                      </span>
+                    </div>
+
+                    <p className="text-white font-medium">{v.message}</p>
+
+                    {v.snapshotBase64 ? (
+                      <div className="rounded overflow-hidden border border-gray-800 bg-black">
+                        <img src={v.snapshotBase64} alt="Snapshot Evidence" className="w-full h-32 object-cover" />
+                      </div>
+                    ) : (
+                      <div className="text-[11px] text-[#777777] bg-[#111111] p-2 rounded text-center">
+                        No snapshot image
+                      </div>
+                    )}
+
+                    <div className="text-[10px] text-[#888888] pt-1 border-t border-[#262626]">
+                      Logged at: {new Date(v.createdAt).toLocaleTimeString()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Score Summary Metrics Cards */}
@@ -176,80 +227,6 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
           <div className="text-2xl font-black text-[#8c8c8c]">{unansweredCount}</div>
           <div className="text-xs text-[#a6a6a6] mt-0.5">Unanswered</div>
         </div>
-      </div>
-
-      {/* AI Proctoring Integrity Audit Report */}
-      <div className="bg-[#121212] border border-blue-900/40 rounded-xl p-5 shadow-lg space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#262626] pb-3">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xl">🤖</span>
-            <div>
-              <h2 className="text-lg font-bold text-white">AI Proctoring Integrity Audit</h2>
-              <p className="text-xs text-[#a6a6a6]">Webcam vision logs, device detection, and camera evidence snapshots captured during exam</p>
-            </div>
-          </div>
-          <div>
-            {(!result.proctoringViolations || result.proctoringViolations.length === 0) ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-950 text-green-400 border border-green-700">
-                🟢 HIGH TRUST (0 Violations)
-              </span>
-            ) : result.proctoringViolations.length <= 2 ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-950 text-amber-300 border border-amber-700">
-                🟡 MODERATE RISK ({result.proctoringViolations.length} Violations)
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-950 text-red-400 border border-red-800 animate-pulse">
-                🔴 HIGH RISK / FLAGGED ({result.proctoringViolations.length} Violations)
-              </span>
-            )}
-          </div>
-        </div>
-
-        {(!result.proctoringViolations || result.proctoringViolations.length === 0) ? (
-          <div className="bg-[#181818] p-4 rounded-lg text-xs text-slate-400 border border-[#262626] text-center">
-            No proctoring violations recorded for this attempt. Student completed the exam with a clean webcam record.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {result.proctoringViolations.map((v: any) => (
-              <div key={v.id} className="bg-[#1a1a1a] border border-[#333333] rounded-lg p-3 space-y-2 flex flex-col justify-between">
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center gap-2">
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-800 uppercase tracking-wider">
-                      ⚠️ {v.violationType.replace('_', ' ')}
-                    </span>
-                    <span className="text-[10px] font-mono text-[#a6a6a6]">
-                      Warning {v.warningNumber}
-                    </span>
-                  </div>
-                  <p className="text-xs text-white font-medium line-clamp-2">{v.message}</p>
-                  <p className="text-[10px] text-[#888888] font-mono">
-                    Logged: {new Date(v.timestamp).toLocaleString()}
-                  </p>
-                </div>
-
-                {v.snapshotBase64 ? (
-                  <div className="pt-2">
-                    <p className="text-[10px] text-slate-400 mb-1">Captured Camera Snapshot:</p>
-                    <img
-                      src={v.snapshotBase64}
-                      alt="Proctoring violation snapshot"
-                      className="w-full h-32 object-cover rounded border border-[#404040] hover:scale-[1.02] transition cursor-pointer"
-                      onClick={() => {
-                        const w = window.open("");
-                        if (w) {
-                          w.document.write(`<title>Evidence Snapshot</title><body style="background:#000;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><img src="${v.snapshotBase64}" style="max-width:90vw;max-height:90vh;border-radius:12px;border:3px solid #f59e0b;"/></body>`);
-                        }
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <p className="text-[10px] text-gray-500 italic pt-2">No camera snapshot available</p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Filter Tabs Header */}

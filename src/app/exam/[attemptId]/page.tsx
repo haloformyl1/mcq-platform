@@ -7,7 +7,6 @@ import { useProctoring } from "@/hooks/useProctoring";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
-import WebcamProctor from "@/components/WebcamProctor";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -83,10 +82,18 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     }
   }, [resolvedParams.attemptId, router, isSubmitting]);
 
-  const { warningsLeft, showSlipWarning, setShowSlipWarning, isAiActive } = useProctoring(
+  const { warningsLeft, showSlipWarning, setShowSlipWarning, violationType, violationMessage, isAiActive } = useProctoring(
     videoRef,
     submitTest,
-    !!examData
+    !!examData,
+    examData ? {
+      attemptId: resolvedParams.attemptId,
+      studentId: examData.student?.id || examData.attempt?.studentId || "",
+      testId: examData.test?.id || "",
+      studentName: examData.student?.name,
+      studentEmail: examData.student?.email,
+      testTitle: examData.test?.title
+    } : undefined
   );
 
   useEffect(() => {
@@ -454,9 +461,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Warning: Eye Tracking</h2>
-            <p className="text-[#a6a6a6] mb-4 text-lg">
-              You looked away from the screen for over 10 seconds. This is a violation of the test rules.
+            <h2 className="text-2xl font-bold text-white mb-4">
+              {violationType === "CELL_PHONE_DETECTED" ? "📱 Cell Phone Detected!" : violationType === "MULTIPLE_PERSONS_DETECTED" ? "👥 Multiple Persons Detected!" : "⚠️ AI Proctoring Warning"}
+            </h2>
+            <p className="text-amber-200 mb-4 text-base bg-red-950/40 p-3 rounded border border-red-800/60 font-semibold">
+              {violationMessage || "Violation detected. Photo snapshot captured and sent to Admin."}
             </p>
             <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
               <p className="text-red-400 font-bold text-xl">
@@ -505,15 +514,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             </div>
           </div>
         </div>
-      )}
-
-      {/* AI Webcam & Device Proctoring Widget */}
-      {examData && (examData.test?.aiProctoringEnabled ?? true) && (
-        <WebcamProctor
-          attemptId={resolvedParams.attemptId}
-          maxWarnings={examData.test?.maxProctoringWarnings || 5}
-          onMaxWarningsExceeded={(reason) => submitTest(reason)}
-        />
       )}
     </div>
   );

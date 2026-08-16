@@ -22,6 +22,7 @@ model Student {
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
   accessRequests TestAccessRequest[]
+  proctoringViolations ProctoringViolation[]
 }
 
 model AdminUser {
@@ -49,8 +50,6 @@ model Test {
   unlockAt           DateTime?
   lockAt             DateTime?
   postLockHoldMinutes Int     @default(4320) // Default 72 hours (4320 minutes)
-  aiProctoringEnabled Boolean @default(true)
-  maxProctoringWarnings Int   @default(5)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -58,6 +57,7 @@ model Test {
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
   accessRequests TestAccessRequest[]
+  proctoringViolations ProctoringViolation[]
 }
 
 model StudentTestOverride {
@@ -116,7 +116,7 @@ model TestAttempt {
   startedAt        DateTime  @default(now())
   submittedAt      DateTime?
   status           String    @default("IN_PROGRESS") // IN_PROGRESS, SUBMITTED
-  submissionReason String?   // MANUAL_SUBMISSION, TIME_EXPIRED, TAB_SWITCH, INACTIVITY_240_SECONDS, PROCTORING_VIOLATION, etc.
+  submissionReason String?   // MANUAL_SUBMISSION, TIME_EXPIRED, TAB_SWITCH, INACTIVITY_240_SECONDS, etc.
   attemptNumber    Int       @default(1)
   
   score            Float?
@@ -148,14 +148,17 @@ model Answer {
 }
 
 model ProctoringViolation {
-  id              String      @id @default(uuid())
-  attemptId       String
-  violationType   String      // CELL_PHONE, MULTIPLE_FACES, NO_FACE, LOOKING_AWAY, TAB_SWITCH
-  warningNumber   Int
-  message         String
-  snapshotBase64  String?     @db.Text
-  confidenceScore Float?
-  timestamp       DateTime    @default(now())
+  id             String      @id @default(uuid())
+  attemptId      String
+  studentId      String
+  testId         String
+  violationType  String      // CELL_PHONE_DETECTED, MULTIPLE_PERSONS_DETECTED, EYE_SLIP_10S, TAB_SWITCH, WINDOW_BLUR
+  message        String
+  snapshotBase64 String?     @db.Text
+  warningNumber  Int
+  createdAt      DateTime    @default(now())
 
-  attempt         TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  student        Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  test           Test        @relation(fields: [testId], references: [id], onDelete: Cascade)
+  attempt        TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 }

@@ -33,7 +33,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
           }
         },
         proctoringViolations: {
-          orderBy: { timestamp: 'asc' }
+          orderBy: { createdAt: 'asc' }
         }
       }
     });
