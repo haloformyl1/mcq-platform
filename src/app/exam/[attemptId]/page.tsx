@@ -164,15 +164,20 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       setTimeLeft(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
     }, 1000);
 
+    const isPermissionPromptingRef = { current: true };
+    const permissionTimer = setTimeout(() => {
+      isPermissionPromptingRef.current = false;
+    }, 5000);
+
     const handleVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
-        if (proctoringSettings.tabSwitchAction === "ALLOW") return;
+        if (proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current) return;
         submitTest("TAB_SWITCH");
       }
     };
     
     const handleBlur = () => {
-      if (proctoringSettings.tabSwitchAction === "ALLOW") return;
+      if (proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current) return;
       submitTest("WINDOW_BLUR");
     };
 
@@ -180,8 +185,20 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       const isFullscreen = document.fullscreenElement || (document as any).webkitFullscreenElement;
       if (!isFullscreen) {
         setShowFullscreenWarning(true);
+        // Instant enforcement: Attempt immediate re-entry into fullscreen
+        const docEl = document.documentElement as any;
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen().catch(() => {});
+        } else if (docEl.webkitRequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        }
+      } else {
+        setShowFullscreenWarning(false);
       }
     };
+
+    // Check immediately on mount if browser is not in fullscreen
+    handleFullscreenChange();
 
     const updateActivity = () => {
       lastActivityTime.current = Date.now();
@@ -198,6 +215,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     window.addEventListener("scroll", updateActivity);
 
     return () => {
+      clearTimeout(permissionTimer);
       clearInterval(timerInterval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
@@ -249,6 +267,18 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </div>
         </div>
         <div className="flex items-center space-x-3 w-full md:w-auto justify-end">
+          <button
+            onClick={() => {
+              const docEl = document.documentElement as any;
+              if (docEl.requestFullscreen) docEl.requestFullscreen().catch((e: any) => console.warn(e));
+              else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+            }}
+            className="flex items-center justify-center space-x-1.5 py-2 px-3 bg-[#262626] hover:bg-[#333333] rounded-md text-cyan-400 border border-cyan-500/40 text-sm md:text-base"
+            title="Enter Fullscreen"
+          >
+            <Maximize2 size={18} />
+            <span className="font-medium hidden sm:inline text-xs">Fullscreen</span>
+          </button>
           <button 
             onClick={handleManualSubmit}
             disabled={isSubmitting}
@@ -467,24 +497,27 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
       {/* Fullscreen Warning Modal */}
       {showFullscreenWarning && (
-        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-[#404040]">
+        <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-red-500/50">
             <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <AlertTriangle className="w-8 h-8 animate-bounce" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Warning!</h2>
-            <p className="text-[#a6a6a6] mb-8 text-lg">
-              Exiting full-screen mode during the test isn't allowed. Are you sure you want to leave the test?
+            <h2 className="text-2xl font-bold text-white mb-4">CRITICAL WARNING: Fullscreen Exited!</h2>
+            <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+              You have exited Fullscreen Mode or switched context. PIECHEM Security Rules require all exams to remain in Fullscreen Mode continuously.
             </p>
-            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+            <div className="bg-red-950/40 border border-red-500/30 rounded-lg p-3 mb-6">
+              <p className="text-red-400 font-bold text-xs">
+                ⚠️ Returning to normal view, switching tabs, or using other apps will result in IMMEDIATE AUTOMATIC SUBMISSION of your test!
+              </p>
+            </div>
+            <div className="flex space-x-4">
               <button 
                 onClick={() => submitTest("EXITED_FULLSCREEN")}
                 disabled={isSubmitting}
-                className="flex-1 bg-[#262626] hover:bg-[#333333] text-white font-medium py-3 rounded-lg border border-[#404040]"
+                className="flex-1 bg-[#262626] hover:bg-red-900/60 text-red-300 font-medium py-3 rounded-lg border border-red-900/40 text-xs"
               >
-                Leave Test
+                Submit & Exit Test
               </button>
               <button 
                 onClick={() => {
@@ -496,9 +529,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   setShowFullscreenWarning(false);
                 }}
                 disabled={isSubmitting}
-                className="flex-1 bg-[#0099ff] hover:bg-[#007acc] text-white font-medium py-3 rounded-lg"
+                className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg text-xs shadow-lg"
               >
-                Return to Test
+                Return to Fullscreen
               </button>
             </div>
           </div>

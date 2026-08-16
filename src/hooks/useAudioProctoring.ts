@@ -74,9 +74,9 @@ export function useAudioProctoring(
         } else {
           continuousNoiseStartTime.current = null;
         }
-
-        animFrameRef.current = requestAnimationFrame(checkVolume);
       };
+
+      const intervalId = setInterval(checkVolume, 500);
 
       const handleAudioViolation = () => {
         audioWarningCount.current += 1;
@@ -90,10 +90,8 @@ export function useAudioProctoring(
         }
       };
 
-      checkVolume();
-
       return () => {
-        if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+        clearInterval(intervalId);
         if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
           audioCtxRef.current.close();
         }

@@ -81,7 +81,7 @@ export function useProctoring(
       }
 
       if (isTrackingRef.current && isTestActive) {
-        timeoutId = setTimeout(trackFace, 500); // Check twice a second
+        timeoutId = setTimeout(trackFace, 1500); // Check once every 1.5s to prevent UI lag
       }
     }
 

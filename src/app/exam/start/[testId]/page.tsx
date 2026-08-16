@@ -15,16 +15,26 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
     setError("");
 
     try {
-      // Pre-request camera permission to avoid popup stealing focus during the actual exam
-      await navigator.mediaDevices.getUserMedia({ video: true });
+      // Pre-request camera & microphone permissions to avoid popups stealing focus during the actual exam
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      // Stop temporary tracks after granted so the exam page opens fresh devices
+      stream.getTracks().forEach(track => track.stop());
     } catch (err) {
-      console.error("Camera permission denied", err);
-      setError("Camera access is required to take this exam. Please allow camera permissions in your browser settings.");
+      console.error("Camera/Microphone permission denied", err);
+      setError("Both Camera & Microphone access are required to take this exam. Please allow permissions when prompted by your browser.");
       setLoading(false);
       return;
     }
 
     try {
+      // Trigger browser fullscreen synchronously inside user gesture click
+      const docEl = document.documentElement as any;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(() => console.warn("Fullscreen deferred/denied"));
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      }
+
       const res = await fetch("/api/exam/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
