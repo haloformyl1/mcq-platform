@@ -209,18 +209,22 @@ export default function StudentDashboard() {
         )}
 
         {/* Study Materials & Reference Resources Section (Between ANNOUNCEMENT and Performance Section) */}
-        {studyMaterials.length > 0 && (
-          <section className="bg-[#161616]/80 border border-cyan-500/30 p-6 rounded-xl backdrop-blur-md shadow-xl space-y-4">
-            <div className="flex justify-between items-center border-b border-[#2a2a2a] pb-3">
-              <div className="flex items-center gap-2.5">
-                <FolderOpen className="w-5 h-5 text-cyan-400 shrink-0" />
-                <h2 className="text-lg font-bold text-white tracking-wide">Study Materials & Notes</h2>
-              </div>
-              <span className="text-xs bg-cyan-950/60 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 font-mono">
-                {studyMaterials.length} Available
-              </span>
+        <section className="bg-[#161616]/80 border border-cyan-500/30 p-6 rounded-xl backdrop-blur-md shadow-xl space-y-4">
+          <div className="flex justify-between items-center border-b border-[#2a2a2a] pb-3">
+            <div className="flex items-center gap-2.5">
+              <FolderOpen className="w-5 h-5 text-cyan-400 shrink-0" />
+              <h2 className="text-lg font-bold text-white tracking-wide">Study Materials & Notes</h2>
             </div>
+            <span className="text-xs bg-cyan-950/60 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 font-mono">
+              {studyMaterials.length} Available
+            </span>
+          </div>
 
+          {studyMaterials.length === 0 ? (
+            <div className="text-center py-6 text-sm text-[#a6a6a6] bg-[#1a1a1a]/50 rounded-lg border border-[#333333]">
+              📚 No study materials uploaded yet. Check back soon for chapter notes and references!
+            </div>
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {studyMaterials.map((mat: any) => {
                 const isPdf = mat.type === "PDF";
@@ -264,8 +268,8 @@ export default function StudentDashboard() {
                 );
               })}
             </div>
-          </section>
-        )}
+          )}
+        </section>
         
         {/* Top Summary Cards */}
         {testsTaken > 0 ? (
