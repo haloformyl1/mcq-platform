@@ -176,3 +176,15 @@ model ProctoringWarningLog {
   attempt      TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 }
 
+model StudyMaterial {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  type        String   // PDF, IMAGE, LINK
+  url         String
+  fileSize    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+

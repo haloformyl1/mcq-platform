@@ -150,25 +150,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Students", href: "/admin/students" },
     { name: "Results", href: "/admin/results" },
     { name: "Notifications", href: "/admin/notifications" },
+    { name: "Content Upload", href: "/admin/study-materials" },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black flex flex-col font-sans text-white">
       <nav className="bg-[#161616]/40 border-b border-[#404040]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-3 sm:px-6">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
+              <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-3">
                 <PiechemLogo size="sm" />
-                <span className="border-l border-gray-700 pl-3 text-sm text-gray-300 font-medium tracking-wide">Admin Panel</span>
+                <span className="border-l border-gray-700 pl-2 sm:pl-3 text-xs sm:text-sm text-gray-300 font-medium tracking-wide whitespace-nowrap">Admin Panel</span>
               </div>
-              <div className="hidden md:block">
-                <div className="ml-4 lg:ml-8 flex items-baseline space-x-1 lg:space-x-3">
+              <div className="hidden md:block min-w-0">
+                <div className="ml-2 lg:ml-6 flex items-baseline space-x-1 lg:space-x-2">
                   {navItems.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium transition whitespace-nowrap ${
+                      className={`px-2 lg:px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium transition whitespace-nowrap ${
                         pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
                           ? "bg-[#262626] text-white"
                           : "text-[#a6a6a6] hover:bg-[#333333] hover:text-white"

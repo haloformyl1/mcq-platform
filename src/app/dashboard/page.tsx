@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, Clock, AlertCircle } from 'lucide-react';
+import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
+  const [studyMaterials, setStudyMaterials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(new Date());
   const router = useRouter();
@@ -34,6 +35,14 @@ export default function StudentDashboard() {
       .catch(() => {
         setLoading(false);
       });
+
+    // Fetch study materials for students
+    fetch("/api/student/study-materials")
+      .then(res => res.json())
+      .then(mats => {
+        if (Array.isArray(mats)) setStudyMaterials(mats);
+      })
+      .catch(() => {});
   }, [router]);
 
   const handleLogout = async () => {
@@ -197,6 +206,65 @@ export default function StudentDashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Study Materials & Reference Resources Section (Between ANNOUNCEMENT and Performance Section) */}
+        {studyMaterials.length > 0 && (
+          <section className="bg-[#161616]/80 border border-cyan-500/30 p-6 rounded-xl backdrop-blur-md shadow-xl space-y-4">
+            <div className="flex justify-between items-center border-b border-[#2a2a2a] pb-3">
+              <div className="flex items-center gap-2.5">
+                <FolderOpen className="w-5 h-5 text-cyan-400 shrink-0" />
+                <h2 className="text-lg font-bold text-white tracking-wide">Study Materials & Notes</h2>
+              </div>
+              <span className="text-xs bg-cyan-950/60 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 font-mono">
+                {studyMaterials.length} Available
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {studyMaterials.map((mat: any) => {
+                const isPdf = mat.type === "PDF";
+                const isImage = mat.type === "IMAGE";
+
+                return (
+                  <div key={mat.id} className="bg-[#1a1a1a] border border-[#333333] hover:border-cyan-500/50 p-4 rounded-xl flex flex-col justify-between gap-3 shadow-md transition group">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 ${
+                          isPdf
+                            ? "bg-red-950/80 text-red-400 border border-red-800/60"
+                            : isImage
+                            ? "bg-purple-950/80 text-purple-400 border border-purple-800/60"
+                            : "bg-blue-950/80 text-blue-400 border border-blue-800/60"
+                        }`}>
+                          {isPdf && <FileText className="w-3.5 h-3.5" />}
+                          {isImage && <ImageIcon className="w-3.5 h-3.5" />}
+                          {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
+                          {mat.type}
+                        </span>
+                        {mat.fileSize && <span className="text-[11px] text-gray-400 font-mono">{mat.fileSize}</span>}
+                      </div>
+
+                      <h3 className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors line-clamp-1">{mat.title}</h3>
+                      {mat.description && <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{mat.description}</p>}
+                    </div>
+
+                    <div className="pt-2 border-t border-[#262626] flex justify-end">
+                      <a
+                        href={mat.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-xs font-semibold transition shadow"
+                      >
+                        <span>{mat.type === "LINK" ? "Open Link" : "View / Download"}</span>
+                        {mat.type === "LINK" ? <ExternalLink className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         )}
         
         {/* Top Summary Cards */}
