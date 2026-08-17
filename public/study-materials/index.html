@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PIECHEM Crystal Learning Studio — an interactive bilingual solid-state chemistry learning platform." />
+    <meta name="theme-color" content="#F4F9FC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#06131D" media="(prefers-color-scheme: dark)" />
+    <title>Solid-State Chemistry | PIECHEM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      try {
+        const redirect = new URLSearchParams(window.location.search).get('route');
+        if (redirect) window.history.replaceState(null, '', './' + redirect);
+        const stored = JSON.parse(localStorage.getItem('solid-state-chem-storage') || '{}');
+        if (stored?.state?.theme === 'dark') document.documentElement.classList.add('dark');
+      } catch {}
+    </script>
+    <script type="module" crossorigin src="./assets/main-XYTJjV5m.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/useStore-BLI9p05e.js">
+    <link rel="modulepreload" crossorigin href="./assets/States-BFfrVFxI.js">
+    <link rel="stylesheet" crossorigin href="./assets/States-BVEaQvsg.css">
+    <link rel="stylesheet" crossorigin href="./assets/main-Tmwx8c9a.css">
+  <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

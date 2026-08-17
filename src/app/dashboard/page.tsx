@@ -157,10 +157,18 @@ export default function StudentDashboard() {
             <a href="tel:9830507435" className="font-semibold text-cyan-400 hover:underline">9830507435</a>
           </div>
 
-          <button onClick={handleLogout} className="hidden md:flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="/study-materials/index.html"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg shadow-md transition border border-cyan-400/40"
+            >
+              <span>📚 Study Materials & 3D Lab</span>
+            </a>
+            <button onClick={handleLogout} className="hidden md:flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

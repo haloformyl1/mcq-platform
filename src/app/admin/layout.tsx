@@ -150,6 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Students", href: "/admin/students" },
     { name: "Results", href: "/admin/results" },
     { name: "Notifications", href: "/admin/notifications" },
+    { name: "Study Materials 📚", href: "/study-materials/index.html" },
   ];
 
   return (

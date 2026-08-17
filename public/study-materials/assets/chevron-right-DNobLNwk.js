@@ -1,0 +1,1 @@
+import{r as e}from"./useStore-BLI9p05e.js";var t=e(`chevron-right`,[[`path`,{d:`m9 18 6-6-6-6`,key:`mthhwq`}]]);export{t};
