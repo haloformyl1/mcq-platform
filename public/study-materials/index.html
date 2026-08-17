@@ -2,9 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/study-materials/favicon.svg" />
+    <link rel="apple-touch-icon" href="/study-materials/apple-touch-icon.png" />
+    <link rel="manifest" href="/study-materials/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="PIECHEM Crystal Learning Studio — an interactive bilingual solid-state chemistry learning platform." />
     <meta name="theme-color" content="#F4F9FC" media="(prefers-color-scheme: light)" />
@@ -16,17 +16,17 @@
     <script>
       try {
         const redirect = new URLSearchParams(window.location.search).get('route');
-        if (redirect) window.history.replaceState(null, '', './' + redirect);
+        if (redirect) window.history.replaceState(null, '', '/study-materials/' + redirect);
         const stored = JSON.parse(localStorage.getItem('solid-state-chem-storage') || '{}');
         if (stored?.state?.theme === 'dark') document.documentElement.classList.add('dark');
       } catch {}
     </script>
-    <script type="module" crossorigin src="./assets/main-XYTJjV5m.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/useStore-BLI9p05e.js">
-    <link rel="modulepreload" crossorigin href="./assets/States-BFfrVFxI.js">
-    <link rel="stylesheet" crossorigin href="./assets/States-BVEaQvsg.css">
-    <link rel="stylesheet" crossorigin href="./assets/main-Tmwx8c9a.css">
-  <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
+    <script type="module" crossorigin src="/study-materials/assets/main-BKc955lr.js"></script>
+    <link rel="modulepreload" crossorigin href="/study-materials/assets/useStore-BLI9p05e.js">
+    <link rel="modulepreload" crossorigin href="/study-materials/assets/States-Ctztw4ZM.js">
+    <link rel="stylesheet" crossorigin href="/study-materials/assets/States-DQe2AOJS.css">
+    <link rel="stylesheet" crossorigin href="/study-materials/assets/main-D-17zDhz.css">
+  <link rel="manifest" href="/study-materials/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/study-materials/registerSW.js"></script></head>
   <body>
     <div id="root"></div>
   </body>
