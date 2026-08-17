@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen } from 'lucide-react';
+import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen, Clock } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
