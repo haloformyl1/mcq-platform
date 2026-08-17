@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+"use client";
 
 export default function StudyMaterialsRedirect() {
   return (
@@ -11,3 +11,4 @@ export default function StudyMaterialsRedirect() {
     </div>
   );
 }
+
