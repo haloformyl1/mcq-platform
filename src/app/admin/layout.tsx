@@ -150,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Students", href: "/admin/students" },
     { name: "Results", href: "/admin/results" },
     { name: "Notifications", href: "/admin/notifications" },
-    { name: "Study Materials 📚", href: "/study-materials/index.html" },
+    { name: "Study Materials 📚", href: "/study-materials" },
   ];
 
   return (
@@ -166,17 +166,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="hidden md:block">
                 <div className="ml-4 lg:ml-8 flex items-baseline space-x-1 lg:space-x-3">
                   {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium transition whitespace-nowrap ${
-                        pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
-                          ? "bg-[#262626] text-white"
-                          : "text-[#a6a6a6] hover:bg-[#333333] hover:text-white"
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
+                    item.href.startsWith("/study-materials") ? (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        className="px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium text-[#a6a6a6] hover:bg-[#333333] hover:text-white transition whitespace-nowrap"
+                      >
+                        {item.name}
+                      </a>
+                    ) : (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium transition whitespace-nowrap ${
+                          pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
+                            ? "bg-[#262626] text-white"
+                            : "text-[#a6a6a6] hover:bg-[#333333] hover:text-white"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    )
                   ))}
                 </div>
               </div>

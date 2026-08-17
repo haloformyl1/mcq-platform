@@ -159,7 +159,7 @@ export default function StudentDashboard() {
 
           <div className="flex items-center gap-2 shrink-0">
             <a
-              href="/study-materials/index.html"
+              href="/study-materials"
               className="flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm px-3 py-1.5 rounded-lg shadow-md transition border border-cyan-400/40"
             >
               <span>📚 Study Materials & 3D Lab</span>
