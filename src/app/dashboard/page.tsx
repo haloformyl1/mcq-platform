@@ -149,12 +149,22 @@ export default function StudentDashboard() {
           </div>
 
           {/* Center Badge */}
-          <div className="flex px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-[#121824]/90 backdrop-blur-md border border-[#334155]/60 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-[10px] sm:text-xs text-slate-300 font-medium tracking-wide items-center justify-center gap-1 sm:gap-1.5 text-center">
-            <span className="text-slate-400 hidden xs:inline">Designed & Prepared by</span>
-            <span className="font-semibold text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">Arghyadeep Roy</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-slate-400 hidden xs:inline">Contact:</span>
-            <a href="tel:9830507435" className="font-semibold text-cyan-400 hover:underline">9830507435</a>
+          <div className="px-4 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
+            <span className="text-slate-400 hidden xs:inline">Prepared by</span>
+            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
+              Arghyadeep Roy
+            </span>
+            <span className="text-slate-600">•</span>
+            <a 
+              href="tel:9830507435" 
+              className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/70 text-cyan-300 hover:text-white hover:bg-cyan-600/60 border border-cyan-500/40 transition-all font-mono shadow-sm"
+              title="Call Arghyadeep Roy"
+            >
+              <svg className="w-3 h-3 mr-1 text-cyan-400 fill-current" viewBox="0 0 24 24">
+                <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              <span>9830507435</span>
+            </a>
           </div>
 
           <button onClick={handleLogout} className="hidden md:flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
