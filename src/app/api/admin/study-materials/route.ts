@@ -35,24 +35,27 @@ export async function POST(req: Request) {
       if (!url) {
         return NextResponse.json({ error: "Link URL is required" }, { status: 400 });
       }
-    } else if (file) {
-      const bytes = await file.arrayBuffer();
+    } else if (file && typeof (file as any).arrayBuffer === "function") {
+      const bytes = await (file as any).arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      const sizeMB = ((file as any).size / (1024 * 1024)).toFixed(2);
       fileSizeFormatted = `${sizeMB} MB`;
 
       const uploadsDir = path.join(process.cwd(), "public", "uploads", "study_materials");
       await mkdir(uploadsDir, { recursive: true });
 
-      const sanitizeName = (file as any).name ? (file as any).name.replace(/[^a-zA-Z0-9.-]/g, "_") : `file_${Date.now()}`;
+      const rawName = (file as any).name || `file_${Date.now()}`;
+      const sanitizeName = rawName.replace(/[^a-zA-Z0-9.-]/g, "_");
       const fileName = `${Date.now()}_${sanitizeName}`;
       const filePath = path.join(uploadsDir, fileName);
       await writeFile(filePath, buffer);
 
       finalUrl = `/uploads/study_materials/${fileName}`;
-    } else if (!url) {
-      return NextResponse.json({ error: "File or link URL is required" }, { status: 400 });
+    } else if (url.trim()) {
+      finalUrl = url.trim();
+    } else {
+      return NextResponse.json({ error: "Please select a valid file or enter a link URL" }, { status: 400 });
     }
 
     const material = await prisma.studyMaterial.create({
@@ -66,9 +69,10 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, material });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Create study material error:", error);
-    return NextResponse.json({ error: "Failed to upload study material" }, { status: 500 });
+    const detailMsg = error?.message || (typeof error === 'string' ? error : "Failed to upload study material");
+    return NextResponse.json({ error: detailMsg }, { status: 500 });
   }
 }
 

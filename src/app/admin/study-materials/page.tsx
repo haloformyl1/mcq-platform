@@ -76,8 +76,8 @@ export default function AdminStudyMaterials() {
       } else {
         setError(data.error || "Upload failed");
       }
-    } catch (err) {
-      setError("Failed to process request");
+    } catch (err: any) {
+      setError(err?.message || "Failed to process upload request");
     } finally {
       setSubmitting(false);
     }
