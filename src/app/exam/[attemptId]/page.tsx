@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, use } from "react";
+
 import { useRouter } from "next/navigation";
 import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
 import { useProctoring } from "@/hooks/useProctoring";
 import { useAudioProctoring } from "@/hooks/useAudioProctoring";
+import { useRollingRecorder } from "@/hooks/useRollingRecorder";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -26,6 +28,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [isCameraMinimized, setIsCameraMinimized] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [needsMobileScan, setNeedsMobileScan] = useState(false);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
   const [proctoringSettings, setProctoringSettings] = useState<any>({
     enforceFullscreen: true,
@@ -38,6 +41,28 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     maxAudioWarnings: 3,
     enableMobileEnvironmentScan: true
   });
+
+  const { get30sClipBlob } = useRollingRecorder(mediaStream);
+
+  const handleWarningTrigger = useCallback(async (warningType: "EYE_SLIP" | "AUDIO_NOISE", message: string) => {
+    try {
+      const clipBlob = await get30sClipBlob();
+      const formData = new FormData();
+      formData.append("attemptId", resolvedParams.attemptId);
+      formData.append("warningType", warningType);
+      formData.append("message", message);
+      if (clipBlob) {
+        formData.append("file", clipBlob, `clip_${warningType}_${Date.now()}.webm`);
+      }
+
+      await fetch("/api/exam/log-warning", {
+        method: "POST",
+        body: formData
+      });
+    } catch (err) {
+      console.error("Failed to upload proctoring warning clip:", err);
+    }
+  }, [resolvedParams.attemptId, get30sClipBlob]);
 
   useEffect(() => {
     fetch("/api/admin/proctoring-settings")
@@ -88,6 +113,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       })
         .then(stream => {
           streamRef.current = stream;
+          setMediaStream(stream);
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
           }
@@ -126,7 +152,8 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     !!examData,
     proctoringSettings.faceAbsenceDelaySeconds ?? 10,
     proctoringSettings.maxAllowedWarnings ?? 5,
-    proctoringSettings.enableAiProctoring ?? true
+    proctoringSettings.enableAiProctoring ?? true,
+    handleWarningTrigger
   );
 
   const { audioWarningsLeft, showAudioWarning, setShowAudioWarning } = useAudioProctoring(
@@ -135,8 +162,10 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     !!examData,
     proctoringSettings.audioNoiseDelaySeconds ?? 10,
     proctoringSettings.maxAudioWarnings ?? 3,
-    proctoringSettings.enableAudioProctoring ?? true
+    proctoringSettings.enableAudioProctoring ?? true,
+    handleWarningTrigger
   );
+
 
   useEffect(() => {
     if (!examData) return;

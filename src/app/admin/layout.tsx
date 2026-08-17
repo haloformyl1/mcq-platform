@@ -163,12 +163,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span className="border-l border-gray-700 pl-3 text-sm text-gray-300 font-medium tracking-wide">Admin Panel</span>
               </div>
               <div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
+                <div className="ml-4 lg:ml-8 flex items-baseline space-x-1 lg:space-x-3">
                   {navItems.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                      className={`px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium transition whitespace-nowrap ${
                         pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
                           ? "bg-[#262626] text-white"
                           : "text-[#a6a6a6] hover:bg-[#333333] hover:text-white"
@@ -180,10 +180,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 lg:space-x-3 overflow-x-auto py-2">
               <button
                 onClick={handleTestAsStudent}
-                className="bg-amber-600/80 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-amber-500/30"
+                className="bg-amber-600/80 hover:bg-amber-600 text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center space-x-1 shadow-sm border border-amber-500/30 whitespace-nowrap shrink-0"
               >
                 <span>🎓 Test as Student</span>
               </button>
@@ -192,11 +192,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   setShowProctoringModal(true);
                   fetchProctoringSettings();
                 }}
-                className="bg-red-950/60 hover:bg-red-900/80 text-red-400 hover:text-white px-3 py-1.5 rounded-md text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-red-500/40"
+                className="bg-red-950/60 hover:bg-red-900/80 text-red-400 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-red-500/40 whitespace-nowrap shrink-0"
                 title="Security Protocols & Proctoring Rules"
               >
-                <Shield size={16} />
-                <span>Security Protocols</span>
+                <Shield size={15} />
+                <span className="hidden sm:inline">Security Protocols</span>
+                <span className="sm:hidden">Security</span>
               </button>
               <button
                 onClick={() => {
@@ -204,14 +205,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   setModalSuccess("");
                   setShowPasswordModal(true);
                 }}
-                className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white p-2 rounded-md transition border border-transparent hover:border-[#404040]"
+                className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white p-2 rounded-md transition border border-transparent hover:border-[#404040] shrink-0"
                 title="Change Password & Credentials"
               >
                 <KeyRound size={18} />
               </button>
               <button
                 onClick={handleLogout}
-                className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
+                className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white px-2.5 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition shrink-0"
               >
                 Logout
               </button>

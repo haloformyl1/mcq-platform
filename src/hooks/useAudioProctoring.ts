@@ -6,7 +6,8 @@ export function useAudioProctoring(
   isTestActive: boolean,
   audioNoiseDelaySeconds: number = 10,
   maxAudioWarnings: number = 3,
-  enableAudioProctoring: boolean = true
+  enableAudioProctoring: boolean = true,
+  onWarningTrigger?: (warningType: "AUDIO_NOISE", message: string) => void
 ) {
   const [audioWarningsLeft, setAudioWarningsLeft] = useState(maxAudioWarnings);
   const [showAudioWarning, setShowAudioWarning] = useState(false);
@@ -15,7 +16,6 @@ export function useAudioProctoring(
   const audioWarningCount = useRef(0);
   const continuousNoiseStartTime = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const animFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     setAudioWarningsLeft(maxAudioWarnings);
@@ -82,6 +82,11 @@ export function useAudioProctoring(
         audioWarningCount.current += 1;
         const maxLimit = maxAudioWarnings || 3;
 
+        const message = `Continuous background sound/speech detected for over ${audioNoiseDelaySeconds || 10}s`;
+        if (onWarningTrigger) {
+          onWarningTrigger("AUDIO_NOISE", message);
+        }
+
         if (audioWarningCount.current >= maxLimit) {
           onSubmit("EXCESSIVE_AUDIO_NOISE");
         } else {
@@ -99,7 +104,7 @@ export function useAudioProctoring(
     } catch (err) {
       console.error("Audio proctoring initialization error:", err);
     }
-  }, [stream, isTestActive, enableAudioProctoring, audioNoiseDelaySeconds, maxAudioWarnings, onSubmit]);
+  }, [stream, isTestActive, enableAudioProctoring, audioNoiseDelaySeconds, maxAudioWarnings, onSubmit, onWarningTrigger]);
 
   return {
     audioWarningsLeft,
@@ -108,3 +113,4 @@ export function useAudioProctoring(
     isAudioActive
   };
 }
+

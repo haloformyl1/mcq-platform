@@ -22,6 +22,7 @@ model Student {
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
   accessRequests TestAccessRequest[]
+  proctoringWarnings ProctoringWarningLog[]
 }
 
 model AdminUser {
@@ -56,6 +57,7 @@ model Test {
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
   accessRequests TestAccessRequest[]
+  proctoringWarnings ProctoringWarningLog[]
 }
 
 model StudentTestOverride {
@@ -128,6 +130,7 @@ model TestAttempt {
   test             Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
   student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
   answers          Answer[]
+  proctoringWarnings ProctoringWarningLog[]
 }
 
 model Answer {
@@ -157,3 +160,19 @@ model ProctoringSetting {
   enableMobileEnvironmentScan  Boolean  @default(true)
   updatedAt                    DateTime @updatedAt
 }
+
+model ProctoringWarningLog {
+  id           String   @id @default(uuid())
+  studentId    String
+  testId       String
+  attemptId    String
+  warningType  String   // EYE_SLIP, AUDIO_NOISE
+  message      String
+  mediaUrl     String?
+  createdAt    DateTime @default(now())
+
+  student      Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  test         Test        @relation(fields: [testId], references: [id], onDelete: Cascade)
+  attempt      TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+}
+

@@ -8,7 +8,8 @@ export function useProctoring(
   isTestActive: boolean,
   faceAbsenceDelaySeconds: number = 10,
   maxAllowedWarnings: number = 5,
-  enableAiProctoring: boolean = true
+  enableAiProctoring: boolean = true,
+  onWarningTrigger?: (warningType: "EYE_SLIP", message: string) => void
 ) {
   const [warningsLeft, setWarningsLeft] = useState(maxAllowedWarnings);
   const [showSlipWarning, setShowSlipWarning] = useState(false);
@@ -89,6 +90,11 @@ export function useProctoring(
       slipCount.current += 1;
       const maxSlips = maxAllowedWarnings || 5;
 
+      const message = `Face absence / looking away detected for over ${faceAbsenceDelaySeconds || 10}s`;
+      if (onWarningTrigger) {
+        onWarningTrigger("EYE_SLIP", message);
+      }
+
       if (slipCount.current >= maxSlips) {
         onSubmit("EXCESSIVE_EYE_SLIP");
       } else {
@@ -105,7 +111,7 @@ export function useProctoring(
       isTrackingRef.current = false;
       clearTimeout(timeoutId);
     };
-  }, [videoRef, isTestActive, onSubmit, faceAbsenceDelaySeconds, maxAllowedWarnings, enableAiProctoring]);
+  }, [videoRef, isTestActive, onSubmit, faceAbsenceDelaySeconds, maxAllowedWarnings, enableAiProctoring, onWarningTrigger]);
 
   return {
     warningsLeft,
@@ -114,3 +120,4 @@ export function useProctoring(
     isAiActive
   };
 }
+

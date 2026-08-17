@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, CheckCircle, XCircle, Clock, Check, X, ShieldAlert } from "lucide-react";
+import { Bell, CheckCircle, XCircle, Clock, Check, X, ShieldAlert, Video, Eye, Mic } from "lucide-react";
 import PiFiringLoader from "@/components/PiFiringLoader";
 
 export default function AdminNotifications() {
   const [requests, setRequests] = useState<any[]>([]);
+  const [warningLogs, setWarningLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
@@ -18,7 +19,8 @@ export default function AdminNotifications() {
         return data;
       })
       .then(data => {
-        setRequests(data);
+        setRequests(data.accessRequests || []);
+        setWarningLogs(data.warningLogs || []);
         setError(null);
       })
       .catch(err => setError(err.message))
@@ -64,21 +66,122 @@ export default function AdminNotifications() {
             <Bell className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Notifications & Access Requests</h1>
-            <p className="text-sm text-[#a6a6a6]">Review student requests to unlock expired tests for their accounts.</p>
+            <h1 className="text-2xl font-bold">Notifications & Security Alerts</h1>
+            <p className="text-sm text-[#a6a6a6]">Review student access requests and AI proctoring security violation video clips.</p>
           </div>
         </div>
-        <div className="text-sm font-semibold bg-[#1a1a1a] px-3.5 py-1.5 rounded-full border border-[#333333]">
-          Pending Requests: <span className="text-amber-400 font-bold ml-1">{pendingRequests.length}</span>
+        <div className="flex items-center gap-3">
+          <div className="text-sm font-semibold bg-[#1a1a1a] px-3.5 py-1.5 rounded-full border border-[#333333]">
+            Warnings Logged: <span className="text-red-400 font-bold ml-1">{warningLogs.length}</span>
+          </div>
+          <div className="text-sm font-semibold bg-[#1a1a1a] px-3.5 py-1.5 rounded-full border border-[#333333]">
+            Pending Requests: <span className="text-amber-400 font-bold ml-1">{pendingRequests.length}</span>
+          </div>
         </div>
       </div>
 
       {error && <p className="text-red-400 bg-red-950/20 border border-red-800 p-4 rounded-lg">{error}</p>}
 
-      {/* Pending Requests Section */}
+      {/* Security Violations & Video Clips Section */}
       <section className="space-y-4">
         <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <span>Pending Requests</span>
+          <ShieldAlert className="w-5 h-5 text-red-500" />
+          <span>Proctoring Security Violations & Clips</span>
+          {warningLogs.length > 0 && (
+            <span className="bg-red-950/80 text-red-400 border border-red-800 text-xs px-2 py-0.5 rounded-full font-bold">
+              {warningLogs.length}
+            </span>
+          )}
+        </h2>
+
+        {warningLogs.length === 0 ? (
+          <div className="bg-[#161616]/60 p-6 text-center text-[#a6a6a6] rounded-xl border border-[#333333]">
+            No security violation warnings reported.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {warningLogs.map((log: any) => {
+              const student = log.student;
+              const studentName = student?.name || "N/A";
+              const studentEmail = student?.email || "N/A";
+              const studentId = student?.id || log.studentId;
+              const isEyeSlip = log.warningType === "EYE_SLIP";
+
+              return (
+                <div key={log.id} className="bg-[#161616]/90 border border-red-500/30 p-5 rounded-xl flex flex-col justify-between gap-4 shadow-lg">
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-2 border-b border-[#2a2a2a] pb-3">
+                      <div>
+                        <div className="font-bold text-white text-base">{studentName}</div>
+                        <div className="text-xs text-blue-400 font-mono">{studentEmail}</div>
+                        <div className="text-[11px] text-gray-400 font-mono mt-0.5">ID: {studentId}</div>
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shrink-0 ${
+                        isEyeSlip 
+                          ? "bg-amber-950/80 text-amber-400 border border-amber-800/60" 
+                          : "bg-red-950/80 text-red-400 border border-red-800/60"
+                      }`}>
+                        {isEyeSlip ? <Eye className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                        {isEyeSlip ? "EYE SLIP / FACE ABSENCE" : "VOICE / AUDIO NOISE"}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-cyan-300 font-medium pt-1">
+                      Test: <strong className="text-white">{log.test?.title || "Exam Session"}</strong>
+                    </p>
+                    <p className="text-xs text-gray-300 bg-red-950/20 border border-red-900/40 p-2.5 rounded-lg">
+                      ⚠️ {log.message}
+                    </p>
+                    
+                    <div className="text-xs text-[#8c8c8c] flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-red-400" />
+                      <span>{new Date(log.createdAt).toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {log.mediaUrl ? (
+                    <div className="mt-2 space-y-1.5">
+                      <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <Video className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>30-Second Warning Clip (Video & Audio)</span>
+                        </div>
+                        <a 
+                          href={log.mediaUrl} 
+                          download={`warning_${log.id}.webm`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-cyan-400 hover:underline text-[11px]"
+                        >
+                          Download Clip
+                        </a>
+                      </div>
+                      <div className="rounded-lg overflow-hidden border border-[#333333] bg-black p-1">
+                        <video
+                          src={log.mediaUrl}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="w-full max-h-56 rounded object-contain bg-black"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 italic bg-[#111] p-3 rounded text-center border border-[#222]">
+                      No video clip attached
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Pending Requests Section */}
+      <section className="space-y-4 pt-4 border-t border-[#333333]">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <span>Pending Access Requests</span>
           {pendingRequests.length > 0 && (
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
           )}
@@ -176,3 +279,4 @@ export default function AdminNotifications() {
     </div>
   );
 }
+
