@@ -26,7 +26,8 @@ export async function uploadToCloudinary(
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder,
-        resource_type: resourceType,
+        resource_type: "video",
+        format: "webm",
         public_id: publicId
       },
       (error, result) => {
@@ -34,7 +35,9 @@ export async function uploadToCloudinary(
           console.error("Cloudinary upload stream error:", error);
           resolve(null);
         } else {
-          resolve(result?.secure_url || null);
+          // Cloudinary returns full URL with format extension
+          const url = result?.secure_url || null;
+          resolve(url);
         }
       }
     );

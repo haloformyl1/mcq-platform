@@ -41,10 +41,7 @@ export async function POST(req: Request) {
       const cloudinaryUrl = await uploadToCloudinary(buffer, "proctoring_clips", "video", fileName);
 
       if (cloudinaryUrl) {
-        // Ensure cloud video URL ends with .mp4 for universal HTML5 browser playback
-        mediaUrl = cloudinaryUrl.endsWith(".mp4") || cloudinaryUrl.endsWith(".webm") 
-          ? cloudinaryUrl 
-          : `${cloudinaryUrl}.mp4`;
+        mediaUrl = cloudinaryUrl;
       } else {
         // 2. Fallback to local disk storage
         const uploadsDir = path.join(process.cwd(), "public", "uploads", "proctoring_clips");

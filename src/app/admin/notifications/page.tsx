@@ -163,24 +163,17 @@ export default function AdminNotifications() {
                         </a>
                       </div>
                       <div className="rounded-lg overflow-hidden border border-[#333333] bg-black p-1">
-                        {(() => {
-                          const rawUrl = log.mediaUrl || "";
-                          const videoUrl = (rawUrl.startsWith("http") && !rawUrl.match(/\.(mp4|webm|ogv)$/i))
-                            ? `${rawUrl}.mp4`
-                            : rawUrl;
-                          return (
-                            <video
-                              controls
-                              playsInline
-                              preload="metadata"
-                              className="w-full max-h-56 rounded object-contain bg-black"
-                            >
-                              <source src={videoUrl} type="video/mp4" />
-                              <source src={rawUrl} type="video/webm" />
-                              Your browser does not support playing this video clip.
-                            </video>
-                          );
-                        })()}
+                        <video
+                          src={log.mediaUrl}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="w-full max-h-56 rounded object-contain bg-black"
+                        >
+                          {log.mediaUrl && <source src={log.mediaUrl} type="video/webm" />}
+                          {log.mediaUrl && <source src={log.mediaUrl} type="video/mp4" />}
+                          Your browser does not support HTML5 video playback.
+                        </video>
                       </div>
                     </div>
                   ) : (
