@@ -61,10 +61,16 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         formData.append("file", clipBlob, `clip_${warningType}_${Date.now()}.webm`);
       }
 
-      await fetch("/api/exam/log-warning", {
+      const res = await fetch("/api/exam/log-warning", {
         method: "POST",
         body: formData
       });
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("Warning log API error:", res.status, errText);
+      } else {
+        console.log("✅ Warning clip successfully logged & uploaded!");
+      }
     } catch (err) {
       console.error("Failed to upload proctoring warning clip:", err);
     }
