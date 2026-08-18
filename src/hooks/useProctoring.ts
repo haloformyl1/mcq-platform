@@ -34,25 +34,30 @@ export function useProctoring(
 
     async function initDetector() {
       try {
+        console.log("🔄 Initializing BlazeFace AI model...");
         await tf.ready();
         
-        detectorRef.current = await blazeface.load();
+        if (!detectorRef.current) {
+          detectorRef.current = await blazeface.load();
+        }
         setIsAiActive(true);
         isTrackingRef.current = true;
+        console.log("✅ BlazeFace AI model successfully loaded!");
         
         if (isTestActive) {
           trackFace();
         }
       } catch (e) {
-        console.error("Face detection init failed", e);
+        console.error("❌ Face detection init failed", e);
       }
     }
 
     async function trackFace() {
-      if (!isTrackingRef.current || !isTestActive || !detectorRef.current || !videoRef.current || videoRef.current.readyState < 2) {
-        if (isTrackingRef.current && isTestActive) {
-          timeoutId = setTimeout(trackFace, 500);
-        }
+      if (!isTrackingRef.current || !isTestActive) return;
+
+      if (!detectorRef.current || !videoRef.current || videoRef.current.readyState < 2) {
+        // Keep retrying every 500ms until camera video element is ready
+        timeoutId = setTimeout(trackFace, 500);
         return;
       }
 
