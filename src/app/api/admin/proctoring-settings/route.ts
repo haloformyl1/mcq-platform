@@ -23,7 +23,7 @@ export async function GET() {
           enableAudioProctoring: false,
           audioNoiseDelaySeconds: 10,
           maxAudioWarnings: 3,
-          enableMobileEnvironmentScan: true
+          enableMobileEnvironmentScan: false
         }
       });
     }
@@ -51,25 +51,25 @@ export async function POST(req: Request) {
       update: {
         enforceFullscreen: Boolean(data.enforceFullscreen),
         enableAiProctoring: false,
-        faceAbsenceDelaySeconds: parseInt(data.faceAbsenceDelaySeconds) || 10,
-        maxAllowedWarnings: parseInt(data.maxAllowedWarnings) || 5,
+        faceAbsenceDelaySeconds: 10,
+        maxAllowedWarnings: 5,
         tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
         enableAudioProctoring: false,
-        audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
-        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3,
-        enableMobileEnvironmentScan: Boolean(data.enableMobileEnvironmentScan)
+        audioNoiseDelaySeconds: 10,
+        maxAudioWarnings: 3,
+        enableMobileEnvironmentScan: false
       },
       create: {
         id: "default",
         enforceFullscreen: Boolean(data.enforceFullscreen),
         enableAiProctoring: false,
-        faceAbsenceDelaySeconds: parseInt(data.faceAbsenceDelaySeconds) || 10,
-        maxAllowedWarnings: parseInt(data.maxAllowedWarnings) || 5,
+        faceAbsenceDelaySeconds: 10,
+        maxAllowedWarnings: 5,
         tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
         enableAudioProctoring: false,
-        audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
-        maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3,
-        enableMobileEnvironmentScan: Boolean(data.enableMobileEnvironmentScan)
+        audioNoiseDelaySeconds: 10,
+        maxAudioWarnings: 3,
+        enableMobileEnvironmentScan: false
       }
     });
 

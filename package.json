@@ -12,10 +12,6 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "@tensorflow-models/blazeface": "^0.1.0",
-    "@tensorflow-models/coco-ssd": "^2.2.3",
-    "@tensorflow/tfjs": "^4.22.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "3dmol": "^2.5.5",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",

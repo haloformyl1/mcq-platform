@@ -26,14 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const [proctoringForm, setProctoringForm] = useState({
     enforceFullscreen: true,
-    enableAiProctoring: true,
-    faceAbsenceDelaySeconds: 10,
-    maxAllowedWarnings: 5,
-    tabSwitchAction: "AUTO_SUBMIT",
-    enableAudioProctoring: true,
-    audioNoiseDelaySeconds: 10,
-    maxAudioWarnings: 3,
-    enableMobileEnvironmentScan: true
+    tabSwitchAction: "AUTO_SUBMIT"
   });
 
   const fetchProctoringSettings = async () => {
@@ -44,14 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (res.ok) {
         setProctoringForm({
           enforceFullscreen: data.enforceFullscreen ?? true,
-          enableAiProctoring: data.enableAiProctoring ?? true,
-          faceAbsenceDelaySeconds: data.faceAbsenceDelaySeconds ?? 10,
-          maxAllowedWarnings: data.maxAllowedWarnings ?? 5,
-          tabSwitchAction: data.tabSwitchAction ?? "AUTO_SUBMIT",
-          enableAudioProctoring: data.enableAudioProctoring ?? true,
-          audioNoiseDelaySeconds: data.audioNoiseDelaySeconds ?? 10,
-          maxAudioWarnings: data.maxAudioWarnings ?? 3,
-          enableMobileEnvironmentScan: data.enableMobileEnvironmentScan ?? true
+          tabSwitchAction: data.tabSwitchAction ?? "AUTO_SUBMIT"
         });
       }
     } catch (e) {
@@ -395,29 +381,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </select>
                 </div>
 
-                {/* 5. Mobile 360° Environment AI Scan Protocol (Mobile Devices Only) */}
-                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-white">3. Mobile 360° Environment AI Scan Protocol</h4>
-                      <p className="text-xs text-[#888888]">
-                        Rear camera pre-exam scan for Left, Center & Right background angles (Mobile Only)
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={proctoringForm.enableMobileEnvironmentScan}
-                        onChange={(e) => setProctoringForm({ ...proctoringForm, enableMobileEnvironmentScan: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#333333] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                    </label>
-                  </div>
-                  <p className="text-[11px] text-amber-400/90 bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
-                    📱 Verification strictly enforces removal of laptops, computers, tablets, or extra mobile phones before exam access is granted.
-                  </p>
-                </div>
+
 
                 <div className="flex justify-end space-x-3 pt-2 border-t border-[#333333]">
                   <button
