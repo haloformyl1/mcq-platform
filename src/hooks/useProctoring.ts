@@ -66,23 +66,30 @@ export function useProctoring(
           // No face detected / looking away
           if (continuousSlipStartTime.current === null) {
             continuousSlipStartTime.current = now;
+            console.log("👁️ Face absence timer started at", new Date(now).toLocaleTimeString());
           } else {
             const delayMs = (faceAbsenceDelaySeconds || 10) * 1000;
-            if (now - continuousSlipStartTime.current >= delayMs) {
+            const elapsed = now - continuousSlipStartTime.current;
+            console.log(`👁️ Face absence ongoing: ${Math.floor(elapsed / 1000)}s / ${faceAbsenceDelaySeconds}s`);
+            
+            if (elapsed >= delayMs) {
               continuousSlipStartTime.current = null; // reset timer
               handleSlip();
             }
           }
         } else {
-          // Face is visible
-          continuousSlipStartTime.current = null;
+          // Face is visible. Only reset if face is detected continuously for 2 checks
+          if (continuousSlipStartTime.current !== null) {
+            console.log("🟢 Face detected again. Resetting absence timer.");
+            continuousSlipStartTime.current = null;
+          }
         }
       } catch (e) {
-        // Ignore frame processing errors
+        console.error("Frame detection error:", e);
       }
 
       if (isTrackingRef.current && isTestActive) {
-        timeoutId = setTimeout(trackFace, 1500); // Check once every 1.5s to prevent UI lag
+        timeoutId = setTimeout(trackFace, 1500); // Check once every 1.5s
       }
     }
 
@@ -90,10 +97,10 @@ export function useProctoring(
       slipCount.current += 1;
 
       const message = `Face absence / looking away detected for over ${faceAbsenceDelaySeconds || 30}s`;
+      console.warn("⚠️ EYE_SLIP Triggered silently:", message);
       if (onWarningTrigger) {
         onWarningTrigger("EYE_SLIP", message);
       }
-      // Note: No modal popup or auto-submit triggered for student. Clips are sent silently to Admin.
     }
 
     if (isTestActive && enableAiProctoring) {
