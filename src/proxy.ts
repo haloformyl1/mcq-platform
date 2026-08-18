@@ -5,20 +5,32 @@ import { decrypt } from '@/lib/auth'
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  const isAdminRoute = pathname.startsWith('/admin') && pathname !== '/admin/login'
+  const isAdminPage = pathname.startsWith('/admin') && pathname !== '/admin/login'
+  const isAdminApi = pathname.startsWith('/api/admin')
   const isExamRoute = pathname.startsWith('/exam')
 
   const session = request.cookies.get('session')?.value
   const adminSession = request.cookies.get('admin_session')?.value
 
-  // Admin routes protection
-  if (isAdminRoute) {
+  // Admin pages protection
+  if (isAdminPage) {
     if (!adminSession) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
     const payload = await decrypt(adminSession)
     if (!payload || payload.role !== 'admin') {
       return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+  }
+
+  // Admin API routes protection
+  if (isAdminApi) {
+    if (!adminSession) {
+      return NextResponse.json({ error: 'Unauthorized: Admin session required' }, { status: 401 })
+    }
+    const payload = await decrypt(adminSession)
+    if (!payload || payload.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
     }
   }
 
@@ -37,5 +49,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/exam/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*', '/exam/:path*'],
 }

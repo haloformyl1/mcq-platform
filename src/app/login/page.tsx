@@ -39,6 +39,17 @@ export default function StudentLogin() {
   const allReqsMet = reqLength && reqUpper && reqLower && reqNumber && reqSpecial;
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        router.push('/admin/login');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [router]);
+
+  useEffect(() => {
     const savedEmail = localStorage.getItem("piechem_student_email");
     if (savedEmail) setEmail(savedEmail);
   }, []);
@@ -528,16 +539,7 @@ export default function StudentLogin() {
             </div>
           )}
 
-          {step === "EMAIL_ENTRY" && (
-            <div className="mt-8 text-[#a6a6a6] text-[16px]">
-              <div className="flex justify-between items-center mb-6">
-                <Link href="/admin/login" className="hover:underline flex items-center group">
-                  Admin Login
-                  <svg className="w-5 h-5 ml-1 text-[#a6a6a6] group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                </Link>
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
     </div>

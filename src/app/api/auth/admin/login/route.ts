@@ -3,10 +3,29 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { encrypt } from "@/lib/auth";
 
+// Basic rate-limiting store: IP/Identifier -> { count, resetTime }
+const loginAttempts = new Map<string, { count: number; resetTime: number }>();
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for") || "local_client";
+    const now = Date.now();
+    const attempt = loginAttempts.get(ip) || { count: 0, resetTime: now + 15 * 60 * 1000 };
+
+    if (now > attempt.resetTime) {
+      attempt.count = 0;
+      attempt.resetTime = now + 15 * 60 * 1000;
+    }
+
+    if (attempt.count >= 5) {
+      return NextResponse.json(
+        { error: "Too many failed login attempts. Please try again in 15 minutes." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const username = body.username || "admin";
     const password = body.password || body.passcode;
@@ -42,6 +61,8 @@ export async function POST(req: Request) {
     }
 
     if (!admin) {
+      attempt.count += 1;
+      loginAttempts.set(ip, attempt);
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
@@ -59,8 +80,13 @@ export async function POST(req: Request) {
     }
 
     if (!isValidPassword) {
+      attempt.count += 1;
+      loginAttempts.set(ip, attempt);
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
+
+    // Reset attempt counter on successful login
+    loginAttempts.delete(ip);
 
     // Generate admin session JWT token
     const sessionToken = await encrypt({
@@ -75,7 +101,7 @@ export async function POST(req: Request) {
       value: sessionToken,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       maxAge: 60 * 60 * 24, // 1 day
       path: '/',
     });
