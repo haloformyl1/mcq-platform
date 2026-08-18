@@ -25,8 +25,8 @@ export function useRollingRecorder(stream: MediaStream | null) {
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
           recordedChunksRef.current.push(e.data);
-          // Retain latest ~30 slices (30s)
-          if (recordedChunksRef.current.length > 35) {
+          // Retain latest ~65 slices (60s / 1 min rolling buffer)
+          if (recordedChunksRef.current.length > 65) {
             recordedChunksRef.current.shift();
           }
         }
@@ -47,7 +47,7 @@ export function useRollingRecorder(stream: MediaStream | null) {
     };
   }, [stream]);
 
-  const get30sClipBlob = useCallback(async (): Promise<Blob | null> => {
+  const get1MinClipBlob = useCallback(async (): Promise<Blob | null> => {
     if (recordedChunksRef.current.length === 0) return null;
 
     const mimeType = mediaRecorderRef.current?.mimeType || 'video/webm';
@@ -55,7 +55,7 @@ export function useRollingRecorder(stream: MediaStream | null) {
     return blob;
   }, []);
 
-  return { get30sClipBlob };
+  return { get1MinClipBlob };
 }
 
 

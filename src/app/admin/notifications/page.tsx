@@ -129,6 +129,12 @@ export default function AdminNotifications() {
                     <p className="text-xs text-cyan-300 font-medium pt-1">
                       Test: <strong className="text-white">{log.test?.title || "Exam Session"}</strong>
                     </p>
+                    {log.questionNumber && (
+                      <div className="text-xs text-amber-300 bg-amber-950/30 border border-amber-800/40 p-2 rounded-md space-y-0.5">
+                        <span className="font-bold text-amber-400">Solving Question #{log.questionNumber}:</span>
+                        {log.questionText && <p className="text-[#ddd] italic line-clamp-2">{log.questionText}</p>}
+                      </div>
+                    )}
                     <p className="text-xs text-gray-300 bg-red-950/20 border border-red-900/40 p-2.5 rounded-lg">
                       ⚠️ {log.message}
                     </p>
@@ -144,7 +150,7 @@ export default function AdminNotifications() {
                       <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
                         <div className="flex items-center gap-1.5">
                           <Video className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>30-Second Warning Clip (Video & Audio)</span>
+                          <span>1-Minute Incident Clip (30s Prior + 30s Event)</span>
                         </div>
                         <a 
                           href={log.mediaUrl} 

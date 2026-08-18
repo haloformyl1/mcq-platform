@@ -24,20 +24,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
     }
 
+    const questionNumberRaw = formData.get("questionNumber") as string | null;
+    const questionText = (formData.get("questionText") as string | null) || null;
+    const questionNumber = questionNumberRaw ? parseInt(questionNumberRaw, 10) : null;
+
     let mediaUrl: string | null = null;
 
     if (file) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const uploadsDir = path.join(process.cwd(), "public", "uploads", "proctoring_clips");
-      await mkdir(uploadsDir, { recursive: true });
+      const fileName = `${attemptId}_${warningType.toLowerCase()}_${Date.now()}`;
 
-      const fileName = `${attemptId}_${warningType.toLowerCase()}_${Date.now()}.webm`;
-      const filePath = path.join(uploadsDir, fileName);
-      await writeFile(filePath, buffer);
+      // 1. Try uploading to Cloudinary (Vercel CDN compatible)
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const cloudinaryUrl = await uploadToCloudinary(buffer, "proctoring_clips", "video", fileName);
 
-      mediaUrl = `/uploads/proctoring_clips/${fileName}`;
+      if (cloudinaryUrl) {
+        mediaUrl = cloudinaryUrl;
+      } else {
+        // 2. Fallback to local disk storage
+        const uploadsDir = path.join(process.cwd(), "public", "uploads", "proctoring_clips");
+        await mkdir(uploadsDir, { recursive: true });
+
+        const localFileName = `${fileName}.webm`;
+        const filePath = path.join(uploadsDir, localFileName);
+        await writeFile(filePath, buffer);
+
+        mediaUrl = `/uploads/proctoring_clips/${localFileName}`;
+      }
     }
 
     const warningLog = await prisma.proctoringWarningLog.create({
@@ -47,7 +62,9 @@ export async function POST(req: Request) {
         attemptId: attemptId,
         warningType: warningType,
         message: message || (warningType === "EYE_SLIP" ? "Looking away / Face absence warning" : "Microphone audio noise detected warning"),
-        mediaUrl: mediaUrl
+        mediaUrl: mediaUrl,
+        questionNumber: questionNumber,
+        questionText: questionText
       }
     });
 

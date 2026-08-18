@@ -80,19 +80,12 @@ export function useAudioProctoring(
 
       const handleAudioViolation = () => {
         audioWarningCount.current += 1;
-        const maxLimit = maxAudioWarnings || 3;
 
         const message = `Continuous background sound/speech detected for over ${audioNoiseDelaySeconds || 10}s`;
         if (onWarningTrigger) {
           onWarningTrigger("AUDIO_NOISE", message);
         }
-
-        if (audioWarningCount.current >= maxLimit) {
-          onSubmit("EXCESSIVE_AUDIO_NOISE");
-        } else {
-          setAudioWarningsLeft(maxLimit - audioWarningCount.current);
-          setShowAudioWarning(true);
-        }
+        // Note: No modal popup or auto-submit triggered for student. Clips are sent silently to Admin.
       };
 
       return () => {

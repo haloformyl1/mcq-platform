@@ -42,15 +42,21 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     enableMobileEnvironmentScan: true
   });
 
-  const { get30sClipBlob } = useRollingRecorder(mediaStream);
+  const { get1MinClipBlob } = useRollingRecorder(mediaStream);
 
   const handleWarningTrigger = useCallback(async (warningType: "EYE_SLIP" | "AUDIO_NOISE", message: string) => {
     try {
-      const clipBlob = await get30sClipBlob();
+      const clipBlob = await get1MinClipBlob();
       const formData = new FormData();
       formData.append("attemptId", resolvedParams.attemptId);
       formData.append("warningType", warningType);
       formData.append("message", message);
+      
+      const qNum = currentQ + 1;
+      const qText = examData?.questions?.[currentQ]?.questionText || "";
+      formData.append("questionNumber", qNum.toString());
+      formData.append("questionText", qText);
+
       if (clipBlob) {
         formData.append("file", clipBlob, `clip_${warningType}_${Date.now()}.webm`);
       }
@@ -62,7 +68,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     } catch (err) {
       console.error("Failed to upload proctoring warning clip:", err);
     }
-  }, [resolvedParams.attemptId, get30sClipBlob]);
+  }, [resolvedParams.attemptId, get1MinClipBlob, currentQ, examData]);
 
   useEffect(() => {
     fetch("/api/admin/proctoring-settings")

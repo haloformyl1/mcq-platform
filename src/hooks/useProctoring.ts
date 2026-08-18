@@ -88,19 +88,12 @@ export function useProctoring(
 
     function handleSlip() {
       slipCount.current += 1;
-      const maxSlips = maxAllowedWarnings || 5;
 
-      const message = `Face absence / looking away detected for over ${faceAbsenceDelaySeconds || 10}s`;
+      const message = `Face absence / looking away detected for over ${faceAbsenceDelaySeconds || 30}s`;
       if (onWarningTrigger) {
         onWarningTrigger("EYE_SLIP", message);
       }
-
-      if (slipCount.current >= maxSlips) {
-        onSubmit("EXCESSIVE_EYE_SLIP");
-      } else {
-        setWarningsLeft(maxSlips - slipCount.current);
-        setShowSlipWarning(true);
-      }
+      // Note: No modal popup or auto-submit triggered for student. Clips are sent silently to Admin.
     }
 
     if (isTestActive && enableAiProctoring) {

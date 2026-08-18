@@ -382,7 +382,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-bold text-white">2. Webcam AI Face Detection Protocol</h4>
-                      <p className="text-xs text-[#888888]">Detect face presence & eye movement using AI vision</p>
+                      <p className="text-xs text-amber-400 font-medium">🎥 Silent Admin Recording Mode (Captures 1-Min Clip: 30s before + 30s during absence)</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -399,36 +399,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]">
                       <div>
                         <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Face Absence Warning Delay
+                          Absence Detection Trigger Delay
                         </label>
                         <select
                           value={proctoringForm.faceAbsenceDelaySeconds}
                           onChange={(e) => setProctoringForm({ ...proctoringForm, faceAbsenceDelaySeconds: parseInt(e.target.value) })}
                           className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
                         >
-                          <option value={5}>5 Seconds</option>
-                          <option value={10}>10 Seconds (Default)</option>
+                          <option value={10}>10 Seconds</option>
                           <option value={15}>15 Seconds</option>
                           <option value={20}>20 Seconds</option>
-                          <option value={30}>30 Seconds</option>
+                          <option value={30}>30 Seconds (Default for Calculations)</option>
+                          <option value={45}>45 Seconds</option>
                         </select>
                       </div>
 
                       <div>
                         <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Max Allowed Warnings before Auto-Submit
+                          Student Exam Experience
                         </label>
-                        <select
-                          value={proctoringForm.maxAllowedWarnings}
-                          onChange={(e) => setProctoringForm({ ...proctoringForm, maxAllowedWarnings: parseInt(e.target.value) })}
-                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
-                        >
-                          <option value={1}>1 Warning (Strict)</option>
-                          <option value={2}>2 Warnings</option>
-                          <option value={3}>3 Warnings</option>
-                          <option value={5}>5 Warnings (Default)</option>
-                          <option value={10}>10 Warnings</option>
-                        </select>
+                        <div className="w-full bg-[#262626]/80 border border-green-800/60 text-green-300 rounded-lg p-2 text-xs font-medium">
+                          ✅ Zero Interruptions (No warnings, no auto-submit)
+                        </div>
                       </div>
                     </div>
                   )}
@@ -457,7 +449,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-bold text-white">4. Microphone AI Sound Detection Protocol</h4>
-                      <p className="text-xs text-[#888888]">Detect background talking/sound via microphone for over 10s</p>
+                      <p className="text-xs text-amber-400 font-medium">🎙️ Silent Admin Recording Mode (Captures 1-Min Audio/Video Clip)</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -474,14 +466,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]">
                       <div>
                         <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Continuous Sound Warning Delay
+                          Continuous Sound Trigger Delay
                         </label>
                         <select
                           value={proctoringForm.audioNoiseDelaySeconds}
                           onChange={(e) => setProctoringForm({ ...proctoringForm, audioNoiseDelaySeconds: parseInt(e.target.value) })}
                           className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
                         >
-                          <option value={5}>5 Seconds</option>
                           <option value={10}>10 Seconds (Default)</option>
                           <option value={15}>15 Seconds</option>
                           <option value={20}>20 Seconds</option>
@@ -491,18 +482,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                       <div>
                         <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Max Allowed Sound Warnings before Auto-Submit
+                          Student Exam Experience
                         </label>
-                        <select
-                          value={proctoringForm.maxAudioWarnings}
-                          onChange={(e) => setProctoringForm({ ...proctoringForm, maxAudioWarnings: parseInt(e.target.value) })}
-                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
-                        >
-                          <option value={1}>1 Warning (Strict)</option>
-                          <option value={2}>2 Warnings</option>
-                          <option value={3}>3 Warnings (Default)</option>
-                          <option value={5}>5 Warnings</option>
-                        </select>
+                        <div className="w-full bg-[#262626]/80 border border-green-800/60 text-green-300 rounded-lg p-2 text-xs font-medium">
+                          ✅ Zero Interruptions (No warnings, no auto-submit)
+                        </div>
                       </div>
                     </div>
                   )}
