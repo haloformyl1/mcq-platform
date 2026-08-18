@@ -3,10 +3,7 @@
 import { useState, useEffect, useCallback, useRef, use } from "react";
 
 import { useRouter } from "next/navigation";
-import { Menu, X, Minimize2, Maximize2, AlertTriangle } from "lucide-react";
-import { useProctoring } from "@/hooks/useProctoring";
-import { useAudioProctoring } from "@/hooks/useAudioProctoring";
-import { useRollingRecorder } from "@/hooks/useRollingRecorder";
+import { Menu, X, Maximize2, AlertTriangle } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -25,56 +22,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
-  const [isCameraMinimized, setIsCameraMinimized] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [needsMobileScan, setNeedsMobileScan] = useState(false);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
   const [proctoringSettings, setProctoringSettings] = useState<any>({
     enforceFullscreen: true,
-    enableAiProctoring: true,
-    faceAbsenceDelaySeconds: 30,
-    maxAllowedWarnings: 5,
     tabSwitchAction: "AUTO_SUBMIT",
-    enableAudioProctoring: true,
-    audioNoiseDelaySeconds: 10,
-    maxAudioWarnings: 3,
     enableMobileEnvironmentScan: true
   });
-
-  const { get1MinClipBlob } = useRollingRecorder(mediaStream);
-
-  const handleWarningTrigger = useCallback(async (warningType: "EYE_SLIP" | "AUDIO_NOISE", message: string) => {
-    try {
-      const clipBlob = await get1MinClipBlob();
-      const formData = new FormData();
-      formData.append("attemptId", resolvedParams.attemptId);
-      formData.append("warningType", warningType);
-      formData.append("message", message);
-      
-      const qNum = currentQ + 1;
-      const qText = examData?.questions?.[currentQ]?.questionText || "";
-      formData.append("questionNumber", qNum.toString());
-      formData.append("questionText", qText);
-
-      if (clipBlob) {
-        formData.append("file", clipBlob, `clip_${warningType}_${Date.now()}.webm`);
-      }
-
-      const res = await fetch("/api/exam/log-warning", {
-        method: "POST",
-        body: formData
-      });
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("Warning log API error:", res.status, errText);
-      } else {
-        console.log("✅ Warning clip successfully logged & uploaded!");
-      }
-    } catch (err) {
-      console.error("Failed to upload proctoring warning clip:", err);
-    }
-  }, [resolvedParams.attemptId, get1MinClipBlob, currentQ, examData]);
 
   useEffect(() => {
     fetch("/api/admin/proctoring-settings")
@@ -94,8 +49,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   
   const lastActivityTime = useRef(Date.now());
   const examDataRef = useRef<any>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     if (window.innerWidth >= 1024) setShowPalette(true);
@@ -116,31 +69,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         (document.documentElement as any).webkitRequestFullscreen();
       }
     }
-
-    if (proctoringSettings.enableAiProctoring || proctoringSettings.enableAudioProctoring) {
-      // Request camera and microphone access for proctoring
-      navigator.mediaDevices.getUserMedia({
-        video: proctoringSettings.enableAiProctoring ?? true,
-        audio: proctoringSettings.enableAudioProctoring ?? true
-      })
-        .then(stream => {
-          streamRef.current = stream;
-          setMediaStream(stream);
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch(err => {
-          console.error("Camera/Microphone access denied or failed", err);
-        });
-    }
-
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [resolvedParams.attemptId, router, proctoringSettings.enforceFullscreen, proctoringSettings.enableAiProctoring, proctoringSettings.enableAudioProctoring]);
+  }, [resolvedParams.attemptId, router, proctoringSettings.enforceFullscreen]);
 
   const submitTest = useCallback(async (reason: string) => {
     if (isSubmitting) return;
@@ -157,27 +86,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       console.error("Submission failed", e);
     }
   }, [resolvedParams.attemptId, router, isSubmitting]);
-
-  const { warningsLeft, showSlipWarning, setShowSlipWarning, isAiActive } = useProctoring(
-    videoRef,
-    submitTest,
-    !!examData,
-    proctoringSettings.faceAbsenceDelaySeconds ?? 10,
-    proctoringSettings.maxAllowedWarnings ?? 5,
-    proctoringSettings.enableAiProctoring ?? true,
-    handleWarningTrigger
-  );
-
-  const { audioWarningsLeft, showAudioWarning, setShowAudioWarning } = useAudioProctoring(
-    streamRef.current,
-    submitTest,
-    !!examData,
-    proctoringSettings.audioNoiseDelaySeconds ?? 10,
-    proctoringSettings.maxAudioWarnings ?? 3,
-    proctoringSettings.enableAudioProctoring ?? true,
-    handleWarningTrigger
-  );
-
 
   useEffect(() => {
     if (!examData) return;
@@ -267,7 +175,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       window.removeEventListener("click", updateActivity);
       window.removeEventListener("scroll", updateActivity);
     };
-  }, [examData, submitTest]);
+  }, [examData, submitTest, proctoringSettings.tabSwitchAction]);
 
   const handleOptionSelect = async (questionId: string, option: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: option }));
@@ -343,35 +251,10 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       <div className="flex flex-1 overflow-hidden relative">
         <main className="flex-1 overflow-y-auto p-4 sm:p-8">
           <div className="max-w-4xl mx-auto w-full bg-[#161616]/80 border border-[#404040] rounded-xl p-4 sm:p-8 shadow-2xl">
-            {/* Inline Camera Preview (Responsive & Safe) */}
             <div className="mb-6 flex justify-between items-start gap-4">
               <h2 className="text-xl font-medium text-[#a6a6a6] pt-1">
                 Question <span className="font-bold text-white text-2xl">{currentQ + 1}</span>
               </h2>
-              <div className={`transition-all duration-300 bg-black rounded-lg overflow-hidden shadow-lg border border-gray-700 relative flex-shrink-0 ${isCameraMinimized ? 'w-20 sm:w-24' : 'w-28 sm:w-36 md:w-48'}`}>
-                <div className="absolute top-0 left-0 right-0 flex items-center justify-between z-10 bg-gradient-to-b from-black/80 to-transparent p-1.5 sm:p-2">
-                  <div className="flex items-center text-[10px] sm:text-xs text-white font-bold tracking-wider drop-shadow-md">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500 animate-pulse mr-1.5"></div>
-                    REC
-                    {isAiActive && <span className="ml-2 text-[9px] text-green-400 bg-black/40 px-1 rounded border border-green-500/30">AI On</span>}
-                  </div>
-                  <button 
-                    onClick={() => setIsCameraMinimized(!isCameraMinimized)} 
-                    className="text-white hover:text-gray-300 p-0.5 sm:p-1 bg-black/40 rounded transition-colors" 
-                    title={isCameraMinimized ? "Expand Camera" : "Minimize Camera"}
-                    aria-label={isCameraMinimized ? "Expand Camera" : "Minimize Camera"}
-                  >
-                    {isCameraMinimized ? <Maximize2 size={12} /> : <Minimize2 size={12} />}
-                  </button>
-                </div>
-                <video 
-                  ref={videoRef}
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  className={`w-full object-cover transform -scale-x-100 transition-all duration-300 ${isCameraMinimized ? 'h-7 sm:h-8 opacity-40' : 'h-auto opacity-100'}`}
-                ></video>
-              </div>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-medium mb-8 leading-relaxed">
@@ -585,60 +468,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                 Return to Fullscreen
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Slip Warning Modal */}
-      {showSlipWarning && !showFullscreenWarning && (
-        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-red-500/50">
-            <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Warning: Eye Tracking</h2>
-            <p className="text-[#a6a6a6] mb-4 text-lg">
-              You looked away from the screen for over {proctoringSettings.faceAbsenceDelaySeconds ?? 10} seconds. This is a violation of the test rules.
-            </p>
-            <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
-              <p className="text-red-400 font-bold text-xl">
-                {warningsLeft} warning{warningsLeft !== 1 ? 's' : ''} remaining
-              </p>
-              <p className="text-sm text-red-400/80 mt-1">before automatic submission</p>
-            </div>
-            <button 
-              onClick={() => setShowSlipWarning(false)}
-              className="w-full bg-[#262626] hover:bg-[#333333] text-white font-medium py-3 rounded-lg border border-[#404040]"
-            >
-              I Understand, Return to Test
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Audio Noise Warning Modal */}
-      {showAudioWarning && !showFullscreenWarning && (
-        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-red-500/50">
-            <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Warning: Microphone Audio Detection</h2>
-            <p className="text-[#a6a6a6] mb-4 text-lg">
-              Continuous background sound / speech was detected for over {proctoringSettings.audioNoiseDelaySeconds ?? 10} seconds. Please maintain complete silence.
-            </p>
-            <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-8">
-              <p className="text-red-400 font-bold text-xl">
-                {audioWarningsLeft} warning{audioWarningsLeft !== 1 ? 's' : ''} remaining
-              </p>
-              <p className="text-sm text-red-400/80 mt-1">before automatic submission</p>
-            </div>
-            <button 
-              onClick={() => setShowAudioWarning(false)}
-              className="w-full bg-[#262626] hover:bg-[#333333] text-white font-medium py-3 rounded-lg border border-[#404040]"
-            >
-              I Understand, Return to Test
-            </button>
           </div>
         </div>
       )}

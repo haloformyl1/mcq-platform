@@ -377,59 +377,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </div>
                 </div>
 
-                {/* 2. Webcam AI Proctoring */}
-                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-white">2. Webcam AI Face Detection Protocol</h4>
-                      <p className="text-xs text-amber-400 font-medium">🎥 Silent Admin Recording Mode (Captures 1-Min Clip: 30s before + 30s during absence)</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={proctoringForm.enableAiProctoring}
-                        onChange={(e) => setProctoringForm({ ...proctoringForm, enableAiProctoring: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#333333] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                    </label>
-                  </div>
-
-                  {proctoringForm.enableAiProctoring && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Absence Detection Trigger Delay
-                        </label>
-                        <select
-                          value={proctoringForm.faceAbsenceDelaySeconds}
-                          onChange={(e) => setProctoringForm({ ...proctoringForm, faceAbsenceDelaySeconds: parseInt(e.target.value) })}
-                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
-                        >
-                          <option value={10}>10 Seconds</option>
-                          <option value={15}>15 Seconds</option>
-                          <option value={20}>20 Seconds</option>
-                          <option value={30}>30 Seconds (Default for Calculations)</option>
-                          <option value={45}>45 Seconds</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Student Exam Experience
-                        </label>
-                        <div className="w-full bg-[#262626]/80 border border-green-800/60 text-green-300 rounded-lg p-2 text-xs font-medium">
-                          ✅ Zero Interruptions (No warnings, no auto-submit)
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 3. Tab Switch / App Minimization Protocol */}
+                {/* 2. Tab Switch / App Minimization Protocol */}
                 <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-3">
                   <div>
-                    <h4 className="text-sm font-bold text-white">3. Tab Switch / App Minimization Action</h4>
+                    <h4 className="text-sm font-bold text-white">2. Tab Switch / App Minimization Action</h4>
                     <p className="text-xs text-[#888888]">Specify action when student switches window or minimizes browser</p>
                   </div>
 
@@ -444,59 +395,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </select>
                 </div>
 
-                {/* 4. Microphone AI Sound Detection Protocol */}
-                <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-white">4. Microphone AI Sound Detection Protocol</h4>
-                      <p className="text-xs text-amber-400 font-medium">🎙️ Silent Admin Recording Mode (Captures 1-Min Audio/Video Clip)</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={proctoringForm.enableAudioProctoring}
-                        onChange={(e) => setProctoringForm({ ...proctoringForm, enableAudioProctoring: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#333333] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                    </label>
-                  </div>
-
-                  {proctoringForm.enableAudioProctoring && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Continuous Sound Trigger Delay
-                        </label>
-                        <select
-                          value={proctoringForm.audioNoiseDelaySeconds}
-                          onChange={(e) => setProctoringForm({ ...proctoringForm, audioNoiseDelaySeconds: parseInt(e.target.value) })}
-                          className="w-full bg-[#262626] border border-[#404040] text-white rounded-lg p-2 text-xs focus:ring-red-500"
-                        >
-                          <option value={10}>10 Seconds (Default)</option>
-                          <option value={15}>15 Seconds</option>
-                          <option value={20}>20 Seconds</option>
-                          <option value={30}>30 Seconds</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-1">
-                          Student Exam Experience
-                        </label>
-                        <div className="w-full bg-[#262626]/80 border border-green-800/60 text-green-300 rounded-lg p-2 text-xs font-medium">
-                          ✅ Zero Interruptions (No warnings, no auto-submit)
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
                 {/* 5. Mobile 360° Environment AI Scan Protocol (Mobile Devices Only) */}
                 <div className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333333] space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-bold text-white">5. Mobile 360° Environment AI Scan Protocol</h4>
+                      <h4 className="text-sm font-bold text-white">3. Mobile 360° Environment AI Scan Protocol</h4>
                       <p className="text-xs text-[#888888]">
                         Rear camera pre-exam scan for Left, Center & Right background angles (Mobile Only)
                       </p>

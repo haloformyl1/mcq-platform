@@ -16,11 +16,11 @@ export async function GET() {
         data: {
           id: "default",
           enforceFullscreen: true,
-          enableAiProctoring: true,
+          enableAiProctoring: false,
           faceAbsenceDelaySeconds: 10,
           maxAllowedWarnings: 5,
           tabSwitchAction: "AUTO_SUBMIT",
-          enableAudioProctoring: true,
+          enableAudioProctoring: false,
           audioNoiseDelaySeconds: 10,
           maxAudioWarnings: 3,
           enableMobileEnvironmentScan: true
@@ -50,11 +50,11 @@ export async function POST(req: Request) {
       where: { id: "default" },
       update: {
         enforceFullscreen: Boolean(data.enforceFullscreen),
-        enableAiProctoring: Boolean(data.enableAiProctoring),
+        enableAiProctoring: false,
         faceAbsenceDelaySeconds: parseInt(data.faceAbsenceDelaySeconds) || 10,
         maxAllowedWarnings: parseInt(data.maxAllowedWarnings) || 5,
         tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
-        enableAudioProctoring: Boolean(data.enableAudioProctoring),
+        enableAudioProctoring: false,
         audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
         maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3,
         enableMobileEnvironmentScan: Boolean(data.enableMobileEnvironmentScan)
@@ -62,11 +62,11 @@ export async function POST(req: Request) {
       create: {
         id: "default",
         enforceFullscreen: Boolean(data.enforceFullscreen),
-        enableAiProctoring: Boolean(data.enableAiProctoring),
+        enableAiProctoring: false,
         faceAbsenceDelaySeconds: parseInt(data.faceAbsenceDelaySeconds) || 10,
         maxAllowedWarnings: parseInt(data.maxAllowedWarnings) || 5,
         tabSwitchAction: data.tabSwitchAction || "AUTO_SUBMIT",
-        enableAudioProctoring: Boolean(data.enableAudioProctoring),
+        enableAudioProctoring: false,
         audioNoiseDelaySeconds: parseInt(data.audioNoiseDelaySeconds) || 10,
         maxAudioWarnings: parseInt(data.maxAudioWarnings) || 3,
         enableMobileEnvironmentScan: Boolean(data.enableMobileEnvironmentScan)
