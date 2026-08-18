@@ -33,7 +33,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [proctoringSettings, setProctoringSettings] = useState<any>({
     enforceFullscreen: true,
     enableAiProctoring: true,
-    faceAbsenceDelaySeconds: 10,
+    faceAbsenceDelaySeconds: 30,
     maxAllowedWarnings: 5,
     tabSwitchAction: "AUTO_SUBMIT",
     enableAudioProctoring: true,

@@ -111,7 +111,7 @@ export function useProctoring(
       isTrackingRef.current = false;
       clearTimeout(timeoutId);
     };
-  }, [videoRef, isTestActive, onSubmit, faceAbsenceDelaySeconds, maxAllowedWarnings, enableAiProctoring, onWarningTrigger]);
+  }, [videoRef, isTestActive, onSubmit, faceAbsenceDelaySeconds, maxAllowedWarnings, enableAiProctoring, onWarningTrigger, videoRef?.current]);
 
   return {
     warningsLeft,
