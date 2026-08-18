@@ -7,7 +7,6 @@ import { Menu, X, Maximize2, AlertTriangle } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
-import MobileEnvironmentScanner from "@/components/MobileEnvironmentScanner";
 
 export default function ExamSession({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -421,13 +420,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         )}
       </div>
 
-      {/* Mobile 360 Pre-Exam Scanner */}
-      {needsMobileScan && (
-        <MobileEnvironmentScanner
-          onComplete={() => setNeedsMobileScan(false)}
-          onCancel={() => router.push('/dashboard')}
-        />
-      )}
+
 
       {/* Fullscreen Warning Modal */}
       {showFullscreenWarning && (

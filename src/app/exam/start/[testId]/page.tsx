@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use, useEffect } from "react";
+import { useState, use } from "react";
 import { useRouter } from "next/navigation";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 
@@ -13,18 +13,6 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
   const startTest = async () => {
     setLoading(true);
     setError("");
-
-    try {
-      // Pre-request camera & microphone permissions to avoid popups stealing focus during the actual exam
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      // Stop temporary tracks after granted so the exam page opens fresh devices
-      stream.getTracks().forEach(track => track.stop());
-    } catch (err) {
-      console.error("Camera/Microphone permission denied", err);
-      setError("Both Camera & Microphone access are required to take this exam. Please allow permissions when prompted by your browser.");
-      setLoading(false);
-      return;
-    }
 
     try {
       // Trigger browser fullscreen synchronously inside user gesture click
@@ -69,7 +57,6 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
             <li>You must not switch browser tabs, minimize the window, or open other applications during the test.</li>
             <li><strong className="text-red-400">WARNING:</strong> Navigating away from the test tab will result in automatic submission.</li>
             <li><strong className="text-red-400">WARNING:</strong> Being inactive for more than 4 minutes will result in automatic submission.</li>
-            <li><strong className="text-red-400">WARNING:</strong> Do not remove your eyes from the mobile/laptop screen for more than 10 seconds continuously — this is against PIECHEM exam rules. After 5 such warnings, the test may be automatically submitted.</li>
             <li>Your answers are saved automatically when selected.</li>
             <li>Once submitted, you cannot re-attempt the test.</li>
             <li>If you face any issues during the exam contact us on WhatsApp: <strong className="text-white">7595825568</strong> via another device (not the device you are using to attempt the test).</li>
