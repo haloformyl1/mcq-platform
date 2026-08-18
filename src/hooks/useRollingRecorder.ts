@@ -18,7 +18,10 @@ export function useRollingRecorder(stream: MediaStream | null) {
     }
 
     try {
-      const options = mimeType ? { mimeType } : undefined;
+      const options: MediaRecorderOptions = {
+        mimeType: mimeType || undefined,
+        videoBitsPerSecond: 250000 // 250 kbps ensures 1-min video stays under ~2 MB (well below Vercel's 4.5 MB limit)
+      };
       const recorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = recorder;
 
