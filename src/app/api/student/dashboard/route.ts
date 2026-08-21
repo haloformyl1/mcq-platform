@@ -198,9 +198,31 @@ export async function GET(req: Request) {
       }));
     }
     
+    // Fetch active custom admin announcements
+    const now = new Date();
+    const customAnnouncements = await prisma.announcement.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { startAt: null },
+          { startAt: { lte: now } }
+        ],
+        AND: [
+          {
+            OR: [
+              { endAt: null },
+              { endAt: { gte: now } }
+            ]
+          }
+        ]
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
     return NextResponse.json({
       student,
       availableTests: availableTestsWithOverrides,
+      customAnnouncements,
       allAttempts,
       lastExamTopStudents,
       lastExamTitle

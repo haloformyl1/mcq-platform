@@ -186,25 +186,58 @@ export default function StudentDashboard() {
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Moving Announcement Banner (Placed at the very top of main) */}
-        {bannerItems.length > 0 && (
-          <div className="bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <span className="shrink-0 text-xs font-bold bg-amber-500 text-black px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow">
-                <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                ANNOUNCEMENT
-              </span>
-              <div className="flex-1 overflow-hidden relative">
-                <div className="animate-marquee whitespace-nowrap inline-block text-sm font-semibold text-amber-200">
-                  {bannerItems.map((item: any) => (
-                    <span
-                      key={item.test.id}
-                      className="mr-16"
-                      dangerouslySetInnerHTML={{ __html: item.message }}
-                    />
-                  ))}
+        {((data.customAnnouncements && data.customAnnouncements.length > 0) || bannerItems.length > 0) && (
+          <div className="space-y-4">
+            {/* 1. Custom Admin Announcements */}
+            {data.customAnnouncements?.map((item: any) => (
+              <div key={item.id} className={`bg-gradient-to-r ${item.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <span className={`shrink-0 text-xs font-bold ${item.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
+                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                    {item.badgeText || "ANNOUNCEMENT"}
+                  </span>
+                  <div className="flex-1 overflow-hidden relative">
+                    <div className={`${item.isMarquee ? "animate-marquee whitespace-nowrap inline-block" : "block"} text-sm font-semibold ${item.textColor || "text-amber-200"}`}>
+                      <strong className="mr-2 text-white">{item.title}:</strong>
+                      <span>{item.content}</span>
+                      {item.actionLabel && item.actionUrl && (
+                        <a
+                          href={item.actionUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="ml-3 underline font-bold hover:text-white"
+                        >
+                          {item.actionLabel} →
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
+
+            {/* 2. Automated Live Test Banners */}
+            {bannerItems.length > 0 && (
+              <div className="bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <span className="shrink-0 text-xs font-bold bg-amber-500 text-black px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow">
+                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                    TEST ALERT
+                  </span>
+                  <div className="flex-1 overflow-hidden relative">
+                    <div className="animate-marquee whitespace-nowrap inline-block text-sm font-semibold text-amber-200">
+                      {bannerItems.map((item: any) => (
+                        <span
+                          key={item.test.id}
+                          className="mr-16"
+                          dangerouslySetInnerHTML={{ __html: item.message }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
