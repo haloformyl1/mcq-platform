@@ -320,8 +320,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </Link>
         </div>
 
-        {/* Moving Important Notice Ticker Banner (Excludes UPCOMING test alerts) */}
-        {(() => {
+        {/* Moving Important Notice Ticker Banner (Renders ONLY on Available Tests page) */}
+        {categoryKey === "available" && (() => {
           const rawItems: any[] = [];
           (availableTests || []).forEach((t: any) => {
             const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
