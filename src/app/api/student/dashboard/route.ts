@@ -168,17 +168,23 @@ export async function GET(req: Request) {
 
           const displayName = att.student.name || att.student.email.split('@')[0];
 
+          // Completion time in seconds
+          const startMs = new Date(att.startedAt).getTime();
+          const submitMs = att.submittedAt ? new Date(att.submittedAt).getTime() : startMs;
+          const durationSeconds = Math.max(0, Math.floor((submitMs - startMs) / 1000));
+
           studentMap.set(att.studentId, {
             studentId: att.studentId,
             name: displayName,
             score: att.score || 0,
             percentage: att.percentage || 0,
-            accuracy: Number(avgAccuracy.toFixed(1))
+            accuracy: Number(avgAccuracy.toFixed(1)),
+            durationSeconds
           });
         }
       }
 
-      // Sort by score desc, then by accuracy desc, then by name alphabetically asc
+      // Sort by score desc, then by accuracy desc, then by faster completion time asc
       const sorted = Array.from(studentMap.values()).sort((a, b) => {
         if (b.score !== a.score) {
           return b.score - a.score;
@@ -186,7 +192,8 @@ export async function GET(req: Request) {
         if (b.accuracy !== a.accuracy) {
           return b.accuracy - a.accuracy;
         }
-        return a.name.localeCompare(b.name);
+        // Tie-breaker: Faster test completion time (fewer seconds taken) wins!
+        return a.durationSeconds - b.durationSeconds;
       });
 
       lastExamTopStudents = sorted.slice(0, 2).map((st, idx) => ({

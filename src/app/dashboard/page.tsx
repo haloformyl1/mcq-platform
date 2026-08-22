@@ -357,7 +357,7 @@ export default function StudentDashboard() {
                 </span>
               </div>
               <span className="text-xs text-[#7dd3fc] bg-[#0099ff]/10 px-3 py-1 rounded-full border border-[#0099ff]/30 font-medium">
-                Ranked by Score & Avg Accuracy
+                Ranked by Score, Accuracy & Speed
               </span>
             </div>
 
