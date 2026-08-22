@@ -320,36 +320,27 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </Link>
         </div>
 
-        {/* Moving Important Notice Ticker Banner */}
+        {/* Moving Important Notice Ticker Banner (Excludes UPCOMING test alerts) */}
         {(() => {
-          const bannerItems: any[] = [];
+          const rawItems: any[] = [];
           (availableTests || []).forEach((t: any) => {
             const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
             const lock = t.lockAt ? new Date(t.lockAt) : null;
 
-            if (unlock) {
-              const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
-              if (now >= bannerStart && now < unlock) {
-                bannerItems.push({
-                  type: "UPCOMING",
-                  test: t,
-                  message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
-                });
-              } else if (now >= unlock && (!lock || now < lock)) {
-                bannerItems.push({
-                  type: "LIVE_EXPIRING",
-                  test: t,
-                  message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! ${lock ? `It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>.` : 'Available for all students.'}`
-                });
-              }
+            if (unlock && now >= unlock && (!lock || now < lock)) {
+              rawItems.push({
+                type: "LIVE_EXPIRING",
+                test: t,
+                message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! ${lock ? `It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>.` : 'Available for all students.'}`
+              });
             } else if (lock && now < lock) {
-              bannerItems.push({
+              rawItems.push({
                 type: "LIVE_EXPIRING",
                 test: t,
                 message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
               });
             } else if (t.status === "LIVE" || t.status === "PUBLISHED" || t.status === "SCHEDULE_EXPIRED") {
-              bannerItems.push({
+              rawItems.push({
                 type: "LIVE_NOW",
                 test: t,
                 message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
@@ -367,7 +358,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           };
           const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
 
-          const hasContent = bannerItems.length > 0 || (cfg.customNotice && cfg.customNotice.trim().length > 0);
+          const hasContent = rawItems.length > 0 || (cfg.customNotice && cfg.customNotice.trim().length > 0);
           if (!hasContent) return null;
 
           return (
@@ -382,7 +373,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                     className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
                     style={{ animationDuration: speedDuration }}
                   >
-                    {bannerItems.map((item: any) => (
+                    {rawItems.map((item: any) => (
                       <span
                         key={item.test.id}
                         className="mr-16"
