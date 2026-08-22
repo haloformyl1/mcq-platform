@@ -25,6 +25,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Your account has been suspended. Please contact the administrator for assistance." }, { status: 403 });
     }
 
+    // Check Subscription Limit for FREE students (Lifetime max 2 tests)
+    const isPaidSubscriber = student.subscriptionStatus === "PAID";
+    if (!isPaidSubscriber) {
+      const totalSubmittedAttempts = await prisma.testAttempt.count({
+        where: { studentId: student.id, status: "SUBMITTED" }
+      });
+      const activeAttemptForThisTest = await prisma.testAttempt.findFirst({
+        where: { testId, studentId: student.id, status: "IN_PROGRESS" }
+      });
+
+      if (totalSubmittedAttempts >= 2 && !activeAttemptForThisTest) {
+        return NextResponse.json({ 
+          error: "Free Limit Reached! You have completed 2 free tests. Please upgrade to a Paid Subscription to unlock unlimited test access.",
+          requiresSubscription: true 
+        }, { status: 403 });
+      }
+    }
+
     const test = await prisma.test.findUnique({
       where: { id: testId },
       include: { questions: { orderBy: { orderIndex: "asc" } } }

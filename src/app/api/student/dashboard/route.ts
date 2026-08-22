@@ -35,7 +35,20 @@ export async function GET(req: Request) {
     const student = await prisma.student.update({
       where: { id: studentId },
       data: { lastLogin: new Date() },
-      select: { email: true, name: true }
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        phone: true, 
+        gender: true, 
+        dob: true, 
+        board: true, 
+        academicLevel: true, 
+        status: true,
+        subscriptionStatus: true,
+        avatarUrl: true,
+        createdAt: true 
+      }
     });
 
     const availableTests = await prisma.test.findMany({

@@ -21,9 +21,18 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' }
     });
 
+    const upgradeRequests = await prisma.subscriptionUpgradeRequest.findMany({
+      where: { status: "PENDING" },
+      include: {
+        student: { select: { id: true, name: true, email: true, phone: true, subscriptionStatus: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
     return NextResponse.json({
       accessRequests,
-      warningLogs
+      warningLogs,
+      upgradeRequests
     });
   } catch (error) {
     console.error("Fetch notifications error:", error);

@@ -32,6 +32,7 @@ interface Student {
   name: string | null;
   email: string;
   status: string;
+  subscriptionStatus?: string;
   createdAt: string;
   lastLogin: string | null;
   _count: {
@@ -132,6 +133,7 @@ export default function AdminStudents() {
                   <th className="px-4 py-3">Name</th>
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Subscription</th>
                   <th className="px-4 py-3">Registered</th>
                   <th className="px-4 py-3">Last Seen</th>
                   <th className="px-4 py-3">Tests</th>
@@ -148,6 +150,34 @@ export default function AdminStudents() {
                       <span className={`px-2 py-1 rounded text-xs font-medium ${student.status === "ACTIVE" ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"}`}>
                         {student.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={student.subscriptionStatus || "FREE"}
+                        onChange={async (e) => {
+                          const newSub = e.target.value;
+                          try {
+                            const res = await fetch(`/api/admin/students/${student.id}/status`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ subscriptionStatus: newSub })
+                            });
+                            if (res.ok) {
+                              setStudents(prev => prev.map(s => s.id === student.id ? { ...s, subscriptionStatus: newSub } : s));
+                            }
+                          } catch (err) {
+                            console.error("Failed to update subscription", err);
+                          }
+                        }}
+                        className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
+                          student.subscriptionStatus === "PAID"
+                            ? "bg-amber-950/90 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+                            : "bg-slate-900 text-slate-400 border-slate-700"
+                        }`}
+                      >
+                        <option value="FREE" className="bg-slate-900 text-slate-300">FREE</option>
+                        <option value="PAID" className="bg-amber-950 text-amber-300 font-bold">PAID (GOLD)</option>
+                      </select>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="text-gray-200">{new Date(student.createdAt).toLocaleDateString()}</div>

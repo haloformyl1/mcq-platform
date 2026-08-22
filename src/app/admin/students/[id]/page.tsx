@@ -11,6 +11,7 @@ interface StudentDetails {
     name: string | null;
     email: string;
     status: string;
+    subscriptionStatus?: string;
     createdAt: string;
     lastLogin: string | null;
   };
@@ -280,6 +281,33 @@ export default function AdminStudentDetails() {
             <div className="flex justify-between"><span className="text-gray-500">Student ID</span> <span className="text-gray-300 font-mono">{student.id}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Name</span> <span className="text-gray-300">{student.name || "N/A"}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Email</span> <span className="text-gray-300">{student.email}</span></div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Subscription Plan</span>
+              <select
+                value={student.subscriptionStatus || "FREE"}
+                onChange={async (e) => {
+                  const newSub = e.target.value;
+                  try {
+                    const res = await fetch(`/api/admin/students/${id}/status`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ subscriptionStatus: newSub })
+                    });
+                    if (res.ok) fetchStudent();
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
+                className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
+                  student.subscriptionStatus === "PAID"
+                    ? "bg-amber-950/90 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+                    : "bg-slate-900 text-slate-400 border-slate-700"
+                }`}
+              >
+                <option value="FREE" className="bg-slate-900 text-slate-300">FREE</option>
+                <option value="PAID" className="bg-amber-950 text-amber-300 font-bold">PAID (GOLD)</option>
+              </select>
+            </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Status</span>
               <span className={`px-2 rounded font-medium ${student.status === "ACTIVE" ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"}`}>

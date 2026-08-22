@@ -39,6 +39,7 @@ export async function GET(req: Request) {
         name: true,
         email: true,
         status: true,
+        subscriptionStatus: true,
         createdAt: true,
         lastLogin: true,
         _count: {

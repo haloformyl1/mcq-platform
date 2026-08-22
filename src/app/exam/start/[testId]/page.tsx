@@ -10,9 +10,12 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [requiresSub, setRequiresSub] = useState(false);
+
   const startTest = async () => {
     setLoading(true);
     setError("");
+    setRequiresSub(false);
 
     try {
       // Trigger browser fullscreen synchronously inside user gesture click
@@ -36,6 +39,9 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
         router.push(`/exam/${data.attemptId}`);
       } else {
         setError(data.error || "Failed to start test");
+        if (data.requiresSubscription) {
+          setRequiresSub(true);
+        }
         setLoading(false);
       }
     } catch (e) {
@@ -63,7 +69,24 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
           </ul>
         </div>
 
-        {error && <div className="mb-6 p-4 bg-red-500/10 text-red-400 border border-red-500/50 rounded-md">{error}</div>}
+        {error && (
+          <div className="mb-6 p-5 bg-gradient-to-r from-amber-950/90 via-red-950/90 to-amber-950/90 border border-amber-500/60 rounded-xl space-y-4 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+            <div className="text-amber-200 text-sm font-semibold leading-relaxed flex items-start gap-2">
+              <span className="text-amber-400 font-bold text-lg">⚠️</span>
+              <span>{error}</span>
+            </div>
+            {requiresSub && (
+              <div className="pt-2 flex justify-end">
+                <button
+                  onClick={() => router.push("/dashboard/account")}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(245,158,11,0.5)] transition active:scale-95 cursor-pointer"
+                >
+                  ✨ Upgrade to Paid Subscription
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#404040]">
           <button 

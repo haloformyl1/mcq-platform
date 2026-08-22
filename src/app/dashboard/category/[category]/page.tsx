@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock, FolderOpen, LogOut } from 'lucide-react';
+import { ArrowLeft, Clock, FolderOpen, LogOut, User } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -58,6 +58,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   };
 
   const { student, availableTests = [], allAttempts = [] } = data;
+  const studentName = student?.name || (student?.email ? student.email.split('@')[0] : 'Student');
 
   const currentAvailableTests: any[] = [];
   const upcomingTests: any[] = [];
@@ -286,119 +287,173 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
       <AdminPreviewBanner />
 
       {/* Header */}
-      <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-cyan-500/20 bg-[#08131e]/80 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
-          <div className="flex items-center space-x-4 shrink-0">
+          <div className="flex flex-col items-start gap-1.5 shrink-0">
             <PiechemLogo size="md" href="/dashboard" />
+            
+            {/* Student Contact Badge directly under Logo */}
+            <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 mt-0.5">
+              <span className="text-slate-400 hidden xs:inline">Prepared by</span>
+              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
+                Arghyadeep Roy
+              </span>
+              <span className="text-cyan-500/60">•</span>
+              <a 
+                href="tel:9830507435" 
+                className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/50 transition-all font-mono shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                title="Call Arghyadeep Roy"
+              >
+                <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
+                  <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+                <span>9830507435</span>
+              </a>
+            </div>
           </div>
 
-          <div className="px-4 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
-            <span className="text-slate-400 hidden xs:inline">Prepared by</span>
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
-              Arghyadeep Roy
+          {/* Center Welcome Greeting Badge */}
+          <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] text-xs text-slate-200">
+            <span className="text-slate-400">Welcome Back,</span>
+            <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-blue-300">
+              {studentName}
             </span>
-            <span className="text-slate-600">•</span>
-            <a 
-              href="tel:9830507435" 
-              className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/70 text-cyan-300 hover:text-white hover:bg-cyan-600/60 border border-cyan-500/40 transition-all font-mono shadow-sm"
-              title="Call Arghyadeep Roy"
-            >
-              <svg className="w-3 h-3 mr-1 text-cyan-400 fill-current" viewBox="0 0 24 24">
-                <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-              </svg>
-              <span>9830507435</span>
-            </a>
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse ml-0.5"></span>
           </div>
 
-          <button 
-            onClick={() => {
-              document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-              router.push("/");
-            }} 
-            className="hidden md:flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </button>
+          {/* Right Action: My Account */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Link 
+              href="/dashboard/account"
+              className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 mr-2 text-cyan-400" />
+              My Account
+            </Link>
+
+            <button 
+              onClick={() => {
+                document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                router.push("/");
+              }} 
+              className="hidden md:flex items-center text-xs font-bold text-slate-400 hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-950/40 border border-transparent hover:border-red-900/40"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Moving Important Notice Ticker Banner (Renders ONLY on Available Tests page - Top under Header) */}
-        {categoryKey === "available" && (() => {
-          const rawItems: any[] = [];
-          (availableTests || []).forEach((t: any) => {
-            const lock = t.lockAt ? new Date(t.lockAt) : null;
-
-            if (t.status === "SCHEDULE_EXPIRED" || lock) {
-              if (!lock || now < lock) {
-                rawItems.push({
-                  type: "SCHEDULE_EXPIRED_LIVE",
-                  test: t,
-                  message: `🔥 Scheduled Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${lock ? formatDateTime(lock) : "N/A"}</strong>.`
-                });
-              }
-            } else if (t.status === "LIVE" || t.status === "PUBLISHED") {
-              rawItems.push({
-                type: "LIVE_NOW",
-                test: t,
-                message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
-              });
-            }
-          });
-
-          const cfg = data.testAlertSettings || {
-            badgeText: "IMPORTANT",
-            bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
-            badgeColor: "bg-amber-500 text-black",
-            textColor: "text-amber-200",
-            marqueeSpeed: "normal",
-            customNotice: ""
-          };
-          const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-          const hasContent = rawItems.length > 0 || (cfg.customNotice && cfg.customNotice.trim().length > 0);
-          if (!hasContent) return null;
-
-          return (
-            <div className={`bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
-              <div className="flex items-center gap-3 overflow-hidden">
-                <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                  <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                  {cfg.badgeText || "IMPORTANT"}
-                </span>
-                <div className="flex-1 overflow-hidden relative">
-                  <div 
-                    className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
-                    style={{ animationDuration: speedDuration }}
-                  >
-                    {rawItems.map((item: any) => (
-                      <span
-                        key={item.test.id}
-                        className="mr-16"
-                        dangerouslySetInnerHTML={{ __html: item.message }}
-                      />
-                    ))}
-                    {cfg.customNotice && (
-                      <span className="mr-16">
-                        📢 <strong>Notice:</strong> {cfg.customNotice}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Back to Dashboard Button */}
-        <div className="flex items-center justify-between">
+      <main className="w-full py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Top Action Row: Back Button + Announcement Ticker Banner */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
           <Link 
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-cyan-950/40 border border-cyan-800/50 px-4 py-2 rounded-lg transition shadow"
+            className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-cyan-950/40 border border-cyan-800/50 px-4 py-2.5 rounded-xl transition shadow shrink-0 h-full"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
+
+          {/* Announcement Ticker Banner */}
+          {(() => {
+            const rawItems: any[] = [];
+
+            if (categoryKey === "available") {
+              (availableTests || []).forEach((t: any) => {
+                const lock = t.lockAt ? new Date(t.lockAt) : null;
+                if (t.status === "SCHEDULE_EXPIRED" || lock) {
+                  if (!lock || now < lock) {
+                    rawItems.push({
+                      type: "SCHEDULE_EXPIRED_LIVE",
+                      test: t,
+                      message: `🔥 Scheduled Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${lock ? formatDateTime(lock) : "N/A"}</strong>.`
+                    });
+                  }
+                } else if (t.status === "LIVE" || t.status === "PUBLISHED") {
+                  rawItems.push({
+                    type: "LIVE_NOW",
+                    test: t,
+                    message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
+                  });
+                }
+              });
+            } else if (categoryKey === "upcoming") {
+              (availableTests || []).forEach((t: any) => {
+                if (t.status === "UPCOMING") {
+                  const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
+                  const lock = t.lockAt ? new Date(t.lockAt) : null;
+
+                  if (unlock && now < unlock) {
+                    rawItems.push({
+                      type: "UPCOMING",
+                      test: t,
+                      message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
+                    });
+                  } else if (!lock || now < lock) {
+                    rawItems.push({
+                      type: "UPCOMING",
+                      test: t,
+                      message: `🔥 Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `It will conclude on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
+                    });
+                  } else {
+                    rawItems.push({
+                      type: "UPCOMING",
+                      test: t,
+                      message: `⌛ Upcoming Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> concluded at <strong class="text-red-300 font-mono">${formatDateTime(lock)}</strong>. Students who missed this test may request the Admin to unlock access.`
+                    });
+                  }
+                }
+              });
+            }
+
+            const cfg = data.testAlertSettings || {
+              badgeText: categoryKey === "upcoming" ? "TEST ALERT" : "IMPORTANT",
+              bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
+              badgeColor: "bg-amber-500 text-black",
+              textColor: "text-amber-200",
+              marqueeSpeed: "normal",
+              customNotice: ""
+            };
+            const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
+
+            const hasContent = rawItems.length > 0 || (categoryKey === "available" && cfg.customNotice && cfg.customNotice.trim().length > 0);
+            if (!hasContent) return null;
+
+            const isUpcomingCategory = categoryKey === "upcoming";
+            const badgeLabel = isUpcomingCategory ? "TEST ALERT" : "IMPORTANT";
+            const badgeStyle = isUpcomingCategory ? "bg-amber-500 text-black" : "bg-cyan-500 text-black";
+
+            return (
+              <div className={`flex-1 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2.5 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
+                <div className="flex items-center gap-3 overflow-hidden w-full">
+                  <span className={`shrink-0 text-xs font-bold ${badgeStyle} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
+                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                    {badgeLabel}
+                  </span>
+                  <div className="flex-1 overflow-hidden relative">
+                    <div 
+                      className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
+                      style={{ animationDuration: speedDuration }}
+                    >
+                      {rawItems.map((item: any) => (
+                        <span
+                          key={item.test.id}
+                          className="mr-16"
+                          dangerouslySetInnerHTML={{ __html: item.message }}
+                        />
+                      ))}
+                      {categoryKey === "available" && cfg.customNotice && (
+                        <span className="mr-16">
+                          📢 <strong>Notice:</strong> {cfg.customNotice}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Category Header Box */}

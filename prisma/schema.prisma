@@ -12,9 +12,16 @@ model Student {
   email     String   @unique
   passwordHash String?
   name      String?
+  phone     String?
+  gender    String?  @default("Male")
+  dob       DateTime?
+  board     String?  @default("CBSE")
+  academicLevel String? @default("11")
   otp       String?
   otpExpiry DateTime?
   status    String   @default("ACTIVE") // ACTIVE, SUSPENDED
+  subscriptionStatus String @default("FREE") // FREE, PAID
+  avatarUrl String?  @default("/avatars/atom.jpg")
   lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -22,6 +29,7 @@ model Student {
   attempts  TestAttempt[]
   studentOverrides StudentTestOverride[]
   accessRequests TestAccessRequest[]
+  upgradeRequests SubscriptionUpgradeRequest[]
   proctoringWarnings ProctoringWarningLog[]
 }
 
@@ -198,6 +206,17 @@ model TestAlertSetting {
   marqueeSpeed String   @default("normal") // slow, normal, fast
   customNotice String?  @default("")
   updatedAt    DateTime @updatedAt
+}
+
+model SubscriptionUpgradeRequest {
+  id        String   @id @default(uuid())
+  studentId String
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 

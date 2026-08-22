@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen, Clock } from 'lucide-react';
+import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen, Clock, User } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -147,35 +147,58 @@ export default function StudentDashboard() {
       <AdminPreviewBanner />
 
       {/* Header */}
-      <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-cyan-500/20 bg-[#08131e]/80 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
-          <div className="flex items-center space-x-4 shrink-0">
+          <div className="flex flex-col items-start gap-1.5 shrink-0">
             <PiechemLogo size="md" href="/dashboard" />
+            
+            {/* Student Contact Badge directly under Logo */}
+            <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 mt-0.5">
+              <span className="text-slate-400 hidden xs:inline">Prepared by</span>
+              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
+                Arghyadeep Roy
+              </span>
+              <span className="text-cyan-500/60">•</span>
+              <a 
+                href="tel:9830507435" 
+                className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/50 transition-all font-mono shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                title="Call Arghyadeep Roy"
+              >
+                <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
+                  <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+                <span>9830507435</span>
+              </a>
+            </div>
           </div>
 
-          {/* Center Badge */}
-          <div className="px-4 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
-            <span className="text-slate-400 hidden xs:inline">Prepared by</span>
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
-              Arghyadeep Roy
+          {/* Center Welcome Greeting Badge */}
+          <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] text-xs text-slate-200">
+            <span className="text-slate-400">Welcome Back,</span>
+            <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-blue-300">
+              {studentName}
             </span>
-            <span className="text-slate-600">•</span>
-            <a 
-              href="tel:9830507435" 
-              className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/70 text-cyan-300 hover:text-white hover:bg-cyan-600/60 border border-cyan-500/40 transition-all font-mono shadow-sm"
-              title="Call Arghyadeep Roy"
-            >
-              <svg className="w-3 h-3 mr-1 text-cyan-400 fill-current" viewBox="0 0 24 24">
-                <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-              </svg>
-              <span>9830507435</span>
-            </a>
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse ml-0.5"></span>
           </div>
 
-          <button onClick={handleLogout} className="hidden md:flex items-center text-sm text-[#a6a6a6] hover:text-white transition px-3 py-2 rounded-md hover:bg-[#262626] shrink-0">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </button>
+          {/* Right Action: My Account */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Link 
+              href="/dashboard/account"
+              className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 mr-2 text-cyan-400" />
+              My Account
+            </Link>
+
+            <button 
+              onClick={handleLogout} 
+              className="hidden md:flex items-center text-xs font-bold text-slate-400 hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-950/40 border border-transparent hover:border-red-900/40"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -221,57 +244,68 @@ export default function StudentDashboard() {
           );
         })()}
         
-        {/* Study Materials & Reference Resources Section (Between ANNOUNCEMENT and Performance Section) */}
-        <section className="bg-[#161616]/80 border border-cyan-500/30 p-6 rounded-xl backdrop-blur-md shadow-xl space-y-4">
-          <div className="flex justify-between items-center border-b border-[#2a2a2a] pb-3">
-            <div className="flex items-center gap-2.5">
-              <FolderOpen className="w-5 h-5 text-cyan-400 shrink-0" />
-              <h2 className="text-lg font-bold text-white tracking-wide">Study Materials & Notes</h2>
+        {/* Study Materials & Reference Resources Section */}
+        <section className="bg-gradient-to-b from-[#122230]/90 via-[#0d1722]/90 to-[#080d14]/90 border border-cyan-500/30 p-6 rounded-2xl backdrop-blur-xl shadow-[0_10px_30px_rgba(6,182,212,0.1)] space-y-6">
+          <div className="flex justify-between items-center border-b border-cyan-500/20 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-xl border border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                <FolderOpen className="w-5 h-5 shrink-0" />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-wide">Study Materials & Notes</h2>
+                <p className="text-xs text-slate-400">Interactive 3D models, visual guides, and reference resources</p>
+              </div>
             </div>
-            <span className="text-xs bg-cyan-950/60 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 font-mono">
+            <span className="text-xs bg-gradient-to-r from-cyan-950/80 to-blue-950/80 text-cyan-300 px-3.5 py-1 rounded-full border border-cyan-500/40 font-mono font-bold shadow">
               {studyMaterials.length} Available
             </span>
           </div>
 
           {studyMaterials.length === 0 ? (
-            <div className="text-center py-6 text-sm text-[#a6a6a6] bg-[#1a1a1a]/50 rounded-lg border border-[#333333]">
-              📚 No study materials uploaded yet. Check back soon for chapter notes and references!
+            <div className="bg-slate-950/60 border border-cyan-900/30 p-8 rounded-xl text-center text-slate-400 space-y-2">
+              <BookOpen className="w-8 h-8 text-cyan-500/50 mx-auto" />
+              <p className="text-sm font-medium">No study materials published yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {studyMaterials.map((mat: any) => {
                 const isPdf = mat.type === "PDF";
                 const isImage = mat.type === "IMAGE";
 
                 return (
-                  <div key={mat.id} className="bg-[#1a1a1a] border border-[#333333] hover:border-cyan-500/50 p-4 rounded-xl flex flex-col justify-between gap-3 shadow-md transition group">
-                    <div className="space-y-2">
+                  <div 
+                    key={mat.id} 
+                    className="group bg-gradient-to-br from-[#121c27] via-[#0d1620] to-[#0a0f16] border border-cyan-500/20 hover:border-cyan-400/60 p-5 rounded-xl flex flex-col justify-between gap-4 shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.2)] transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-cyan-500/10 via-blue-500/5 to-transparent rounded-bl-full pointer-events-none group-hover:from-cyan-400/20 transition-all"></div>
+
+                    <div className="space-y-3 relative z-10">
                       <div className="flex items-center justify-between">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 ${
+                        <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 shadow ${
                           isPdf
-                            ? "bg-red-950/80 text-red-400 border border-red-800/60"
+                            ? "bg-red-950/90 text-red-300 border border-red-800/60"
                             : isImage
-                            ? "bg-purple-950/80 text-purple-400 border border-purple-800/60"
-                            : "bg-blue-950/80 text-blue-400 border border-blue-800/60"
+                            ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
+                            : "bg-blue-950/90 text-cyan-300 border border-cyan-500/50"
                         }`}>
                           {isPdf && <FileText className="w-3.5 h-3.5" />}
                           {isImage && <ImageIcon className="w-3.5 h-3.5" />}
                           {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
                           {mat.type}
                         </span>
-                        {mat.fileSize && <span className="text-[11px] text-gray-400 font-mono">{mat.fileSize}</span>}
+                        {mat.fileSize && <span className="text-[11px] text-slate-400 font-mono font-semibold">{mat.fileSize}</span>}
                       </div>
 
-                      <h3 className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors line-clamp-1">{mat.title}</h3>
-                      {mat.description && <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{mat.description}</p>}
+                      <h3 className="font-bold text-white text-base group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug">{mat.title}</h3>
+                      {mat.description && <p className="text-xs text-slate-300/90 line-clamp-3 leading-relaxed">{mat.description}</p>}
                     </div>
 
-                    <div className="pt-2 border-t border-[#262626] flex justify-end">
+                    <div className="pt-3 border-t border-cyan-950 flex justify-end relative z-10">
                       <a
                         href={mat.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-xs font-semibold transition shadow"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-95"
                       >
                         <span>{mat.type === "LINK" ? "Open Link" : "View / Download"}</span>
                         {mat.type === "LINK" ? <ExternalLink className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
@@ -317,10 +351,19 @@ export default function StudentDashboard() {
             </div>
           </div>
         ) : (
-          <div className="bg-[#161616]/60 border border-[#333333] p-8 rounded-xl text-center backdrop-blur-sm">
-            <Medal className="w-12 h-12 text-[#0099ff] mx-auto mb-4 opacity-80" />
-            <h2 className="text-2xl font-bold mb-2">Start Your Performance Journey</h2>
-            <p className="text-[#a6a6a6] mb-6">You haven't completed any tests yet. Take your first test to unlock powerful analytics!</p>
+          <div className="bg-gradient-to-r from-[#0a1b2a]/90 via-[#0d2336]/90 to-[#081522]/90 border border-cyan-500/30 p-8 sm:p-10 rounded-2xl text-center backdrop-blur-xl shadow-[0_10px_35px_rgba(0,153,255,0.15)] space-y-4 relative overflow-hidden">
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none"></div>
+            
+            <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.25)]">
+              <Medal className="w-7 h-7 text-cyan-300 animate-pulse" />
+            </div>
+            
+            <div className="space-y-1.5 max-w-lg mx-auto">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">Start Your Performance Journey</h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                You haven't completed any tests yet. Take your first test from <strong className="text-cyan-300 font-semibold">Available Tests</strong> to unlock real-time accuracy, score graphs, and leaderboard insights!
+              </p>
+            </div>
           </div>
         )}
 
@@ -641,86 +684,84 @@ export default function StudentDashboard() {
           };
 
           return (
-            <div className="space-y-6">
-
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* 1. Folder 1: Upcoming Tests */}
-              <div className="bg-[#121212]/90 border border-amber-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.08)] transition-all">
+              <div className="bg-[#121212]/90 border border-amber-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.08)] hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-1">
                 <Link
                   href="/dashboard/category/upcoming"
-                  className="w-full flex items-center justify-between p-5 sm:p-6 bg-[#1a1610]/80 hover:bg-[#2a2218] transition-colors border-b border-amber-500/20 text-left cursor-pointer group"
+                  className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-[#1a1610]/90 to-[#120e0a]/90 hover:from-[#2a2218] hover:to-[#1a140e] transition-colors text-left cursor-pointer group space-y-5"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="p-2 rounded-xl bg-amber-950/90 border border-amber-700/60 shadow group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="p-3 rounded-xl bg-amber-950/90 border border-amber-700/60 shadow group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
                       <PiechemLogo size="sm" showText={false} />
                     </div>
-                    <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center gap-2 group-hover:text-amber-300 transition-colors">
-                        Upcoming / Scheduled Tests
-                      </h2>
-                      <p className="text-xs text-amber-200/70 mt-0.5">Click to view all scheduled upcoming tests →</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold shrink-0">
+                    <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold shrink-0 shadow">
                       {upcomingTests.length} Scheduled
                     </span>
-                    <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+
+                  <div className="space-y-1.5 flex-1">
+                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-between group-hover:text-amber-300 transition-colors">
+                      <span>Upcoming / Scheduled</span>
+                      <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                    </h2>
+                    <p className="text-xs text-amber-200/70 leading-relaxed">Click to view all scheduled upcoming tests →</p>
                   </div>
                 </Link>
               </div>
 
               {/* 2. Folder 2: Available Tests */}
-              <div className="bg-[#121212]/90 border border-green-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(34,197,94,0.08)] transition-all">
+              <div className="bg-[#121212]/90 border border-green-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(34,197,94,0.08)] hover:border-green-400 transition-all duration-300 transform hover:-translate-y-1">
                 <Link
                   href="/dashboard/category/available"
-                  className="w-full flex items-center justify-between p-5 sm:p-6 bg-[#0f1f17]/80 hover:bg-[#162e22] transition-colors border-b border-green-500/20 text-left cursor-pointer group"
+                  className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-[#0f1f17]/90 to-[#0a1610]/90 hover:from-[#162e22] hover:to-[#0f2118] transition-colors text-left cursor-pointer group space-y-5"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="p-2 rounded-xl bg-green-950/90 border border-green-700/60 shadow group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="p-3 rounded-xl bg-green-950/90 border border-green-700/60 shadow group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
                       <PiechemLogo size="sm" showText={false} />
                     </div>
-                    <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center gap-2 group-hover:text-green-300 transition-colors">
+                    <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold shrink-0 shadow">
+                      {currentAvailableTests.length} Live
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 flex-1">
+                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-between group-hover:text-green-300 transition-colors">
+                      <span className="flex items-center gap-2">
                         Available Tests
                         <span className="relative flex h-2.5 w-2.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                         </span>
-                      </h2>
-                      <p className="text-xs text-green-200/70 mt-0.5">Click to view all tests ready to attempt →</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold shrink-0">
-                      {currentAvailableTests.length} Live
-                    </span>
-                    <ChevronRight className="w-5 h-5 text-green-400 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                      <ChevronRight className="w-5 h-5 text-green-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                    </h2>
+                    <p className="text-xs text-green-200/70 leading-relaxed">Click to view all tests ready to attempt →</p>
                   </div>
                 </Link>
               </div>
 
               {/* 3. Folder 3: Expired Tests */}
-              <div className="bg-[#121212]/90 border border-red-900/50 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(239,68,68,0.05)] transition-all">
+              <div className="bg-[#121212]/90 border border-red-900/50 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(239,68,68,0.05)] hover:border-red-600 transition-all duration-300 transform hover:-translate-y-1">
                 <Link
                   href="/dashboard/category/expired"
-                  className="w-full flex items-center justify-between p-5 sm:p-6 bg-[#1f1012]/80 hover:bg-[#2c1719] transition-colors border-b border-red-900/30 text-left cursor-pointer group"
+                  className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-[#1f1012]/90 to-[#140b0c]/90 hover:from-[#2c1719] hover:to-[#1e1011] transition-colors text-left cursor-pointer group space-y-5"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <div className="p-2 rounded-xl bg-red-950/90 border border-red-800/60 shadow group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="p-3 rounded-xl bg-red-950/90 border border-red-800/60 shadow group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
                       <PiechemLogo size="sm" showText={false} />
                     </div>
-                    <div>
-                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide group-hover:text-red-300 transition-colors">
-                        Expired Tests
-                      </h2>
-                      <p className="text-xs text-red-200/70 mt-0.5">Click to view all past concluded tests →</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-800 font-mono font-bold shrink-0">
+                    <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-800 font-mono font-bold shrink-0 shadow">
                       {expiredTests.length} Expired
                     </span>
-                    <ChevronRight className="w-5 h-5 text-red-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+
+                  <div className="space-y-1.5 flex-1">
+                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-between group-hover:text-red-300 transition-colors">
+                      <span>Expired Tests</span>
+                      <ChevronRight className="w-5 h-5 text-red-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                    </h2>
+                    <p className="text-xs text-red-200/70 leading-relaxed">Click to view all past concluded tests →</p>
                   </div>
                 </Link>
               </div>
