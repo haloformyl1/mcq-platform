@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen, Clock } from 'lucide-react';
+import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen, Clock } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -14,6 +14,11 @@ export default function StudentDashboard() {
   const [studyMaterials, setStudyMaterials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(new Date());
+
+  // Collapsible Folder Accordion States
+  const [openUpcoming, setOpenUpcoming] = useState(true);
+  const [openLive, setOpenLive] = useState(true);
+  const [openExpired, setOpenExpired] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -119,11 +124,11 @@ export default function StudentDashboard() {
           test: t,
           message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
         });
-      } else if (now >= unlock && lock && now < lock) {
+      } else if (now >= unlock && (!lock || now < lock)) {
         bannerItems.push({
           type: "LIVE_EXPIRING",
           test: t,
-          message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>. Please attempt the test before it closes!`
+          message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! ${lock ? `It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>.` : 'Available for all students.'}`
         });
       }
     } else if (lock && now < lock) {
@@ -131,6 +136,12 @@ export default function StudentDashboard() {
         type: "LIVE_EXPIRING",
         test: t,
         message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
+      });
+    } else if (t.status === "LIVE" || t.status === "PUBLISHED" || t.status === "SCHEDULE_EXPIRED") {
+      bannerItems.push({
+        type: "LIVE_NOW",
+        test: t,
+        message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
       });
     }
 
@@ -152,7 +163,7 @@ export default function StudentDashboard() {
 
       {/* Header */}
       <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
+        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
           <div className="flex items-center space-x-4 shrink-0">
             <PiechemLogo size="md" />
           </div>
@@ -183,63 +194,54 @@ export default function StudentDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+      <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
         
-        {/* Moving Announcement Banner (Placed at the very top of main) */}
-        {((data.customAnnouncements && data.customAnnouncements.length > 0) || bannerItems.length > 0) && (
-          <div className="space-y-4">
-            {/* 1. Custom Admin Announcements */}
-            {data.customAnnouncements?.map((item: any) => (
-              <div key={item.id} className={`bg-gradient-to-r ${item.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <span className={`shrink-0 text-xs font-bold ${item.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                    {item.badgeText || "ANNOUNCEMENT"}
-                  </span>
-                  <div className="flex-1 overflow-hidden relative">
-                    <div className={`${item.isMarquee ? "animate-marquee whitespace-nowrap inline-block" : "block"} text-sm font-semibold ${item.textColor || "text-amber-200"}`}>
-                      <strong className="mr-2 text-white">{item.title}:</strong>
-                      <span>{item.content}</span>
-                      {item.actionLabel && item.actionUrl && (
-                        <a
-                          href={item.actionUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="ml-3 underline font-bold hover:text-white"
-                        >
-                          {item.actionLabel} →
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Moving Test Alert Banner */}
+        {(() => {
+          const cfg = data.testAlertSettings || {
+            badgeText: "TEST ALERT",
+            bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
+            badgeColor: "bg-amber-500 text-black",
+            textColor: "text-amber-200",
+            marqueeSpeed: "normal",
+            customNotice: ""
+          };
+          const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
 
-            {/* 2. Automated Live Test Banners */}
-            {bannerItems.length > 0 && (
-              <div className="bg-gradient-to-r from-amber-950/90 via-yellow-900/70 to-amber-950/90 border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <span className="shrink-0 text-xs font-bold bg-amber-500 text-black px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow">
-                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                    TEST ALERT
-                  </span>
-                  <div className="flex-1 overflow-hidden relative">
-                    <div className="animate-marquee whitespace-nowrap inline-block text-sm font-semibold text-amber-200">
-                      {bannerItems.map((item: any) => (
-                        <span
-                          key={item.test.id}
-                          className="mr-16"
-                          dangerouslySetInnerHTML={{ __html: item.message }}
-                        />
-                      ))}
-                    </div>
+          // Show banner if there are test alert items OR if custom notice OR even when empty with active tests
+          const hasContent = bannerItems.length > 0 || (cfg.customNotice && cfg.customNotice.trim().length > 0);
+          if (!hasContent) return null;
+
+          return (
+            <div className={`bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
+                  <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                  {cfg.badgeText || "TEST ALERT"}
+                </span>
+                <div className="flex-1 overflow-hidden relative">
+                  <div 
+                    className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
+                    style={{ animationDuration: speedDuration }}
+                  >
+                    {bannerItems.map((item: any) => (
+                      <span
+                        key={item.test.id}
+                        className="mr-16"
+                        dangerouslySetInnerHTML={{ __html: item.message }}
+                      />
+                    ))}
+                    {cfg.customNotice && (
+                      <span className="mr-16">
+                        📢 <strong>Notice:</strong> {cfg.customNotice}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          );
+        })()}
 
         {/* Study Materials & Reference Resources Section (Between ANNOUNCEMENT and Performance Section) */}
         <section className="bg-[#161616]/80 border border-cyan-500/30 p-6 rounded-xl backdrop-blur-md shadow-xl space-y-4">
@@ -535,31 +537,32 @@ export default function StudentDashboard() {
                   </div>
                   
                   {/* Status Banner */}
-                  <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333] overflow-hidden relative">
+                  <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333] overflow-hidden">
                     {isUpcomingStage && test.unlockDate && (
-                      <div className="animate-marquee whitespace-nowrap text-amber-300 font-medium">
+                      <div className="text-amber-300 font-medium truncate">
                         <span>🔒 Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
                       </div>
                     )}
                     {isLiveStage && test.lockState === "SCHEDULED_OPEN" && test.lockDate && (
-                      <div className="animate-marquee whitespace-nowrap text-green-400 font-medium">
+                      <div className="text-green-400 font-medium truncate">
                         <span>🔥 Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
                       </div>
                     )}
                     {isLiveStage && (test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE") && (
-                      <div className="flex items-center text-green-400 font-medium">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span>
+                      <div className="flex items-center text-green-400 font-medium truncate">
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2 shrink-0"></span>
                         <span>🟢 Auto-Released Live Test</span>
                       </div>
                     )}
                     {isHoldingStage && test.autoLiveDate && (
-                      <div className="animate-marquee whitespace-nowrap text-orange-300 font-medium">
-                        <span>⌛ Concluded at {formatDateTime(test.lockDate)} • Auto-lives under Other Available Tests at: <strong className="font-mono font-semibold text-green-400">{formatDateTime(test.autoLiveDate)}</strong></span>
+                      <div className="text-orange-300 font-medium text-[11px] leading-tight">
+                        <div>⌛ Concluded at {formatDateTime(test.lockDate)}</div>
+                        <div className="text-green-400 font-mono mt-0.5">Auto-lives: {formatDateTime(test.autoLiveDate)}</div>
                       </div>
                     )}
                     {isLockedStage && (
-                      <div className="animate-marquee whitespace-nowrap text-red-400 font-medium">
-                        <span>⚠️ Not Available: Please contact Admin to request live access.</span>
+                      <div className="text-red-400 font-medium truncate">
+                        <span>⚠️ Contact Admin for access</span>
                       </div>
                     )}
                     {activeAttempt && (
@@ -658,69 +661,88 @@ export default function StudentDashboard() {
           };
 
           return (
-            <div className="space-y-10">
+            <div className="space-y-6">
 
-              {/* 1. Box 1: Upcoming Tests (Always at Top) */}
-              <div className="bg-[#121212]/90 border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(245,158,11,0.08)] space-y-4">
-                <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="p-2 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-700/50 text-base">🔒</span>
-                    <h2 className="text-xl font-bold text-white tracking-wide">Upcoming / Current Tests</h2>
+              {/* 1. Folder 1: Upcoming Tests */}
+              <div className="bg-[#121212]/90 border border-amber-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.08)] transition-all">
+                <Link
+                  href="/dashboard/category/upcoming"
+                  className="w-full flex items-center justify-between p-5 sm:p-6 bg-[#1a1610]/80 hover:bg-[#2a2218] transition-colors border-b border-amber-500/20 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="p-2 rounded-xl bg-amber-950/90 border border-amber-700/60 shadow group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+                      <PiechemLogo size="sm" showText={false} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center gap-2 group-hover:text-amber-300 transition-colors">
+                        Upcoming / Scheduled Tests
+                      </h2>
+                      <p className="text-xs text-amber-200/70 mt-0.5">Click to view all scheduled upcoming tests →</p>
+                    </div>
                   </div>
-                  <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold">
-                    {upcomingTests.length} Scheduled
-                  </span>
-                </div>
-                {upcomingTests.length === 0 ? (
-                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No upcoming / current tests scheduled at the moment.</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {upcomingTests.map(test => renderTestCard(test))}
-                  </div>
-                )}
-              </div>
-
-              {/* 2. Box 2: Current Available Tests */}
-              <div className="bg-[#121212]/90 border border-[#0099ff]/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(0,153,255,0.08)] space-y-4">
-                <div className="flex items-center justify-between border-b border-[#0099ff]/20 pb-3">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-3.5 w-3.5 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500"></span>
+                    <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold shrink-0">
+                      {upcomingTests.length} Scheduled
                     </span>
-                    <h2 className="text-xl font-bold text-white tracking-wide">Other Available Tests</h2>
+                    <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold">
-                    {currentAvailableTests.length} Available
-                  </span>
-                </div>
-                {currentAvailableTests.length === 0 ? (
-                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No other available tests at the moment.</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {currentAvailableTests.map(test => renderTestCard(test))}
-                  </div>
-                )}
+                </Link>
               </div>
 
-              {/* 3. Box 3: Expired Tests */}
-              <div className="bg-[#121212]/90 border border-red-900/40 rounded-2xl p-5 sm:p-6 shadow-[0_0_20px_rgba(239,68,68,0.05)] space-y-4">
-                <div className="flex items-center justify-between border-b border-red-900/30 pb-3">
+              {/* 2. Folder 2: Available Tests */}
+              <div className="bg-[#121212]/90 border border-green-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(34,197,94,0.08)] transition-all">
+                <Link
+                  href="/dashboard/category/available"
+                  className="w-full flex items-center justify-between p-5 sm:p-6 bg-[#0f1f17]/80 hover:bg-[#162e22] transition-colors border-b border-green-500/20 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="p-2 rounded-xl bg-green-950/90 border border-green-700/60 shadow group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+                      <PiechemLogo size="sm" showText={false} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center gap-2 group-hover:text-green-300 transition-colors">
+                        Available Tests
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                        </span>
+                      </h2>
+                      <p className="text-xs text-green-200/70 mt-0.5">Click to view all tests ready to attempt →</p>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-3">
-                    <span className="p-2 rounded-lg bg-red-950/80 text-red-400 border border-red-800/50 text-base">⌛</span>
-                    <h2 className="text-xl font-bold text-white tracking-wide">Expired Tests</h2>
+                    <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold shrink-0">
+                      {currentAvailableTests.length} Live
+                    </span>
+                    <ChevronRight className="w-5 h-5 text-green-400 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-800 font-mono font-bold">
-                    {expiredTests.length} Expired
-                  </span>
-                </div>
-                {expiredTests.length === 0 ? (
-                  <p className="text-[#a6a6a6] bg-[#1a1a1a]/50 p-4 rounded-xl border border-[#333333] text-sm">No expired tests.</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {expiredTests.map(test => renderTestCard(test))}
+                </Link>
+              </div>
+
+              {/* 3. Folder 3: Expired Tests */}
+              <div className="bg-[#121212]/90 border border-red-900/50 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(239,68,68,0.05)] transition-all">
+                <Link
+                  href="/dashboard/category/expired"
+                  className="w-full flex items-center justify-between p-5 sm:p-6 bg-[#1f1012]/80 hover:bg-[#2c1719] transition-colors border-b border-red-900/30 text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="p-2 rounded-xl bg-red-950/90 border border-red-800/60 shadow group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+                      <PiechemLogo size="sm" showText={false} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide group-hover:text-red-300 transition-colors">
+                        Expired Tests
+                      </h2>
+                      <p className="text-xs text-red-200/70 mt-0.5">Click to view all past concluded tests →</p>
+                    </div>
                   </div>
-                )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-800 font-mono font-bold shrink-0">
+                      {expiredTests.length} Expired
+                    </span>
+                    <ChevronRight className="w-5 h-5 text-red-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
               </div>
             </div>
           );

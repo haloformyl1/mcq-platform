@@ -189,26 +189,18 @@ model StudyMaterial {
   updatedAt   DateTime @updatedAt
 }
 
-model Announcement {
-  id            String    @id @default(uuid())
-  title         String
-  content       String
-  type          String    @default("BANNER") // BANNER, TICKER, POPUP, CARD
-  priority      String    @default("INFO") // INFO, WARNING, URGENT, SUCCESS
-  bgGradient    String    @default("from-amber-950/90 via-yellow-900/70 to-amber-950/90")
-  textColor     String    @default("text-amber-200")
-  badgeColor    String    @default("bg-amber-500 text-black")
-  badgeText     String    @default("ANNOUNCEMENT")
-  actionLabel   String?
-  actionUrl     String?
-  isMarquee     Boolean   @default(true)
-  isDismissible Boolean   @default(false)
-  isActive      Boolean   @default(true)
-  startAt       DateTime?
-  endAt         DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model TestAlertSetting {
+  id           String   @id @default("default")
+  badgeText    String   @default("TEST ALERT")
+  bgGradient   String   @default("from-amber-950/90 via-yellow-900/70 to-amber-950/90")
+  badgeColor   String   @default("bg-amber-500 text-black")
+  textColor    String   @default("text-amber-200")
+  marqueeSpeed String   @default("normal") // slow, normal, fast
+  customNotice String?  @default("")
+  updatedAt    DateTime @updatedAt
 }
+
+
 
 
 

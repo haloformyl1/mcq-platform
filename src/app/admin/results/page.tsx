@@ -28,6 +28,26 @@ export default function AdminResults() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleDeleteAttempt = async (attemptId: string, studentName: string, testTitle: string) => {
+    if (!confirm(`Are you sure you want to permanently delete the test record for "${studentName}" (${testTitle})?\n\nThis will remove the score, attempt answers, and proctoring records from everywhere (Student Dashboard, Admin Results, & Analytics).`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/results/${attemptId}`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResults(prev => prev.filter(r => r.id !== attemptId));
+      } else {
+        alert(data.error || "Failed to delete test record.");
+      }
+    } catch (err) {
+      alert("Error deleting test record.");
+    }
+  };
+
   if (loading) return <PiFiringLoader fullScreen={false} />;
 
   return (
@@ -89,12 +109,20 @@ export default function AdminResults() {
                     </div>
                   </div>
 
-                  <Link 
-                    href={`/admin/results/${result.id}`}
-                    className="w-full mt-2 flex items-center justify-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 rounded-md shadow-md transition-all active:scale-[0.98]"
-                  >
-                    Inspect Details →
-                  </Link>
+                  <div className="flex items-center gap-2 pt-2 border-t border-[#262626]">
+                    <Link 
+                      href={`/admin/results/${result.id}`}
+                      className="flex-1 flex items-center justify-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-md shadow transition"
+                    >
+                      Inspect Details →
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteAttempt(result.id, studentName, result.test?.title || "Test")}
+                      className="px-3 py-2 bg-red-950/80 hover:bg-red-900 text-red-400 hover:text-white text-xs font-bold rounded-md border border-red-800/60 transition shrink-0"
+                    >
+                      Delete Record
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -102,15 +130,15 @@ export default function AdminResults() {
 
           {/* Desktop Table View (Visible on medium & larger screens) */}
           <div className="hidden md:block bg-[#161616]/60 shadow rounded-lg overflow-x-auto border border-[#333333] backdrop-blur-sm">
-            <table className="min-w-full divide-y divide-[#333333]">
+            <table className="w-full divide-y divide-[#333333]">
               <thead className="bg-[#1a1a1a]/80">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Student Name & Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Test Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Status & Reason</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Score & %</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Date & Start Time</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Action</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Student Name & Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Test Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Status & Reason</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Score & %</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Date & Start Time</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-transparent divide-y divide-[#333333]">
@@ -127,14 +155,14 @@ export default function AdminResults() {
                       onClick={() => router.push(`/admin/results/${result.id}`)}
                       className="hover:bg-[#262626]/70 cursor-pointer transition-colors group"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">{studentName}</div>
                         <div className="text-xs text-[#a6a6a6]">{studentEmail}</div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4">
                         <div className="text-sm font-medium text-white max-w-xs truncate">{result.test?.title}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           result.status === 'SUBMITTED' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-yellow-900/30 text-yellow-400 border border-yellow-800'
                         }`}>
@@ -144,7 +172,7 @@ export default function AdminResults() {
                           <div className="text-xs text-[#a6a6a6] mt-1">{result.submissionReason.replace(/_/g, ' ')}</div>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         {result.status === 'SUBMITTED' ? (
                           <div>
                             <div className="text-sm font-bold text-white">{result.score != null ? result.score : '-'}</div>
@@ -154,18 +182,31 @@ export default function AdminResults() {
                           <span className="text-sm text-[#a6a6a6]">-</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#a6a6a6]">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-[#a6a6a6]">
                         <div>{formattedDate}</div>
                         <div className="text-xs text-[#737373]">{formattedTime}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link 
-                          href={`/admin/results/${result.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 text-xs bg-blue-600/20 text-blue-400 group-hover:bg-blue-600 group-hover:text-white border border-blue-500/30 px-3 py-1.5 rounded transition-all font-semibold"
-                        >
-                          Inspect Details →
-                        </Link>
+                      <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end space-x-2 shrink-0">
+                          <Link 
+                            href={`/admin/results/${result.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-xs bg-blue-600/20 text-blue-400 group-hover:bg-blue-600 group-hover:text-white border border-blue-500/30 px-3 py-1.5 rounded transition-all font-semibold shrink-0"
+                          >
+                            Inspect Details →
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteAttempt(result.id, studentName, result.test?.title || "Test");
+                            }}
+                            className="inline-flex items-center gap-1 text-xs bg-red-950/80 hover:bg-red-700 text-red-300 hover:text-white border border-red-800/60 px-3 py-1.5 rounded transition-all font-semibold shrink-0"
+                            title="Delete Test Record from Everywhere"
+                          >
+                            Delete Record
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

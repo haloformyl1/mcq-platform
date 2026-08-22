@@ -80,3 +80,26 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     return NextResponse.json({ error: "Failed to fetch result" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
+  try {
+    const attempt = await prisma.testAttempt.findUnique({
+      where: { id: params.id }
+    });
+
+    if (!attempt) {
+      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+    }
+
+    // Delete test attempt. Cascade rules clean up connected Answers and Proctoring Warning logs automatically.
+    await prisma.testAttempt.delete({
+      where: { id: params.id }
+    });
+
+    return NextResponse.json({ success: true, message: "Test record deleted successfully everywhere." });
+  } catch (error) {
+    console.error("Delete test attempt error:", error);
+    return NextResponse.json({ error: "Failed to delete test record" }, { status: 500 });
+  }
+}

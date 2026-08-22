@@ -198,31 +198,27 @@ export async function GET(req: Request) {
       }));
     }
     
-    // Fetch active custom admin announcements
-    const now = new Date();
-    const customAnnouncements = await prisma.announcement.findMany({
-      where: {
-        isActive: true,
-        OR: [
-          { startAt: null },
-          { startAt: { lte: now } }
-        ],
-        AND: [
-          {
-            OR: [
-              { endAt: null },
-              { endAt: { gte: now } }
-            ]
-          }
-        ]
-      },
-      orderBy: { createdAt: 'desc' }
+    let testAlertSettings = await prisma.testAlertSetting.findUnique({
+      where: { id: "default" }
     });
+
+    if (!testAlertSettings) {
+      testAlertSettings = {
+        id: "default",
+        badgeText: "TEST ALERT",
+        bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
+        badgeColor: "bg-amber-500 text-black",
+        textColor: "text-amber-200",
+        marqueeSpeed: "normal",
+        customNotice: "",
+        updatedAt: new Date()
+      };
+    }
 
     return NextResponse.json({
       student,
       availableTests: availableTestsWithOverrides,
-      customAnnouncements,
+      testAlertSettings,
       allAttempts,
       lastExamTopStudents,
       lastExamTitle
