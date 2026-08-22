@@ -80,6 +80,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", lockDate, autoLiveDate });
         }
       }
+    } else if (unlockDate && now >= unlockDate && (!lockDate || now < lockDate)) {
+      currentAvailableTests.push({ ...test, category: "LIVE", lockState: "UNLOCKED_LIVE", lockDate });
     } else if (test.status === "UPCOMING" || (unlockDate && now < unlockDate)) {
       upcomingTests.push({ ...test, category: "UPCOMING", lockState: "WAITING_UNLOCK", unlockDate });
     } else if (test.status === "EXPIRED" || test.status === "LOCKED") {
