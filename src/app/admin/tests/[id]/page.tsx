@@ -30,6 +30,12 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
     if (testToSave.status === "LIVE" || testToSave.status === "PUBLISHED") {
       testToSave.unlockAt = null;
       testToSave.lockAt = null;
+    } else if (testToSave.status === "SCHEDULE_EXPIRED") {
+      if (!testToSave.lockAt) {
+        alert("Please select a Scheduled Expiry Date & Time.");
+        return;
+      }
+      testToSave.unlockAt = null;
     } else if (testToSave.status === "UPCOMING" || testToSave.status === "LOCKED") {
       if (!testToSave.unlockAt) {
         alert("Please select an Unlock Date & Time.");
@@ -284,6 +290,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             <option value="DRAFT">DRAFT</option>
             <option value="LIVE">LIVE</option>
             <option value="UPCOMING">UPCOMING</option>
+            <option value="SCHEDULE_EXPIRED">SCHEDULED EXPIRY (LIVE until Future Expiry Date)</option>
             <option value="EXPIRED">EXPIRED</option>
           </select>
         </div>
@@ -328,6 +335,30 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           <p className="mt-1 text-xs text-[#888888]">When enabled, the positions of answer options (A, B, C, D) will be shuffled for each question. The correct answer will automatically move with its option.</p>
         </div>
       </div>
+
+      {test.status === "SCHEDULE_EXPIRED" && (
+        <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-red-900/50 backdrop-blur-sm space-y-4">
+          <h2 className="text-lg font-bold text-red-400">Scheduled Expiry Configuration</h2>
+          <p className="text-xs text-[#a6a6a6]">
+            Enter a future date & time. The test will remain <strong className="text-green-400">LIVE</strong> and can be attempted by students until that time arrives. Once reached, the test will automatically move to the <strong className="text-red-400">EXPIRED</strong> category.
+          </p>
+
+          <div className="pt-2 border-t border-[#333333]">
+            <label className="block text-sm font-medium text-[#a6a6a6]">Scheduled Expiry Date & Time</label>
+            <input type="datetime-local" className="mt-1 block w-full md:w-1/2 bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.lockAt)} onChange={e => {
+              const val = e.target.value;
+              if (!val) { setTest({...test, lockAt: null}); return; }
+              const d = new Date(val);
+              if (!isNaN(d.getTime())) setTest({...test, lockAt: d.toISOString()});
+            }} />
+            {test.lockAt && (
+              <p className="mt-2 text-xs text-orange-400 font-mono">
+                Will auto-expire on: {formatDateTimeDisplay(test.lockAt)}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {(test.status === "UPCOMING" || test.status === "LOCKED") && (
         <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm space-y-4">

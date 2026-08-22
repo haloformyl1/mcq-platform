@@ -436,14 +436,20 @@ export default function StudentDashboard() {
             const lockDate = test.lockAt ? new Date(test.lockAt) : null;
             const unlockDate = test.unlockAt ? new Date(test.unlockAt) : null;
 
-            if (test.status === "SCHEDULE_EXPIRED" || test.status === "EXPIRED" || test.status === "CLOSED") {
-              if (lockDate && now < lockDate) {
+            if (test.status === "SCHEDULE_EXPIRED") {
+              if (!lockDate || now < lockDate) {
                 // Before scheduled expiration: currently LIVE & available for all students!
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
               } else if (test.hasIndividualAccess) {
                 currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
               } else {
                 // Scheduled expiration date has passed -> Expired & requires admin approval
+                expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
+              }
+            } else if (test.status === "EXPIRED" || test.status === "CLOSED") {
+              if (test.hasIndividualAccess) {
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+              } else {
                 expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
               }
             } else if (test.status === "LIVE" || test.status === "PUBLISHED") {

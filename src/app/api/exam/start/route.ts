@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
     }
 
-    const isScheduleExpiredActive = test.status === "SCHEDULE_EXPIRED" && test.lockAt && new Date() < new Date(test.lockAt);
+    const isScheduleExpiredActive = test.status === "SCHEDULE_EXPIRED" && (!test.lockAt || new Date() < new Date(test.lockAt));
 
     if (test.status !== "LIVE" && test.status !== "PUBLISHED" && test.status !== "UPCOMING" && test.status !== "LOCKED" && !isScheduleExpiredActive && !override) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
@@ -74,14 +74,20 @@ export async function POST(req: Request) {
     const effectiveLockAt = override?.overrideLockAt ?? test.lockAt;
 
     if (!activeAttempt && !override) {
-      if (effectiveUnlockAt && serverTime < new Date(effectiveUnlockAt)) {
-        return NextResponse.json({ error: "Test has not opened yet" }, { status: 403 });
-      }
-      if (effectiveLockAt && serverTime >= new Date(effectiveLockAt)) {
-        const holdMinutes = test.postLockHoldMinutes ?? 4320;
-        const autoLiveDate = new Date(new Date(effectiveLockAt).getTime() + holdMinutes * 60 * 1000);
-        if (serverTime < autoLiveDate) {
-          return NextResponse.json({ error: "New attempts for this test are currently locked." }, { status: 403 });
+      if (test.status === "UPCOMING" || test.status === "LOCKED") {
+        if (effectiveUnlockAt && serverTime < new Date(effectiveUnlockAt)) {
+          return NextResponse.json({ error: "Test has not opened yet" }, { status: 403 });
+        }
+        if (effectiveLockAt && serverTime >= new Date(effectiveLockAt)) {
+          const holdMinutes = test.postLockHoldMinutes ?? 4320;
+          const autoLiveDate = new Date(new Date(effectiveLockAt).getTime() + holdMinutes * 60 * 1000);
+          if (serverTime < autoLiveDate) {
+            return NextResponse.json({ error: "New attempts for this test are currently locked." }, { status: 403 });
+          }
+        }
+      } else if (test.status === "SCHEDULE_EXPIRED") {
+        if (effectiveLockAt && serverTime >= new Date(effectiveLockAt)) {
+          return NextResponse.json({ error: "This scheduled test has expired." }, { status: 403 });
         }
       }
     }

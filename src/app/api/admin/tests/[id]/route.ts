@@ -31,6 +31,11 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
     if (status === "LIVE" || status === "PUBLISHED") {
       unlockAt = null;
       lockAt = null;
+    } else if (status === "SCHEDULE_EXPIRED") {
+      if (!lockAt) {
+        return NextResponse.json({ error: "Scheduled Expiry Date & Time is required." }, { status: 400 });
+      }
+      unlockAt = null;
     } else if (status === "UPCOMING" || status === "LOCKED") {
       if (!unlockAt) {
         return NextResponse.json({ error: "Unlock Date & Time is required for UPCOMING status." }, { status: 400 });

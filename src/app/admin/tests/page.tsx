@@ -80,6 +80,13 @@ export default function AdminTests() {
       return;
     }
 
+    if (bulkStatus === "SCHEDULE_EXPIRED") {
+      if (!bulkLockAt) {
+        alert("Please select a Scheduled Expiry Date & Time.");
+        return;
+      }
+    }
+
     if (bulkStatus === "UPCOMING") {
       if (!bulkUnlockAt) {
         alert("Please select an Unlock Date & Time for UPCOMING status.");
@@ -184,6 +191,7 @@ export default function AdminTests() {
             >
               <option value="">-- Change Selected Status To --</option>
               <option value="LIVE">LIVE</option>
+              <option value="SCHEDULE_EXPIRED">SCHEDULED EXPIRY (LIVE until Future Expiry Date)</option>
               <option value="DRAFT">DRAFT</option>
               <option value="UPCOMING">UPCOMING</option>
               <option value="EXPIRED">EXPIRED</option>
@@ -198,6 +206,24 @@ export default function AdminTests() {
             </button>
           </div>
         </div>
+
+        {/* Schedule Inputs for Bulk SCHEDULED EXPIRY selection */}
+        {bulkStatus === "SCHEDULE_EXPIRED" && (
+          <div className="pt-3 border-t border-[#333333] bg-[#111111]/80 p-3 rounded-lg">
+            <label className="block text-xs font-semibold text-orange-400">Scheduled Expiry Date & Time for Selected Tests</label>
+            <input
+              type="datetime-local"
+              value={bulkLockAt}
+              onChange={e => setBulkLockAt(e.target.value)}
+              className="mt-1 block w-full sm:w-1/2 bg-[#262626] border border-[#404040] text-white rounded-md p-1.5 text-xs focus:ring-orange-500 focus:border-orange-500 [color-scheme:dark]"
+            />
+            {bulkLockAt && (
+              <p className="mt-1 text-[11px] text-orange-400 font-mono">
+                Will auto-expire on: {formatDateTimeDisplay(bulkLockAt)}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Schedule Inputs for Bulk UPCOMING selection */}
         {bulkStatus === "UPCOMING" && (
