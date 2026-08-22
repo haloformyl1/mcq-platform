@@ -116,42 +116,27 @@ export default function StudentDashboard() {
     const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
     const lock = t.lockAt ? new Date(t.lockAt) : null;
 
-    if (unlock) {
-      const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
-      if (now >= bannerStart && now < unlock) {
+    if (t.status === "UPCOMING") {
+      if (unlock && now < unlock) {
+        // State 3: Before getting live (not live yet)
         bannerItems.push({
           type: "UPCOMING",
           test: t,
-          message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
+          message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
         });
-      } else if (now >= unlock && (!lock || now < lock)) {
+      } else if (!lock || now < lock) {
+        // State 1: At unlock state (currently live)
         bannerItems.push({
-          type: "LIVE_EXPIRING",
+          type: "UPCOMING",
           test: t,
-          message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! ${lock ? `It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>.` : 'Available for all students.'}`
+          message: `🔥 Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `It will conclude on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
         });
-      }
-    } else if (lock && now < lock) {
-      bannerItems.push({
-        type: "LIVE_EXPIRING",
-        test: t,
-        message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
-      });
-    } else if (t.status === "LIVE" || t.status === "PUBLISHED" || t.status === "SCHEDULE_EXPIRED") {
-      bannerItems.push({
-        type: "LIVE_NOW",
-        test: t,
-        message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
-      });
-    }
-
-    if (lock) {
-      const postLock24h = new Date(lock.getTime() + 24 * 60 * 60 * 1000);
-      if (now >= lock && now < postLock24h) {
+      } else {
+        // State 2: Concluded (live window passed)
         bannerItems.push({
-          type: "RECENTLY_LOCKED",
+          type: "UPCOMING",
           test: t,
-          message: `⌛ Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> was live until <strong class="text-red-300 font-mono">${formatDateTime(t.lockAt)}</strong> and has now concluded. If you missed submitting your test in time, please contact the Admin to request access.`
+          message: `⌛ Upcoming Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> concluded at <strong class="text-red-300 font-mono">${formatDateTime(lock)}</strong>. Students who missed this test may request the Admin to unlock access.`
         });
       }
     }

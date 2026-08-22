@@ -337,22 +337,17 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         {categoryKey === "available" && (() => {
           const rawItems: any[] = [];
           (availableTests || []).forEach((t: any) => {
-            const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
             const lock = t.lockAt ? new Date(t.lockAt) : null;
 
-            if (unlock && now >= unlock && (!lock || now < lock)) {
-              rawItems.push({
-                type: "LIVE_EXPIRING",
-                test: t,
-                message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! ${lock ? `It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>.` : 'Available for all students.'}`
-              });
-            } else if (lock && now < lock) {
-              rawItems.push({
-                type: "LIVE_EXPIRING",
-                test: t,
-                message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
-              });
-            } else if (t.status === "LIVE" || t.status === "PUBLISHED" || t.status === "SCHEDULE_EXPIRED") {
+            if (t.status === "SCHEDULE_EXPIRED" || lock) {
+              if (!lock || now < lock) {
+                rawItems.push({
+                  type: "SCHEDULE_EXPIRED_LIVE",
+                  test: t,
+                  message: `🔥 Scheduled Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${lock ? formatDateTime(lock) : "N/A"}</strong>.`
+                });
+              }
+            } else if (t.status === "LIVE" || t.status === "PUBLISHED") {
               rawItems.push({
                 type: "LIVE_NOW",
                 test: t,
