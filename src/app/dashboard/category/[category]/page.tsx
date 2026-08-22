@@ -69,20 +69,25 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
 
     if (test.status === "SCHEDULE_EXPIRED") {
       if (!lockDate || now < lockDate) {
-        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
-      } else if (test.hasIndividualAccess) {
-        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_OVERRIDE", lockDate });
+        // Unlocked and live during scheduled window: belongs under UPCOMING category as LIVE NOW
+        upcomingTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", lockDate });
       } else {
         const autoLiveDate = new Date(lockDate.getTime() + (test.postLockHoldMinutes || 0) * 60 * 1000);
         if (now < autoLiveDate) {
+          // Locked after live time ended, but still within Post-Lock Holding duration: stays under UPCOMING category
           upcomingTests.push({ ...test, category: "HOLDING", lockState: "HOLDING_BEFORE_AUTO_LIVE", lockDate, autoLiveDate });
         } else {
+          // Post-Lock Holding duration has EXPIRED: auto-released into AVAILABLE category
           currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", lockDate, autoLiveDate });
         }
       }
+    } else if (unlockDate && now < unlockDate) {
+      // Locked before unlock time: stays in UPCOMING
+      upcomingTests.push({ ...test, category: "UPCOMING", lockState: "WAITING_UNLOCK", unlockDate });
     } else if (unlockDate && now >= unlockDate && (!lockDate || now < lockDate)) {
-      currentAvailableTests.push({ ...test, category: "LIVE", lockState: "UNLOCKED_LIVE", lockDate });
-    } else if (test.status === "UPCOMING" || (unlockDate && now < unlockDate)) {
+      // Unlocked and live: stays under UPCOMING
+      upcomingTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "UNLOCKED_LIVE", lockDate });
+    } else if (test.status === "UPCOMING") {
       upcomingTests.push({ ...test, category: "UPCOMING", lockState: "WAITING_UNLOCK", unlockDate });
     } else if (test.status === "EXPIRED" || test.status === "LOCKED") {
       if (test.hasIndividualAccess) {
@@ -133,7 +138,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
     const submittedAttempt = attemptsForThisTest.find((att: any) => att.status === "SUBMITTED");
     const activeAttempt = attemptsForThisTest.find((att: any) => att.status === "IN_PROGRESS");
 
-    const isLiveStage = test.category === "LIVE";
+    const isLiveStage = test.category === "LIVE" || test.category === "UPCOMING_LIVE";
     const isUpcomingStage = test.category === "UPCOMING";
     const isHoldingStage = test.category === "HOLDING";
     const isLockedStage = test.category === "EXPIRED";

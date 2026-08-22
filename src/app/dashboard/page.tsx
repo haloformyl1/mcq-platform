@@ -433,13 +433,35 @@ export default function StudentDashboard() {
 
             if (test.status === "SCHEDULE_EXPIRED") {
               if (!lockDate || now < lockDate) {
-                // Before scheduled expiration: currently LIVE & available for all students!
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
-              } else if (test.hasIndividualAccess) {
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+                upcomingTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", lockDate });
               } else {
-                // Scheduled expiration date has passed -> Expired & requires admin approval
-                expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
+                const autoLiveDate = new Date(lockDate.getTime() + (test.postLockHoldMinutes || 0) * 60 * 1000);
+                if (now < autoLiveDate) {
+                  upcomingTests.push({ ...test, category: "HOLDING", lockState: "HOLDING_BEFORE_AUTO_LIVE", lockDate, autoLiveDate });
+                } else {
+                  currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", lockDate, autoLiveDate });
+                }
+              }
+            } else if (unlockDate && now < unlockDate) {
+              upcomingTests.push({ ...test, category: "UPCOMING", lockState: "WAITING_UNLOCK", unlockDate });
+            } else if (unlockDate && now >= unlockDate && (!lockDate || now < lockDate)) {
+              upcomingTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "UNLOCKED_LIVE", lockDate });
+            } else if (test.status === "UPCOMING" || test.status === "LOCKED") {
+              const holdMinutes = test.postLockHoldMinutes ?? 4320;
+              const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
+
+              if (unlockDate && now < unlockDate) {
+                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate, autoLiveDate });
+              } else if (!lockDate || now < lockDate) {
+                upcomingTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate, autoLiveDate });
+              } else if (autoLiveDate && now < autoLiveDate) {
+                if (test.hasIndividualAccess) {
+                  currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED", unlockDate, lockDate, autoLiveDate });
+                } else {
+                  upcomingTests.push({ ...test, category: "HOLDING", lockState: "POST_LOCK_HOLDING", unlockDate, lockDate, autoLiveDate });
+                }
+              } else {
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", unlockDate, lockDate, autoLiveDate });
               }
             } else if (test.status === "EXPIRED" || test.status === "CLOSED") {
               if (test.hasIndividualAccess) {
@@ -447,29 +469,13 @@ export default function StudentDashboard() {
               } else {
                 expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
               }
-            } else if (test.status === "LIVE" || test.status === "PUBLISHED") {
-              // LIVE/PUBLISHED tests are always LIVE and available to all students
-              currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
-            } else if (test.status === "UPCOMING" || test.status === "LOCKED") {
-              const holdMinutes = test.postLockHoldMinutes ?? 4320;
-              const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
-
-              if (unlockDate && now < unlockDate) {
-                // Stage 1: Before unlock time -> inside Upcoming / Current Tests section (UPCOMING badge)
-                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate, autoLiveDate });
-              } else if (!lockDate || now < lockDate) {
-                // Stage 2: Active scheduled live window -> inside Upcoming / Current Tests section (LIVE NOW badge & enabled button!)
-                upcomingTests.push({ ...test, category: "UPCOMING", lockState: "SCHEDULED_OPEN", unlockDate, lockDate, autoLiveDate });
-              } else if (autoLiveDate && now < autoLiveDate) {
-                // Stage 3: Post-lock holding period (5m to 72h) -> STAYS inside Upcoming / Current Tests section (LOCKED badge)
-                if (test.hasIndividualAccess) {
-                  currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED", unlockDate, lockDate, autoLiveDate });
-                } else {
-                  upcomingTests.push({ ...test, category: "UPCOMING", lockState: "POST_LOCK_HOLDING", unlockDate, lockDate, autoLiveDate });
-                }
+            } else {
+              if (!lockDate || now < lockDate) {
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
+              } else if (test.hasIndividualAccess) {
+                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
               } else {
-                // Stage 4: After post-lock holding duration passes -> Automatically transitions to LIVE under Other Available Tests section!
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", unlockDate, lockDate, autoLiveDate });
+                expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
               }
             }
           });
