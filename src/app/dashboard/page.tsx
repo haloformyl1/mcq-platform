@@ -196,53 +196,6 @@ export default function StudentDashboard() {
 
       <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
         
-        {/* Moving Test Alert Banner */}
-        {(() => {
-          const cfg = data.testAlertSettings || {
-            badgeText: "IMPORTANT",
-            bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
-            badgeColor: "bg-amber-500 text-black",
-            textColor: "text-amber-200",
-            marqueeSpeed: "normal",
-            customNotice: ""
-          };
-          const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-          // Show banner if there are test alert items OR if custom notice OR even when empty with active tests
-          const hasContent = bannerItems.length > 0 || (cfg.customNotice && cfg.customNotice.trim().length > 0);
-          if (!hasContent) return null;
-
-          return (
-            <div className={`bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
-              <div className="flex items-center gap-3 overflow-hidden">
-                <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                  <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                  {cfg.badgeText || "TEST ALERT"}
-                </span>
-                <div className="flex-1 overflow-hidden relative">
-                  <div 
-                    className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
-                    style={{ animationDuration: speedDuration }}
-                  >
-                    {bannerItems.map((item: any) => (
-                      <span
-                        key={item.test.id}
-                        className="mr-16"
-                        dangerouslySetInnerHTML={{ __html: item.message }}
-                      />
-                    ))}
-                    {cfg.customNotice && (
-                      <span className="mr-16">
-                        📢 <strong>Notice:</strong> {cfg.customNotice}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
         {/* Study Materials & Reference Resources Section (Between ANNOUNCEMENT and Performance Section) */}
         <section className="bg-[#161616]/80 border border-cyan-500/30 p-6 rounded-xl backdrop-blur-md shadow-xl space-y-4">
           <div className="flex justify-between items-center border-b border-[#2a2a2a] pb-3">
