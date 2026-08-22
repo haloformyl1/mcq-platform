@@ -1,17 +1,20 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 
 interface PiechemLogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   showText?: boolean;
   className?: string;
+  href?: string;
 }
 
 export default function PiechemLogo({
   size = "md",
   showText = true,
   className = "",
+  href
 }: PiechemLogoProps) {
   // Dimensions for different sizes
   const dimensions = {
@@ -23,7 +26,7 @@ export default function PiechemLogo({
 
   const current = dimensions[size] || dimensions.md;
 
-  return (
+  const logoContent = (
     <div className={`flex items-center ${current.gap} select-none ${className}`}>
       {/* Icon Mark */}
       <div className="relative group shrink-0 flex items-center justify-center">
@@ -138,4 +141,14 @@ export default function PiechemLogo({
       )}
     </div>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="inline-block hover:opacity-90 transition-opacity">
+        {logoContent}
+      </Link>
+    );
+  }
+
+  return logoContent;
 }

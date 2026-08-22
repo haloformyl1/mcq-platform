@@ -165,7 +165,7 @@ export default function StudentDashboard() {
       <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
           <div className="flex items-center space-x-4 shrink-0">
-            <PiechemLogo size="md" />
+            <PiechemLogo size="md" href="/dashboard" />
           </div>
 
           {/* Center Badge */}

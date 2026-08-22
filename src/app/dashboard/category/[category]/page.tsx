@@ -276,7 +276,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
       <header className="border-b border-[#333333] bg-[#161616]/60 backdrop-blur-md sticky top-0 z-40">
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
           <div className="flex items-center space-x-4 shrink-0">
-            <PiechemLogo size="md" />
+            <PiechemLogo size="md" href="/dashboard" />
           </div>
 
           <div className="px-4 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
