@@ -96,12 +96,25 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         expiredTests.push({ ...test, category: "EXPIRED", lockState: "LOCKED_ADMIN_ONLY" });
       }
     } else {
-      if (!lockDate || now < lockDate) {
-        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate });
+      const holdMinutes = test.postLockHoldMinutes ?? 4320;
+      const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
+
+      if (unlockDate && now < unlockDate) {
+        upcomingTests.push({ ...test, category: "UPCOMING", lockState: "BEFORE_UNLOCK", unlockDate, lockDate, autoLiveDate });
+      } else if (lockDate && now < lockDate) {
+        upcomingTests.push({ ...test, category: "UPCOMING_LIVE", lockState: "SCHEDULED_OPEN", unlockDate, lockDate, autoLiveDate });
+      } else if (autoLiveDate && now < autoLiveDate) {
+        if (test.hasIndividualAccess) {
+          currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_OVERRIDE", lockDate, autoLiveDate });
+        } else {
+          upcomingTests.push({ ...test, category: "HOLDING", lockState: "POST_LOCK_HOLDING", unlockDate, lockDate, autoLiveDate });
+        }
+      } else if (!lockDate && !unlockDate) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate: null });
       } else if (test.hasIndividualAccess) {
         currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_OVERRIDE", lockDate });
       } else {
-        expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_AFTER_LOCK", lockDate });
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", lockDate, autoLiveDate });
       }
     }
   });
