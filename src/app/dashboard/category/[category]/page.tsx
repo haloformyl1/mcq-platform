@@ -323,17 +323,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         </div>
       </header>
 
-      <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex items-center justify-between">
-          <Link 
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-cyan-950/40 border border-cyan-800/50 px-4 py-2 rounded-lg transition"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-          </Link>
-        </div>
-
-        {/* Moving Important Notice Ticker Banner (Renders ONLY on Available Tests page) */}
+      <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Moving Important Notice Ticker Banner (Renders ONLY on Available Tests page - Top under Header) */}
         {categoryKey === "available" && (() => {
           const rawItems: any[] = [];
           (availableTests || []).forEach((t: any) => {
@@ -399,6 +390,16 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             </div>
           );
         })()}
+
+        {/* Back to Dashboard Button */}
+        <div className="flex items-center justify-between">
+          <Link 
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-cyan-950/40 border border-cyan-800/50 px-4 py-2 rounded-lg transition shadow"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          </Link>
+        </div>
 
         {/* Category Header Box */}
         <div className={`rounded-2xl border ${selectedHeaderBg} p-6 shadow-xl flex justify-between items-center`}>
