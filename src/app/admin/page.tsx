@@ -24,9 +24,20 @@ export default function AdminDashboard() {
       })
       .then(data => {
         if (data) {
+          const now = new Date();
+          const liveCount = data.filter((t: any) => {
+            if (t.status === "PUBLISHED" || t.status === "LIVE") return true;
+            if (t.status === "SCHEDULE_EXPIRED") {
+              const lockDate = t.lockAt ? new Date(t.lockAt) : null;
+              // If lockAt is set and current time is before lockAt, it is actively LIVE for students!
+              return !lockDate || now < lockDate;
+            }
+            return false;
+          }).length;
+
           setStats({
             totalTests: data.length,
-            publishedTests: data.filter((t: any) => t.status === "PUBLISHED" || t.status === "LIVE").length,
+            publishedTests: liveCount,
             totalQuestions: data.reduce((acc: number, t: any) => acc + (t._count?.questions || 0), 0),
             totalAttempts: data.reduce((acc: number, t: any) => acc + (t._count?.attempts || 0), 0),
           });
