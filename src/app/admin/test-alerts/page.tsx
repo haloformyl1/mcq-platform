@@ -37,7 +37,7 @@ export default function AdminTestAlertsPage() {
   const [success, setSuccess] = useState("");
 
   const [form, setForm] = useState({
-    badgeText: "TEST ALERT",
+    badgeText: "IMPORTANT",
     bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
     badgeColor: "bg-amber-500 text-black",
     textColor: "text-amber-200",

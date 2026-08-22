@@ -320,6 +320,87 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </Link>
         </div>
 
+        {/* Moving Important Notice Ticker Banner */}
+        {(() => {
+          const bannerItems: any[] = [];
+          (availableTests || []).forEach((t: any) => {
+            const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
+            const lock = t.lockAt ? new Date(t.lockAt) : null;
+
+            if (unlock) {
+              const bannerStart = new Date(unlock.getFullYear(), unlock.getMonth(), unlock.getDate() - 1, 0, 0, 0, 0);
+              if (now >= bannerStart && now < unlock) {
+                bannerItems.push({
+                  type: "UPCOMING",
+                  test: t,
+                  message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> will go live on <strong class="text-amber-300 font-mono">${formatDateTime(t.unlockAt)}</strong>. Please prepare to attempt the test!`
+                });
+              } else if (now >= unlock && (!lock || now < lock)) {
+                bannerItems.push({
+                  type: "LIVE_EXPIRING",
+                  test: t,
+                  message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! ${lock ? `It will expire on <strong class="text-green-300 font-mono">${formatDateTime(t.lockAt)}</strong>.` : 'Available for all students.'}`
+                });
+              }
+            } else if (lock && now < lock) {
+              bannerItems.push({
+                type: "LIVE_EXPIRING",
+                test: t,
+                message: `🔥 Scheduled Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${formatDateTime(t.lockAt)}</strong>.`
+              });
+            } else if (t.status === "LIVE" || t.status === "PUBLISHED" || t.status === "SCHEDULE_EXPIRED") {
+              bannerItems.push({
+                type: "LIVE_NOW",
+                test: t,
+                message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
+              });
+            }
+          });
+
+          const cfg = data.testAlertSettings || {
+            badgeText: "IMPORTANT",
+            bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
+            badgeColor: "bg-amber-500 text-black",
+            textColor: "text-amber-200",
+            marqueeSpeed: "normal",
+            customNotice: ""
+          };
+          const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
+
+          const hasContent = bannerItems.length > 0 || (cfg.customNotice && cfg.customNotice.trim().length > 0);
+          if (!hasContent) return null;
+
+          return (
+            <div className={`bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
+                  <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
+                  {cfg.badgeText || "IMPORTANT"}
+                </span>
+                <div className="flex-1 overflow-hidden relative">
+                  <div 
+                    className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
+                    style={{ animationDuration: speedDuration }}
+                  >
+                    {bannerItems.map((item: any) => (
+                      <span
+                        key={item.test.id}
+                        className="mr-16"
+                        dangerouslySetInnerHTML={{ __html: item.message }}
+                      />
+                    ))}
+                    {cfg.customNotice && (
+                      <span className="mr-16">
+                        📢 <strong>Notice:</strong> {cfg.customNotice}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Category Header Box */}
         <div className={`rounded-2xl border ${selectedHeaderBg} p-6 shadow-xl flex justify-between items-center`}>
           <div className="flex items-center gap-4">
