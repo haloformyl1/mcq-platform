@@ -204,13 +204,13 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white select-none font-sans">
       <AdminPreviewBanner />
       <header className="bg-[#161616]/40 p-4 flex flex-col md:flex-row md:justify-between md:items-center border-b border-[#404040] gap-4">
-        <div className="flex justify-between items-center w-full md:w-auto gap-3">
+        <div className="flex justify-between items-center w-full md:w-auto gap-2 min-w-0">
           <PiechemLogo size="sm" showText={false} />
-          <div className="pr-2">
-            <h1 className="text-lg md:text-xl font-bold tracking-wide break-words">{examData.test.title}</h1>
-            <p className="text-sm text-[#a6a6a6] mt-0.5">Question {currentQ + 1} of {questions.length}</p>
+          <div className="min-w-0 flex-1 px-1">
+            <h1 className="text-base sm:text-lg md:text-xl font-bold tracking-wide truncate" title={examData.test.title}>{examData.test.title}</h1>
+            <p className="text-xs sm:text-sm text-[#a6a6a6] mt-0.5">Question {currentQ + 1} of {questions.length}</p>
           </div>
-          <div className="text-lg md:text-2xl font-mono font-semibold bg-[#262626] px-3 py-1.5 md:py-2 md:px-4 rounded-lg text-white shrink-0">
+          <div className="text-base sm:text-lg md:text-2xl font-mono font-bold bg-[#262626] px-2.5 py-1 sm:px-3 sm:py-1.5 md:py-2 md:px-4 rounded-lg text-cyan-300 border border-cyan-500/30 shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
             {timeLeft}
           </div>
         </div>

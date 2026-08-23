@@ -283,64 +283,61 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white font-sans pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white">
       <AdminPreviewBanner />
 
-      {/* Header */}
-      <header className="border-b border-cyan-500/20 bg-[#08131e]/80 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
-          <div className="flex flex-col items-start gap-1.5 shrink-0">
-            <PiechemLogo size="md" href="/dashboard" />
-            
-            {/* Student Contact Badge directly under Logo */}
-            <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 mt-0.5">
-              <span className="text-slate-400 hidden xs:inline">Designed by</span>
-              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
-                Arghyadeep Roy
-              </span>
-              <span className="text-cyan-500/60">•</span>
-              <a 
-                href="tel:9830507435" 
-                className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/50 transition-all font-mono shadow-[0_0_10px_rgba(6,182,212,0.2)]"
-                title="Call Arghyadeep Roy"
+      <header className="border-b border-cyan-500/20 bg-[#08131e]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
+          <div className="flex justify-between items-center gap-2">
+            <div className="flex flex-col items-start gap-1 shrink-0">
+              <PiechemLogo size="md" href="/dashboard" />
+              
+              <div className="hidden sm:flex px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide items-center space-x-1.5 mt-0.5">
+                <span className="text-slate-400">Designed by</span>
+                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
+                  Arghyadeep Roy
+                </span>
+                <span className="text-cyan-500/60">•</span>
+                <a 
+                  href="tel:9830507435" 
+                  className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/50 transition-all font-mono shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                  title="Call Arghyadeep Roy"
+                >
+                  <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
+                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                  </svg>
+                  <span>9830507435</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <Link 
+                href="/dashboard/account"
+                className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer whitespace-nowrap"
               >
-                <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
-                  <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                </svg>
-                <span>9830507435</span>
-              </a>
+                <User className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
+                <span>My Account</span>
+              </Link>
             </div>
           </div>
 
-          {/* Center Welcome Greeting Badge */}
-          <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] text-xs text-slate-200">
-            <span className="text-slate-400">Welcome Back,</span>
-            <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-blue-300">
-              {studentName}
-            </span>
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse ml-0.5"></span>
-          </div>
-
-          {/* Right Action: My Account */}
-          <div className="flex items-center gap-2 shrink-0">
-            <Link 
-              href="/dashboard/account"
-              className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer"
-            >
-              <User className="w-3.5 h-3.5 mr-2 text-cyan-400" />
-              My Account
-            </Link>
-
-            <button 
-              onClick={() => {
-                document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                router.push("/");
-              }} 
-              className="hidden md:flex items-center text-xs font-bold text-slate-400 hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-950/40 border border-transparent hover:border-red-900/40"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+          {/* Student Contact Badge on Mobile */}
+          <div className="flex sm:hidden justify-between items-center w-full pt-1.5 border-t border-cyan-500/15">
+            <div className="px-2.5 py-1 rounded-full bg-slate-950/90 border border-cyan-500/30 text-[10px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 w-full justify-between">
+              <div className="flex items-center space-x-1">
+                <span className="text-slate-400">Designed by</span>
+                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                  Arghyadeep Roy
+                </span>
+              </div>
+              <a 
+                href="tel:9830507435" 
+                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono text-[10px]"
+              >
+                <span>📞 9830507435</span>
+              </a>
+            </div>
           </div>
         </div>
       </header>

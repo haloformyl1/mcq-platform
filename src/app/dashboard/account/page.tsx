@@ -211,50 +211,72 @@ export default function StudentAccountPage() {
       <AdminPreviewBanner />
 
       {/* Modern Netflix-Style Header Bar */}
-      <header className="border-b border-cyan-500/20 bg-[#061019]/85 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
-        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
-          <div className="flex flex-col items-start gap-1.5 shrink-0">
-            <PiechemLogo size="md" href="/dashboard" />
-            <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 text-[11px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 mt-0.5">
-              <span className="text-slate-400 hidden xs:inline">Designed by</span>
-              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
-                Arghyadeep Roy
-              </span>
-              <span className="text-cyan-500/60">•</span>
-              <a href="tel:9830507435" className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/50 transition-all font-mono">
-                <span>9830507435</span>
-              </a>
+      <header className="border-b border-cyan-500/20 bg-[#061019]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
+        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
+          <div className="flex justify-between items-center gap-2">
+            <div className="flex flex-col items-start gap-1 shrink-0">
+              <PiechemLogo size="md" href="/dashboard" />
+              
+              <div className="hidden sm:flex px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 text-[11px] text-slate-300 font-semibold tracking-wide items-center space-x-1.5 mt-0.5">
+                <span className="text-slate-400">Designed by</span>
+                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
+                  Arghyadeep Roy
+                </span>
+                <span className="text-cyan-500/60">•</span>
+                <a href="tel:9830507435" className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/50 transition-all font-mono">
+                  <span>9830507435</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-300 hover:text-white transition-all px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-600/80 shadow-[0_0_15px_rgba(6,182,212,0.2)] whitespace-nowrap"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Back to</span> Dashboard
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center text-xs font-bold text-red-400 hover:text-white transition-all px-2.5 sm:px-3 py-2 rounded-xl bg-red-950/40 hover:bg-red-600/80 border border-red-800/50 shadow"
+                title="Logout"
+              >
+                <LogOut className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-bold text-cyan-300 hover:text-white transition-all px-4 py-2 rounded-xl bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-600/80 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center text-xs font-bold text-red-400 hover:text-white transition-all px-3 py-2 rounded-xl bg-red-950/40 hover:bg-red-600/80 border border-red-800/50 shadow"
-            >
-              <LogOut className="w-3.5 h-3.5 mr-1.5" /> Logout
-            </button>
+          {/* Student Contact Badge on Mobile (Full width row under logo) */}
+          <div className="flex sm:hidden justify-between items-center w-full pt-1.5 border-t border-cyan-500/15">
+            <div className="px-2.5 py-1 rounded-full bg-slate-950/90 border border-cyan-500/30 text-[10px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 w-full justify-between">
+              <div className="flex items-center space-x-1">
+                <span className="text-slate-400">Designed by</span>
+                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                  Arghyadeep Roy
+                </span>
+              </div>
+              <a 
+                href="tel:9830507435" 
+                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono text-[10px]"
+              >
+                <span>📞 9830507435</span>
+              </a>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-10">
+      <main className="max-w-6xl mx-auto py-6 sm:py-10 px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-10">
         
         {/* Netflix-Style Account Profile Banner */}
-        <div className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-r from-[#0d1d2b] via-[#091520] to-[#050b11] p-8 sm:p-10 shadow-[0_10px_40px_rgba(0,153,255,0.15)]">
+        <div className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-r from-[#0d1d2b] via-[#091520] to-[#050b11] p-5 sm:p-10 shadow-[0_10px_40px_rgba(0,153,255,0.15)]">
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-500/10 via-blue-600/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left">
+          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-5 sm:gap-6 text-center md:text-left">
             {/* Avatar Pill with Glowing Ring */}
             <div className="relative shrink-0">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-cyan-600 via-teal-500 to-blue-600 p-1 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-cyan-600 via-teal-500 to-blue-600 p-1 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
                 <div className="w-full h-full bg-[#07111a] rounded-[22px] overflow-hidden flex items-center justify-center">
                   <img
                     src={avatarUrl || "/avatars/atom.jpg"}
@@ -263,30 +285,30 @@ export default function StudentAccountPage() {
                   />
                 </div>
               </div>
-              <span className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-[#07111a] rounded-full animate-pulse" title="Active Account"></span>
+              <span className="absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 border-2 border-[#07111a] rounded-full animate-pulse" title="Active Account"></span>
             </div>
 
             {/* Profile Info */}
-            <div className="space-y-3 flex-1">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{studentName}</h1>
+            <div className="space-y-3 flex-1 w-full min-w-0">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+                <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight break-words">{studentName}</h1>
                 {student.subscriptionStatus === "PAID" ? (
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 border border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.5)] tracking-wide uppercase">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 border border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.5)] tracking-wide uppercase shrink-0">
                     <Sparkles className="w-3.5 h-3.5 text-slate-950 fill-slate-950" /> Subscribed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow shrink-0">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Student Account
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 text-xs text-slate-400 pt-1">
-                <span className="flex items-center gap-1.5">
-                  <Mail className="w-4 h-4 text-cyan-400" /> {student.email || 'N/A'}
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start items-center gap-2 sm:gap-4 text-xs text-slate-400 pt-1">
+                <span className="flex items-center gap-1.5 break-all max-w-full">
+                  <Mail className="w-4 h-4 text-cyan-400 shrink-0" /> {student.email || 'N/A'}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Phone className="w-4 h-4 text-teal-400" /> {student.phone || 'Not Linked'}
+                  <Phone className="w-4 h-4 text-teal-400 shrink-0" /> {student.phone || 'Not Linked'}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-blue-400" /> Enrolled: {joinedDate}
