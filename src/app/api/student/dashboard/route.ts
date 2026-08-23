@@ -66,9 +66,18 @@ export async function GET(req: Request) {
         status: true,
         unlockAt: true,
         lockAt: true,
-        postLockHoldMinutes: true
+        postLockHoldMinutes: true,
+        targetBoard: true,
+        targetAcademicLevel: true
       },
       orderBy: { createdAt: 'desc' }
+    });
+
+    // Filter tests by target audience (Board and Class/Semester eligibility)
+    const eligibleTests = availableTests.filter(t => {
+      const matchesBoard = !t.targetBoard || t.targetBoard === "ALL" || t.targetBoard === student.board;
+      const matchesLevel = !t.targetAcademicLevel || t.targetAcademicLevel === "ALL" || t.targetAcademicLevel === student.academicLevel;
+      return matchesBoard && matchesLevel;
     });
 
     // Apply per-student overrides: prefer any StudentTestOverride for this student & test
@@ -85,7 +94,7 @@ export async function GET(req: Request) {
       requestsMap[r.testId] = r;
     });
 
-    const availableTestsWithOverrides = availableTests.map(t => {
+    const availableTestsWithOverrides = eligibleTests.map(t => {
       const o = overridesMap[t.id];
       const r = requestsMap[t.id];
       const base = o ? {

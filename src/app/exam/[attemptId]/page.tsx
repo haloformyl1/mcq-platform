@@ -331,7 +331,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             {/* Modern Glassmorphic Author Badge */}
             <div className="mt-8 flex justify-center pb-4">
               <div className="px-4 py-2 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
-                <span className="text-slate-400">Prepared by</span>
+                <span className="text-slate-400">Designed by</span>
                 <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
                   Arghyadeep Roy
                 </span>

@@ -216,7 +216,7 @@ export default function StudentAccountPage() {
           <div className="flex flex-col items-start gap-1.5 shrink-0">
             <PiechemLogo size="md" href="/dashboard" />
             <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 text-[11px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 mt-0.5">
-              <span className="text-slate-400 hidden xs:inline">Prepared by</span>
+              <span className="text-slate-400 hidden xs:inline">Designed by</span>
               <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
                 Arghyadeep Roy
               </span>

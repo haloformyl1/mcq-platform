@@ -140,7 +140,7 @@ export default function StudentLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch (err: any) {
       setError("Incorrect email or password.");
     } finally {
@@ -179,7 +179,7 @@ export default function StudentLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch (err: any) {
       setError(err.message || "Failed to setup account");
     } finally {

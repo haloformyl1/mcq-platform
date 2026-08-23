@@ -58,6 +58,8 @@ model Test {
   unlockAt           DateTime?
   lockAt             DateTime?
   postLockHoldMinutes Int     @default(4320) // Default 72 hours (4320 minutes)
+  targetBoard        String?  @default("ALL") // ALL, CBSE, ICSE, WBCHSE
+  targetAcademicLevel String? @default("ALL") // ALL, 11, 12, SEM-I, SEM-II, SEM-III, SEM-IV
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

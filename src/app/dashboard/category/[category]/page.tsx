@@ -294,7 +294,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             
             {/* Student Contact Badge directly under Logo */}
             <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 mt-0.5">
-              <span className="text-slate-400 hidden xs:inline">Prepared by</span>
+              <span className="text-slate-400 hidden xs:inline">Designed by</span>
               <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
                 Arghyadeep Roy
               </span>

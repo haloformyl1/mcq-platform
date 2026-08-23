@@ -11,6 +11,10 @@ export default function AdminTests() {
   const [bulkUnlockAt, setBulkUnlockAt] = useState<string>("");
   const [bulkLockAt, setBulkLockAt] = useState<string>("");
   const [bulkHoldMinutes, setBulkHoldMinutes] = useState<number>(4320);
+
+  // Bulk Target Audience states
+  const [bulkTargetBoard, setBulkTargetBoard] = useState<string>("ALL");
+  const [bulkTargetLevel, setBulkTargetLevel] = useState<string>("ALL");
   const [isApplying, setIsApplying] = useState<boolean>(false);
   const router = useRouter();
 
@@ -135,6 +139,40 @@ export default function AdminTests() {
     }
   };
 
+  const applyBulkTargetAudience = async () => {
+    if (selectedIds.length === 0) {
+      alert("Please select at least one test using the checkboxes.");
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      const res = await fetch("/api/admin/tests/bulk-target", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          testIds: selectedIds,
+          targetBoard: bulkTargetBoard,
+          targetAcademicLevel: bulkTargetLevel,
+        }),
+      });
+
+      const data = await res.json();
+      setIsApplying(false);
+
+      if (res.ok && data.success) {
+        alert(`Successfully updated Target Audience for ${data.count} test(s) to ${bulkTargetBoard} • ${bulkTargetLevel}!`);
+        setSelectedIds([]);
+        fetchTests();
+      } else {
+        alert(data.error || "Failed to update target audience for selected tests.");
+      }
+    } catch (err) {
+      setIsApplying(false);
+      alert("An error occurred while updating target audience for tests.");
+    }
+  };
+
   const formatDateTimeDisplay = (dStr: string | null) => {
     if (!dStr) return "";
     const d = new Date(dStr);
@@ -200,9 +238,82 @@ export default function AdminTests() {
             <button
               onClick={applyBulkStatus}
               disabled={isApplying || selectedIds.length === 0 || !bulkStatus}
-              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-bold shadow transition flex items-center space-x-1.5"
+              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-sm font-bold shadow transition flex items-center space-x-1.5 cursor-pointer"
             >
-              {isApplying ? "Updating..." : `Apply Status to Selected (${selectedIds.length})`}
+              {isApplying ? "Updating..." : `Apply Status (${selectedIds.length})`}
+            </button>
+          </div>
+        </div>
+
+        {/* Dedicated Bulk Target Audience Control Section */}
+        <div className="pt-3 border-t border-cyan-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-[#0d1c28]/60 p-3 rounded-lg border border-cyan-500/30">
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-bold uppercase tracking-wider bg-cyan-950 text-cyan-300 px-3 py-1 rounded-full border border-cyan-700">
+              🎯 Bulk Target Audience
+            </span>
+            <span className="text-xs text-slate-300 hidden lg:inline">
+              Set Board & Class/Semester for all selected tests at once
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            {/* Bulk Board Select */}
+            <select
+              value={bulkTargetBoard}
+              onChange={e => {
+                const b = e.target.value;
+                let lvl = bulkTargetLevel;
+                if (b === "WBCHSE" && (lvl === "11" || lvl === "12")) lvl = "SEM-I";
+                else if ((b === "CBSE" || b === "ICSE") && lvl.startsWith("SEM")) lvl = "11";
+                setBulkTargetBoard(b);
+                setBulkTargetLevel(lvl);
+              }}
+              className="bg-[#1a2936] border border-cyan-500/40 text-white text-xs font-bold rounded-md p-2 focus:ring-cyan-500 focus:border-cyan-500"
+            >
+              <option value="ALL">🌐 All Boards (CBSE, ICSE, WBCHSE)</option>
+              <option value="CBSE">CBSE Board</option>
+              <option value="ICSE">ICSE Board</option>
+              <option value="WBCHSE">WBCHSE Board</option>
+            </select>
+
+            {/* Bulk Class / Semester Select */}
+            <select
+              value={bulkTargetLevel}
+              onChange={e => setBulkTargetLevel(e.target.value)}
+              className="bg-[#1a2936] border border-cyan-500/40 text-cyan-300 text-xs font-bold rounded-md p-2 focus:ring-cyan-500 focus:border-cyan-500"
+            >
+              <option value="ALL">📚 All Classes / Semesters</option>
+              {bulkTargetBoard === "WBCHSE" ? (
+                <>
+                  <option value="SEM-I">Sem-I (Only WBCHSE Sem-1 Students)</option>
+                  <option value="SEM-II">Sem-II (Only WBCHSE Sem-2 Students)</option>
+                  <option value="SEM-III">Sem-III (Only WBCHSE Sem-3 Students)</option>
+                  <option value="SEM-IV">Sem-IV (Only WBCHSE Sem-4 Students)</option>
+                </>
+              ) : bulkTargetBoard === "CBSE" || bulkTargetBoard === "ICSE" ? (
+                <>
+                  <option value="11">Class 11 (Only Class 11 Students)</option>
+                  <option value="12">Class 12 (Only Class 12 Students)</option>
+                </>
+              ) : (
+                <>
+                  <option value="11">Class 11</option>
+                  <option value="12">Class 12</option>
+                  <option value="SEM-I">Sem-I</option>
+                  <option value="SEM-II">Sem-II</option>
+                  <option value="SEM-III">Sem-III</option>
+                  <option value="SEM-IV">Sem-IV</option>
+                </>
+              )}
+            </select>
+
+            {/* Apply Target Audience Button */}
+            <button
+              onClick={applyBulkTargetAudience}
+              disabled={isApplying || selectedIds.length === 0}
+              className="bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md text-xs font-extrabold uppercase tracking-wide shadow-[0_0_15px_rgba(6,182,212,0.3)] transition flex items-center space-x-1.5 cursor-pointer"
+            >
+              {isApplying ? "Updating..." : `Apply Target Audience (${selectedIds.length})`}
             </button>
           </div>
         </div>
@@ -292,6 +403,7 @@ export default function AdminTests() {
                 />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Title</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Target Audience</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Questions</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Actions</th>
@@ -319,6 +431,17 @@ export default function AdminTests() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-white">{test.title}</div>
                     <div className="text-sm text-[#a6a6a6]">{test.durationMinutes} mins | {test.marksPerQuestion} marks/q</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {(!test.targetBoard || test.targetBoard === 'ALL') && (!test.targetAcademicLevel || test.targetAcademicLevel === 'ALL') ? (
+                      <span className="px-2 py-0.5 inline-flex text-xs font-semibold rounded bg-cyan-950/60 text-cyan-300 border border-cyan-700/50">
+                        🌐 All Students
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 inline-flex items-center gap-1 text-xs font-bold rounded-md bg-amber-950/80 text-amber-300 border border-amber-600/60 shadow">
+                        🎯 {test.targetBoard !== 'ALL' ? test.targetBoard : 'All Boards'} • {test.targetAcademicLevel !== 'ALL' ? test.targetAcademicLevel : 'All Levels'}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

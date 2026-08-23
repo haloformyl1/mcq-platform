@@ -41,6 +41,8 @@ export async function POST(req: Request) {
         negativeMarks: parseFloat(data.negativeMarks) || 0,
         randomizeQuestions: data.randomizeQuestions || false,
         randomizeOptions: data.randomizeOptions || false,
+        targetBoard: data.targetBoard || "ALL",
+        targetAcademicLevel: data.targetAcademicLevel || "ALL",
       },
     });
     return NextResponse.json(test);

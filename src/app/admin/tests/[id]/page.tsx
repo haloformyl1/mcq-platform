@@ -336,6 +336,92 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         </div>
       </div>
 
+      {/* Target Audience & Curriculum Eligibility Settings */}
+      <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-cyan-500/30 backdrop-blur-sm space-y-4">
+        <div>
+          <h2 className="text-lg font-bold text-cyan-300 flex items-center gap-2">
+            🎯 Target Audience & Eligibility
+          </h2>
+          <p className="text-xs text-[#a6a6a6] mt-0.5">
+            Configure which Board and Class / Semester this test is designed for. Students not matching this target audience will not see this test.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          {/* Target Board Selection */}
+          <div>
+            <label className="block text-sm font-medium text-[#a6a6a6]">Target Educational Board</label>
+            <select
+              className="mt-1 block w-full bg-[#262626] border border-cyan-500/40 text-white rounded-md p-2.5 focus:ring-[#3b82f6] focus:border-[#3b82f6] font-semibold"
+              value={test.targetBoard || "ALL"}
+              onChange={(e) => {
+                const newBoard = e.target.value;
+                let newLevel = test.targetAcademicLevel || "ALL";
+                // Reset level if switching board types
+                if (newBoard === "WBCHSE" && (newLevel === "11" || newLevel === "12")) {
+                  newLevel = "SEM-I";
+                } else if ((newBoard === "CBSE" || newBoard === "ICSE") && (newLevel.startsWith("SEM"))) {
+                  newLevel = "11";
+                }
+                setTest({ ...test, targetBoard: newBoard, targetAcademicLevel: newLevel });
+              }}
+            >
+              <option value="ALL">🌐 All Educational Boards (CBSE, ICSE, WBCHSE)</option>
+              <option value="CBSE">CBSE Board</option>
+              <option value="ICSE">ICSE Board</option>
+              <option value="WBCHSE">WBCHSE Board</option>
+            </select>
+          </div>
+
+          {/* Target Class / Semester Selection (Dynamic) */}
+          <div>
+            <label className="block text-sm font-medium text-[#a6a6a6]">
+              {test.targetBoard === "WBCHSE" ? "Target Semester (WBCHSE)" : test.targetBoard === "CBSE" || test.targetBoard === "ICSE" ? `Target Class (${test.targetBoard})` : "Target Class / Semester"}
+            </label>
+            <select
+              className="mt-1 block w-full bg-[#262626] border border-cyan-500/40 text-white rounded-md p-2.5 focus:ring-[#3b82f6] focus:border-[#3b82f6] font-semibold text-cyan-300"
+              value={test.targetAcademicLevel || "ALL"}
+              onChange={(e) => setTest({ ...test, targetAcademicLevel: e.target.value })}
+            >
+              <option value="ALL">📚 All Classes / Semesters</option>
+              {test.targetBoard === "WBCHSE" ? (
+                <>
+                  <option value="SEM-I">Sem-I (Only WBCHSE Sem-1 Students)</option>
+                  <option value="SEM-II">Sem-II (Only WBCHSE Sem-2 Students)</option>
+                  <option value="SEM-III">Sem-III (Only WBCHSE Sem-3 Students)</option>
+                  <option value="SEM-IV">Sem-IV (Only WBCHSE Sem-4 Students)</option>
+                </>
+              ) : test.targetBoard === "CBSE" || test.targetBoard === "ICSE" ? (
+                <>
+                  <option value="11">Class 11 (Only Class 11 Students)</option>
+                  <option value="12">Class 12 (Only Class 12 Students)</option>
+                </>
+              ) : (
+                <>
+                  <option value="11">Class 11</option>
+                  <option value="12">Class 12</option>
+                  <option value="SEM-I">Sem-I</option>
+                  <option value="SEM-II">Sem-II</option>
+                  <option value="SEM-III">Sem-III</option>
+                  <option value="SEM-IV">Sem-IV</option>
+                </>
+              )}
+            </select>
+          </div>
+        </div>
+
+        <div className="bg-[#111111] p-3 rounded border border-cyan-900/40 text-xs text-cyan-200/80 font-mono">
+          📌 Active Filter Preview: {test.targetBoard || "ALL"} • {test.targetAcademicLevel || "ALL"}
+          {(test.targetBoard && test.targetBoard !== "ALL") || (test.targetAcademicLevel && test.targetAcademicLevel !== "ALL") ? (
+            <span className="ml-2 text-amber-300 font-sans font-bold">
+              (Restricted to {test.targetBoard !== "ALL" ? test.targetBoard : "All Boards"} {test.targetAcademicLevel !== "ALL" ? test.targetAcademicLevel : "All Levels"} students only)
+            </span>
+          ) : (
+            <span className="ml-2 text-green-400 font-sans font-bold">(Available to all enrolled students)</span>
+          )}
+        </div>
+      </div>
+
       {test.status === "SCHEDULE_EXPIRED" && (
         <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-red-900/50 backdrop-blur-sm space-y-4">
           <h2 className="text-lg font-bold text-red-400">Scheduled Expiry Configuration</h2>
