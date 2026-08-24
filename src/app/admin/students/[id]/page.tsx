@@ -62,6 +62,16 @@ export default function AdminStudentDetails() {
   const [confirmSuspend, setConfirmSuspend] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
+  
+  // Transfer Data state
+  const [confirmTransfer, setConfirmTransfer] = useState(false);
+  const [targetStudents, setTargetStudents] = useState<any[]>([]);
+  const [selectedTargetId, setSelectedTargetId] = useState("");
+  const [deleteSource, setDeleteSource] = useState(false);
+  const [transferring, setTransferring] = useState(false);
+  const [transferMessage, setTransferMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [targetSearch, setTargetSearch] = useState("");
+
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
@@ -119,6 +129,62 @@ export default function AdminStudentDetails() {
       }
     } catch (err) {
       console.error("Failed to delete");
+    }
+  };
+
+  const fetchTargetStudents = async (query: string = "") => {
+    try {
+      const res = await fetch(`/api/admin/students?search=${encodeURIComponent(query)}`);
+      if (res.ok) {
+        const data = await res.json();
+        // Exclude current student
+        setTargetStudents((data.students || []).filter((s: any) => s.id !== id));
+      }
+    } catch (err) {
+      console.error("Failed to fetch target students", err);
+    }
+  };
+
+  const executeTransfer = async () => {
+    if (!selectedTargetId) {
+      setTransferMessage({ type: "error", text: "Please select a target student account." });
+      return;
+    }
+
+    setTransferring(true);
+    setTransferMessage(null);
+
+    try {
+      const res = await fetch("/api/admin/students/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sourceStudentId: id,
+          targetStudentId: selectedTargetId,
+          deleteSourceAccount: deleteSource
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setTransferMessage({ type: "success", text: data.message || "Transfer completed successfully!" });
+        setTimeout(() => {
+          if (deleteSource) {
+            router.push("/admin/students");
+          } else {
+            setConfirmTransfer(false);
+            fetchStudent();
+          }
+        }, 1500);
+      } else {
+        setTransferMessage({ type: "error", text: data.error || "Failed to transfer account data." });
+      }
+    } catch (err) {
+      console.error("Transfer error:", err);
+      setTransferMessage({ type: "error", text: "An error occurred while transferring data." });
+    } finally {
+      setTransferring(false);
     }
   };
 
@@ -213,6 +279,15 @@ export default function AdminStudentDetails() {
         </div>
         <div className="flex gap-4">
           <button
+            onClick={() => {
+              setConfirmTransfer(true);
+              fetchTargetStudents();
+            }}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium shadow-md transition"
+          >
+            Transfer Data & Results
+          </button>
+          <button
             onClick={() => setConfirmSuspend(true)}
             className={`px-4 py-2 rounded font-medium ${student.status === "ACTIVE" ? "bg-yellow-600 hover:bg-yellow-700 text-white" : "bg-green-600 hover:bg-green-700 text-white"}`}
           >
@@ -226,6 +301,91 @@ export default function AdminStudentDetails() {
           </button>
         </div>
       </div>
+
+      {confirmTransfer && (
+        <div className="bg-[#2A2A2A] p-6 rounded-xl border border-indigo-500/50 space-y-4 shadow-xl">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-xl font-bold text-indigo-300">Transfer Account Results & Exam Data</h2>
+              <p className="text-sm text-gray-300 mt-1">
+                Transfer all test attempts ({statistics.totalAttempted}), answers, scores, access overrides, and proctoring logs from <strong className="text-white">{student.name || student.email}</strong> to another account.
+              </p>
+            </div>
+            <button
+              onClick={() => { setConfirmTransfer(false); setTransferMessage(null); }}
+              className="text-gray-400 hover:text-white text-lg font-bold px-2"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div className="space-y-3 bg-[#1E1E1E] p-4 rounded-lg border border-[#333]">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Search & Select Target Student Account</label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Filter by target student name, email, or ID..."
+                  value={targetSearch}
+                  onChange={(e) => {
+                    setTargetSearch(e.target.value);
+                    fetchTargetStudents(e.target.value);
+                  }}
+                  className="flex-1 bg-[#111] border border-[#444] text-gray-100 p-2 rounded text-sm focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <select
+                value={selectedTargetId}
+                onChange={(e) => setSelectedTargetId(e.target.value)}
+                className="w-full bg-[#111] border border-[#444] text-gray-100 p-2.5 rounded text-sm focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">-- Choose Target Account --</option>
+                {targetStudents.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name ? `${s.name} (${s.email})` : s.email} - Attempts: {s._count?.attempts || 0}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <input
+                type="checkbox"
+                id="deleteSource"
+                checked={deleteSource}
+                onChange={(e) => setDeleteSource(e.target.checked)}
+                className="w-4 h-4 text-indigo-600 bg-gray-900 border-gray-700 rounded focus:ring-indigo-500"
+              />
+              <label htmlFor="deleteSource" className="text-sm text-gray-300 cursor-pointer">
+                Delete source account (<span className="text-gray-400 font-mono">{student.email}</span>) after transferring data
+              </label>
+            </div>
+          </div>
+
+          {transferMessage && (
+            <div className={`p-3 rounded text-sm ${transferMessage.type === 'success' ? 'bg-green-900/40 text-green-300 border border-green-500/40' : 'bg-red-900/40 text-red-300 border border-red-500/40'}`}>
+              {transferMessage.text}
+            </div>
+          )}
+
+          <div className="flex gap-4 justify-end pt-2">
+            <button
+              onClick={() => { setConfirmTransfer(false); setTransferMessage(null); }}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white text-sm"
+              disabled={transferring}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={executeTransfer}
+              disabled={transferring || !selectedTargetId}
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded text-white text-sm font-semibold shadow-md"
+            >
+              {transferring ? "Transferring Data..." : "Confirm & Transfer Data"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {confirmSuspend && (
         <div className="bg-[#2A2A2A] p-6 rounded-xl border border-yellow-600/50">
