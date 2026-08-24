@@ -259,10 +259,10 @@ export default function StudentDashboard() {
 
       <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
 
-        {/* Active Curriculum Filter & Quick View Switcher Bar */}
-        <div className="bg-gradient-to-r from-[#0c1c2b] via-[#091522] to-[#060e18] border border-cyan-500/40 p-4 sm:p-5 rounded-2xl shadow-[0_0_25px_rgba(6,182,212,0.15)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        {/* Active Curriculum Filter & Quick View Switcher Bar (Glassmorphic Transparent) */}
+        <div className="bg-cyan-950/20 backdrop-blur-xl border border-cyan-500/30 p-4 sm:p-5 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-cyan-950/80 rounded-xl border border-cyan-500/50 text-cyan-300 shadow">
+            <div className="p-2.5 bg-cyan-950/50 backdrop-blur-md rounded-xl border border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
@@ -277,8 +277,8 @@ export default function StudentDashboard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <div className="flex items-center gap-2 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 flex-1 md:flex-initial">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider px-2">Board:</span>
+            <div className="flex items-center gap-2 bg-slate-950/40 backdrop-blur-md p-1.5 rounded-xl border border-cyan-500/20 flex-1 md:flex-initial">
+              <span className="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider px-2">Board:</span>
               <select
                 value={student.board || 'CBSE'}
                 disabled={updatingCurriculum}
@@ -287,16 +287,16 @@ export default function StudentDashboard() {
                   const defaultLevel = nb === 'WBCHSE' ? 'SEM-I' : '11';
                   handleCurriculumChange(nb, defaultLevel);
                 }}
-                className="bg-cyan-950 text-cyan-300 border border-cyan-500/50 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer"
+                className="bg-cyan-950/70 text-cyan-300 border border-cyan-500/40 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none cursor-pointer"
               >
-                <option value="CBSE">CBSE</option>
-                <option value="ICSE">ICSE</option>
-                <option value="WBCHSE">WBCHSE</option>
+                <option value="CBSE" className="bg-[#08131e] text-cyan-300">CBSE</option>
+                <option value="ICSE" className="bg-[#08131e] text-cyan-300">ICSE</option>
+                <option value="WBCHSE" className="bg-[#08131e] text-cyan-300">WBCHSE</option>
               </select>
             </div>
 
-            <div className="flex items-center gap-2 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 flex-1 md:flex-initial">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider px-2">
+            <div className="flex items-center gap-2 bg-slate-950/40 backdrop-blur-md p-1.5 rounded-xl border border-cyan-500/20 flex-1 md:flex-initial">
+              <span className="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider px-2">
                 {student.board === 'WBCHSE' ? 'Semester:' : 'Class:'}
               </span>
               {student.board === 'WBCHSE' ? (
@@ -304,22 +304,22 @@ export default function StudentDashboard() {
                   value={student.academicLevel || 'SEM-I'}
                   disabled={updatingCurriculum}
                   onChange={(e) => handleCurriculumChange(student.board || 'WBCHSE', e.target.value)}
-                  className="bg-teal-950 text-teal-300 border border-teal-500/50 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer"
+                  className="bg-teal-950/70 text-teal-300 border border-teal-500/40 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none cursor-pointer"
                 >
-                  <option value="SEM-I">SEM-I</option>
-                  <option value="SEM-II">SEM-II</option>
-                  <option value="SEM-III">SEM-III</option>
-                  <option value="SEM-IV">SEM-IV</option>
+                  <option value="SEM-I" className="bg-[#08131e] text-teal-300">SEM-I</option>
+                  <option value="SEM-II" className="bg-[#08131e] text-teal-300">SEM-II</option>
+                  <option value="SEM-III" className="bg-[#08131e] text-teal-300">SEM-III</option>
+                  <option value="SEM-IV" className="bg-[#08131e] text-teal-300">SEM-IV</option>
                 </select>
               ) : (
                 <select
                   value={student.academicLevel || '11'}
                   disabled={updatingCurriculum}
                   onChange={(e) => handleCurriculumChange(student.board || 'CBSE', e.target.value)}
-                  className="bg-teal-950 text-teal-300 border border-teal-500/50 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer"
+                  className="bg-teal-950/70 text-teal-300 border border-teal-500/40 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none cursor-pointer"
                 >
-                  <option value="11">Class 11</option>
-                  <option value="12">Class 12</option>
+                  <option value="11" className="bg-[#08131e] text-teal-300">Class 11</option>
+                  <option value="12" className="bg-[#08131e] text-teal-300">Class 12</option>
                 </select>
               )}
             </div>
