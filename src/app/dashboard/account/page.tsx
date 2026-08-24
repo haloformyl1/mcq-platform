@@ -45,8 +45,28 @@ export default function StudentAccountPage() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordOtp, setPasswordOtp] = useState("");
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [otpSentMsg, setOtpSentMsg] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [passLoading, setPassLoading] = useState(false);
   const [passMsg, setPassMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Security Policy Requirements
+  const reqLength = newPassword.length >= 8;
+  const reqUpper = /[A-Z]/.test(newPassword);
+  const reqLower = /[a-z]/.test(newPassword);
+  const reqNumber = /[0-9]/.test(newPassword);
+  const reqSpecial = /[^A-Za-z0-9]/.test(newPassword);
+  const allReqsMet = reqLength && reqUpper && reqLower && reqNumber && reqSpecial;
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const router = useRouter();
 
@@ -155,12 +175,43 @@ export default function StudentAccountPage() {
     }
   };
 
+  const handleSendPasswordOtp = async () => {
+    setSendingOtp(true);
+    setOtpSentMsg(null);
+    setPassMsg(null);
+
+    try {
+      const res = await fetch("/api/auth/student/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), name })
+      });
+      const resData = await res.json();
+
+      if (res.ok) {
+        setOtpSentMsg(`Verification OTP sent to your registered email (${email}). Please check your inbox/spam folder.`);
+        setResendCooldown(30);
+      } else {
+        setPassMsg({ type: "error", text: resData.error || "Failed to send OTP to email." });
+      }
+    } catch (err) {
+      setPassMsg({ type: "error", text: "Network error sending OTP code." });
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPassMsg(null);
 
-    if (!newPassword || newPassword.length < 6) {
-      setPassMsg({ type: "error", text: "New password must be at least 6 characters long." });
+    if (!passwordOtp) {
+      setPassMsg({ type: "error", text: "Please enter the verification OTP sent to your email." });
+      return;
+    }
+
+    if (!allReqsMet) {
+      setPassMsg({ type: "error", text: "Your new password does not meet the security policy requirements." });
       return;
     }
 
@@ -172,10 +223,14 @@ export default function StudentAccountPage() {
     setPassLoading(true);
 
     try {
-      const res = await fetch("/api/auth/student/reset-password", {
+      const res = await fetch("/api/student/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ oldPassword, newPassword })
+        body: JSON.stringify({
+          currentPassword: oldPassword,
+          otp: passwordOtp,
+          newPassword
+        })
       });
       const resData = await res.json();
 
@@ -184,6 +239,8 @@ export default function StudentAccountPage() {
         setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
+        setPasswordOtp("");
+        setOtpSentMsg(null);
       } else {
         setPassMsg({ type: "error", text: resData.error || "Failed to update password." });
       }
@@ -619,6 +676,30 @@ export default function StudentAccountPage() {
                 </div>
               </div>
 
+              {/* OTP Verification & Password Policy Instructions */}
+              <div className="bg-slate-950/80 p-4 rounded-xl border border-cyan-500/30 space-y-3">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div>
+                    <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">Email OTP Verification Required</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">Send a verification code to <strong className="text-white font-mono">{email}</strong> to verify student identity</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSendPasswordOtp}
+                    disabled={sendingOtp || resendCooldown > 0}
+                    className="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white rounded-xl text-xs font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    {sendingOtp ? "Sending OTP..." : resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Send Email OTP"}
+                  </button>
+                </div>
+                {otpSentMsg && (
+                  <div className="p-3 rounded-lg bg-green-950/80 border border-green-600/50 text-green-300 text-xs font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span>{otpSentMsg}</span>
+                  </div>
+                )}
+              </div>
+
               {/* Password Feedback Alerts */}
               {passMsg && (
                 <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
@@ -632,31 +713,58 @@ export default function StudentAccountPage() {
               )}
 
               <form onSubmit={handlePasswordChange} className="space-y-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Current Password</label>
-                  <input
-                    type="password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    placeholder="Enter your current password"
-                    className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* OTP Input */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center justify-between">
+                      <span>Verification OTP *</span>
+                      <span className="text-[11px] text-slate-400 font-normal">Check your inbox</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={passwordOtp}
+                      onChange={(e) => setPasswordOtp(e.target.value)}
+                      placeholder="6-digit OTP code"
+                      className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition font-mono tracking-widest"
+                    />
+                  </div>
+
+                  {/* Current Password (Optional) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Current Password (Optional)</label>
+                    <input
+                      type="password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      placeholder="Enter current password if set"
+                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* New Password */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">New Password</label>
+                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">New Password *</label>
                     <input
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="At least 6 characters"
+                      placeholder="Enter strong new password"
                       className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
                     />
                   </div>
 
+                  {/* Confirm New Password */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Confirm New Password</label>
+                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                      <span>Confirm New Password *</span>
+                      {confirmPassword && (
+                        <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-green-400" : "text-red-400"}`}>
+                          {newPassword === confirmPassword ? "✓ Passwords Match" : "✗ Passwords Mismatch"}
+                        </span>
+                      )}
+                    </label>
                     <input
                       type="password"
                       value={confirmPassword}
@@ -667,14 +775,38 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
+                {/* Password Policy Security Checklist */}
+                <div className="bg-slate-950/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                  <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
+                    Password Security Policy Checklist:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className={`flex items-center gap-2 font-medium ${reqLength ? "text-green-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqLength ? "✓" : "○"}</span> Minimum 8 characters long
+                    </div>
+                    <div className={`flex items-center gap-2 font-medium ${reqUpper ? "text-green-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqUpper ? "✓" : "○"}</span> At least 1 uppercase letter (A-Z)
+                    </div>
+                    <div className={`flex items-center gap-2 font-medium ${reqLower ? "text-green-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqLower ? "✓" : "○"}</span> At least 1 lowercase letter (a-z)
+                    </div>
+                    <div className={`flex items-center gap-2 font-medium ${reqNumber ? "text-green-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqNumber ? "✓" : "○"}</span> At least 1 numeric digit (0-9)
+                    </div>
+                    <div className={`flex items-center gap-2 font-medium ${reqSpecial ? "text-green-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqSpecial ? "✓" : "○"}</span> At least 1 special character (@, #, $, %, etc.)
+                    </div>
+                  </div>
+                </div>
+
                 <div className="pt-3 flex justify-end">
                   <button
                     type="submit"
-                    disabled={passLoading}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-extrabold tracking-wide uppercase transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-95 disabled:opacity-50 cursor-pointer"
+                    disabled={passLoading || !passwordOtp || !allReqsMet || newPassword !== confirmPassword}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-extrabold tracking-wide uppercase transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {passLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
-                    <span>{passLoading ? "Updating Password..." : "Save New Password"}</span>
+                    <span>{passLoading ? "Updating Password..." : "Verify OTP & Save Password"}</span>
                   </button>
                 </div>
               </form>
