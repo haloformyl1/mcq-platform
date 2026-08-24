@@ -21,6 +21,20 @@ export default function StudentDashboard() {
   const [openExpired, setOpenExpired] = useState(true);
   const router = useRouter();
 
+  const [updatingCurriculum, setUpdatingCurriculum] = useState(false);
+
+  const fetchDashboardData = async () => {
+    try {
+      const res = await fetch("/api/student/dashboard");
+      const resData = await res.json();
+      if (!resData.error) {
+        setData(resData);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
@@ -49,6 +63,27 @@ export default function StudentDashboard() {
       })
       .catch(() => {});
   }, [router]);
+
+  const handleCurriculumChange = async (newBoard: string, newLevel: string) => {
+    setUpdatingCurriculum(true);
+    try {
+      const res = await fetch("/api/student/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          board: newBoard,
+          academicLevel: newLevel
+        })
+      });
+      if (res.ok) {
+        await fetchDashboardData();
+      }
+    } catch (err) {
+      console.error("Failed to update curriculum", err);
+    } finally {
+      setUpdatingCurriculum(false);
+    }
+  };
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -223,6 +258,80 @@ export default function StudentDashboard() {
       </header>
 
       <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+
+        {/* Active Curriculum Filter & Quick View Switcher Bar */}
+        <div className="bg-gradient-to-r from-[#0c1c2b] via-[#091522] to-[#060e18] border border-cyan-500/40 p-4 sm:p-5 rounded-2xl shadow-[0_0_25px_rgba(6,182,212,0.15)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-cyan-950/80 rounded-xl border border-cyan-500/50 text-cyan-300 shadow">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm sm:text-base font-extrabold text-white">Active Curriculum View</h3>
+                {updatingCurriculum && <span className="text-xs text-cyan-400 font-mono animate-pulse">Updating view...</span>}
+              </div>
+              <p className="text-xs text-slate-300">
+                Currently showing tests tailored for <strong className="text-cyan-300 font-bold">{student.board || 'CBSE'}</strong> • <strong className="text-teal-300 font-bold">{student.board === 'WBCHSE' ? student.academicLevel || 'SEM-I' : `Class ${student.academicLevel || '11'}`}</strong>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-2 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 flex-1 md:flex-initial">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider px-2">Board:</span>
+              <select
+                value={student.board || 'CBSE'}
+                disabled={updatingCurriculum}
+                onChange={(e) => {
+                  const nb = e.target.value;
+                  const defaultLevel = nb === 'WBCHSE' ? 'SEM-I' : '11';
+                  handleCurriculumChange(nb, defaultLevel);
+                }}
+                className="bg-cyan-950 text-cyan-300 border border-cyan-500/50 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer"
+              >
+                <option value="CBSE">CBSE</option>
+                <option value="ICSE">ICSE</option>
+                <option value="WBCHSE">WBCHSE</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800 flex-1 md:flex-initial">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider px-2">
+                {student.board === 'WBCHSE' ? 'Semester:' : 'Class:'}
+              </span>
+              {student.board === 'WBCHSE' ? (
+                <select
+                  value={student.academicLevel || 'SEM-I'}
+                  disabled={updatingCurriculum}
+                  onChange={(e) => handleCurriculumChange(student.board || 'WBCHSE', e.target.value)}
+                  className="bg-teal-950 text-teal-300 border border-teal-500/50 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer"
+                >
+                  <option value="SEM-I">SEM-I</option>
+                  <option value="SEM-II">SEM-II</option>
+                  <option value="SEM-III">SEM-III</option>
+                  <option value="SEM-IV">SEM-IV</option>
+                </select>
+              ) : (
+                <select
+                  value={student.academicLevel || '11'}
+                  disabled={updatingCurriculum}
+                  onChange={(e) => handleCurriculumChange(student.board || 'CBSE', e.target.value)}
+                  className="bg-teal-950 text-teal-300 border border-teal-500/50 rounded-lg px-2 py-1 text-xs font-bold focus:outline-none cursor-pointer"
+                >
+                  <option value="11">Class 11</option>
+                  <option value="12">Class 12</option>
+                </select>
+              )}
+            </div>
+
+            <Link
+              href="/dashboard/account"
+              className="text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold px-2 py-1"
+            >
+              Account Settings
+            </Link>
+          </div>
+        </div>
 
         {/* 1. UPCOMING TEST ALERT BANNER (Shown at Top of Main Page) */}
         {(() => {

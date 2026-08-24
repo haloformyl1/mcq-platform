@@ -134,7 +134,8 @@ export default function StudentAccountPage() {
       const resData = await res.json();
 
       if (res.ok) {
-        setProfileMsg({ type: "success", text: "Profile details saved successfully!" });
+        const levelLabel = board === "WBCHSE" ? academicLevel : `Class ${academicLevel}`;
+        setProfileMsg({ type: "success", text: `Profile saved successfully! Main screen view updated for ${board} (${levelLabel}).` });
         if (resData.student) {
           setData((prev: any) => ({
             ...prev,
