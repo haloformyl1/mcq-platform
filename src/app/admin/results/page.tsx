@@ -15,6 +15,13 @@ interface AttemptItem {
   timeSpentSeconds?: number | null;
   resumedAt?: string | Date | null;
   extraTimeMinutes?: number | null;
+  answers?: Array<{
+    isChangedInResume?: boolean | null;
+    isFreshInResume?: boolean | null;
+    previousAnswer?: string | null;
+    selectedAnswer?: string | null;
+    answeredAt?: string | Date | null;
+  }>;
   student?: {
     id?: string;
     name?: string | null;
@@ -231,6 +238,8 @@ export default function AdminResults() {
                     const durM = result.test?.durationMinutes || 0;
                     const leftSec = Math.max(0, durM * 60 - (result.timeSpentSeconds || 0));
                     const allowedSec = leftSec + (result.extraTimeMinutes || 0) * 60;
+                    const changedCount = result.answers?.filter(a => Boolean(a.isChangedInResume)).length || 0;
+                    const freshCount = result.answers?.filter(a => Boolean(a.isFreshInResume)).length || 0;
 
                     return (
                       <div className="flex justify-between items-center text-xs text-[#a6a6a6] pt-1">
@@ -241,9 +250,23 @@ export default function AdminResults() {
                             <span className="text-blue-400 font-semibold ml-1.5">({Number(result.percentage).toFixed(1)}%)</span>
                           )}
                           {isResumed && (
-                            <div className="text-[11px] text-cyan-300 font-semibold mt-0.5">
-                              Allowed: {formatSeconds(allowedSec)}
-                              <span className="text-[10px] text-[#888888] ml-1">({formatSeconds(leftSec)} leftover + {result.extraTimeMinutes || 0}m grace)</span>
+                            <div className="space-y-1 mt-0.5">
+                              <div className="text-[11px] text-cyan-300 font-semibold">
+                                Allowed: {formatSeconds(allowedSec)}
+                                <span className="text-[10px] text-[#888888] ml-1">({formatSeconds(leftSec)} leftover + {result.extraTimeMinutes || 0}m grace)</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {changedCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-amber-300 bg-amber-950/60 border border-amber-500/50 px-1.5 py-0.5 rounded font-medium">
+                                    <RotateCcw className="w-2.5 h-2.5" /> {changedCount} changed
+                                  </span>
+                                )}
+                                {freshCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-cyan-300 bg-cyan-950/60 border border-cyan-700/50 px-1.5 py-0.5 rounded font-medium">
+                                    ⚡ {freshCount} fresh
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -348,6 +371,8 @@ export default function AdminResults() {
                         const durM = result.test?.durationMinutes || 0;
                         const leftSec = Math.max(0, durM * 60 - (result.timeSpentSeconds || 0));
                         const allowedSec = leftSec + (result.extraTimeMinutes || 0) * 60;
+                        const changedCount = result.answers?.filter(a => Boolean(a.isChangedInResume)).length || 0;
+                        const freshCount = result.answers?.filter(a => Boolean(a.isFreshInResume)).length || 0;
 
                         return (
                           <>
@@ -357,8 +382,22 @@ export default function AdminResults() {
                                   <div className="text-sm font-bold text-white">{result.score != null ? result.score : "-"}</div>
                                   <div className="text-xs text-blue-400 font-medium">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : ""}</div>
                                   {isResumed && (
-                                    <div className="text-[11px] text-cyan-300 font-semibold mt-0.5">
-                                      Resumed Allowed: {formatSeconds(allowedSec)}
+                                    <div className="mt-0.5">
+                                      <div className="text-[11px] text-cyan-300 font-semibold">
+                                        Resumed Allowed: {formatSeconds(allowedSec)}
+                                      </div>
+                                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                        {changedCount > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-[10px] text-amber-300 bg-amber-950/60 border border-amber-500/50 px-1.5 py-0.5 rounded font-medium">
+                                            <RotateCcw className="w-2.5 h-2.5" /> {changedCount} changed
+                                          </span>
+                                        )}
+                                        {freshCount > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-[10px] text-cyan-300 bg-cyan-950/60 border border-cyan-700/50 px-1.5 py-0.5 rounded font-medium">
+                                            ⚡ {freshCount} fresh
+                                          </span>
+                                        )}
+                                      </div>
                                     </div>
                                   )}
                                 </div>

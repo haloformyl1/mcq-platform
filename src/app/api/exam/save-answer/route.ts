@@ -22,6 +22,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid attempt or already submitted" }, { status: 400 });
     }
 
+    const existingAnswer = await prisma.answer.findUnique({
+      where: {
+        attemptId_questionId: {
+          attemptId,
+          questionId
+        }
+      }
+    });
+
+    const isResumedSession = Boolean(
+      attempt.resumedAt ||
+      attempt.previousAnswersSnapshot ||
+      (attempt.timeSpentSeconds && attempt.timeSpentSeconds > 0)
+    );
+
+    let previousAnswer = existingAnswer?.previousAnswer ?? null;
+    let isChangedInResume = existingAnswer?.isChangedInResume ?? false;
+    let isFreshInResume = existingAnswer?.isFreshInResume ?? false;
+
+    if (isResumedSession) {
+      const snapshot = (attempt.previousAnswersSnapshot as Record<string, string> | null) || {};
+      const originalChoice = snapshot[questionId] || existingAnswer?.previousAnswer || null;
+
+      if (originalChoice) {
+        previousAnswer = originalChoice;
+        isChangedInResume = selectedAnswer !== originalChoice;
+        isFreshInResume = false;
+      } else {
+        isFreshInResume = true;
+        isChangedInResume = false;
+      }
+    }
+
     await prisma.answer.upsert({
       where: {
         attemptId_questionId: {
@@ -29,12 +62,26 @@ export async function POST(req: Request) {
           questionId
         }
       },
-      update: { selectedAnswer, answeredAt: new Date() },
-      create: { attemptId, questionId, selectedAnswer }
+      update: {
+        selectedAnswer,
+        answeredAt: new Date(),
+        previousAnswer,
+        isChangedInResume,
+        isFreshInResume
+      },
+      create: {
+        attemptId,
+        questionId,
+        selectedAnswer,
+        answeredAt: new Date(),
+        previousAnswer,
+        isChangedInResume,
+        isFreshInResume
+      }
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to save answer" }, { status: 500 });
   }
 }

@@ -139,6 +139,7 @@ model TestAttempt {
   timeSpentSeconds   Int?      @default(0)
   resumedAt          DateTime?
   extraTimeMinutes   Int?      @default(0)
+  previousAnswersSnapshot Json?
 
   test             Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
   student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
@@ -153,6 +154,9 @@ model Answer {
   selectedAnswer String?     // "A", "B", "C", "D"
   isCorrect      Boolean?
   answeredAt     DateTime    @default(now())
+  previousAnswer      String?
+  isChangedInResume   Boolean?    @default(false)
+  isFreshInResume     Boolean?    @default(false)
 
   attempt        TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   question       Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)

@@ -11,7 +11,7 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'All' | 'Correct' | 'Incorrect' | 'Unanswered'>('All');
+  const [filter, setFilter] = useState<'All' | 'Correct' | 'Incorrect' | 'Unanswered' | 'Changed' | 'Fresh'>('All');
   const router = useRouter();
 
   const [resumeModalOpen, setResumeModalOpen] = useState(false);
@@ -151,11 +151,15 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
   const correctCount = result.answers.filter((a: any) => a.isCorrect).length;
   const incorrectCount = result.answers.filter((a: any) => !a.isCorrect && a.selectedAnswer).length;
   const unansweredCount = result.answers.filter((a: any) => !a.selectedAnswer).length;
+  const changedInResumeCount = result.answers.filter((a: any) => Boolean(a.isChangedInResume)).length;
+  const freshInResumeCount = result.answers.filter((a: any) => Boolean(a.isFreshInResume)).length;
 
   const filteredAnswers = result.answers.filter((ans: any) => {
     if (filter === 'Correct') return ans.isCorrect === true;
     if (filter === 'Incorrect') return ans.isCorrect === false && ans.selectedAnswer;
     if (filter === 'Unanswered') return !ans.selectedAnswer;
+    if (filter === 'Changed') return Boolean(ans.isChangedInResume);
+    if (filter === 'Fresh') return Boolean(ans.isFreshInResume);
     return true;
   });
 
@@ -316,7 +320,7 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
               <div className="bg-black/50 border border-cyan-500/40 p-3.5 rounded-lg shadow-inner">
                 <div className="text-[11px] text-[#a6a6a6] uppercase font-semibold">Total Allowed in Resumed Test</div>
                 <div className="text-xl font-bold text-cyan-300 font-mono mt-0.5">
@@ -344,6 +348,30 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="text-[10px] text-amber-300/80 mt-0.5 font-medium">
                   bonus time granted by admin
+                </div>
+              </div>
+
+              <div className="bg-black/40 border border-amber-500/30 p-3.5 rounded-lg">
+                <div className="text-[11px] text-amber-400 uppercase font-semibold flex items-center gap-1">
+                  <RotateCcw className="w-3 h-3" /> Answers Changed
+                </div>
+                <div className="text-xl font-bold text-amber-300 font-mono mt-0.5">
+                  {changedInResumeCount}
+                </div>
+                <div className="text-[10px] text-[#888888] mt-0.5">
+                  previously selected answer altered
+                </div>
+              </div>
+
+              <div className="bg-black/40 border border-cyan-500/30 p-3.5 rounded-lg">
+                <div className="text-[11px] text-cyan-400 uppercase font-semibold flex items-center gap-1">
+                  ⚡ Freshly Attempted
+                </div>
+                <div className="text-xl font-bold text-cyan-300 font-mono mt-0.5">
+                  {freshInResumeCount}
+                </div>
+                <div className="text-[10px] text-[#888888] mt-0.5">
+                  new questions answered in resume
                 </div>
               </div>
             </div>
@@ -386,16 +414,25 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
           </span>
         </h2>
         
-        <div className="flex gap-1.5 bg-[#0f0f0f] p-1 rounded-md border border-[#2d2d2d] text-xs">
-          {(['All', 'Correct', 'Incorrect', 'Unanswered'] as const).map((f) => (
+        <div className="flex flex-wrap gap-1.5 bg-[#0f0f0f] p-1 rounded-md border border-[#2d2d2d] text-xs">
+          {[
+            { id: "All", label: "All" },
+            { id: "Correct", label: "Correct" },
+            { id: "Incorrect", label: "Incorrect" },
+            { id: "Unanswered", label: "Unanswered" },
+            ...(isResumed ? [
+              { id: "Changed", label: `🔄 Changed (${changedInResumeCount})` },
+              { id: "Fresh", label: `⚡ Fresh (${freshInResumeCount})` }
+            ] : [])
+          ].map((f) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
+              key={f.id}
+              onClick={() => setFilter(f.id as any)}
               className={`px-3 py-1.5 rounded transition-all font-medium ${
-                filter === f ? 'bg-[#333333] text-white shadow' : 'text-[#a6a6a6] hover:text-white hover:bg-[#262626]'
+                filter === f.id ? "bg-[#333333] text-white shadow" : "text-[#a6a6a6] hover:text-white hover:bg-[#262626]"
               }`}
             >
-              {f}
+              {f.label}
             </button>
           ))}
         </div>
@@ -424,7 +461,7 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
             >
               {/* Question Header & Status Badge */}
               <div className="flex items-start justify-between gap-4 mb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-bold text-sm bg-[#262626] border border-[#404040] text-white px-2.5 py-1 rounded">
                     Q{idx + 1}
                   </span>
@@ -443,6 +480,16 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                       <MinusCircle className="w-3.5 h-3.5" /> Not Attempted
                     </span>
                   )}
+                  {ans.isChangedInResume && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-950/70 border border-amber-500/70 px-2.5 py-1 rounded-full shadow-sm">
+                      <RotateCcw className="w-3.5 h-3.5" /> Answer Changed in Resume (Was Option {ans.previousAnswer} ➔ Changed to Option {ans.selectedAnswer})
+                    </span>
+                  )}
+                  {ans.isFreshInResume && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 bg-cyan-950/60 border border-cyan-700/60 px-2.5 py-1 rounded-full">
+                      ⚡ Freshly Attempted in Resume
+                    </span>
+                  )}
                 </div>
 
                 {ans.answeredAt && (
@@ -457,24 +504,58 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                 {q.questionText}
               </p>
 
+              {/* Resume Change Indicator Alert */}
+              {ans.isChangedInResume && (
+                <div className="mb-3.5 p-3 rounded-lg bg-amber-950/30 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-inner">
+                  <div className="flex items-center gap-2">
+                    <RotateCcw className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>
+                      <strong>Answer Changed in Resumed Session:</strong> Student previously selected{" "}
+                      <span className="px-1.5 py-0.5 rounded bg-amber-900/60 text-amber-300 border border-amber-700/50 font-bold font-mono">
+                        Option {ans.previousAnswer}
+                      </span>{" "}
+                      and changed it to{" "}
+                      <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/60 font-bold font-mono">
+                        Option {ans.selectedAnswer}
+                      </span>
+                    </span>
+                  </div>
+                  {ans.answeredAt && (
+                    <span className="text-[11px] text-[#a6a6a6] shrink-0 font-mono">
+                      Updated at: {new Date(ans.answeredAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {ans.isFreshInResume && (
+                <div className="mb-3.5 p-2.5 rounded-lg bg-cyan-950/20 border border-cyan-700/40 text-xs text-cyan-300 flex items-center gap-2 shadow-inner">
+                  <span>⚡ <strong>Freshly Attempted:</strong> This question was unattempted initially and answered for the first time during the resumed test session.</span>
+                </div>
+              )}
+
               {/* Options Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 {['A', 'B', 'C', 'D'].map((optKey) => {
-                  let originalKey = mapping ? (mapping[optKey] || optKey) : optKey;
-                  let optionText = q[`option${originalKey}`];
+                  const originalKey = mapping ? (mapping[optKey] || optKey) : optKey;
+                  const optionText = q[`option${originalKey}`];
 
                   const isStudentSelection = ans.selectedAnswer === optKey;
                   const isCorrectKey = q.correctAnswer === originalKey;
+                  const isPreviousChoice = ans.isChangedInResume && ans.previousAnswer === optKey;
 
                   let cardStyle = "border-[#3a3a3a] bg-[#1e1e1e] text-[#a6a6a6]";
                   let badgeText = null;
 
                   if (isStudentSelection && isCorrectKey) {
                     cardStyle = "border-green-500 bg-green-950/40 text-green-200 font-medium shadow-sm";
-                    badgeText = "Student Choice (Correct)";
+                    badgeText = ans.isChangedInResume ? "Student Choice (Changed ➔ Correct)" : "Student Choice (Correct)";
                   } else if (isStudentSelection && !isCorrectKey) {
                     cardStyle = "border-red-500 bg-red-950/40 text-red-200 font-medium shadow-sm";
-                    badgeText = "Student Choice (Wrong)";
+                    badgeText = ans.isChangedInResume ? "Student Choice (Changed ➔ Wrong)" : "Student Choice (Wrong)";
+                  } else if (isPreviousChoice) {
+                    cardStyle = "border-amber-500/70 border-dashed bg-amber-950/20 text-amber-200";
+                    badgeText = "Previously Selected Option";
                   } else if (!isStudentSelection && isCorrectKey) {
                     cardStyle = "border-green-500/60 bg-green-950/20 text-green-300 font-medium";
                     badgeText = "Correct Answer Key";

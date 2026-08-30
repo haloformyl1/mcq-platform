@@ -122,6 +122,26 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
       finalExtraMinutes += 5;
     }
 
+    // Capture snapshot of all answers currently selected before reopening
+    const existingAnswers = await prisma.answer.findMany({
+      where: { attemptId: params.id }
+    });
+
+    const previousAnswersSnapshot: Record<string, string> = {};
+    for (const a of existingAnswers) {
+      if (a.selectedAnswer) {
+        previousAnswersSnapshot[a.questionId] = a.selectedAnswer;
+        await prisma.answer.update({
+          where: { id: a.id },
+          data: {
+            previousAnswer: a.selectedAnswer,
+            isChangedInResume: false,
+            isFreshInResume: false
+          }
+        });
+      }
+    }
+
     const updated = await prisma.testAttempt.update({
       where: { id: params.id },
       data: {
@@ -131,6 +151,7 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
         resumedAt: null,
         timeSpentSeconds: timeSpent,
         extraTimeMinutes: finalExtraMinutes,
+        previousAnswersSnapshot: previousAnswersSnapshot as Record<string, string>,
         score: null,
         percentage: null,
         correctCount: null,

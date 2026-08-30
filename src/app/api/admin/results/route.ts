@@ -21,6 +21,7 @@ export async function GET() {
       include: {
         student: { select: { id: true, name: true, email: true } },
         test: { select: { id: true, title: true, totalQuestions: true, durationMinutes: true } },
+        answers: { select: { isChangedInResume: true, isFreshInResume: true, previousAnswer: true, selectedAnswer: true, answeredAt: true } },
       }
     });
     return NextResponse.json(attempts);

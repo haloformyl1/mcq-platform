@@ -38,16 +38,38 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     if (!attempt) return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
 
     // Map existing answers by questionId
-    const existingAnswersMap = new Map<string, any>();
+    const existingAnswersMap = new Map<string, Record<string, unknown>>();
     attempt.answers.forEach((ans) => {
       existingAnswersMap.set(ans.questionId, ans);
     });
+
+    const snapshot = (attempt.previousAnswersSnapshot as Record<string, string> | null) || {};
 
     // Build complete answer list containing all test questions (including unattempted ones)
     const allAnswers = attempt.test.questions.map((question) => {
       const existing = existingAnswersMap.get(question.id);
       if (existing) {
-        return existing;
+        const snapChoice = snapshot[question.id] || null;
+        const prevChoice = existing.previousAnswer || snapChoice || null;
+
+        let isChanged = Boolean(existing.isChangedInResume);
+        if (!isChanged && prevChoice && existing.selectedAnswer && prevChoice !== existing.selectedAnswer) {
+          isChanged = true;
+        }
+
+        let isFresh = Boolean(existing.isFreshInResume);
+        if (!isFresh && !prevChoice && existing.selectedAnswer && attempt.resumedAt && existing.answeredAt) {
+          if (new Date(existing.answeredAt as string | Date) >= new Date(attempt.resumedAt)) {
+            isFresh = true;
+          }
+        }
+
+        return {
+          ...existing,
+          previousAnswer: prevChoice,
+          isChangedInResume: isChanged,
+          isFreshInResume: isFresh
+        };
       }
       return {
         id: `unanswered_${question.id}`,
@@ -56,6 +78,9 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         selectedAnswer: null,
         isCorrect: false,
         answeredAt: null,
+        previousAnswer: null,
+        isChangedInResume: false,
+        isFreshInResume: false,
         question: question
       };
     });
