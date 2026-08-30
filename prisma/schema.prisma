@@ -136,6 +136,9 @@ model TestAttempt {
   unansweredCount  Int?
   
   questionShufflings Json?   // Stores option shuffling mappings: { questionId: { "A": "C", "B": "A", ... } }
+  timeSpentSeconds   Int?      @default(0)
+  resumedAt          DateTime?
+  extraTimeMinutes   Int?      @default(0)
 
   test             Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
   student          Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)

@@ -730,6 +730,10 @@ export default function StudentDashboard() {
                     <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow">
                       🎯 Best of Luck!
                     </button>
+                  ) : activeAttempt ? (
+                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-[0_0_15px_rgba(202,138,4,0.3)] animate-pulse">
+                      Continue Test
+                    </Link>
                   ) : isHoldingStage ? (
                     test.userRequestStatus === "PENDING" ? (
                       <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 cursor-not-allowed">

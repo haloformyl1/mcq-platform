@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -83,12 +83,20 @@ export async function POST(req: Request) {
 
     const percentage = test.questions.length > 0 ? (score / (test.questions.length * test.marksPerQuestion)) * 100 : 0;
 
+    // Calculate cumulative time spent
+    const now = new Date();
+    const sessionStart = attempt.resumedAt || attempt.startedAt;
+    const sessionSeconds = Math.max(0, Math.floor((now.getTime() - sessionStart.getTime()) / 1000));
+    const totalAllowedSeconds = (test.durationMinutes + (attempt.extraTimeMinutes || 0)) * 60;
+    const totalSpentSeconds = Math.min(totalAllowedSeconds, (attempt.timeSpentSeconds || 0) + sessionSeconds);
+
     const updatedAttempt = await prisma.testAttempt.update({
       where: { id: attemptId },
       data: {
         status: "SUBMITTED",
-        submittedAt: new Date(),
+        submittedAt: now,
         submissionReason: reason || "MANUAL_SUBMISSION",
+        timeSpentSeconds: totalSpentSeconds,
         score,
         percentage,
         correctCount,
@@ -109,6 +117,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, result: updatedAttempt });
   } catch (error) {
+    console.error("Submit test error:", error);
     return NextResponse.json({ error: "Failed to submit test" }, { status: 500 });
   }
 }

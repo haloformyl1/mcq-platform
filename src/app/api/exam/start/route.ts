@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -70,7 +70,8 @@ export async function POST(req: Request) {
 
     // Check for an active IN_PROGRESS attempt
     const activeAttempt = await prisma.testAttempt.findFirst({
-      where: { testId, studentId: student.id, status: "IN_PROGRESS" }
+      where: { testId, studentId: student.id, status: "IN_PROGRESS" },
+      include: { answers: true }
     });
     
     // Check for completed attempts to enforce limit
@@ -110,20 +111,43 @@ export async function POST(req: Request) {
       }
     }
 
-    let attemptId = activeAttempt?.id;
-    let existingAttemptStartedAt = activeAttempt?.startedAt;
+    let attemptId: string;
+    let endTime: Date;
+    const savedAnswers: Record<string, string> = {};
 
-    if (!activeAttempt) {
+    if (activeAttempt) {
+      attemptId = activeAttempt.id;
+
+      // Calculate remaining time precisely from where student left off
+      const totalAllowedSeconds = (test.durationMinutes + (activeAttempt.extraTimeMinutes || 0)) * 60;
+      const timeSpentSoFar = activeAttempt.timeSpentSeconds || 0;
+      const remainingSeconds = Math.max(10, totalAllowedSeconds - timeSpentSoFar);
+      endTime = new Date(serverTime.getTime() + remainingSeconds * 1000);
+
+      // Record when this resume session started
+      await prisma.testAttempt.update({
+        where: { id: activeAttempt.id },
+        data: { resumedAt: serverTime }
+      });
+
+      // Load already selected answers
+      activeAttempt.answers.forEach(a => {
+        if (a.selectedAnswer) {
+          savedAnswers[a.questionId] = a.selectedAnswer;
+        }
+      });
+    } else {
       const newAttempt = await prisma.testAttempt.create({
         data: {
           testId,
           studentId: student.id,
           status: "IN_PROGRESS",
-          attemptNumber: attemptsUsed + 1
+          attemptNumber: attemptsUsed + 1,
+          resumedAt: serverTime
         }
       });
       attemptId = newAttempt.id;
-      existingAttemptStartedAt = newAttempt.startedAt;
+      endTime = new Date(serverTime.getTime() + test.durationMinutes * 60000);
     }
 
     let displayQuestions = test.questions.map(q => ({
@@ -136,61 +160,77 @@ export async function POST(req: Request) {
       imageUrl: q.imageUrl,
     }));
 
-    // Track shuffling information for answer validation
+    // If resuming an attempt with existing question shufflings, preserve the exact option mapping
+    const existingShufflings = activeAttempt?.questionShufflings as Record<string, Record<string, string>> | null;
     const questionShufflings: Record<string, Record<string, string>> = {};
 
-    if (test.randomizeQuestions) {
-      displayQuestions = displayQuestions.sort(() => Math.random() - 0.5);
-    }
-
-    // Shuffle options for each question if enabled
-    if (test.randomizeOptions) {
-      const options = ['A', 'B', 'C', 'D'];
-      
+    if (existingShufflings && Object.keys(existingShufflings).length > 0) {
       displayQuestions = displayQuestions.map(q => {
-        // Create array of [letter, option_text] pairs
-        const optionPairs: [string, string][] = [
-          ['A', q.optionA],
-          ['B', q.optionB],
-          ['C', q.optionC],
-          ['D', q.optionD],
-        ];
-
-        // Shuffle the pairs
-        for (let i = optionPairs.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [optionPairs[i], optionPairs[j]] = [optionPairs[j], optionPairs[i]];
+        if (existingShufflings[q.id]) {
+          const mapping = existingShufflings[q.id];
+          const origOptions: Record<string, string> = {
+            "A": q.optionA,
+            "B": q.optionB,
+            "C": q.optionC,
+            "D": q.optionD,
+          };
+          return {
+            ...q,
+            optionA: origOptions[mapping["A"]] || q.optionA,
+            optionB: origOptions[mapping["B"]] || q.optionB,
+            optionC: origOptions[mapping["C"]] || q.optionC,
+            optionD: origOptions[mapping["D"]] || q.optionD,
+          };
         }
+        return q;
+      });
+    } else {
+      if (test.randomizeQuestions) {
+        displayQuestions = displayQuestions.sort(() => Math.random() - 0.5);
+      }
 
-        // Create mapping: new position -> original letter
-        const mapping: Record<string, string> = {};
-        optionPairs.forEach((pair, idx) => {
-          mapping[options[idx]] = pair[0]; // "A" -> "C" means display position A contains original option C
+      // Shuffle options for each question if enabled
+      if (test.randomizeOptions) {
+        const options = ["A", "B", "C", "D"];
+        
+        displayQuestions = displayQuestions.map(q => {
+          const optionPairs: [string, string][] = [
+            ["A", q.optionA],
+            ["B", q.optionB],
+            ["C", q.optionC],
+            ["D", q.optionD],
+          ];
+
+          for (let i = optionPairs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optionPairs[i], optionPairs[j]] = [optionPairs[j], optionPairs[i]];
+          }
+
+          const mapping: Record<string, string> = {};
+          optionPairs.forEach((pair, idx) => {
+            mapping[options[idx]] = pair[0];
+          });
+
+          questionShufflings[q.id] = mapping;
+
+          return {
+            ...q,
+            optionA: optionPairs[0][1],
+            optionB: optionPairs[1][1],
+            optionC: optionPairs[2][1],
+            optionD: optionPairs[3][1],
+          };
         });
 
-        questionShufflings[q.id] = mapping;
-
-        // Return question with shuffled options (mapping stored server-side, not sent to client)
-        return {
-          ...q,
-          optionA: optionPairs[0][1],
-          optionB: optionPairs[1][1],
-          optionC: optionPairs[2][1],
-          optionD: optionPairs[3][1],
-        };
-      });
-    }
-
-    const endTime = new Date(existingAttemptStartedAt!.getTime() + test.durationMinutes * 60000);
-
-    // Store shuffling information in attempt if options were shuffled
-    if (test.randomizeOptions && Object.keys(questionShufflings).length > 0) {
-      await prisma.testAttempt.update({
-        where: { id: attemptId },
-        data: {
-          questionShufflings: questionShufflings as any,
+        if (Object.keys(questionShufflings).length > 0) {
+          await prisma.testAttempt.update({
+            where: { id: attemptId },
+            data: {
+              questionShufflings: questionShufflings as Record<string, Record<string, string>>,
+            }
+          });
         }
-      });
+      }
     }
 
     return NextResponse.json({
@@ -201,10 +241,12 @@ export async function POST(req: Request) {
         totalQuestions: test.totalQuestions,
       },
       questions: displayQuestions,
+      savedAnswers,
       serverTime: serverTime.toISOString(),
       endTime: endTime.toISOString(),
     });
   } catch (error) {
+    console.error("Start test error:", error);
     return NextResponse.json({ error: "Failed to start test" }, { status: 500 });
   }
 }

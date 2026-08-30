@@ -51,16 +51,50 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
   useEffect(() => {
     if (window.innerWidth >= 1024) setShowPalette(true);
-    const data = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
-    if (data) {
-      const parsed = JSON.parse(data);
-      setExamData(parsed);
-      examDataRef.current = parsed;
-    } else {
-      alert("Exam session data not found. Please contact administrator.");
-      router.push("/dashboard");
-    }
-    
+
+    const loadSession = async () => {
+      const localData = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          setExamData(parsed);
+          examDataRef.current = parsed;
+          if (parsed.savedAnswers) {
+            setAnswers(prev => ({ ...parsed.savedAnswers, ...prev }));
+          }
+        } catch (e) {}
+      }
+
+      // Fetch fresh session from server to synchronize remaining timer & saved answers
+      try {
+        const res = await fetch(`/api/exam/session/${resolvedParams.attemptId}`);
+        const session = await res.json();
+        if (res.ok) {
+          if (session.isSubmitted) {
+            localStorage.removeItem(`exam_${resolvedParams.attemptId}`);
+            router.push(`/exam/result/${resolvedParams.attemptId}`);
+            return;
+          }
+          setExamData(session);
+          examDataRef.current = session;
+          localStorage.setItem(`exam_${resolvedParams.attemptId}`, JSON.stringify(session));
+          if (session.savedAnswers) {
+            setAnswers(prev => ({ ...session.savedAnswers, ...prev }));
+          }
+        } else if (!localData) {
+          alert(session.error || "Exam session data not found. Please contact administrator.");
+          router.push("/dashboard");
+        }
+      } catch (err) {
+        if (!localData) {
+          alert("Unable to connect to exam server. Please contact administrator.");
+          router.push("/dashboard");
+        }
+      }
+    };
+
+    loadSession();
+
     if (proctoringSettings.enforceFullscreen) {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen().catch(() => console.warn("Fullscreen denied by browser"));
@@ -176,10 +210,21 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     };
   }, [examData, submitTest, proctoringSettings.tabSwitchAction]);
 
-  const handleOptionSelect = async (questionId: string, option: string) => {
-    setAnswers(prev => ({ ...prev, [questionId]: option }));
+  const handleOptionSelect = useCallback((questionId: string, option: string) => {
     lastActivityTime.current = Date.now();
-    
+    setAnswers(prev => {
+      const next = { ...prev, [questionId]: option };
+      try {
+        const cached = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          parsed.savedAnswers = next;
+          localStorage.setItem(`exam_${resolvedParams.attemptId}`, JSON.stringify(parsed));
+        }
+      } catch {}
+      return next;
+    });
+
     fetch("/api/exam/save-answer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -189,7 +234,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         selectedAnswer: option
       })
     }).catch(console.error);
-  };
+  }, [resolvedParams.attemptId]);
 
   const handleManualSubmit = () => {
     setShowSubmitConfirm(true);

@@ -245,6 +245,13 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow">
               🎯 Best of Luck!
             </button>
+          ) : activeAttempt ? (
+            <Link 
+              href={`/exam/start/${test.id}`}
+              className="w-full block text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-black bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 transition shadow-lg animate-pulse"
+            >
+              Resume Test →
+            </Link>
           ) : isHoldingStage ? (
             <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-orange-300 bg-orange-950/60 border border-orange-800/80 cursor-not-allowed">
               ⌛ In Holding Period
