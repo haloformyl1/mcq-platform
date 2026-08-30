@@ -43,24 +43,33 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       existingAnswersMap.set(ans.questionId, ans);
     });
 
+    const hasSnapshot = Boolean(
+      attempt.previousAnswersSnapshot &&
+      typeof attempt.previousAnswersSnapshot === "object" &&
+      Object.keys(attempt.previousAnswersSnapshot).length > 0
+    );
     const snapshot = (attempt.previousAnswersSnapshot as Record<string, string> | null) || {};
 
     // Build complete answer list containing all test questions (including unattempted ones)
     const allAnswers = attempt.test.questions.map((question) => {
       const existing = existingAnswersMap.get(question.id);
       if (existing) {
-        const snapChoice = snapshot[question.id] || null;
-        const prevChoice = existing.previousAnswer || snapChoice || null;
-
+        let prevChoice: string | null = (existing.previousAnswer as string) || null;
         let isChanged = Boolean(existing.isChangedInResume);
-        if (!isChanged && prevChoice && existing.selectedAnswer && prevChoice !== existing.selectedAnswer) {
-          isChanged = true;
-        }
-
         let isFresh = Boolean(existing.isFreshInResume);
-        if (!isFresh && !prevChoice && existing.selectedAnswer && attempt.resumedAt && existing.answeredAt) {
-          if (new Date(existing.answeredAt as string | Date) >= new Date(attempt.resumedAt)) {
+
+        if (hasSnapshot) {
+          const wasInSnapshot = question.id in snapshot;
+          const snapChoice = snapshot[question.id] || null;
+
+          if (wasInSnapshot && snapChoice) {
+            prevChoice = snapChoice;
+            isChanged = existing.selectedAnswer !== snapChoice;
+            isFresh = false;
+          } else if (!wasInSnapshot && existing.selectedAnswer) {
             isFresh = true;
+            isChanged = false;
+            prevChoice = null;
           }
         }
 

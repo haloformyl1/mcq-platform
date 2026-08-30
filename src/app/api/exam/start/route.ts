@@ -124,16 +124,27 @@ export async function POST(req: Request) {
       const remainingSeconds = Math.max(10, totalAllowedSeconds - timeSpentSoFar);
       endTime = new Date(serverTime.getTime() + remainingSeconds * 1000);
 
-      // Record when this resume session started
-      await prisma.testAttempt.update({
-        where: { id: activeAttempt.id },
-        data: { resumedAt: serverTime }
-      });
+      // Load already selected answers and guarantee previous answers snapshot is stored
+      let snapshotToSave: Record<string, string> | null = null;
+      if (!activeAttempt.previousAnswersSnapshot) {
+        snapshotToSave = {};
+      }
 
-      // Load already selected answers
       activeAttempt.answers.forEach(a => {
         if (a.selectedAnswer) {
           savedAnswers[a.questionId] = a.selectedAnswer;
+          if (snapshotToSave) {
+            snapshotToSave[a.questionId] = a.selectedAnswer;
+          }
+        }
+      });
+
+      // Record when this resume session started and guarantee snapshot is frozen
+      await prisma.testAttempt.update({
+        where: { id: activeAttempt.id },
+        data: {
+          resumedAt: serverTime,
+          ...(snapshotToSave ? { previousAnswersSnapshot: snapshotToSave } : {})
         }
       });
     } else {

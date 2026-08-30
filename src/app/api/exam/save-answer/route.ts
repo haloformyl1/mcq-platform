@@ -42,16 +42,24 @@ export async function POST(req: Request) {
     let isFreshInResume = existingAnswer?.isFreshInResume ?? false;
 
     if (isResumedSession) {
-      const snapshot = (attempt.previousAnswersSnapshot as Record<string, string> | null) || {};
-      const originalChoice = snapshot[questionId] || existingAnswer?.previousAnswer || null;
+      const snapshot = attempt.previousAnswersSnapshot as Record<string, string> | null;
+      if (snapshot && typeof snapshot === "object") {
+        const wasInSnapshot = questionId in snapshot;
+        const originalChoice = snapshot[questionId] || null;
 
-      if (originalChoice) {
-        previousAnswer = originalChoice;
-        isChangedInResume = selectedAnswer !== originalChoice;
+        if (wasInSnapshot && originalChoice) {
+          previousAnswer = originalChoice;
+          isChangedInResume = selectedAnswer !== originalChoice;
+          isFreshInResume = false;
+        } else if (!wasInSnapshot) {
+          isFreshInResume = true;
+          isChangedInResume = false;
+          previousAnswer = null;
+        }
+      } else if (existingAnswer?.previousAnswer) {
+        previousAnswer = existingAnswer.previousAnswer;
+        isChangedInResume = selectedAnswer !== previousAnswer;
         isFreshInResume = false;
-      } else {
-        isFreshInResume = true;
-        isChangedInResume = false;
       }
     }
 

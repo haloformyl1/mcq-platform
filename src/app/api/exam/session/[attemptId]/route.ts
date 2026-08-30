@@ -53,14 +53,31 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
 
     const now = new Date();
 
+    let snapshotToSave: Record<string, string> | null = null;
+    if (!attempt.previousAnswersSnapshot && (attempt.timeSpentSeconds || 0) > 0) {
+      snapshotToSave = {};
+      attempt.answers.forEach(a => {
+        if (a.selectedAnswer) snapshotToSave![a.questionId] = a.selectedAnswer;
+      });
+    }
+
     if (attempt.resumedAt) {
       const elapsedSinceResume = Math.max(0, Math.floor((now.getTime() - new Date(attempt.resumedAt).getTime()) / 1000));
       remainingSeconds = Math.max(5, remainingSeconds - elapsedSinceResume);
+      if (snapshotToSave) {
+        await prisma.testAttempt.update({
+          where: { id: attempt.id },
+          data: { previousAnswersSnapshot: snapshotToSave }
+        });
+      }
     } else {
       // First session entry after start/reopen
       await prisma.testAttempt.update({
         where: { id: attempt.id },
-        data: { resumedAt: now }
+        data: {
+          resumedAt: now,
+          ...(snapshotToSave ? { previousAnswersSnapshot: snapshotToSave } : {})
+        }
       });
     }
 
