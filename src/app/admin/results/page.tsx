@@ -12,6 +12,9 @@ interface AttemptItem {
   submissionReason?: string | null;
   score?: number | null;
   percentage?: number | null;
+  timeSpentSeconds?: number | null;
+  resumedAt?: string | Date | null;
+  extraTimeMinutes?: number | null;
   student?: {
     id?: string;
     name?: string | null;
@@ -219,19 +222,47 @@ export default function AdminResults() {
                     {result.test?.title}
                   </div>
 
-                  <div className="flex justify-between items-center text-xs text-[#a6a6a6] pt-1">
-                    <div>
-                      <span className="text-[#737373]">Score: </span>
-                      <span className="font-bold text-white text-base">{result.score != null ? result.score : "-"}</span>
-                      {result.percentage != null && (
-                        <span className="text-blue-400 font-semibold ml-1.5">({Number(result.percentage).toFixed(1)}%)</span>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-white font-medium">{formattedDate}</div>
-                      <div className="text-[#737373] text-[11px]">{formattedTime}</div>
-                    </div>
-                  </div>
+                  {(() => {
+                    const isResumed = Boolean(
+                      result.resumedAt ||
+                      (result.timeSpentSeconds != null && result.timeSpentSeconds > 0) ||
+                      (result.extraTimeMinutes != null && result.extraTimeMinutes > 0)
+                    );
+                    const durM = result.test?.durationMinutes || 0;
+                    const leftSec = Math.max(0, durM * 60 - (result.timeSpentSeconds || 0));
+                    const allowedSec = leftSec + (result.extraTimeMinutes || 0) * 60;
+
+                    return (
+                      <div className="flex justify-between items-center text-xs text-[#a6a6a6] pt-1">
+                        <div>
+                          <span className="text-[#737373]">Score: </span>
+                          <span className="font-bold text-white text-base">{result.score != null ? result.score : "-"}</span>
+                          {result.percentage != null && (
+                            <span className="text-blue-400 font-semibold ml-1.5">({Number(result.percentage).toFixed(1)}%)</span>
+                          )}
+                          {isResumed && (
+                            <div className="text-[11px] text-cyan-300 font-semibold mt-0.5">
+                              Allowed: {formatSeconds(allowedSec)}
+                              <span className="text-[10px] text-[#888888] ml-1">({formatSeconds(leftSec)} leftover + {result.extraTimeMinutes || 0}m grace)</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-medium">{formattedDate}</div>
+                          <div className="text-[#737373] text-[11px]">{formattedTime}</div>
+                          {result.resumedAt ? (
+                            <div className="text-[11px] text-amber-400 font-bold mt-0.5">
+                              ⚡ Resumed: {new Date(result.resumedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </div>
+                          ) : isResumed && result.status === "IN_PROGRESS" ? (
+                            <div className="text-[11px] text-amber-400/80 font-medium mt-0.5">
+                              ⏳ Waiting start
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex flex-col gap-2 pt-2 border-t border-[#262626]">
                     {result.status === "SUBMITTED" && (
@@ -308,20 +339,59 @@ export default function AdminResults() {
                           <div className="text-xs text-[#a6a6a6] mt-1">{result.submissionReason.replace(/_/g, " ")}</div>
                         )}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        {result.status === "SUBMITTED" ? (
-                          <div>
-                            <div className="text-sm font-bold text-white">{result.score != null ? result.score : "-"}</div>
-                            <div className="text-xs text-blue-400 font-medium">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : ""}</div>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-[#a6a6a6]">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-[#a6a6a6]">
-                        <div>{formattedDate}</div>
-                        <div className="text-xs text-[#737373]">{formattedTime}</div>
-                      </td>
+                      {(() => {
+                        const isResumed = Boolean(
+                          result.resumedAt ||
+                          (result.timeSpentSeconds != null && result.timeSpentSeconds > 0) ||
+                          (result.extraTimeMinutes != null && result.extraTimeMinutes > 0)
+                        );
+                        const durM = result.test?.durationMinutes || 0;
+                        const leftSec = Math.max(0, durM * 60 - (result.timeSpentSeconds || 0));
+                        const allowedSec = leftSec + (result.extraTimeMinutes || 0) * 60;
+
+                        return (
+                          <>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              {result.status === "SUBMITTED" ? (
+                                <div>
+                                  <div className="text-sm font-bold text-white">{result.score != null ? result.score : "-"}</div>
+                                  <div className="text-xs text-blue-400 font-medium">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : ""}</div>
+                                  {isResumed && (
+                                    <div className="text-[11px] text-cyan-300 font-semibold mt-0.5">
+                                      Resumed Allowed: {formatSeconds(allowedSec)}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  <span className="text-sm text-[#a6a6a6]">-</span>
+                                  {isResumed && (
+                                    <div className="text-xs text-cyan-300 font-semibold mt-0.5">
+                                      Allowed: {formatSeconds(allowedSec)}
+                                      <div className="text-[10px] text-[#888888]">
+                                        ({formatSeconds(leftSec)} leftover + {result.extraTimeMinutes || 0}m grace)
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-[#a6a6a6]">
+                              <div>{formattedDate}</div>
+                              <div className="text-xs text-[#737373]">Initial: {formattedTime}</div>
+                              {result.resumedAt ? (
+                                <div className="text-xs font-bold text-amber-400 mt-0.5">
+                                  ⚡ Resumed: {new Date(result.resumedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                </div>
+                              ) : isResumed && result.status === "IN_PROGRESS" ? (
+                                <div className="text-[11px] text-amber-400/80 font-medium mt-0.5">
+                                  ⏳ Waiting student start
+                                </div>
+                              ) : null}
+                            </td>
+                          </>
+                        );
+                      })()}
                       <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2 shrink-0">
                           {result.status === "SUBMITTED" && (

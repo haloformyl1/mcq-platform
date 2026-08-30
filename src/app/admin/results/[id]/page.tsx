@@ -131,6 +131,20 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
     durationText = `${mins}m ${secs}s`;
   }
 
+  const isResumed = Boolean(
+    result.resumedAt ||
+    (result.timeSpentSeconds != null && result.timeSpentSeconds > 0) ||
+    (result.extraTimeMinutes != null && result.extraTimeMinutes > 0)
+  );
+
+  const testDurationMinutes = result.test?.durationMinutes || 0;
+  const totalOriginalSeconds = testDurationMinutes * 60;
+  const spentBeforeResume = result.timeSpentSeconds || 0;
+  const leftOverSeconds = Math.max(0, totalOriginalSeconds - spentBeforeResume);
+  const extraGraceMinutes = result.extraTimeMinutes || 0;
+  const graceSeconds = extraGraceMinutes * 60;
+  const totalResumedAllowedSeconds = leftOverSeconds + graceSeconds;
+
   const totalQCount = result.test?.totalQuestions || result.answers.length;
   const avgTimePerQuestion = (secondsSpent > 0 && totalQCount > 0) ? (secondsSpent / totalQCount).toFixed(1) : "N/A";
 
@@ -213,19 +227,43 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
 
           <div className="bg-[#1e1e1e] p-4 rounded-md border border-[#333333] flex items-center gap-3">
             <Clock className="w-8 h-8 text-amber-400 shrink-0" />
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="text-xs text-[#a6a6a6]">Start & Submit Time</div>
-              <div className="text-xs font-medium text-white">{startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
-              <div className="text-xs text-[#a6a6a6]">{submitTime ? submitTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "Not submitted"}</div>
+              <div className="text-xs font-medium text-white">
+                Initial: {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </div>
+              {result.resumedAt ? (
+                <div className="text-xs font-bold text-amber-400 mt-0.5">
+                  ⚡ Resumed: {new Date(result.resumedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </div>
+              ) : isResumed && result.status === "IN_PROGRESS" ? (
+                <div className="text-xs font-semibold text-amber-400/80 mt-0.5">
+                  ⏳ Resumed: Awaiting student start
+                </div>
+              ) : null}
+              <div className="text-xs text-[#737373] mt-0.5">
+                {submitTime ? `Submitted: ${submitTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : "Not submitted"}
+              </div>
             </div>
           </div>
 
           <div className="bg-[#1e1e1e] p-4 rounded-md border border-[#333333] flex items-center gap-3">
             <Award className="w-8 h-8 text-emerald-400 shrink-0" />
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="text-xs text-[#a6a6a6]">Total Duration</div>
               <div className="text-sm font-bold text-white">{durationText}</div>
-              <div className="text-xs text-[#a6a6a6]">Allowed: {result.test?.durationMinutes} mins</div>
+              {isResumed ? (
+                <div className="mt-0.5">
+                  <div className="text-xs text-cyan-300 font-bold">
+                    Allowed: {formatSeconds(totalResumedAllowedSeconds)}
+                  </div>
+                  <div className="text-[10px] text-[#888888]">
+                    ({formatSeconds(leftOverSeconds)} leftover + {extraGraceMinutes}m grace)
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-[#a6a6a6]">Allowed: {result.test?.durationMinutes} mins</div>
+              )}
             </div>
           </div>
 
@@ -238,6 +276,79 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
+
+        {/* Resumed Session Details Banner (Shown if test was approved/reopened by Admin) */}
+        {isResumed && (
+          <div className="mt-4 bg-gradient-to-r from-amber-950/40 via-[#1c1811] to-cyan-950/30 border border-amber-500/50 rounded-xl p-4 sm:p-5 shadow-lg space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/40 shrink-0">
+                  <RotateCcw className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-400">Resumed Test Session</span>
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-semibold">
+                      Admin Approved
+                    </span>
+                    {result.status === "IN_PROGRESS" && (
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-green-500/20 text-green-300 border border-green-500/40 font-mono font-semibold animate-pulse">
+                        Active In Progress
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-white font-medium mt-1">
+                    {result.resumedAt ? (
+                      <>
+                        Student started the test again at:{" "}
+                        <span className="text-amber-300 font-bold font-mono text-base">
+                          {new Date(result.resumedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                        </span>{" "}
+                        <span className="text-xs text-[#a6a6a6]">({new Date(result.resumedAt).toLocaleDateString()})</span>
+                      </>
+                    ) : (
+                      <span className="text-amber-300 font-medium">
+                        Approval granted by Admin — awaiting student to click Continue Test.
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div className="bg-black/50 border border-cyan-500/40 p-3.5 rounded-lg shadow-inner">
+                <div className="text-[11px] text-[#a6a6a6] uppercase font-semibold">Total Allowed in Resumed Test</div>
+                <div className="text-xl font-bold text-cyan-300 font-mono mt-0.5">
+                  {formatSeconds(totalResumedAllowedSeconds)}
+                </div>
+                <div className="text-[10px] text-cyan-400/80 mt-0.5 font-medium">
+                  previously left over + grace time
+                </div>
+              </div>
+
+              <div className="bg-black/40 border border-white/10 p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#a6a6a6] uppercase font-semibold">Previously Left Over Time</div>
+                <div className="text-xl font-bold text-white font-mono mt-0.5">
+                  {formatSeconds(leftOverSeconds)}
+                </div>
+                <div className="text-[10px] text-[#737373] mt-0.5">
+                  ({formatSeconds(spentBeforeResume)} used of {testDurationMinutes}m test)
+                </div>
+              </div>
+
+              <div className="bg-black/40 border border-white/10 p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#a6a6a6] uppercase font-semibold">Admin Grace Time Added</div>
+                <div className="text-xl font-bold text-amber-400 font-mono mt-0.5">
+                  +{extraGraceMinutes} mins
+                </div>
+                <div className="text-[10px] text-amber-300/80 mt-0.5 font-medium">
+                  bonus time granted by admin
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Score Summary Metrics Cards */}

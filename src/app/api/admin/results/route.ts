@@ -20,7 +20,7 @@ export async function GET() {
       orderBy: { startedAt: "desc" },
       include: {
         student: { select: { id: true, name: true, email: true } },
-        test: { select: { id: true, title: true, totalQuestions: true } },
+        test: { select: { id: true, title: true, totalQuestions: true, durationMinutes: true } },
       }
     });
     return NextResponse.json(attempts);
