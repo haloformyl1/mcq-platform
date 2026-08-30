@@ -460,41 +460,41 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
               }`}
             >
               {/* Question Header & Status Badge */}
-              <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex items-center justify-between gap-4 mb-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold text-sm bg-[#262626] border border-[#404040] text-white px-2.5 py-1 rounded">
+                  <span className="font-bold text-xs bg-[#222222] border border-[#383838] text-white px-2 py-0.5 rounded">
                     Q{idx + 1}
                   </span>
                   {status === 'correct' && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-400 bg-green-900/30 border border-green-800 px-2.5 py-1 rounded-full">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Correct
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-400 bg-green-950/50 border border-green-800/60 px-2 py-0.5 rounded-full">
+                      ✓ Correct
                     </span>
                   )}
                   {status === 'incorrect' && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 bg-red-900/30 border border-red-800 px-2.5 py-1 rounded-full">
-                      <XCircle className="w-3.5 h-3.5" /> Wrongly Answered
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-400 bg-red-950/50 border border-red-800/60 px-2 py-0.5 rounded-full">
+                      ✕ Wrong
                     </span>
                   )}
                   {status === 'unanswered' && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#a6a6a6] bg-[#262626] border border-[#404040] px-2.5 py-1 rounded-full">
-                      <MinusCircle className="w-3.5 h-3.5" /> Not Attempted
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#888888] bg-[#1c1c1c] border border-[#333333] px-2 py-0.5 rounded-full">
+                      Unanswered
                     </span>
                   )}
                   {ans.isChangedInResume && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-950/70 border border-amber-500/70 px-2.5 py-1 rounded-full shadow-sm">
-                      <RotateCcw className="w-3.5 h-3.5" /> Answer Changed in Resume (Was Option {ans.previousAnswer} ➔ Changed to Option {ans.selectedAnswer})
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                      Changed: {ans.previousAnswer} ➔ {ans.selectedAnswer}
                     </span>
                   )}
                   {ans.isFreshInResume && (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 bg-cyan-950/60 border border-cyan-700/60 px-2.5 py-1 rounded-full">
-                      ⚡ Freshly Attempted in Resume
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 px-2 py-0.5 rounded-full">
+                      ⚡ Fresh
                     </span>
                   )}
                 </div>
 
                 {ans.answeredAt && (
-                  <span className="text-xs text-[#8c8c8c] flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> Answered at {new Date(ans.answeredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  <span className="text-xs text-[#737373]">
+                    {new Date(ans.answeredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 )}
               </div>
@@ -504,38 +504,10 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                 {q.questionText}
               </p>
 
-              {/* Resume Change Indicator Alert */}
-              {ans.isChangedInResume && (
-                <div className="mb-3.5 p-3 rounded-lg bg-amber-950/30 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-inner">
-                  <div className="flex items-center gap-2">
-                    <RotateCcw className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>
-                      <strong>Answer Changed in Resumed Session:</strong> Student previously selected{" "}
-                      <span className="px-1.5 py-0.5 rounded bg-amber-900/60 text-amber-300 border border-amber-700/50 font-bold font-mono">
-                        Option {ans.previousAnswer}
-                      </span>{" "}
-                      and changed it to{" "}
-                      <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/60 font-bold font-mono">
-                        Option {ans.selectedAnswer}
-                      </span>
-                    </span>
-                  </div>
-                  {ans.answeredAt && (
-                    <span className="text-[11px] text-[#a6a6a6] shrink-0 font-mono">
-                      Updated at: {new Date(ans.answeredAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                    </span>
-                  )}
-                </div>
-              )}
 
-              {ans.isFreshInResume && (
-                <div className="mb-3.5 p-2.5 rounded-lg bg-cyan-950/20 border border-cyan-700/40 text-xs text-cyan-300 flex items-center gap-2 shadow-inner">
-                  <span>⚡ <strong>Freshly Attempted:</strong> This question was unattempted initially and answered for the first time during the resumed test session.</span>
-                </div>
-              )}
 
               {/* Options Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-2">
                 {['A', 'B', 'C', 'D'].map((optKey) => {
                   const originalKey = mapping ? (mapping[optKey] || optKey) : optKey;
                   const optionText = q[`option${originalKey}`];
@@ -544,65 +516,59 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                   const isCorrectKey = q.correctAnswer === originalKey;
                   const isPreviousChoice = ans.isChangedInResume && ans.previousAnswer === optKey;
 
-                  let cardStyle = "border-[#3a3a3a] bg-[#1e1e1e] text-[#a6a6a6]";
+                  let cardStyle = "border-[#262626] bg-[#141414] text-[#a6a6a6]";
                   const badges: Array<{ text: string; style: string }> = [];
 
-                  // Always mark the correct answer key clearly everywhere
                   if (isCorrectKey) {
+                    cardStyle = "border-green-600/50 bg-green-950/20 text-green-200 font-medium";
+                    if (isStudentSelection) {
+                      badges.push({
+                        text: "✓ Correct",
+                        style: "bg-green-500/20 text-green-300 border-green-500/30 font-semibold"
+                      });
+                    } else {
+                      badges.push({
+                        text: "✓ Correct Answer",
+                        style: "bg-green-500/20 text-green-300 border-green-500/30 font-semibold"
+                      });
+                    }
+                  } else if (isStudentSelection) {
+                    cardStyle = "border-red-600/50 bg-red-950/20 text-red-200 font-medium";
                     badges.push({
-                      text: "Correct Answer Key",
-                      style: "bg-green-900/70 text-green-300 border-green-500/60"
+                      text: "✕ Your Choice",
+                      style: "bg-red-500/20 text-red-300 border-red-500/30 font-semibold"
                     });
+                  } else if (isPreviousChoice) {
+                    cardStyle = "border-amber-600/40 border-dashed bg-amber-950/15 text-amber-200";
                   }
 
-                  if (isStudentSelection) {
-                    if (isCorrectKey) {
-                      cardStyle = "border-green-500 bg-green-950/40 text-green-200 font-medium shadow-sm ring-1 ring-green-500/40";
-                      badges.push({
-                        text: ans.isChangedInResume ? "Student Choice (Changed ➔ Correct)" : "Student Choice (Correct)",
-                        style: "bg-green-800/80 text-green-100 border-green-400/60"
-                      });
-                    } else {
-                      cardStyle = "border-red-500 bg-red-950/40 text-red-200 font-medium shadow-sm";
-                      badges.push({
-                        text: ans.isChangedInResume ? "Student Choice (Changed ➔ Wrong)" : "Student Choice (Wrong)",
-                        style: "bg-red-900/70 text-red-200 border-red-500/60"
-                      });
-                    }
-                  } else if (isPreviousChoice) {
+                  if (isPreviousChoice) {
                     badges.push({
-                      text: "Previously Selected Option",
-                      style: "bg-amber-950/80 text-amber-300 border-amber-500/60"
+                      text: "Prev Choice",
+                      style: "bg-amber-500/15 text-amber-300 border-amber-500/25"
                     });
-                    if (isCorrectKey) {
-                      cardStyle = "border-green-500/90 bg-green-950/30 text-green-200 font-medium shadow-sm ring-1 ring-green-500/30";
-                    } else {
-                      cardStyle = "border-amber-500/70 border-dashed bg-amber-950/20 text-amber-200";
-                    }
-                  } else if (isCorrectKey) {
-                    cardStyle = "border-green-500/80 bg-green-950/25 text-green-200 font-medium shadow-sm";
                   }
 
                   return (
-                    <div key={optKey} className={`p-3 rounded-md border text-sm flex items-center justify-between gap-3 ${cardStyle}`}>
+                    <div key={optKey} className={`px-3 py-2.5 rounded-lg border text-sm flex items-center justify-between gap-3 ${cardStyle}`}>
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <span className={`font-bold w-6 h-6 flex items-center justify-center rounded text-xs shrink-0 border ${
+                        <span className={`w-5 h-5 flex items-center justify-center rounded text-xs shrink-0 font-bold border ${
                           isCorrectKey
-                            ? "bg-green-500 text-black border-green-400 font-black"
+                            ? "bg-green-500/25 text-green-300 border-green-500/40"
                             : isStudentSelection
-                            ? "bg-red-500/30 text-red-200 border-red-500/40 font-bold"
+                            ? "bg-red-500/25 text-red-300 border-red-500/40"
                             : isPreviousChoice
-                            ? "bg-amber-500/30 text-amber-200 border-amber-500/40 font-bold"
-                            : "bg-black/40 text-[#a6a6a6] border-white/10"
+                            ? "bg-amber-500/25 text-amber-300 border-amber-500/40"
+                            : "bg-white/5 text-[#888888] border-white/10"
                         }`}>
                           {optKey}
                         </span>
-                        <span className="truncate">{optionText}</span>
+                        <span className="truncate text-sm">{optionText}</span>
                       </div>
                       {badges.length > 0 && (
-                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           {badges.map((b, bIdx) => (
-                            <span key={bIdx} className={`text-[10px] uppercase font-bold shrink-0 px-2 py-0.5 rounded border ${b.style}`}>
+                            <span key={bIdx} className={`text-[11px] px-2 py-0.5 rounded-full border ${b.style}`}>
                               {b.text}
                             </span>
                           ))}
