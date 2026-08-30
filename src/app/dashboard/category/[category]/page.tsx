@@ -401,11 +401,19 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                       message: `🔥 Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `It will conclude on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
                     });
                   } else {
-                    rawItems.push({
-                      type: "UPCOMING",
-                      test: t,
-                      message: `⌛ Upcoming Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> concluded at <strong class="text-red-300 font-mono">${formatDateTime(lock)}</strong>. Students who missed this test may request the Admin to unlock access.`
-                    });
+                    // State 2: Concluded (live window passed)
+                    // Show notification for next 72 hours from the time it concluded; after that stop the notification.
+                    const concludedAt = lock;
+                    const msSinceConclusion = concludedAt ? now.getTime() - concludedAt.getTime() : Infinity;
+                    const maxHoldMs = 72 * 60 * 60 * 1000; // 72 hours
+
+                    if (concludedAt && msSinceConclusion >= 0 && msSinceConclusion <= maxHoldMs) {
+                      rawItems.push({
+                        type: "UPCOMING",
+                        test: t,
+                        message: `⌛ Upcoming Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> concluded at <strong class="text-red-300 font-mono">${formatDateTime(lock)}</strong>. Students who missed this test may request the Admin to unlock access.`
+                      });
+                    }
                   }
                 }
               });
