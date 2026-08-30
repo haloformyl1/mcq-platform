@@ -545,34 +545,68 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                   const isPreviousChoice = ans.isChangedInResume && ans.previousAnswer === optKey;
 
                   let cardStyle = "border-[#3a3a3a] bg-[#1e1e1e] text-[#a6a6a6]";
-                  let badgeText = null;
+                  const badges: Array<{ text: string; style: string }> = [];
 
-                  if (isStudentSelection && isCorrectKey) {
-                    cardStyle = "border-green-500 bg-green-950/40 text-green-200 font-medium shadow-sm";
-                    badgeText = ans.isChangedInResume ? "Student Choice (Changed ➔ Correct)" : "Student Choice (Correct)";
-                  } else if (isStudentSelection && !isCorrectKey) {
-                    cardStyle = "border-red-500 bg-red-950/40 text-red-200 font-medium shadow-sm";
-                    badgeText = ans.isChangedInResume ? "Student Choice (Changed ➔ Wrong)" : "Student Choice (Wrong)";
+                  // Always mark the correct answer key clearly everywhere
+                  if (isCorrectKey) {
+                    badges.push({
+                      text: "Correct Answer Key",
+                      style: "bg-green-900/70 text-green-300 border-green-500/60"
+                    });
+                  }
+
+                  if (isStudentSelection) {
+                    if (isCorrectKey) {
+                      cardStyle = "border-green-500 bg-green-950/40 text-green-200 font-medium shadow-sm ring-1 ring-green-500/40";
+                      badges.push({
+                        text: ans.isChangedInResume ? "Student Choice (Changed ➔ Correct)" : "Student Choice (Correct)",
+                        style: "bg-green-800/80 text-green-100 border-green-400/60"
+                      });
+                    } else {
+                      cardStyle = "border-red-500 bg-red-950/40 text-red-200 font-medium shadow-sm";
+                      badges.push({
+                        text: ans.isChangedInResume ? "Student Choice (Changed ➔ Wrong)" : "Student Choice (Wrong)",
+                        style: "bg-red-900/70 text-red-200 border-red-500/60"
+                      });
+                    }
                   } else if (isPreviousChoice) {
-                    cardStyle = "border-amber-500/70 border-dashed bg-amber-950/20 text-amber-200";
-                    badgeText = "Previously Selected Option";
-                  } else if (!isStudentSelection && isCorrectKey) {
-                    cardStyle = "border-green-500/60 bg-green-950/20 text-green-300 font-medium";
-                    badgeText = "Correct Answer Key";
+                    badges.push({
+                      text: "Previously Selected Option",
+                      style: "bg-amber-950/80 text-amber-300 border-amber-500/60"
+                    });
+                    if (isCorrectKey) {
+                      cardStyle = "border-green-500/90 bg-green-950/30 text-green-200 font-medium shadow-sm ring-1 ring-green-500/30";
+                    } else {
+                      cardStyle = "border-amber-500/70 border-dashed bg-amber-950/20 text-amber-200";
+                    }
+                  } else if (isCorrectKey) {
+                    cardStyle = "border-green-500/80 bg-green-950/25 text-green-200 font-medium shadow-sm";
                   }
 
                   return (
                     <div key={optKey} className={`p-3 rounded-md border text-sm flex items-center justify-between gap-3 ${cardStyle}`}>
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="font-bold w-6 h-6 flex items-center justify-center rounded bg-black/40 text-xs shrink-0 border border-white/10">
+                        <span className={`font-bold w-6 h-6 flex items-center justify-center rounded text-xs shrink-0 border ${
+                          isCorrectKey
+                            ? "bg-green-500 text-black border-green-400 font-black"
+                            : isStudentSelection
+                            ? "bg-red-500/30 text-red-200 border-red-500/40 font-bold"
+                            : isPreviousChoice
+                            ? "bg-amber-500/30 text-amber-200 border-amber-500/40 font-bold"
+                            : "bg-black/40 text-[#a6a6a6] border-white/10"
+                        }`}>
                           {optKey}
                         </span>
                         <span className="truncate">{optionText}</span>
                       </div>
-                      {badgeText && (
-                        <span className="text-[10px] uppercase font-bold shrink-0 px-2 py-0.5 rounded bg-black/40 border border-white/10">
-                          {badgeText}
-                        </span>
+                      {badges.length > 0 && (
+                        <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                          {badges.map((b, bIdx) => (
+                            <span key={bIdx} className={`text-[10px] uppercase font-bold shrink-0 px-2 py-0.5 rounded border ${b.style}`}>
+                              {b.text}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                   );
