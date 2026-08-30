@@ -115,6 +115,19 @@ export async function POST(req: Request) {
     let endTime: Date;
     const savedAnswers: Record<string, string> = {};
 
+    let displayQuestions = test.questions.map(q => ({
+      id: q.id,
+      questionText: q.questionText,
+      optionA: q.optionA,
+      optionB: q.optionB,
+      optionC: q.optionC,
+      optionD: q.optionD,
+      imageUrl: q.imageUrl,
+    }));
+
+    const existingShufflings = activeAttempt?.questionShufflings as Record<string, any> | null;
+    const existingQuestionOrder = (activeAttempt?.questionOrder as string[] | null) || (existingShufflings?._questionOrder as string[] | null);
+
     if (activeAttempt) {
       attemptId = activeAttempt.id;
 
@@ -139,6 +152,53 @@ export async function POST(req: Request) {
         }
       });
 
+      // Preserve existing question order if already established
+      let questionOrder = existingQuestionOrder;
+      if (questionOrder && Array.isArray(questionOrder) && questionOrder.length > 0) {
+        const orderMap = new Map(questionOrder.map((id, idx) => [id, idx]));
+        displayQuestions.sort((a, b) => {
+          const idxA = orderMap.has(a.id) ? orderMap.get(a.id)! : 999999;
+          const idxB = orderMap.has(b.id) ? orderMap.get(b.id)! : 999999;
+          return idxA - idxB;
+        });
+      } else {
+        // Fallback for attempts that did not have questionOrder saved
+        if (test.randomizeQuestions) {
+          for (let i = displayQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [displayQuestions[i], displayQuestions[j]] = [displayQuestions[j], displayQuestions[i]];
+          }
+        }
+        questionOrder = displayQuestions.map(q => q.id);
+        await prisma.testAttempt.update({
+          where: { id: activeAttempt.id },
+          data: { questionOrder }
+        });
+      }
+
+      // Preserve existing option shuffling
+      if (existingShufflings && Object.keys(existingShufflings).length > 0) {
+        displayQuestions = displayQuestions.map(q => {
+          if (existingShufflings[q.id]) {
+            const mapping = existingShufflings[q.id];
+            const origOptions: Record<string, string> = {
+              "A": q.optionA,
+              "B": q.optionB,
+              "C": q.optionC,
+              "D": q.optionD,
+            };
+            return {
+              ...q,
+              optionA: origOptions[mapping["A"]] || q.optionA,
+              optionB: origOptions[mapping["B"]] || q.optionB,
+              optionC: origOptions[mapping["C"]] || q.optionC,
+              optionD: origOptions[mapping["D"]] || q.optionD,
+            };
+          }
+          return q;
+        });
+      }
+
       // Record when this resume session started and guarantee snapshot is frozen
       await prisma.testAttempt.update({
         where: { id: activeAttempt.id },
@@ -148,57 +208,17 @@ export async function POST(req: Request) {
         }
       });
     } else {
-      const newAttempt = await prisma.testAttempt.create({
-        data: {
-          testId,
-          studentId: student.id,
-          status: "IN_PROGRESS",
-          attemptNumber: attemptsUsed + 1,
-          resumedAt: serverTime
-        }
-      });
-      attemptId = newAttempt.id;
-      endTime = new Date(serverTime.getTime() + test.durationMinutes * 60000);
-    }
-
-    let displayQuestions = test.questions.map(q => ({
-      id: q.id,
-      questionText: q.questionText,
-      optionA: q.optionA,
-      optionB: q.optionB,
-      optionC: q.optionC,
-      optionD: q.optionD,
-      imageUrl: q.imageUrl,
-    }));
-
-    // If resuming an attempt with existing question shufflings, preserve the exact option mapping
-    const existingShufflings = activeAttempt?.questionShufflings as Record<string, Record<string, string>> | null;
-    const questionShufflings: Record<string, Record<string, string>> = {};
-
-    if (existingShufflings && Object.keys(existingShufflings).length > 0) {
-      displayQuestions = displayQuestions.map(q => {
-        if (existingShufflings[q.id]) {
-          const mapping = existingShufflings[q.id];
-          const origOptions: Record<string, string> = {
-            "A": q.optionA,
-            "B": q.optionB,
-            "C": q.optionC,
-            "D": q.optionD,
-          };
-          return {
-            ...q,
-            optionA: origOptions[mapping["A"]] || q.optionA,
-            optionB: origOptions[mapping["B"]] || q.optionB,
-            optionC: origOptions[mapping["C"]] || q.optionC,
-            optionD: origOptions[mapping["D"]] || q.optionD,
-          };
-        }
-        return q;
-      });
-    } else {
+      // New Attempt: establish deterministic question order
       if (test.randomizeQuestions) {
-        displayQuestions = displayQuestions.sort(() => Math.random() - 0.5);
+        for (let i = displayQuestions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [displayQuestions[i], displayQuestions[j]] = [displayQuestions[j], displayQuestions[i]];
+        }
       }
+      const questionOrder = displayQuestions.map(q => q.id);
+      const questionShufflings: Record<string, any> = {
+        _questionOrder: questionOrder,
+      };
 
       // Shuffle options for each question if enabled
       if (test.randomizeOptions) {
@@ -232,16 +252,21 @@ export async function POST(req: Request) {
             optionD: optionPairs[3][1],
           };
         });
-
-        if (Object.keys(questionShufflings).length > 0) {
-          await prisma.testAttempt.update({
-            where: { id: attemptId },
-            data: {
-              questionShufflings: questionShufflings as Record<string, Record<string, string>>,
-            }
-          });
-        }
       }
+
+      const newAttempt = await prisma.testAttempt.create({
+        data: {
+          testId,
+          studentId: student.id,
+          status: "IN_PROGRESS",
+          attemptNumber: attemptsUsed + 1,
+          resumedAt: serverTime,
+          questionOrder,
+          questionShufflings: Object.keys(questionShufflings).length > 0 ? questionShufflings : undefined,
+        }
+      });
+      attemptId = newAttempt.id;
+      endTime = new Date(serverTime.getTime() + test.durationMinutes * 60000);
     }
 
     return NextResponse.json({

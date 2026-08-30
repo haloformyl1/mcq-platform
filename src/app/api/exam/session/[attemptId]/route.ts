@@ -84,9 +84,9 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
     const endTime = new Date(now.getTime() + remainingSeconds * 1000);
 
     // Reconstruct display questions respecting option shuffling if present
-    const shufflings = attempt.questionShufflings as Record<string, Record<string, string>> | null;
+    const shufflings = attempt.questionShufflings as Record<string, any> | null;
 
-    const displayQuestions = test.questions.map(q => {
+    let displayQuestions = test.questions.map(q => {
       let optionA = q.optionA;
       let optionB = q.optionB;
       let optionC = q.optionC;
@@ -116,6 +116,17 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
         imageUrl: q.imageUrl
       };
     });
+
+    // Reorder questions to strictly match the persistent questionOrder established at test start
+    const savedOrder = (attempt.questionOrder as string[] | null) || (shufflings?._questionOrder as string[] | null);
+    if (savedOrder && Array.isArray(savedOrder) && savedOrder.length > 0) {
+      const orderMap = new Map(savedOrder.map((id, idx) => [id, idx]));
+      displayQuestions.sort((a, b) => {
+        const idxA = orderMap.has(a.id) ? orderMap.get(a.id)! : 999999;
+        const idxB = orderMap.has(b.id) ? orderMap.get(b.id)! : 999999;
+        return idxA - idxB;
+      });
+    }
 
     const savedAnswers: Record<string, string> = {};
     attempt.answers.forEach(a => {

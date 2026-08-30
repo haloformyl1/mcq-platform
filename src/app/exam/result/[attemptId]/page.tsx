@@ -220,10 +220,23 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-3">
-                        <p className="font-semibold text-sm sm:text-base text-white leading-relaxed break-words">
-                          <span className="text-blue-400 font-bold mr-2">Q{idx + 1}.</span>
-                          {q.questionText}
-                        </p>
+                        <div className="flex-1">
+                          <p className="font-semibold text-sm sm:text-base text-white leading-relaxed break-words">
+                            <span className="text-blue-400 font-bold mr-2">Q{idx + 1}.</span>
+                            {q.questionText}
+                          </p>
+                          {q.imageUrl && (
+                            <div className="mt-3 mb-2 flex justify-center">
+                              <div className="relative max-w-full rounded-lg overflow-hidden border border-[#404040] bg-black/40 p-1.5 shadow-md">
+                                <img
+                                  src={q.imageUrl}
+                                  alt="Question diagram"
+                                  className="max-h-72 w-auto object-contain rounded"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
                         <span className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shrink-0 ${
                           status === 'correct' ? 'bg-green-900/40 text-green-300 border border-green-700' :
                           status === 'incorrect' ? 'bg-red-900/40 text-red-300 border border-red-700' :

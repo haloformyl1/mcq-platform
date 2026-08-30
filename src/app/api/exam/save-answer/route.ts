@@ -9,6 +9,7 @@ import { cookies } from "next/headers";
 export async function POST(req: Request) {
   try {
     const { attemptId, questionId, selectedAnswer } = await req.json();
+    const cleanSelectedAnswer = selectedAnswer && typeof selectedAnswer === "string" && selectedAnswer.trim() ? selectedAnswer.trim() : null;
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value;
     const payload = await decrypt(session!);
@@ -71,7 +72,7 @@ export async function POST(req: Request) {
         }
       },
       update: {
-        selectedAnswer,
+        selectedAnswer: cleanSelectedAnswer,
         answeredAt: new Date(),
         previousAnswer,
         isChangedInResume,
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
       create: {
         attemptId,
         questionId,
-        selectedAnswer,
+        selectedAnswer: cleanSelectedAnswer,
         answeredAt: new Date(),
         previousAnswer,
         isChangedInResume,

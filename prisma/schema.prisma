@@ -135,6 +135,7 @@ model TestAttempt {
   incorrectCount   Int?
   unansweredCount  Int?
   
+  questionOrder    Json?
   questionShufflings Json?   // Stores option shuffling mappings: { questionId: { "A": "C", "B": "A", ... } }
   timeSpentSeconds   Int?      @default(0)
   resumedAt          DateTime?

@@ -8,13 +8,38 @@ import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {
-    const { attemptId, reason = "MANUAL_SUBMISSION" } = await req.json();
+    const { attemptId, reason = "MANUAL_SUBMISSION", answers } = await req.json();
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value;
     const payload = await decrypt(session!);
     
     if (!payload || !payload.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Persist any answers passed directly with submission to prevent race conditions
+    if (answers && typeof answers === "object") {
+      const entries = Object.entries(answers);
+      for (const [qId, selAns] of entries) {
+        if (selAns && typeof selAns === "string") {
+          await prisma.answer.upsert({
+            where: {
+              attemptId_questionId: {
+                attemptId,
+                questionId: qId
+              }
+            },
+            update: {
+              selectedAnswer: selAns
+            },
+            create: {
+              attemptId,
+              questionId: qId,
+              selectedAnswer: selAns
+            }
+          });
+        }
+      }
     }
 
     const attempt = await prisma.testAttempt.findUnique({

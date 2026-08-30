@@ -79,6 +79,19 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
       };
     });
 
+    // Ensure questions on the result scrutiny page strictly follow the attempt question order
+    const savedOrder = (attempt.questionOrder as string[] | null) || ((attempt.questionShufflings as any)?._questionOrder as string[] | null);
+    if (savedOrder && Array.isArray(savedOrder) && savedOrder.length > 0) {
+      const orderMap = new Map(savedOrder.map((id, idx) => [id, idx]));
+      allAnswers.sort((a, b) => {
+        const qIdA = (a as any).questionId || "";
+        const idxA = orderMap.has(qIdA) ? orderMap.get(qIdA)! : 999999;
+        const qIdB = (b as any).questionId || "";
+        const idxB = orderMap.has(qIdB) ? orderMap.get(qIdB)! : 999999;
+        return idxA - idxB;
+      });
+    }
+
     const { test, ...attemptData } = attempt;
 
     return NextResponse.json({

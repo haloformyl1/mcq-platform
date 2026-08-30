@@ -48,6 +48,61 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   
   const lastActivityTime = useRef(Date.now());
   const examDataRef = useRef<any>(null);
+  const answersRef = useRef<Record<string, string>>({});
+  const saveQueueRef = useRef<Map<string, string | null>>(new Map());
+  const isSavingRef = useRef<boolean>(false);
+
+  const processSaveQueue = useCallback(async () => {
+    if (isSavingRef.current || saveQueueRef.current.size === 0) return;
+    isSavingRef.current = true;
+
+    const entry = saveQueueRef.current.entries().next().value;
+    if (!entry) {
+      isSavingRef.current = false;
+      return;
+    }
+    const [questionId, option] = entry;
+
+    try {
+      const res = await fetch("/api/exam/save-answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          attemptId: resolvedParams.attemptId,
+          questionId,
+          selectedAnswer: option
+        })
+      });
+      if (res.ok) {
+        saveQueueRef.current.delete(questionId);
+      }
+    } catch (e) {
+      console.warn("Retrying save-answer in background...", e);
+    } finally {
+      isSavingRef.current = false;
+      if (saveQueueRef.current.size > 0) {
+        setTimeout(processSaveQueue, 1000);
+      }
+    }
+  }, [resolvedParams.attemptId]);
+
+  useEffect(() => {
+    try {
+      const savedQ = localStorage.getItem(`exam_q_${resolvedParams.attemptId}`);
+      if (savedQ !== null) {
+        const idx = parseInt(savedQ, 10);
+        if (!isNaN(idx) && idx >= 0) {
+          setCurrentQ(idx);
+        }
+      }
+    } catch {}
+  }, [resolvedParams.attemptId]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(`exam_q_${resolvedParams.attemptId}`, currentQ.toString());
+    } catch {}
+  }, [currentQ, resolvedParams.attemptId]);
 
   useEffect(() => {
     if (window.innerWidth >= 1024) setShowPalette(true);
@@ -60,7 +115,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           setExamData(parsed);
           examDataRef.current = parsed;
           if (parsed.savedAnswers) {
-            setAnswers(prev => ({ ...parsed.savedAnswers, ...prev }));
+            setAnswers(prev => {
+              const merged = { ...parsed.savedAnswers, ...prev };
+              answersRef.current = merged;
+              return merged;
+            });
           }
         } catch (e) {}
       }
@@ -79,7 +138,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           examDataRef.current = session;
           localStorage.setItem(`exam_${resolvedParams.attemptId}`, JSON.stringify(session));
           if (session.savedAnswers) {
-            setAnswers(prev => ({ ...session.savedAnswers, ...prev }));
+            setAnswers(prev => {
+              const merged = { ...session.savedAnswers, ...prev };
+              answersRef.current = merged;
+              return merged;
+            });
           }
         } else if (!localData) {
           alert(session.error || "Exam session data not found. Please contact administrator.");
@@ -111,9 +174,16 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       await fetch("/api/exam/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ attemptId: resolvedParams.attemptId, reason })
+        body: JSON.stringify({
+          attemptId: resolvedParams.attemptId,
+          reason,
+          answers: answersRef.current
+        })
       });
-      localStorage.removeItem(`exam_${resolvedParams.attemptId}`);
+      try {
+        localStorage.removeItem(`exam_${resolvedParams.attemptId}`);
+        localStorage.removeItem(`exam_q_${resolvedParams.attemptId}`);
+      } catch {}
       router.push(`/exam/result/${resolvedParams.attemptId}`);
     } catch (e) {
       console.error("Submission failed", e);
@@ -159,8 +229,10 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     };
     
     const handleBlur = () => {
-      if (proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current) return;
-      submitTest("WINDOW_BLUR");
+      if (isMobileDevice || proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current) return;
+      if (document.visibilityState !== "visible") {
+        submitTest("TAB_SWITCH");
+      }
     };
 
     const handleFullscreenChange = () => {
@@ -213,7 +285,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const handleOptionSelect = useCallback((questionId: string, option: string) => {
     lastActivityTime.current = Date.now();
     setAnswers(prev => {
-      const next = { ...prev, [questionId]: option };
+      const isAlreadySelected = prev[questionId] === option;
+      const next = { ...prev };
+      if (isAlreadySelected) {
+        delete next[questionId];
+      } else {
+        next[questionId] = option;
+      }
+      answersRef.current = next;
       try {
         const cached = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
         if (cached) {
@@ -222,19 +301,36 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           localStorage.setItem(`exam_${resolvedParams.attemptId}`, JSON.stringify(parsed));
         }
       } catch {}
+
+      saveQueueRef.current.set(questionId, isAlreadySelected ? null : option);
+      setTimeout(processSaveQueue, 50);
+
       return next;
     });
+  }, [resolvedParams.attemptId, processSaveQueue]);
 
-    fetch("/api/exam/save-answer", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        attemptId: resolvedParams.attemptId,
-        questionId,
-        selectedAnswer: option
-      })
-    }).catch(console.error);
-  }, [resolvedParams.attemptId]);
+  const handleClearAnswer = useCallback((questionId: string) => {
+    lastActivityTime.current = Date.now();
+    setAnswers(prev => {
+      if (!prev[questionId]) return prev;
+      const next = { ...prev };
+      delete next[questionId];
+      answersRef.current = next;
+      try {
+        const cached = localStorage.getItem(`exam_${resolvedParams.attemptId}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          parsed.savedAnswers = next;
+          localStorage.setItem(`exam_${resolvedParams.attemptId}`, JSON.stringify(parsed));
+        }
+      } catch {}
+
+      saveQueueRef.current.set(questionId, null);
+      setTimeout(processSaveQueue, 50);
+
+      return next;
+    });
+  }, [resolvedParams.attemptId, processSaveQueue]);
 
   const handleManualSubmit = () => {
     setShowSubmitConfirm(true);
@@ -301,9 +397,21 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               </h2>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-medium mb-8 leading-relaxed">
+            <h2 className="text-xl sm:text-2xl font-medium mb-4 leading-relaxed">
               {currentQuestion.questionText}
             </h2>
+
+            {currentQuestion.imageUrl && (
+              <div className="mb-6 flex justify-center">
+                <div className="relative max-w-full rounded-xl overflow-hidden border border-[#404040] bg-black/40 p-2 shadow-lg">
+                  <img
+                    src={currentQuestion.imageUrl}
+                    alt="Question diagram"
+                    className="max-h-80 sm:max-h-96 w-auto object-contain rounded-lg"
+                  />
+                </div>
+              </div>
+            )}
             
             <div className="space-y-4">
               {['A', 'B', 'C', 'D'].map((opt) => {
@@ -315,7 +423,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   <div 
                     key={opt}
                     onClick={() => handleOptionSelect(currentQuestion.id, opt)}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-colors duration-150 ${
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-colors duration-150 touch-manipulation select-none active:scale-[0.99] ${
                       isSelected 
                         ? 'border-[#0099ff] bg-[#0099ff]/20' 
                         : 'border-[#404040] hover:border-white hover:bg-[#262626]'
@@ -353,16 +461,27 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                 Previous
               </button>
               
-              <button 
-                onClick={() => setMarkedForReview(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
-                className={`order-1 sm:order-2 px-4 py-3 sm:py-2 font-medium rounded-md border-2 transition-colors duration-150 w-full sm:w-auto text-center ${
-                  markedForReview[currentQuestion.id] 
-                    ? 'bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/50' 
-                    : 'bg-transparent border-[#404040] text-purple-400 hover:bg-[#262626] hover:border-purple-400'
-                }`}
-              >
-                {markedForReview[currentQuestion.id] ? "Marked for Review" : "Mark for Review"}
-              </button>
+              <div className="order-1 sm:order-2 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <button 
+                  onClick={() => setMarkedForReview(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
+                  className={`px-4 py-3 sm:py-2 font-medium rounded-md border-2 transition-colors duration-150 text-center ${
+                    markedForReview[currentQuestion.id] 
+                      ? 'bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/50' 
+                      : 'bg-transparent border-[#404040] text-purple-400 hover:bg-[#262626] hover:border-purple-400'
+                  }`}
+                >
+                  {markedForReview[currentQuestion.id] ? "Marked for Review" : "Mark for Review"}
+                </button>
+
+                {answers[currentQuestion.id] && (
+                  <button 
+                    onClick={() => handleClearAnswer(currentQuestion.id)}
+                    className="px-3 py-2 text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 rounded-md transition"
+                  >
+                    Clear Choice
+                  </button>
+                )}
+              </div>
 
               <button 
                 onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
@@ -520,9 +639,30 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">Submit Test</h2>
-            <p className="text-[#a6a6a6] mb-8 text-lg">
+            <p className="text-[#a6a6a6] mb-6 text-sm">
               Are you sure you want to submit your test? You will not be able to change your answers after submission.
             </p>
+
+            <div className="grid grid-cols-3 gap-2 p-3 mb-6 bg-[#222222] border border-[#333333] rounded-lg text-center text-xs">
+              <div>
+                <span className="block text-xl font-bold text-cyan-400">
+                  {Object.values(answers).filter(Boolean).length}
+                </span>
+                <span className="text-[#a6a6a6]">Answered</span>
+              </div>
+              <div>
+                <span className="block text-xl font-bold text-purple-400">
+                  {Object.keys(markedForReview).filter(k => markedForReview[k]).length}
+                </span>
+                <span className="text-[#a6a6a6]">Review</span>
+              </div>
+              <div>
+                <span className="block text-xl font-bold text-amber-400">
+                  {questions.length - Object.values(answers).filter(Boolean).length}
+                </span>
+                <span className="text-[#a6a6a6]">Unanswered</span>
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <button 
                 onClick={() => setShowSubmitConfirm(false)}
