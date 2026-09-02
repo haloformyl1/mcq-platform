@@ -836,7 +836,7 @@ export default function StudentAccountPage() {
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-amber-400" /> Pay via UPI VPA
                 </h3>
-                <p className="text-xs text-slate-400">Scan QR or Copy VPA to pay monthly fee</p>
+                <p className="text-xs text-slate-400">Scan QR Code with PhonePe, Google Pay, or Paytm</p>
               </div>
               <button 
                 onClick={() => setShowPaymentModal(false)}
