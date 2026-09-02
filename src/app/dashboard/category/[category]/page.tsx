@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
@@ -178,6 +178,11 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                 ⌛ CONCLUDED
               </span>
             )}
+                        {test.isPremium && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-[0_0_10px_rgba(245,158,11,0.4)] tracking-wide uppercase shrink-0 whitespace-nowrap">
+                ⭐ PREMIUM
+              </span>
+            )}
             {isLockedStage && (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-950/80 text-red-400 border border-red-800/60 shrink-0 whitespace-nowrap">
                 ⌛ EXPIRED
@@ -226,6 +231,11 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                 <div>⌛ Concluded at {formatDateTime(test.lockDate)}</div>
                 <div className="text-green-400 font-mono mt-0.5">Auto-lives: {formatDateTime(test.autoLiveDate)}</div>
               </div>
+            )}
+                        {test.isPremium && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-[0_0_10px_rgba(245,158,11,0.4)] tracking-wide uppercase shrink-0 whitespace-nowrap">
+                ⭐ PREMIUM
+              </span>
             )}
             {isLockedStage && (
               <div className="text-red-400 font-medium truncate">

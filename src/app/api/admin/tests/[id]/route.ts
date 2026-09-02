@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { recalculateTestAttempts } from "@/lib/recalculate";
 
@@ -67,6 +67,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         postLockHoldMinutes: typeof data.postLockHoldMinutes !== 'undefined' && !isNaN(parseInt(data.postLockHoldMinutes)) ? parseInt(data.postLockHoldMinutes) : 4320,
         targetBoard: data.targetBoard || "ALL",
         targetAcademicLevel: data.targetAcademicLevel || "ALL",
+        isPremium: Boolean(data.isPremium),
       },
     });
 

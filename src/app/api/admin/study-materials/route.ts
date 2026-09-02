@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
@@ -20,7 +20,8 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const title = formData.get("title") as string;
     const description = formData.get("description") as string || "";
-    const type = formData.get("type") as string; // PDF, IMAGE, LINK
+    const type = formData.get("type") as string;
+    const isPremium = formData.get("isPremium") === "true"; // PDF, IMAGE, LINK
     const url = formData.get("url") as string || "";
     const file = formData.get("file") as Blob | null;
 
@@ -64,7 +65,8 @@ export async function POST(req: Request) {
         description,
         type,
         url: finalUrl,
-        fileSize: fileSizeFormatted
+        fileSize: fileSizeFormatted,
+        isPremium
       }
     });
 
@@ -93,5 +95,19 @@ export async function DELETE(req: Request) {
   } catch (error) {
     console.error("Delete study material error:", error);
     return NextResponse.json({ error: "Failed to delete material" }, { status: 500 });
+  }
+}
+
+
+export async function PATCH(req: Request) {
+  try {
+    const { id, isPremium } = await req.json();
+    const updated = await prisma.studyMaterial.update({
+      where: { id },
+      data: { isPremium: Boolean(isPremium) }
+    });
+    return NextResponse.json({ success: true, material: updated });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to update material" }, { status: 500 });
   }
 }

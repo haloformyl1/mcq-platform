@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Upload, FileText, Image as ImageIcon, Link as LinkIcon, Trash2, Plus, ExternalLink, Download, File, CheckCircle2 } from "lucide-react";
@@ -14,8 +14,9 @@ export default function AdminStudyMaterials() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    type: "PDF", // PDF, IMAGE, LINK
+    type: "PDF",
     url: "",
+    isPremium: false,
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -56,6 +57,7 @@ export default function AdminStudyMaterials() {
       formData.append("title", form.title.trim());
       formData.append("description", form.description.trim());
       formData.append("type", form.type);
+      formData.append("isPremium", String(form.isPremium));
       formData.append("url", form.url.trim());
       if (selectedFile) {
         formData.append("file", selectedFile);
@@ -69,7 +71,7 @@ export default function AdminStudyMaterials() {
       const data = await res.json();
       if (res.ok) {
         setSuccess("Study material uploaded successfully!");
-        setForm({ title: "", description: "", type: "PDF", url: "" });
+        setForm({ title: "", description: "", type: "PDF", url: "", isPremium: false });
         setSelectedFile(null);
         fetchMaterials();
         setTimeout(() => setSuccess(null), 4000);
@@ -179,6 +181,14 @@ export default function AdminStudyMaterials() {
                 })}
               </div>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-gray-300">Access Plan Tier</label>
+            <select value={form.isPremium ? "PREMIUM" : "FREE"} onChange={(e) => setForm({ ...form, isPremium: e.target.value === "PREMIUM" })} className="w-full bg-[#262626] border border-amber-500/40 text-amber-300 font-bold rounded-lg px-3.5 py-2.5 text-xs outline-none cursor-pointer">
+              <option value="FREE" className="bg-[#1a1a1a] text-slate-300 font-normal">🔓 FREE (Available to All Students)</option>
+              <option value="PREMIUM" className="bg-amber-950 text-amber-300 font-bold">⭐ PREMIUM (Paid Subscribers Only)</option>
+            </select>
           </div>
 
           <div className="space-y-2">
