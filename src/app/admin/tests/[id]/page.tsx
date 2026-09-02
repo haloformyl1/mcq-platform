@@ -273,13 +273,8 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
       </div>
 
       <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-[#a6a6a6]">Title</label>
-          <input className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.title} onChange={e => setTest({...test, title: e.target.value})} />
-        </div>
-        <div>
-                  <div>
-          <label className="block text-sm font-medium text-[#a6a6a6]">Access Plan Tier</label>
+                <div>
+          <label className="block text-sm font-medium text-amber-300 font-bold">Access Plan Tier</label>
           <select 
             className="mt-1 block w-full bg-[#262626] border border-amber-500/40 text-amber-300 font-bold rounded-md p-2 focus:ring-amber-500 focus:border-amber-500" 
             value={test.isPremium ? "PREMIUM" : "FREE"} 
@@ -288,6 +283,10 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             <option value="FREE" className="bg-[#1a1a1a] text-slate-300 font-normal">🔓 FREE (Available to All Students)</option>
             <option value="PREMIUM" className="bg-amber-950 text-amber-300 font-bold">⭐ PREMIUM (Paid Subscribers Only)</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-[#a6a6a6]">Title</label>
+          <input className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.title} onChange={e => setTest({...test, title: e.target.value})} />
         </div>
         <div>
           <label className="block text-sm font-medium text-[#a6a6a6]">Status</label>
