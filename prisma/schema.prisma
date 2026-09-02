@@ -1,4 +1,4 @@
-generator client {
+﻿generator client {
   provider = "prisma-client-js"
 }
 
@@ -8,7 +8,6 @@ datasource db {
 }
 
 model Student {
-  subscriptionExpiresAt DateTime?
   id        String   @id @default(uuid())
   email     String   @unique
   passwordHash String?
@@ -22,6 +21,7 @@ model Student {
   otpExpiry DateTime?
   status    String   @default("ACTIVE") // ACTIVE, SUSPENDED
   subscriptionStatus String @default("FREE") // FREE, PAID
+  subscriptionExpiresAt DateTime?
   avatarUrl String?  @default("/avatars/atom.jpg")
   lastLogin DateTime?
   createdAt DateTime @default(now())
@@ -233,12 +233,6 @@ model SubscriptionUpgradeRequest {
 
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
-
-
-
-
-
-
 
 model PaymentSetting {
   id           String   @id @default("default")
