@@ -13,6 +13,14 @@ export async function GET() {
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+        try {
+      await prisma.$executeRawUnsafe(`ALTER TABLE "Test" ADD COLUMN IF NOT EXISTS "isPremium" BOOLEAN NOT NULL DEFAULT false;`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "Student" ADD COLUMN IF NOT EXISTS "subscriptionExpiresAt" TIMESTAMP(3);`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "StudyMaterial" ADD COLUMN IF NOT EXISTS "isPremium" BOOLEAN NOT NULL DEFAULT false;`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "SubscriptionUpgradeRequest" ADD COLUMN IF NOT EXISTS "utrNumber" TEXT, ADD COLUMN IF NOT EXISTS "amount" DOUBLE PRECISION DEFAULT 99.0;`);
+      await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "PaymentSetting" ("id" TEXT NOT NULL PRIMARY KEY, "upiId" TEXT NOT NULL DEFAULT '9830507435@upi', "payeeName" TEXT NOT NULL DEFAULT 'Arghyadeep Roy', "monthlyFee" DOUBLE PRECISION NOT NULL DEFAULT 99.0, "qrImageUrl" TEXT DEFAULT '', "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);`);
+    } catch (e) { console.error("Self migration note:", e); }
+
     const tests = await prisma.test.findMany({
       orderBy: { createdAt: "desc" },
       include: {
