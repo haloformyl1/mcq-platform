@@ -209,25 +209,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black flex flex-col font-sans text-white">
-            <nav className="bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between py-2.5 gap-2 md:gap-0">
-            {/* Top Row / Brand & Nav Links */}
-            <div className="flex items-center justify-between md:justify-start gap-4">
-              <div className="flex items-center space-x-3 shrink-0">
-                <PiechemLogo size="sm" />
-                <span className="border-l border-slate-700 pl-3 text-xs sm:text-sm text-cyan-400 font-semibold tracking-wide">
-                  Admin Portal
-                </span>
-              </div>
+            <nav className="bg-[#0b1724]/95 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="flex items-center justify-between h-16 gap-3">
+            
+            {/* Left Brand & Title */}
+            <div className="flex items-center space-x-3 shrink-0">
+              <PiechemLogo size="sm" />
+              <span className="border-l border-slate-700/80 pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
+                Admin Panel
+              </span>
+            </div>
 
-              {/* Desktop Nav Links */}
-              <div className="hidden lg:flex items-center space-x-1 pl-4 border-l border-slate-800">
+            {/* Middle Nav Links with horizontal scroll container */}
+            <div className="flex-1 flex items-center overflow-x-auto scrollbar-none py-1 mx-2">
+              <div className="flex items-center space-x-1 whitespace-nowrap">
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition shrink-0 ${
                       pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
                         ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-sm"
                         : "text-slate-300 hover:bg-slate-800 hover:text-white"
@@ -239,30 +240,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
 
-            {/* Mobile / Tablet Nav Scroll Bar */}
-            <div className="flex lg:hidden items-center space-x-1 overflow-x-auto pb-1 scrollbar-none border-t border-b border-slate-800/60 py-1.5">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
-                    pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
-                      ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-
             {/* Right Action Tools Bar */}
-            <div className="flex items-center space-x-2 shrink-0 justify-end">
+            <div className="flex items-center space-x-1.5 shrink-0">
               <button
                 onClick={handleTestAsStudent}
-                className="bg-amber-600/90 hover:bg-amber-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 shadow border border-amber-500/40 shrink-0"
+                className="bg-amber-600/90 hover:bg-amber-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-amber-500/40 shrink-0"
               >
-                <span>🎓 Test as Student</span>
+                <span>🎓 Student View</span>
               </button>
 
               <button
@@ -270,7 +254,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   setShowPaymentModal(true);
                   fetchPaymentSettings();
                 }}
-                className="bg-emerald-600/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 shadow border border-emerald-500/40 shrink-0"
+                className="bg-emerald-600/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-emerald-500/40 shrink-0"
               >
                 <span>💰 Payment</span>
               </button>
@@ -280,11 +264,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   setShowProctoringModal(true);
                   fetchProctoringSettings();
                 }}
-                className="bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 border border-red-500/40 shrink-0"
+                className="bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white p-1.5 rounded-lg transition border border-red-500/40 shrink-0"
                 title="Security Protocols"
               >
-                <Shield size={14} />
-                <span className="hidden xl:inline">Security</span>
+                <Shield size={16} />
               </button>
 
               <button
@@ -296,12 +279,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="text-slate-300 hover:bg-slate-800 hover:text-white p-1.5 rounded-lg transition border border-slate-700/60 shrink-0"
                 title="Change Credentials"
               >
-                <KeyRound size={15} />
+                <KeyRound size={16} />
               </button>
 
               <button
                 onClick={handleLogout}
-                className="text-red-400 hover:bg-red-950/60 hover:text-red-300 p-1.5 rounded-lg transition border border-red-900/40 shrink-0 text-xs font-bold"
+                className="text-red-400 hover:bg-red-950/60 hover:text-red-300 px-2 py-1 rounded-lg transition border border-red-900/40 shrink-0 text-xs font-bold"
                 title="Logout"
               >
                 Logout
