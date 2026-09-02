@@ -209,47 +209,70 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black flex flex-col font-sans text-white">
-      <nav className="bg-[#161616]/40 border-b border-[#404040]">
-        <div className="w-full px-3 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
-              <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-3">
+            <nav className="bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between py-2.5 gap-2 md:gap-0">
+            {/* Top Row / Brand & Nav Links */}
+            <div className="flex items-center justify-between md:justify-start gap-4">
+              <div className="flex items-center space-x-3 shrink-0">
                 <PiechemLogo size="sm" />
-                <span className="border-l border-gray-700 pl-2 sm:pl-3 text-xs sm:text-sm text-gray-300 font-medium tracking-wide whitespace-nowrap">Admin Panel</span>
+                <span className="border-l border-slate-700 pl-3 text-xs sm:text-sm text-cyan-400 font-semibold tracking-wide">
+                  Admin Portal
+                </span>
               </div>
-              <div className="hidden md:block min-w-0">
-                <div className="ml-2 lg:ml-6 flex items-baseline space-x-1 lg:space-x-2">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`px-2 lg:px-2.5 py-1.5 rounded-md text-xs lg:text-sm font-medium transition whitespace-nowrap ${
-                        pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
-                          ? "bg-[#262626] text-white"
-                          : "text-[#a6a6a6] hover:bg-[#333333] hover:text-white"
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
+
+              {/* Desktop Nav Links */}
+              <div className="hidden lg:flex items-center space-x-1 pl-4 border-l border-slate-800">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                      pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
+                        ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-sm"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
             </div>
-            <div className="flex items-center space-x-2 lg:space-x-3 overflow-x-auto py-2">
+
+            {/* Mobile / Tablet Nav Scroll Bar */}
+            <div className="flex lg:hidden items-center space-x-1 overflow-x-auto pb-1 scrollbar-none border-t border-b border-slate-800/60 py-1.5">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                    pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
+                      ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+
+            {/* Right Action Tools Bar */}
+            <div className="flex items-center space-x-2 shrink-0 justify-end">
               <button
                 onClick={handleTestAsStudent}
-                className="bg-amber-600/80 hover:bg-amber-600 text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center space-x-1 shadow-sm border border-amber-500/30 whitespace-nowrap shrink-0"
+                className="bg-amber-600/90 hover:bg-amber-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 shadow border border-amber-500/40 shrink-0"
               >
                 <span>🎓 Test as Student</span>
               </button>
-                            <button
+
+              <button
                 onClick={() => {
                   setShowPaymentModal(true);
                   fetchPaymentSettings();
                 }}
-                className="bg-emerald-600/80 hover:bg-emerald-500 text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-emerald-500/30 whitespace-nowrap shrink-0"
+                className="bg-emerald-600/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 shadow border border-emerald-500/40 shrink-0"
               >
-                <span>💰 Payment Settings</span>
+                <span>💰 Payment</span>
               </button>
 
               <button
@@ -257,27 +280,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   setShowProctoringModal(true);
                   fetchProctoringSettings();
                 }}
-                className="bg-red-950/60 hover:bg-red-900/80 text-red-400 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-red-500/40 whitespace-nowrap shrink-0"
-                title="Security Protocols & Proctoring Rules"
+                className="bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 border border-red-500/40 shrink-0"
+                title="Security Protocols"
               >
-                <Shield size={15} />
-                <span className="hidden sm:inline">Security Protocols</span>
-                <span className="sm:hidden">Security</span>
+                <Shield size={14} />
+                <span className="hidden xl:inline">Security</span>
               </button>
+
               <button
                 onClick={() => {
                   setModalError("");
                   setModalSuccess("");
                   setShowPasswordModal(true);
                 }}
-                className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white p-2 rounded-md transition border border-transparent hover:border-[#404040] shrink-0"
-                title="Change Password & Credentials"
+                className="text-slate-300 hover:bg-slate-800 hover:text-white p-1.5 rounded-lg transition border border-slate-700/60 shrink-0"
+                title="Change Credentials"
               >
-                <KeyRound size={18} />
+                <KeyRound size={15} />
               </button>
+
               <button
                 onClick={handleLogout}
-                className="text-[#a6a6a6] hover:bg-[#333333] hover:text-white px-2.5 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition shrink-0"
+                className="text-red-400 hover:bg-red-950/60 hover:text-red-300 p-1.5 rounded-lg transition border border-red-900/40 shrink-0 text-xs font-bold"
+                title="Logout"
               >
                 Logout
               </button>
