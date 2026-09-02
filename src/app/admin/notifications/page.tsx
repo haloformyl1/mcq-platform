@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Bell, Check, X, Clock, RefreshCw } from "lucide-react";
@@ -138,9 +138,18 @@ export default function NotificationsPage() {
                       </span>
                     </div>
 
-                    <p className="text-xs text-amber-200 font-medium pt-1">
-                      Requesting plan upgrade: <strong className="text-amber-400">FREE → PAID (GOLD SUBSCRIBER)</strong>
-                    </p>
+                                        <div className="bg-slate-950/90 p-3 rounded-lg border border-amber-500/40 space-y-1.5 font-mono text-xs">
+                      <div className="flex justify-between items-center text-slate-300">
+                        <span>Amount Paid:</span>
+                        <span className="font-extrabold text-green-400">₹{req.amount || 99}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-slate-300">
+                        <span>Payment UTR / Ref No:</span>
+                        <span className="font-extrabold text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800 tracking-wider">
+                          {req.utrNumber || "NOT PROVIDED"}
+                        </span>
+                      </div>
+                    </div>
 
                     <div className="text-xs text-[#8c8c8c] flex items-center gap-1.5 pt-1">
                       <Clock className="w-3.5 h-3.5 text-amber-400" />
