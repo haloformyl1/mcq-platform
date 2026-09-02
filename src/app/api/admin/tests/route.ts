@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
@@ -23,7 +23,7 @@ export async function GET() {
     });
     return NextResponse.json(tests);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch tests" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error); console.error("Error fetching tests:", error); return NextResponse.json({ error: "Failed to fetch tests: " + msg }, { status: 500 });
   }
 }
 
