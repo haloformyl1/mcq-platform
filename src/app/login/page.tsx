@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
@@ -234,7 +234,13 @@ export default function StudentLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black relative font-sans text-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* Header with PIECHEM logo */}
-      <header className="absolute top-0 left-0 w-full p-6 sm:p-8 flex items-center">
+      <div className="absolute top-0 left-0 w-full z-20 text-center py-2.5 px-4 bg-gradient-to-r from-cyan-500/10 via-blue-500/20 to-purple-500/10 border-b border-cyan-500/20 backdrop-blur-md shadow-sm">
+        <p className="text-xs sm:text-sm font-medium text-cyan-300 tracking-wide">
+          Designed by <span className="font-semibold text-white">Arghyadeep Roy</span> <span className="text-cyan-400/80 mx-1.5">&bull;</span> <span className="text-slate-300">Contact: <a href="tel:9830507435" className="hover:underline font-mono text-cyan-300">9830507435</a></span>
+        </p>
+      </div>
+
+      <header className="absolute top-10 left-0 w-full p-6 sm:p-8 flex items-center">
         <PiechemLogo size="lg" />
       </header>
 
