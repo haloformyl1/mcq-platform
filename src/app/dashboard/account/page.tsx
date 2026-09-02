@@ -865,24 +865,7 @@ export default function StudentAccountPage() {
                   <span className="text-xs text-slate-400">Payee Name:</span>
                   <span className="text-xs font-bold text-white">{paymentSettings?.payeeName || 'Arghyadeep Roy'}</span>
                 </div>
-                <div className="flex justify-between items-center pt-1 border-t border-slate-800">
-                  <span className="text-xs text-slate-400">UPI ID / VPA:</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800">
-                      {paymentSettings?.upiId || '9830507435@upi'}
-                    </span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(paymentSettings?.upiId || '9830507435@upi');
-                        setCopiedUpi(true);
-                        setTimeout(() => setCopiedUpi(false), 2000);
-                      }}
-                      className="p-1 text-slate-400 hover:text-white transition"
-                      title="Copy UPI VPA"
-                    >
-                      {copiedUpi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
+                
                 </div>
               </div>
             </div>
