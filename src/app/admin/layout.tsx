@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -19,6 +19,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [modalSuccess, setModalSuccess] = useState("");
 
   const [showProctoringModal, setShowProctoringModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 });
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentSaving, setPaymentSaving] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [subRequests, setSubRequests] = useState<any[]>([]);
+  const [copiedUpi, setCopiedUpi] = useState(false);
   const [proctoringLoading, setProctoringLoading] = useState(false);
   const [proctoringSaving, setProctoringSaving] = useState(false);
   const [proctoringSuccess, setProctoringSuccess] = useState("");
@@ -28,6 +35,66 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     enforceFullscreen: true,
     tabSwitchAction: "AUTO_SUBMIT"
   });
+
+  const fetchPaymentSettings = async () => {
+    setPaymentLoading(true);
+    try {
+      const res = await fetch("/api/admin/payment-settings");
+      const data = await res.json();
+      if (res.ok && data.settings) {
+        setPaymentForm({
+          upiId: data.settings.upiId || "9830507435@upi",
+          payeeName: data.settings.payeeName || "Arghyadeep Roy",
+          monthlyFee: data.settings.monthlyFee || 99.0
+        });
+      }
+      const subRes = await fetch("/api/admin/subscriptions");
+      const subData = await subRes.json();
+      if (subRes.ok && subData.requests) {
+        setSubRequests(subData.requests);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const handleSavePaymentSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaymentSaving(true);
+    setPaymentSuccess("");
+    try {
+      const res = await fetch("/api/admin/payment-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paymentForm)
+      });
+      if (res.ok) {
+        setPaymentSuccess("UPI Payment VPA & Subscription Settings Updated!");
+        setTimeout(() => setPaymentSuccess(""), 3000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPaymentSaving(false);
+    }
+  };
+
+  const handleProcessSubRequest = async (requestId: string, action: "APPROVE" | "REJECT") => {
+    try {
+      const res = await fetch("/api/admin/subscriptions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, action })
+      });
+      if (res.ok) {
+        setSubRequests(prev => prev.map(r => r.id === requestId ? { ...r, status: action === "APPROVE" ? "APPROVED" : "REJECTED" } : r));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchProctoringSettings = async () => {
     setProctoringLoading(true);
@@ -175,6 +242,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <span>🎓 Test as Student</span>
               </button>
+                            <button
+                onClick={() => {
+                  setShowPaymentModal(true);
+                  fetchPaymentSettings();
+                }}
+                className="bg-emerald-600/80 hover:bg-emerald-500 text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center space-x-1.5 shadow-sm border border-emerald-500/30 whitespace-nowrap shrink-0"
+              >
+                <span>💰 Payment Settings</span>
+              </button>
+
               <button
                 onClick={() => {
                   setShowProctoringModal(true);
@@ -401,6 +478,156 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </button>
                 </div>
               </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Admin UPI Payment & Subscription Control Window Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#161616] border border-emerald-500/50 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowPaymentModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-[#262626]"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center space-x-3 border-b border-[#333333] pb-4">
+              <div className="p-2.5 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-emerald-400">
+                💰
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">UPI Payment Settings & Subscriptions</h3>
+                <p className="text-xs text-gray-400">Configure admin UPI VPA, subscription fee, and process student payments</p>
+              </div>
+            </div>
+
+            {paymentSuccess && (
+              <div className="bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 p-3 rounded-xl text-xs font-medium flex items-center space-x-2">
+                <Check className="w-4 h-4" />
+                <span>{paymentSuccess}</span>
+              </div>
+            )}
+
+            {paymentLoading ? (
+              <div className="py-12 text-center text-sm text-gray-400">Loading payment configuration...</div>
+            ) : (
+              <div className="space-y-6">
+                {/* Section 1: Live QR & VPA Config */}
+                <form onSubmit={handleSavePaymentSettings} className="bg-[#1a1a1a] p-5 rounded-2xl border border-[#333333] space-y-4">
+                  <h4 className="text-sm font-bold text-emerald-400 border-b border-[#333333] pb-2 flex items-center gap-2">
+                    ⚡ Live UPI VPA & Dynamic QR Code Configuration
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                    {/* Instant Regenerated QR Code Preview */}
+                    <div className="bg-white p-3 rounded-xl text-center shadow-md">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${paymentForm.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentForm.payeeName || 'Arghyadeep Roy')}&am=${paymentForm.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+                        alt="Instant Generated QR"
+                        className="w-32 h-32 mx-auto"
+                      />
+                      <span className="text-[10px] text-gray-800 font-bold block mt-1">Live Student QR</span>
+                    </div>
+
+                    {/* VPA Inputs */}
+                    <div className="md:col-span-2 space-y-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">Admin UPI VPA (UPI ID) *</label>
+                        <input
+                          type="text"
+                          required
+                          value={paymentForm.upiId}
+                          onChange={(e) => setPaymentForm({ ...paymentForm, upiId: e.target.value })}
+                          placeholder="e.g. 9830507435@upi"
+                          className="w-full bg-[#262626] border border-[#404040] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-300 mb-1">Payee Name *</label>
+                          <input
+                            type="text"
+                            required
+                            value={paymentForm.payeeName}
+                            onChange={(e) => setPaymentForm({ ...paymentForm, payeeName: e.target.value })}
+                            className="w-full bg-[#262626] border border-[#404040] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-300 mb-1">Monthly Fee (₹) *</label>
+                          <input
+                            type="number"
+                            required
+                            value={paymentForm.monthlyFee}
+                            onChange={(e) => setPaymentForm({ ...paymentForm, monthlyFee: parseFloat(e.target.value) || 0 })}
+                            className="w-full bg-[#262626] border border-[#404040] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={paymentSaving}
+                        className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg disabled:opacity-50"
+                      >
+                        {paymentSaving ? "Saving..." : "Save Payment VPA & Update Student QR"}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                {/* Section 2: Student Payment UTR Verification Requests */}
+                <div className="bg-[#1a1a1a] p-5 rounded-2xl border border-[#333333] space-y-3">
+                  <h4 className="text-sm font-bold text-amber-400 border-b border-[#333333] pb-2">
+                    📋 Student Payment UTR Verification Queue ({subRequests.length})
+                  </h4>
+
+                  <div className="max-h-60 overflow-y-auto space-y-2">
+                    {subRequests.map((req) => (
+                      <div key={req.id} className="bg-[#262626] p-3 rounded-xl border border-[#404040] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                          <div className="text-xs font-bold text-white flex items-center gap-2">
+                            <span>{req.student?.name || 'Student'}</span>
+                            <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">
+                              {req.student?.email}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-gray-400 mt-1 flex flex-wrap gap-3">
+                            <span>UTR/Ref: <strong className="font-mono text-amber-300">{req.utrNumber || 'N/A'}</strong></span>
+                            <span>Amount: <strong className="text-green-400 font-mono">₹{req.amount || 99}</strong></span>
+                            <span>Status: <strong className={req.status === 'APPROVED' ? 'text-green-400' : req.status === 'REJECTED' ? 'text-red-400' : 'text-amber-400'}>{req.status}</strong></span>
+                          </div>
+                        </div>
+
+                        {req.status === "PENDING" && (
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => handleProcessSubRequest(req.id, "APPROVE")}
+                              className="px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white font-bold text-[11px] rounded-lg transition"
+                            >
+                              Approve (30 Days)
+                            </button>
+                            <button
+                              onClick={() => handleProcessSubRequest(req.id, "REJECT")}
+                              className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] rounded-lg transition"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {subRequests.length === 0 && (
+                      <p className="text-xs text-gray-500 text-center py-4">No student payment verification requests yet.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
