@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
+import { QrCode, Copy, Check, 
   User, Mail, Phone, Calendar, ShieldCheck, ArrowLeft, KeyRound, 
   CheckCircle2, AlertCircle, LogOut, Sparkles, BookOpen, Trophy, Clock, RefreshCw 
 } from "lucide-react";
@@ -38,6 +38,10 @@ export default function StudentAccountPage() {
 
   // Upgrade Request State
   const [upgradeReq, setUpgradeReq] = useState<any>(null);
+  const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 });
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [utrNumber, setUtrNumber] = useState("");
+  const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -75,6 +79,7 @@ export default function StudentAccountPage() {
       .then(res => res.json())
       .then(d => {
         if (d.request) setUpgradeReq(d.request);
+        if (d.paymentSettings) setPaymentSettings(d.paymentSettings);
       })
       .catch(() => {});
   };
@@ -108,13 +113,18 @@ export default function StudentAccountPage() {
   }, [router]);
 
   const handleSendUpgradeRequest = async () => {
+    if (!utrNumber.trim()) {
+      setUpgradeMsg({ type: "error", text: "Please enter your 12-digit UTR / Payment Reference Number." });
+      return;
+    }
     setRequestingUpgrade(true);
     setUpgradeMsg(null);
 
     try {
       const res = await fetch("/api/student/upgrade-request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ utrNumber: utrNumber.trim() })
       });
       const resData = await res.json();
 
@@ -444,7 +454,7 @@ export default function StudentAccountPage() {
                         <p className="text-[11px] text-red-200/80">You are currently on the Free plan. You may submit a new request below.</p>
                       </div>
                       <button
-                        onClick={handleSendUpgradeRequest}
+                        onClick={() => setShowPaymentModal(true)}
                         disabled={requestingUpgrade}
                         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                       >
@@ -454,7 +464,7 @@ export default function StudentAccountPage() {
                     </div>
                   ) : (
                     <button
-                      onClick={handleSendUpgradeRequest}
+                      onClick={() => setShowPaymentModal(true)}
                       disabled={requestingUpgrade}
                       className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                     >
@@ -816,6 +826,103 @@ export default function StudentAccountPage() {
 
         </div>
       </main>
+
+      {/* UPI Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-md bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 shadow-2xl space-y-6">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400" /> Pay via UPI VPA
+                </h3>
+                <p className="text-xs text-slate-400">Scan QR or Copy VPA to pay monthly fee</p>
+              </div>
+              <button 
+                onClick={() => setShowPaymentModal(false)}
+                className="text-slate-400 hover:text-white text-lg font-bold p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* QR & UPI Details */}
+            <div className="space-y-4 text-center">
+              <div className="inline-block p-3 bg-white rounded-2xl shadow-lg">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+                  alt="UPI Payment QR Code"
+                  className="w-40 h-40 mx-auto"
+                />
+              </div>
+
+              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2 text-left">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-400">Monthly Plan Fee:</span>
+                  <span className="text-sm font-extrabold text-green-400 font-mono">₹{paymentSettings?.monthlyFee || 99} / Month</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-400">Payee Name:</span>
+                  <span className="text-xs font-bold text-white">{paymentSettings?.payeeName || 'Arghyadeep Roy'}</span>
+                </div>
+                <div className="flex justify-between items-center pt-1 border-t border-slate-800">
+                  <span className="text-xs text-slate-400">UPI ID / VPA:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800">
+                      {paymentSettings?.upiId || '9830507435@upi'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(paymentSettings?.upiId || '9830507435@upi');
+                        setCopiedUpi(true);
+                        setTimeout(() => setCopiedUpi(false), 2000);
+                      }}
+                      className="p-1 text-slate-400 hover:text-white transition"
+                      title="Copy UPI VPA"
+                    >
+                      {copiedUpi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* UTR Input Form */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-slate-300">
+                Enter 12-Digit UTR / Transaction Ref No:
+              </label>
+              <input
+                type="text"
+                value={utrNumber}
+                onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ''))}
+                placeholder="e.g. 423456789012"
+                maxLength={18}
+                className="w-full bg-slate-950 text-white border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono focus:border-cyan-400 focus:outline-none"
+              />
+
+              {upgradeMsg && (
+                <div className={`p-2.5 rounded-xl text-xs ${upgradeMsg.type === 'success' ? 'bg-green-950 text-green-300 border border-green-700' : 'bg-red-950 text-red-300 border border-red-700'}`}>
+                  {upgradeMsg.text}
+                </div>
+              )}
+
+              <button
+                onClick={async () => {
+                  await handleSendUpgradeRequest();
+                  if (utrNumber.trim()) {
+                    setTimeout(() => setShowPaymentModal(false), 1500);
+                  }
+                }}
+                disabled={requestingUpgrade || !utrNumber.trim()}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition active:scale-95 disabled:opacity-50"
+              >
+                {requestingUpgrade ? "Submitting..." : "Submit Payment for Verification"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
