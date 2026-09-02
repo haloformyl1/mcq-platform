@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -424,7 +424,12 @@ export default function StudentDashboard() {
                             ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
                             : "bg-blue-950/90 text-cyan-300 border border-cyan-500/50"
                         }`}>
-                          {isPdf && <FileText className="w-3.5 h-3.5" />}
+                          {mat.isPremium && (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-[0_0_10px_rgba(245,158,11,0.4)] tracking-wide uppercase shrink-0 whitespace-nowrap">
+                            ⭐ PREMIUM
+                          </span>
+                        )}
+                        {isPdf && <FileText className="w-3.5 h-3.5" />}
                           {isImage && <ImageIcon className="w-3.5 h-3.5" />}
                           {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
                           {mat.type}
@@ -437,7 +442,15 @@ export default function StudentDashboard() {
                     </div>
 
                     <div className="pt-3 border-t border-cyan-950 flex justify-end relative z-10">
-                      <a
+                      {mat.isPremium && student?.subscriptionStatus !== "PAID" ? (
+                        <Link
+                          href="/dashboard/account"
+                          className="w-full text-center py-2 px-3 rounded-lg text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-md uppercase tracking-wider"
+                        >
+                          🔒 Subscribe to Access
+                        </Link>
+                      ) : (
+                        <a
                         href={mat.url}
                         target="_blank"
                         rel="noreferrer"
@@ -446,6 +459,7 @@ export default function StudentDashboard() {
                         <span>{mat.type === "LINK" ? "Open Link" : "View / Download"}</span>
                         {mat.type === "LINK" ? <ExternalLink className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
                       </a>
+                      )}
                     </div>
                   </div>
                 );

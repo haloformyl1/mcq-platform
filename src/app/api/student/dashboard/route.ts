@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { recalculateStudentAttempts } from "@/lib/recalculate";
 import { decrypt } from "@/lib/auth";
@@ -68,7 +68,8 @@ export async function GET(req: Request) {
         lockAt: true,
         postLockHoldMinutes: true,
         targetBoard: true,
-        targetAcademicLevel: true
+        targetAcademicLevel: true,
+        isPremium: true
       },
       orderBy: { createdAt: 'desc' }
     });
