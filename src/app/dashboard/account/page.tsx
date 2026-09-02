@@ -848,7 +848,7 @@ export default function StudentAccountPage() {
 
             {/* QR & UPI Details */}
             <div className="space-y-4 text-center">
-              <div className="inline-block p-3 bg-white rounded-2xl shadow-lg">
+                            <div className="inline-block p-3 bg-white rounded-2xl shadow-lg">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
                   alt="UPI Payment QR Code"
@@ -864,8 +864,6 @@ export default function StudentAccountPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400">Payee Name:</span>
                   <span className="text-xs font-bold text-white">{paymentSettings?.payeeName || 'Arghyadeep Roy'}</span>
-                </div>
-                
                 </div>
               </div>
             </div>
