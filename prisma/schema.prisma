@@ -8,6 +8,7 @@ datasource db {
 }
 
 model Student {
+  subscriptionExpiresAt DateTime?
   id        String   @id @default(uuid())
   email     String   @unique
   passwordHash String?
@@ -43,6 +44,7 @@ model AdminUser {
 }
 
 model Test {
+  isPremium           Boolean  @default(false)
   id                 String   @id @default(uuid())
   title              String
   description        String?
@@ -197,6 +199,7 @@ model ProctoringWarningLog {
 }
 
 model StudyMaterial {
+  isPremium   Boolean  @default(false)
   id          String   @id @default(uuid())
   title       String
   description String?
@@ -219,6 +222,8 @@ model TestAlertSetting {
 }
 
 model SubscriptionUpgradeRequest {
+  utrNumber String?
+  amount    Float?   @default(99.0)
   id        String   @id @default(uuid())
   studentId String
   status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
@@ -234,3 +239,12 @@ model SubscriptionUpgradeRequest {
 
 
 
+
+model PaymentSetting {
+  id           String   @id @default("default")
+  upiId        String   @default("9830507435@upi")
+  payeeName    String   @default("Arghyadeep Roy")
+  monthlyFee   Float    @default(99.0)
+  qrImageUrl   String?  @default("")
+  updatedAt    DateTime @updatedAt
+}
