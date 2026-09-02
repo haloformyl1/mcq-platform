@@ -424,11 +424,7 @@ export default function StudentDashboard() {
                             ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
                             : "bg-blue-950/90 text-cyan-300 border border-cyan-500/50"
                         }`}>
-                          {mat.isPremium && (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-[0_0_10px_rgba(245,158,11,0.4)] tracking-wide uppercase shrink-0 whitespace-nowrap">
-                            ⭐ PREMIUM
-                          </span>
-                        )}
+                          
                         {isPdf && <FileText className="w-3.5 h-3.5" />}
                           {isImage && <ImageIcon className="w-3.5 h-3.5" />}
                           {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
