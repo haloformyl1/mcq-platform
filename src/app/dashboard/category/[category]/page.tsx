@@ -178,11 +178,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                 ⌛ CONCLUDED
               </span>
             )}
-                        {test.isPremium && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-[0_0_10px_rgba(245,158,11,0.4)] tracking-wide uppercase shrink-0 whitespace-nowrap">
-                ⭐ PREMIUM
-              </span>
-            )}
+
             {isLockedStage && (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-950/80 text-red-400 border border-red-800/60 shrink-0 whitespace-nowrap">
                 ⌛ EXPIRED
