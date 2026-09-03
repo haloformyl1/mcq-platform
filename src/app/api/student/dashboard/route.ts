@@ -46,6 +46,8 @@ export async function GET(req: Request) {
         academicLevel: true, 
         status: true,
         subscriptionStatus: true,
+        subscriptionStartedAt: true,
+        subscriptionExpiresAt: true,
         avatarUrl: true,
         createdAt: true 
       }

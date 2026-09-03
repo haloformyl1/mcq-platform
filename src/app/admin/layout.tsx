@@ -249,15 +249,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span>🎓 Student View</span>
               </button>
 
-              <button
-                onClick={() => {
-                  setShowPaymentModal(true);
-                  fetchPaymentSettings();
-                }}
+              <Link
+                href="/admin/payments"
                 className="bg-emerald-600/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-emerald-500/40 shrink-0"
               >
                 <span>💰 Payment</span>
-              </button>
+              </Link>
 
               <button
                 onClick={() => {

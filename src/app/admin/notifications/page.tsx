@@ -1,14 +1,13 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Check, X, Clock, RefreshCw } from "lucide-react";
+import { Bell, Check, X, Clock, RefreshCw, CreditCard, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function NotificationsPage() {
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
-  const [upgradeRequests, setUpgradeRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [subActionLoading, setSubActionLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const fetchData = async () => {
@@ -19,7 +18,6 @@ export default function NotificationsPage() {
       if (!res.ok) throw new Error("Failed to fetch notifications");
       const data = await res.json();
       setPendingRequests(data.pendingRequests || data.accessRequests || []);
-      setUpgradeRequests(data.upgradeRequests || []);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -50,26 +48,6 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleSubscriptionAction = async (requestId: string, action: "APPROVE" | "REJECT") => {
-    setSubActionLoading(requestId);
-    try {
-      const res = await fetch("/api/admin/subscriptions", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId, action })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Subscription action failed");
-
-      setUpgradeRequests(prev => prev.filter(req => req.id !== requestId));
-      alert(action === "APPROVE" ? "Student upgraded to Gold Paid Subscriber successfully!" : "Upgrade request rejected.");
-    } catch (err: any) {
-      alert(err.message || "Failed to process upgrade request");
-    } finally {
-      setSubActionLoading(null);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -78,111 +56,47 @@ export default function NotificationsPage() {
     );
   }
 
-  const totalNotifications = pendingRequests.length + upgradeRequests.length;
-
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
+      {/* Header */}
       <div className="flex justify-between items-center border-b border-[#333333] pb-4">
         <div className="flex items-center space-x-3">
           <div className="p-2.5 bg-indigo-950/60 border border-indigo-500/40 rounded-lg text-indigo-400">
             <Bell className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Notifications & Access Requests</h1>
-            <p className="text-sm text-[#a6a6a6]">Review student subscription upgrades and test access requests.</p>
+            <h1 className="text-2xl font-bold text-white">Notifications & Access Requests</h1>
+            <p className="text-xs text-gray-400">Review student test access requests and exam permissions</p>
           </div>
         </div>
+        <div className="bg-[#1f1f1f] border border-[#333333] px-3.5 py-1.5 rounded-full text-xs font-semibold text-gray-300">
+          Pending Access Requests: <span className="text-amber-400 font-bold">{pendingRequests.length}</span>
+        </div>
+      </div>
+
+      {/* Redirect Banner to Payment Section */}
+      <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-cyan-950/80 border border-emerald-500/40 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="text-sm font-semibold bg-[#1a1a1a] px-3.5 py-1.5 rounded-full border border-[#333333]">
-            Total Pending: <span className="text-amber-400 font-bold ml-1">{totalNotifications}</span>
+          <div className="p-2 bg-emerald-900/60 rounded-xl border border-emerald-400/40 text-emerald-300">
+            <CreditCard className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white">Looking for Student Payment & Subscription Requests?</h3>
+            <p className="text-xs text-slate-300">All student UPI payments, UTR verification, and active subscription cycles are under the dedicated Payment Section.</p>
           </div>
         </div>
+        <Link
+          href="/admin/payments"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition whitespace-nowrap"
+        >
+          <span>Go to Payment Section</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
       </div>
 
       {error && <p className="text-red-400 bg-red-950/20 border border-red-800 p-4 rounded-lg">{error}</p>}
 
-      {/* 1. GOLD SUBSCRIPTION UPGRADE REQUESTS */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-extrabold text-amber-400 flex items-center gap-2">
-          <span>✨ Gold Subscription Upgrade Requests</span>
-          {upgradeRequests.length > 0 && (
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
-          )}
-        </h2>
-
-        {upgradeRequests.length === 0 ? (
-          <div className="bg-[#161616]/60 p-6 text-center text-[#a6a6a6] rounded-xl border border-[#333333]">
-            No pending subscription upgrade requests.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {upgradeRequests.map((req: any) => {
-              const student = req.student;
-              const studentName = student?.name || "N/A";
-              const studentEmail = student?.email || "N/A";
-              const studentPhone = student?.phone || "N/A";
-
-              return (
-                <div key={req.id} className="bg-gradient-to-b from-[#1c180e] via-[#141007] to-[#0a0803] border border-amber-500/50 p-5 rounded-xl flex flex-col justify-between gap-4 shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:border-amber-400 transition">
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2 border-b border-amber-500/20 pb-3">
-                      <div>
-                        <div className="font-extrabold text-white text-base flex items-center gap-2">
-                          <span>{studentName}</span>
-                        </div>
-                        <div className="text-xs text-amber-300/90 font-mono">{studentEmail}</div>
-                        <div className="text-xs text-gray-400 font-mono mt-0.5">Phone: {studentPhone}</div>
-                      </div>
-                      <span className="bg-amber-950 text-amber-300 border border-amber-500/60 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shrink-0 shadow">
-                        GOLD REQUEST
-                      </span>
-                    </div>
-
-                                        <div className="bg-slate-950/90 p-3 rounded-lg border border-amber-500/40 space-y-1.5 font-mono text-xs">
-                      <div className="flex justify-between items-center text-slate-300">
-                        <span>Amount Paid:</span>
-                        <span className="font-extrabold text-green-400">₹{req.amount || 99}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-slate-300">
-                        <span>Payment UTR / Ref No:</span>
-                        <span className="font-extrabold text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800 tracking-wider">
-                          {req.utrNumber || "NOT PROVIDED"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="text-xs text-[#8c8c8c] flex items-center gap-1.5 pt-1">
-                      <Clock className="w-3.5 h-3.5 text-amber-400" />
-                      <span>{new Date(req.createdAt).toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-2 border-t border-amber-500/20">
-                    <button
-                      onClick={() => handleSubscriptionAction(req.id, "REJECT")}
-                      disabled={subActionLoading === req.id}
-                      className="flex-1 bg-[#262626] hover:bg-red-950/60 text-red-400 hover:border-red-800 border border-[#404040] py-2.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
-                    >
-                      <X className="w-4 h-4" />
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => handleSubscriptionAction(req.id, "APPROVE")}
-                      disabled={subActionLoading === req.id}
-                      className="flex-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 py-2.5 px-3 rounded-lg text-xs font-black uppercase tracking-wider transition flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-[0_0_15px_rgba(245,158,11,0.4)] cursor-pointer"
-                    >
-                      <Check className="w-4 h-4 text-slate-950" />
-                      Approve Upgrade
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* 2. PENDING TEST ACCESS REQUESTS */}
+      {/* PENDING TEST ACCESS REQUESTS */}
       <section className="space-y-4">
         <h2 className="text-lg font-bold text-white flex items-center gap-2">
           <span>Pending Access Requests</span>
@@ -192,7 +106,7 @@ export default function NotificationsPage() {
         </h2>
 
         {pendingRequests.length === 0 ? (
-          <div className="bg-[#161616]/60 p-6 text-center text-[#a6a6a6] rounded-xl border border-[#333333]">
+          <div className="bg-[#161616]/60 p-8 text-center text-[#a6a6a6] rounded-2xl border border-[#333333]">
             No pending access requests.
           </div>
         ) : (

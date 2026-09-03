@@ -21,6 +21,7 @@ model Student {
   otpExpiry DateTime?
   status    String   @default("ACTIVE") // ACTIVE, SUSPENDED
   subscriptionStatus String @default("FREE") // FREE, PAID
+  subscriptionStartedAt DateTime?
   subscriptionExpiresAt DateTime?
   avatarUrl String?  @default("/avatars/atom.jpg")
   lastLogin DateTime?
@@ -228,6 +229,8 @@ model SubscriptionUpgradeRequest {
   studentId String
   status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
   note      String?
+  approvedAt DateTime?
+  expiresAt  DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
