@@ -188,23 +188,24 @@ export default function StudentDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white font-sans pb-20">
       <AdminPreviewBanner />
 
-      {/* Header */}
-      <header className="border-b border-cyan-500/20 bg-[#08131e]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
-          <div className="flex justify-between items-center gap-2">
-            <div className="flex flex-col items-start gap-1 shrink-0">
+            {/* Unified Navigation & Curriculum Command Bar */}
+      <header className="border-b border-cyan-500/25 bg-[#061019]/95 backdrop-blur-2xl sticky top-0 z-40 shadow-[0_10px_35px_rgba(0,0,0,0.6)]">
+        <div className="w-full py-2.5 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap lg:flex-nowrap justify-between items-center gap-3 sm:gap-4">
+            
+            {/* Left: Brand Identity & Designer Contact */}
+            <div className="flex items-center gap-3 shrink-0">
               <PiechemLogo size="md" href="/dashboard" />
               
-              {/* Student Contact Badge under Logo (Desktop view) */}
-              <div className="hidden sm:flex px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide items-center space-x-1.5 mt-0.5">
+              <div className="hidden sm:flex px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.15)] text-[11px] text-slate-300 font-semibold tracking-wide items-center space-x-1.5">
                 <span className="text-slate-400">Designed by</span>
                 <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
                   Arghyadeep Roy
                 </span>
-                <span className="text-cyan-500/60">•</span>
+                <span className="text-cyan-500/40">·</span>
                 <a 
                   href="tel:9830507435" 
-                  className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/50 transition-all font-mono shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                  className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/40 transition-all font-mono text-[10px]"
                   title="Call Arghyadeep Roy"
                 >
                   <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
@@ -215,28 +216,96 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {/* Center Welcome Greeting Badge */}
-            <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] text-xs text-slate-200">
-              <span className="text-slate-400">Welcome Back,</span>
-              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-blue-300">
-                {studentName}
-              </span>
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse ml-0.5"></span>
+            {/* Center: Integrated Active Curriculum Switcher */}
+            <div className="order-3 lg:order-2 w-full lg:w-auto flex items-center justify-center sm:justify-start lg:justify-center gap-2 bg-slate-950/70 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.12)]">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 hidden xl:inline">Curriculum:</span>
+              </div>
+
+              {/* Board Selector */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Board:</span>
+                <select
+                  value={student.board || 'CBSE'}
+                  disabled={updatingCurriculum}
+                  onChange={(e) => {
+                    const nb = e.target.value;
+                    const defaultLevel = nb === 'WBCHSE' ? 'SEM-I' : '11';
+                    handleCurriculumChange(nb, defaultLevel);
+                  }}
+                  className="bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 rounded-lg px-2.5 py-1 text-xs font-black tracking-wide focus:outline-none cursor-pointer transition shadow-inner"
+                >
+                  <option value="CBSE" className="bg-[#08131e] text-cyan-300 font-bold">CBSE</option>
+                  <option value="ICSE" className="bg-[#08131e] text-cyan-300 font-bold">ICSE</option>
+                  <option value="WBCHSE" className="bg-[#08131e] text-cyan-300 font-bold">WBCHSE</option>
+                </select>
+              </div>
+
+              {/* Semester / Class Selector */}
+              <div className="flex items-center gap-1.5 ml-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">
+                  {student.board === 'WBCHSE' ? 'Sem:' : 'Class:'}
+                </span>
+                {student.board === 'WBCHSE' ? (
+                  <select
+                    value={student.academicLevel || 'SEM-I'}
+                    disabled={updatingCurriculum}
+                    onChange={(e) => handleCurriculumChange(student.board || 'WBCHSE', e.target.value)}
+                    className="bg-teal-950/80 text-teal-300 border border-teal-500/50 hover:border-teal-400 rounded-lg px-2.5 py-1 text-xs font-black tracking-wide focus:outline-none cursor-pointer transition shadow-inner"
+                  >
+                    <option value="SEM-I" className="bg-[#08131e] text-teal-300 font-bold">SEM-I</option>
+                    <option value="SEM-II" className="bg-[#08131e] text-teal-300 font-bold">SEM-II</option>
+                    <option value="SEM-III" className="bg-[#08131e] text-teal-300 font-bold">SEM-III</option>
+                    <option value="SEM-IV" className="bg-[#08131e] text-teal-300 font-bold">SEM-IV</option>
+                  </select>
+                ) : (
+                  <select
+                    value={student.academicLevel || '11'}
+                    disabled={updatingCurriculum}
+                    onChange={(e) => handleCurriculumChange(student.board || 'CBSE', e.target.value)}
+                    className="bg-teal-950/80 text-teal-300 border border-teal-500/50 hover:border-teal-400 rounded-lg px-2.5 py-1 text-xs font-black tracking-wide focus:outline-none cursor-pointer transition shadow-inner"
+                  >
+                    <option value="11" className="bg-[#08131e] text-teal-300 font-bold">Class 11</option>
+                    <option value="12" className="bg-[#08131e] text-teal-300 font-bold">Class 12</option>
+                  </select>
+                )}
+              </div>
+
+              {updatingCurriculum ? (
+                <span className="text-[10px] text-cyan-400 font-mono animate-pulse ml-1">Updating...</span>
+              ) : (
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full ml-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Active
+                </span>
+              )}
             </div>
 
-            {/* Right Action Buttons */}
-            <div className="flex items-center gap-2 shrink-0">
+            {/* Right: Greeting + My Account + Logout */}
+            <div className="order-2 lg:order-3 flex items-center gap-2.5 shrink-0">
+              {/* Student Greeting */}
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-xs text-slate-300 shadow-sm">
+                <span className="text-slate-400 text-[11px]">Welcome,</span>
+                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-teal-200">
+                  {studentName.split(' ')[0]}
+                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
+
+              {/* My Account Button */}
               <Link 
                 href="/dashboard/account"
-                className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-600/90 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 <User className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
                 <span>My Account</span>
               </Link>
 
+              {/* Logout Button */}
               <button 
                 onClick={handleLogout} 
-                className="hidden md:flex items-center text-xs font-bold text-slate-400 hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-950/40 border border-transparent hover:border-red-900/40"
+                className="flex items-center text-xs font-bold text-slate-400 hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-950/40 border border-slate-800 hover:border-red-900/50 cursor-pointer"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -244,101 +313,25 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Student Contact Badge on Mobile (Full width row under logo) */}
-          <div className="flex sm:hidden justify-between items-center w-full pt-1.5 border-t border-cyan-500/15">
-            <div className="px-2.5 py-1 rounded-full bg-slate-950/90 border border-cyan-500/30 text-[10px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 w-full justify-between">
-              <div className="flex items-center space-x-1">
-                <span className="text-slate-400">Designed by</span>
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                  Arghyadeep Roy
-                </span>
-              </div>
-              <a 
-                href="tel:9830507435" 
-                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono text-[10px]"
-              >
-                <span>📞 9830507435</span>
-              </a>
+          {/* Mobile Developer Contact Ribbon */}
+          <div className="flex sm:hidden justify-between items-center w-full pt-2 mt-2 border-t border-cyan-500/15 text-[10px]">
+            <div className="flex items-center space-x-1 text-slate-400">
+              <span>Designed by</span>
+              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                Arghyadeep Roy
+              </span>
             </div>
+            <a 
+              href="tel:9830507435" 
+              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono"
+            >
+              <span>📞 9830507435</span>
+            </a>
           </div>
         </div>
       </header>
 
-      <main className="w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-
-        {/* Active Curriculum Filter & Quick View Switcher Bar (Glassmorphic Transparent) */}
-        <div className="bg-cyan-950/20 backdrop-blur-xl border border-cyan-500/30 p-4 sm:p-5 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-cyan-950/50 backdrop-blur-md rounded-xl border border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm sm:text-base font-extrabold text-white">Active Curriculum View</h3>
-                {updatingCurriculum && <span className="text-xs text-cyan-400 font-mono animate-pulse">Updating view...</span>}
-              </div>
-              <p className="text-xs text-slate-300">
-                Currently showing tests tailored for <strong className="text-cyan-300 font-bold">{student.board || 'CBSE'}</strong> • <strong className="text-teal-300 font-bold">{student.board === 'WBCHSE' ? student.academicLevel || 'SEM-I' : `Class ${student.academicLevel || '11'}`}</strong>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <div className="flex items-center gap-2 bg-slate-950/40 backdrop-blur-md p-1.5 rounded-xl border border-cyan-500/20 flex-1 md:flex-initial">
-              <span className="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider px-2">Board:</span>
-              <select
-                value={student.board || 'CBSE'}
-                disabled={updatingCurriculum}
-                onChange={(e) => {
-                  const nb = e.target.value;
-                  const defaultLevel = nb === 'WBCHSE' ? 'SEM-I' : '11';
-                  handleCurriculumChange(nb, defaultLevel);
-                }}
-                className="bg-cyan-950/70 text-cyan-300 border border-cyan-500/40 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none cursor-pointer"
-              >
-                <option value="CBSE" className="bg-[#08131e] text-cyan-300">CBSE</option>
-                <option value="ICSE" className="bg-[#08131e] text-cyan-300">ICSE</option>
-                <option value="WBCHSE" className="bg-[#08131e] text-cyan-300">WBCHSE</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 bg-slate-950/40 backdrop-blur-md p-1.5 rounded-xl border border-cyan-500/20 flex-1 md:flex-initial">
-              <span className="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider px-2">
-                {student.board === 'WBCHSE' ? 'Semester:' : 'Class:'}
-              </span>
-              {student.board === 'WBCHSE' ? (
-                <select
-                  value={student.academicLevel || 'SEM-I'}
-                  disabled={updatingCurriculum}
-                  onChange={(e) => handleCurriculumChange(student.board || 'WBCHSE', e.target.value)}
-                  className="bg-teal-950/70 text-teal-300 border border-teal-500/40 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none cursor-pointer"
-                >
-                  <option value="SEM-I" className="bg-[#08131e] text-teal-300">SEM-I</option>
-                  <option value="SEM-II" className="bg-[#08131e] text-teal-300">SEM-II</option>
-                  <option value="SEM-III" className="bg-[#08131e] text-teal-300">SEM-III</option>
-                  <option value="SEM-IV" className="bg-[#08131e] text-teal-300">SEM-IV</option>
-                </select>
-              ) : (
-                <select
-                  value={student.academicLevel || '11'}
-                  disabled={updatingCurriculum}
-                  onChange={(e) => handleCurriculumChange(student.board || 'CBSE', e.target.value)}
-                  className="bg-teal-950/70 text-teal-300 border border-teal-500/40 rounded-lg px-2.5 py-1 text-xs font-bold focus:outline-none cursor-pointer"
-                >
-                  <option value="11" className="bg-[#08131e] text-teal-300">Class 11</option>
-                  <option value="12" className="bg-[#08131e] text-teal-300">Class 12</option>
-                </select>
-              )}
-            </div>
-
-            <Link
-              href="/dashboard/account"
-              className="text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold px-2 py-1"
-            >
-              Account Settings
-            </Link>
-          </div>
-        </div>
+      <main className="w-full py-6 px-4 sm:px-6 lg:px-8 space-y-6">
 
         {/* 1. UPCOMING TEST ALERT BANNER (Shown at Top of Main Page) */}
         {(() => {
