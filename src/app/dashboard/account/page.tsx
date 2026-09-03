@@ -84,6 +84,10 @@ export default function StudentAccountPage() {
       .catch(() => {});
   };
 
+    useEffect(() => {
+    fetchUpgradeRequest();
+  }, []);
+
   useEffect(() => {
     fetch("/api/student/dashboard")
       .then((res) => {
@@ -124,7 +128,7 @@ export default function StudentAccountPage() {
       const res = await fetch("/api/student/upgrade-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ utrNumber: utrNumber.trim() })
+        body: JSON.stringify({ utrNumber: utrNumber.trim(), amount: paymentSettings?.monthlyFee || 99.0 })
       });
       const resData = await res.json();
 
@@ -454,7 +458,7 @@ export default function StudentAccountPage() {
                         <p className="text-[11px] text-red-200/80">You are currently on the Free plan. You may submit a new request below.</p>
                       </div>
                       <button
-                        onClick={() => setShowPaymentModal(true)}
+                        onClick={() => { setShowPaymentModal(true); fetchUpgradeRequest(); }}
                         disabled={requestingUpgrade}
                         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                       >
@@ -464,7 +468,7 @@ export default function StudentAccountPage() {
                     </div>
                   ) : (
                     <button
-                      onClick={() => setShowPaymentModal(true)}
+                      onClick={() => { setShowPaymentModal(true); fetchUpgradeRequest(); }}
                       disabled={requestingUpgrade}
                       className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                     >

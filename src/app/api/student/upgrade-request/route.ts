@@ -82,7 +82,14 @@ export async function GET(req: Request) {
       orderBy: { createdAt: "desc" }
     });
 
-    return NextResponse.json({ request: latestRequest });
+    let paymentSettings = await prisma.paymentSetting.findUnique({ where: { id: "default" } });
+    if (!paymentSettings) {
+      paymentSettings = await prisma.paymentSetting.create({
+        data: { id: "default", upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 }
+      });
+    }
+
+    return NextResponse.json({ request: latestRequest, paymentSettings });
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch upgrade request" }, { status: 500 });
   }
