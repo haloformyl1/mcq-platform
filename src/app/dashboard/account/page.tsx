@@ -963,26 +963,35 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
-                {/* Copy UPI ID Pill */}
-                <div className="w-full max-w-md flex items-center justify-between bg-slate-950/80 border border-cyan-500/20 px-4 py-2.5 rounded-xl text-xs">
-                  <span className="text-slate-400 font-medium">UPI VPA:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-cyan-300">
-                      {paymentSettings?.upiId || '9830507435@upi'}
-                    </span>
+                {/* Copy UPI ID Pill - VPA string hidden from public view for privacy */}
+                {paymentSettings?.upiId && (
+                  <div className="w-full max-w-md flex items-center justify-between bg-slate-950/80 border border-cyan-500/20 px-4 py-2.5 rounded-xl text-xs">
+                    <span className="text-slate-400 font-medium">Payment Handle:</span>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(paymentSettings?.upiId || '9830507435@upi');
-                        setCopiedUpi(true);
-                        setTimeout(() => setCopiedUpi(false), 2000);
+                        if (paymentSettings?.upiId) {
+                          navigator.clipboard.writeText(paymentSettings.upiId);
+                          setCopiedUpi(true);
+                          setTimeout(() => setCopiedUpi(false), 2000);
+                        }
                       }}
-                      className="p-1 hover:bg-slate-800 rounded text-cyan-400 hover:text-cyan-300 transition cursor-pointer"
-                      title="Copy UPI ID"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-950/80 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-500/30 rounded-lg transition text-xs font-semibold cursor-pointer"
+                      title="Copy UPI VPA to Clipboard"
                     >
-                      {copiedUpi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedUpi ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-green-400" />
+                          <span className="text-green-400">VPA Copied to Clipboard</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy Payment VPA</span>
+                        </>
+                      )}
                     </button>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Right Column: Step-by-Step Instructions & UTR Verification (6 cols) */}
