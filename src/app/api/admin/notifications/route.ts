@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -7,36 +7,23 @@ export async function GET(req: Request) {
   try {
     const accessRequests = await prisma.testAccessRequest.findMany({
       include: {
-        student: { select: { id: true, name: true, email: true } },
+        student: { select: { id: true, name: true, email: true, phone: true } },
         test: { select: { id: true, title: true, status: true } }
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    const warningLogs = await prisma.proctoringWarningLog.findMany({
-      include: {
-        student: { select: { id: true, name: true, email: true } },
-        test: { select: { id: true, title: true } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    const upgradeRequests = await prisma.subscriptionUpgradeRequest.findMany({
-      where: { status: "PENDING" },
-      include: {
-        student: { select: { id: true, name: true, email: true, phone: true, subscriptionStatus: true } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
     return NextResponse.json({
-      accessRequests,
-      warningLogs,
-      upgradeRequests
+      success: true,
+      accessRequests: accessRequests || [],
+      pendingRequests: accessRequests || []
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Fetch notifications error:", error);
-    return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 });
+    return NextResponse.json({ 
+      error: error?.message || "Failed to fetch notifications",
+      accessRequests: [],
+      pendingRequests: []
+    }, { status: 500 });
   }
 }
-
