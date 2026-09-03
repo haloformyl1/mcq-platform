@@ -830,7 +830,23 @@ export default function StudentAccountPage() {
       {/* UPI Payment Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-md bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 shadow-2xl space-y-6">
+                    <div className="relative w-full max-w-md bg-gradient-to-b from-[#19090c] via-[#0f0709] to-[#080304] border border-red-600/50 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(225,29,72,0.3)] space-y-6">
+            <div className="flex justify-between items-start border-b border-red-900/40 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-black text-red-600 tracking-tighter">PIECHEM</span>
+                  <span className="bg-red-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest">NETFLIX PASS</span>
+                </div>
+                <h3 className="text-lg font-black text-white mt-1">Unlock All Premium Content</h3>
+                <p className="text-xs text-slate-400">Instant access to all exclusive exams & study notes</p>
+              </div>
+              <button 
+                onClick={() => setShowPaymentModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+              >
+                ✕
+              </button>
+            </div>
             <div className="flex justify-between items-center border-b border-slate-800 pb-4">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">

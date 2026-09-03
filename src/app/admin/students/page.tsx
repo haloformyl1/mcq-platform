@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -171,12 +171,12 @@ export default function AdminStudents() {
                         }}
                         className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
                           student.subscriptionStatus === "PAID"
-                            ? "bg-amber-950/90 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+                            ? "bg-red-950/90 text-red-400 border-red-600/60 shadow-[0_0_12px_rgba(225,29,72,0.4)]"
                             : "bg-slate-900 text-slate-400 border-slate-700"
                         }`}
                       >
-                        <option value="FREE" className="bg-slate-900 text-slate-300">FREE</option>
-                        <option value="PAID" className="bg-amber-950 text-amber-300 font-bold">PAID (GOLD)</option>
+                                                <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE PASS</option>
+                        <option value="PAID" className="bg-red-950 text-red-400 font-bold">⭐ PAID (NETFLIX PASS)</option>
                       </select>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
