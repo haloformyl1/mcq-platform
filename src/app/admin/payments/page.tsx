@@ -532,7 +532,7 @@ export default function AdminPaymentsPage() {
                           <div>
                             <span className="text-[11px] text-slate-400 font-medium">Admin Manual Upgrade</span>
                             <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">
-                              {latestReq?.amount ? `Paid: ₹${latestReq.amount}` : "Paid: ₹0 (Complimentary)"}
+                              Paid: ₹0 (Complimentary)
                             </div>
                           </div>
                         )}
