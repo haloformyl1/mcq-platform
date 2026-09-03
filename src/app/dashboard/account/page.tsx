@@ -963,35 +963,7 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
-                {/* Copy UPI ID Pill - VPA string hidden from public view for privacy */}
-                {paymentSettings?.upiId && (
-                  <div className="w-full max-w-md flex items-center justify-between bg-slate-950/80 border border-cyan-500/20 px-4 py-2.5 rounded-xl text-xs">
-                    <span className="text-slate-400 font-medium">Payment Handle:</span>
-                    <button
-                      onClick={() => {
-                        if (paymentSettings?.upiId) {
-                          navigator.clipboard.writeText(paymentSettings.upiId);
-                          setCopiedUpi(true);
-                          setTimeout(() => setCopiedUpi(false), 2000);
-                        }
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-950/80 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-500/30 rounded-lg transition text-xs font-semibold cursor-pointer"
-                      title="Copy UPI VPA to Clipboard"
-                    >
-                      {copiedUpi ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-green-400" />
-                          <span className="text-green-400">VPA Copied to Clipboard</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copy Payment VPA</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
+
               </div>
 
               {/* Right Column: Step-by-Step Instructions & UTR Verification (6 cols) */}
