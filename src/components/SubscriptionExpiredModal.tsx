@@ -23,27 +23,29 @@ export default function SubscriptionExpiredModal({ student }: SubscriptionExpire
       return;
     }
 
-    // Check if subscription was a 30-day paid pass that is now expired
-    const isFree = student.subscriptionStatus === "FREE";
-    const expiryDate = new Date(student.subscriptionExpiresAt);
-    const now = new Date();
-    const isExpired = !isNaN(expiryDate.getTime()) && now >= expiryDate;
+    const checkExpiry = () => {
+      const expiryDate = new Date(student.subscriptionExpiresAt!);
+      if (isNaN(expiryDate.getTime())) return;
+      
+      const now = new Date();
+      // Triggers if expiry timestamp has passed
+      if (now >= expiryDate) {
+        const storageKey = `piechem_expiry_dismissed_${student.id}_${expiryDate.toISOString()}`;
+        const dismissed = localStorage.getItem(storageKey);
 
-    if (!isFree || !isExpired) {
-      return;
-    }
+        if (dismissed === "true") {
+          setIsDismissed(true);
+          setIsOpen(false);
+        } else {
+          setIsDismissed(false);
+          setIsOpen(true);
+        }
+      }
+    };
 
-    // Check if student has already clicked Ignore for this specific expired cycle
-    const storageKey = `piechem_expiry_dismissed_${student.id}_${expiryDate.toISOString()}`;
-    const dismissed = localStorage.getItem(storageKey);
-
-    if (dismissed === "true") {
-      setIsDismissed(true);
-      setIsOpen(false);
-    } else {
-      setIsDismissed(false);
-      setIsOpen(true);
-    }
+    checkExpiry();
+    const interval = setInterval(checkExpiry, 1000); // Live real-time check every second
+    return () => clearInterval(interval);
   }, [student]);
 
   const handleIgnore = () => {
