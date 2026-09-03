@@ -504,7 +504,7 @@ export default function AdminPaymentsPage() {
                   // If subscriptionStartedAt is null, fallback to approvedAt or createdAt
                   const activeSince = st.subscriptionStartedAt || latestReq?.approvedAt || st.updatedAt;
                   // If subscriptionExpiresAt is null, compute exactly 30 days from activeSince
-                  const expiresAt = st.subscriptionExpiresAt || (activeSince ? new Date(new Date(activeSince).getTime() + 30 * 24 * 60 * 60 * 1000) : null);
+                  const expiresAt = st.subscriptionExpiresAt || null;
                   const remaining = calculateRemainingDays(expiresAt);
                   const isExpired = remaining === "EXPIRED";
 
@@ -520,14 +520,21 @@ export default function AdminPaymentsPage() {
                       {/* UTR Info */}
                       <td className="px-4 py-3.5">
                         {latestReq?.utrNumber ? (
-                          <div className="inline-flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded border border-slate-800 font-mono font-bold text-cyan-300 text-[11px]">
-                            <span>{latestReq.utrNumber}</span>
+                          <div>
+                            <div className="inline-flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded border border-slate-800 font-mono font-bold text-cyan-300 text-[11px]">
+                              <span>{latestReq.utrNumber}</span>
+                            </div>
+                            <div className="text-[11px] text-green-400 font-mono font-bold mt-1">
+                              Paid: ₹{latestReq.amount || paymentSettings?.monthlyFee || 99}
+                            </div>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-500 italic">Admin Manual Upgrade</span>
-                        )}
-                        {latestReq?.amount && (
-                          <div className="text-[10px] text-green-400 font-mono mt-0.5">Paid: ₹{latestReq.amount}</div>
+                          <div>
+                            <span className="text-[11px] text-slate-400 font-medium">Admin Manual Upgrade</span>
+                            <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">
+                              {latestReq?.amount ? `Paid: ₹${latestReq.amount}` : "Paid: ₹0 (Complimentary)"}
+                            </div>
+                          </div>
                         )}
                       </td>
 
