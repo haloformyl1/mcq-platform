@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { formatDateTime24 } from "@/lib/subscription";
 import { useRouter } from "next/navigation";
 import PiFiringLoader from "@/components/PiFiringLoader";
 
@@ -33,6 +34,9 @@ interface Student {
   email: string;
   status: string;
   subscriptionStatus?: string;
+  subscriptionStartedAt?: string | null;
+  subscriptionExpiresAt?: string | null;
+  hasActiveUpi?: boolean;
   createdAt: string;
   lastLogin: string | null;
   _count: {
@@ -151,33 +155,46 @@ export default function AdminStudents() {
                         {student.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={student.subscriptionStatus || "FREE"}
-                        onChange={async (e) => {
-                          const newSub = e.target.value;
-                          try {
-                            const res = await fetch(`/api/admin/students/${student.id}/status`, {
-                              method: "PATCH",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ subscriptionStatus: newSub })
-                            });
-                            if (res.ok) {
-                              setStudents(prev => prev.map(s => s.id === student.id ? { ...s, subscriptionStatus: newSub } : s));
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {student.hasActiveUpi ? (
+                        <div 
+                          className="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-950 via-red-900 to-black px-2.5 py-1.5 rounded-lg border border-red-500/60 shadow-[0_0_12px_rgba(239,68,68,0.3)] text-red-300 text-xs font-bold cursor-not-allowed select-none"
+                          title={`Locked: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(student.subscriptionExpiresAt)}. Automatically reverts to FREE PASS after expiry, after which admin can edit.`}
+                        >
+                          <span className="text-xs">🔒</span>
+                          <span className="font-extrabold tracking-wide">PAID (UPI)</span>
+                        </div>
+                      ) : (
+                        <select
+                          value={student.subscriptionStatus || "FREE"}
+                          onChange={async (e) => {
+                            const newSub = e.target.value;
+                            try {
+                              const res = await fetch(`/api/admin/students/${student.id}/status`, {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ subscriptionStatus: newSub })
+                              });
+                              const resData = await res.json();
+                              if (res.ok) {
+                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, subscriptionStatus: newSub, subscriptionExpiresAt: null, hasActiveUpi: false } : s));
+                              } else {
+                                alert(resData.error || "Failed to update subscription");
+                              }
+                            } catch (err) {
+                              console.error("Failed to update subscription", err);
                             }
-                          } catch (err) {
-                            console.error("Failed to update subscription", err);
-                          }
-                        }}
-                        className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
-                          student.subscriptionStatus === "PAID"
-                            ? "bg-red-950/90 text-red-400 border-red-600/60 shadow-[0_0_12px_rgba(225,29,72,0.4)]"
-                            : "bg-slate-900 text-slate-400 border-slate-700"
-                        }`}
-                      >
-                                                <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE PASS</option>
-                        <option value="PAID" className="bg-red-950 text-red-400 font-bold">⭐ PAID (PREMIUM)</option>
-                      </select>
+                          }}
+                          className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer transition ${
+                            student.subscriptionStatus === "PAID"
+                              ? "bg-red-950/90 text-red-400 border-red-600/60 shadow-[0_0_12px_rgba(225,29,72,0.4)]"
+                              : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500"
+                          }`}
+                        >
+                          <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE PASS</option>
+                          <option value="PAID" className="bg-red-950 text-red-400 font-bold">⭐ PAID (PREMIUM)</option>
+                        </select>
+                      )}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="text-gray-200">{new Date(student.createdAt).toLocaleDateString()}</div>

@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { recalculateStudentAttempts } from "@/lib/recalculate";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { autoExpireSubscriptions } from "@/lib/subscription";
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,7 @@ export async function GET(req: Request) {
     }
 
     const studentId = payload.id;
+    await autoExpireSubscriptions();
 
     // Recalculate all submitted attempts for this student to guarantee latest scores
     await recalculateStudentAttempts(studentId);

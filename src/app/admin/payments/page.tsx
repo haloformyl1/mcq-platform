@@ -21,7 +21,7 @@ function formatDateTime24(dateInput: string | Date | null | undefined): string {
 }
 
 function calculateRemainingDays(expiresAtInput: string | Date | null | undefined): string {
-  if (!expiresAtInput) return "-";
+  if (!expiresAtInput) return "NEVER";
   const exp = new Date(expiresAtInput).getTime();
   const now = Date.now();
   const diffMs = exp - now;
@@ -537,19 +537,31 @@ export default function AdminPaymentsPage() {
                       </td>
 
                       {/* Next Payment / Expiry Date */}
-                      <td className="px-4 py-3.5 font-mono text-amber-300 font-bold whitespace-nowrap">
-                        {formatDateTime24(expiresAt)}
+                      <td className="px-4 py-3.5 font-mono whitespace-nowrap">
+                        {expiresAt ? (
+                          <span className="text-amber-300 font-bold">{formatDateTime24(expiresAt)}</span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-purple-950/90 text-purple-300 border border-purple-600/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase">
+                            ♾️ NEVER
+                          </span>
+                        )}
                       </td>
 
                       {/* Time Remaining */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
-                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border font-mono ${
-                          isExpired 
-                            ? "bg-red-950/80 text-red-400 border-red-800" 
-                            : "bg-emerald-950/80 text-emerald-300 border-emerald-700/60"
-                        }`}>
-                          {remaining}
-                        </span>
+                        {expiresAt ? (
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border font-mono ${
+                            isExpired 
+                              ? "bg-red-950/80 text-red-400 border-red-800" 
+                              : "bg-emerald-950/80 text-emerald-300 border-emerald-700/60"
+                          }`}>
+                            {remaining}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-emerald-950/80 text-emerald-300 border border-emerald-600/60 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase font-mono shadow-sm">
+                            ♾️ NEVER
+                          </span>
+                        )}
                       </td>
 
                       {/* Quick Actions */}

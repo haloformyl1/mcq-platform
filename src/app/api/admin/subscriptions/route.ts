@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { autoExpireSubscriptions } from "@/lib/subscription";
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,7 @@ export async function GET(req: Request) {
     }
 
     await ensureMigration();
+    await autoExpireSubscriptions();
 
     const requests = await prisma.subscriptionUpgradeRequest.findMany({
       orderBy: { createdAt: "desc" },
@@ -91,6 +93,7 @@ export async function PATCH(req: Request) {
     }
 
     await ensureMigration();
+    await autoExpireSubscriptions();
 
     const body = await req.json();
     const { requestId, studentId: targetStudentId, action } = body;
@@ -206,6 +209,7 @@ export async function POST(req: Request) {
     }
 
     await ensureMigration();
+    await autoExpireSubscriptions();
 
     const { utrQuery, batchUtrList } = await req.json();
 

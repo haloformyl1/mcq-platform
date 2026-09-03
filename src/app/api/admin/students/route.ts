@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { autoExpireSubscriptions } from "@/lib/subscription";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +15,9 @@ export async function GET(req: Request) {
     if (!payload || payload.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Auto-expire any overdue subscriptions
+    await autoExpireSubscriptions();
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
@@ -40,12 +44,31 @@ export async function GET(req: Request) {
         email: true,
         status: true,
         subscriptionStatus: true,
+        subscriptionStartedAt: true,
+        subscriptionExpiresAt: true,
         createdAt: true,
         lastLogin: true,
         _count: {
           select: { attempts: true }
+        },
+        upgradeRequests: {
+          where: { status: "APPROVED", utrNumber: { not: null } },
+          orderBy: { createdAt: "desc" },
+          take: 1
         }
       }
+    });
+
+    const formattedStudents = students.map((s) => {
+      const hasActiveUpi = s.subscriptionStatus === "PAID" &&
+        s.subscriptionExpiresAt &&
+        new Date(s.subscriptionExpiresAt) > new Date() &&
+        s.upgradeRequests && s.upgradeRequests.length > 0;
+
+      return {
+        ...s,
+        hasActiveUpi: !!hasActiveUpi
+      };
     });
 
     const totalStudents = await prisma.student.count();
@@ -53,7 +76,7 @@ export async function GET(req: Request) {
     const suspendedStudents = await prisma.student.count({ where: { status: 'SUSPENDED' } });
 
     return NextResponse.json({
-      students,
+      students: formattedStudents,
       stats: {
         totalStudents,
         activeStudents,
@@ -61,6 +84,7 @@ export async function GET(req: Request) {
       }
     });
   } catch (error) {
+    console.error("Fetch students error:", error);
     return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 });
   }
 }

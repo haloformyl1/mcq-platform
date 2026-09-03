@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { autoExpireSubscriptions } from "@/lib/subscription";
 
 export async function POST(req: Request) {
   try {
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Your account has been suspended. Please contact the administrator for assistance." }, { status: 403 });
     }
 
+    await autoExpireSubscriptions();
     // Check Subscription Limit for FREE students (Lifetime max 2 tests)
     const isPaidSubscriber = student.subscriptionStatus === "PAID";
     if (!isPaidSubscriber) {
