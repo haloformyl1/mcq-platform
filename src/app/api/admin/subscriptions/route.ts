@@ -47,7 +47,7 @@ export async function GET(req: Request) {
 
     const activeStudents = await prisma.student.findMany({
       where: { subscriptionStatus: "PAID" },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ subscriptionStartedAt: "desc" }, { updatedAt: "desc" }],
       select: {
         id: true,
         name: true,
@@ -56,9 +56,11 @@ export async function GET(req: Request) {
         subscriptionStatus: true,
         subscriptionStartedAt: true,
         subscriptionExpiresAt: true,
+        createdAt: true,
+        updatedAt: true,
         upgradeRequests: {
           where: { status: "APPROVED" },
-          orderBy: { approvedAt: "desc" },
+          orderBy: { createdAt: "desc" },
           take: 1
         }
       }

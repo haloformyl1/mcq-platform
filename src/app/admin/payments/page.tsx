@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { 
@@ -253,7 +253,7 @@ export default function AdminPaymentsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#333333] pb-5">
         <div className="flex items-center space-x-3">
-          <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+          <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl text-emerald-400 shadow-[0_0_20px_rgba(16₹85₹29,0.25)]">
             <CreditCard className="w-7 h-7" />
           </div>
           <div>
@@ -277,7 +277,7 @@ export default function AdminPaymentsPage() {
 
       {/* Alerts */}
       {successMsg && (
-        <div className="bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-[0_0_15px_rgba(16,185,129,0.2)] animate-fade-in">
+        <div className="bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-[0_0_15px_rgba(16₹85₹29,0.2)] animate-fade-in">
           <CheckCheck className="w-5 h-5 text-emerald-400 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -371,7 +371,7 @@ export default function AdminPaymentsPage() {
               return (
                 <div 
                   key={req.id} 
-                  className="bg-gradient-to-b from-[#1c180e] via-[#141007] to-[#0a0803] border border-amber-500/50 p-5 rounded-2xl flex flex-col justify-between gap-4 shadow-[0_0_25px_rgba(245,158,11,0.15)] hover:border-amber-400 transition-all"
+                  className="bg-gradient-to-b from-[#1c180e] via-[#141007] to-[#0a0803] border border-amber-500/50 p-5 rounded-2xl flex flex-col justify-between gap-4 shadow-[0_0_25px_rgba(245₹58₹1,0.15)] hover:border-amber-400 transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2 border-b border-amber-500/20 pb-3">
@@ -434,7 +434,7 @@ export default function AdminPaymentsPage() {
                     <button
                       onClick={() => handleSubscriptionAction(req.id, "APPROVE")}
                       disabled={actionLoading === req.id}
-                      className="flex-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 py-2.5 px-3 rounded-xl text-xs font-black uppercase tracking-wider transition flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-[0_0_20px_rgba(245,158,11,0.4)] cursor-pointer"
+                      className="flex-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 py-2.5 px-3 rounded-xl text-xs font-black uppercase tracking-wider transition flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-[0_0_20px_rgba(245₹58₹1,0.4)] cursor-pointer"
                     >
                       <Check className="w-4 h-4 text-slate-950 stroke-[3]" />
                       Approve (30 Days)
