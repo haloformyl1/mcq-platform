@@ -512,7 +512,7 @@ export default function StudentAccountPage() {
                         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                       >
                         <Sparkles className="w-4 h-4 fill-slate-950" />
-                        <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "⚡ Renew Premium Pass (UPI)" : "⭐ Upgrade to Premium Pass"}</span>
+                        <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "Renew Gold Membership" : "Upgrade to Gold Membership"}</span>
                       </button>
                     </div>
                   ) : (
@@ -522,7 +522,7 @@ export default function StudentAccountPage() {
                       className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                       <Sparkles className="w-4 h-4 fill-slate-950" />
-                      <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "⚡ Renew Premium Pass (UPI)" : "⭐ Upgrade to Premium Pass"}</span>
+                      <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "Renew Gold Membership" : "Upgrade to Gold Membership"}</span>
                     </button>
                   )}
                 </div>
