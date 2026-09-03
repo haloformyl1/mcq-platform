@@ -129,7 +129,7 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         success: true,
-        message: `Verified! Student ${matchingReq.student.name || matchingReq.student.email} granted 30-Day Netflix Pass.`
+        message: `Verified! Student ${matchingReq.student.name || matchingReq.student.email} granted 30-Day Premium Pass.`
       });
     }
 

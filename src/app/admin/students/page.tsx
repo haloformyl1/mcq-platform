@@ -176,7 +176,7 @@ export default function AdminStudents() {
                         }`}
                       >
                                                 <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE PASS</option>
-                        <option value="PAID" className="bg-red-950 text-red-400 font-bold">⭐ PAID (NETFLIX PASS)</option>
+                        <option value="PAID" className="bg-red-950 text-red-400 font-bold">⭐ PAID (PREMIUM)</option>
                       </select>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">

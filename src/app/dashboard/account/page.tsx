@@ -278,7 +278,7 @@ export default function StudentAccountPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans pb-20">
       <AdminPreviewBanner />
 
-      {/* Modern Netflix-Style Header Bar */}
+      {/* Modern Premium Header Bar */}
       <header className="border-b border-cyan-500/20 bg-[#061019]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
           <div className="flex justify-between items-center gap-2">
@@ -337,7 +337,7 @@ export default function StudentAccountPage() {
 
       <main className="max-w-6xl mx-auto py-6 sm:py-10 px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-10">
         
-        {/* Netflix-Style Account Profile Banner */}
+        {/* Premium Account Profile Banner */}
         <div className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-r from-[#0d1d2b] via-[#091520] to-[#050b11] p-5 sm:p-10 shadow-[0_10px_40px_rgba(0,153,255,0.15)]">
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-500/10 via-blue-600/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -835,7 +835,7 @@ export default function StudentAccountPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-black text-red-600 tracking-tighter">PIECHEM</span>
-                  <span className="bg-red-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest">NETFLIX PASS</span>
+                  <span className="bg-red-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest">PREMIUM PASS</span>
                 </div>
                 <h3 className="text-lg font-black text-white mt-1">Unlock All Premium Content</h3>
                 <p className="text-xs text-slate-400">Instant access to all exclusive exams & study notes</p>
@@ -852,7 +852,7 @@ export default function StudentAccountPage() {
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-amber-400" /> Pay via UPI VPA
                 </h3>
-                <p className="text-xs text-slate-400">Scan QR Code with PhonePe, Google Pay, or Paytm</p>
+                <p className="text-xs text-slate-400">Scan QR Code with any UPI App (PhonePe, GPay, Paytm, BHIM)</p>
               </div>
               <button 
                 onClick={() => setShowPaymentModal(false)}
