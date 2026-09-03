@@ -39,6 +39,24 @@ export default function StudentLogin() {
   const allReqsMet = reqLength && reqUpper && reqLower && reqNumber && reqSpecial;
 
   useEffect(() => {
+    fetch("/api/student/dashboard")
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.student && !data.error) {
+          if (data.student.board && data.student.academicLevel) {
+            router.replace("/dashboard");
+          } else {
+            router.replace("/onboarding");
+          }
+        }
+      })
+      .catch(() => {});
+  }, [router]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
@@ -140,7 +158,11 @@ export default function StudentLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      router.push("/onboarding");
+      if (data.isOnboarded) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
     } catch (err: any) {
       setError("Incorrect email or password.");
     } finally {
@@ -179,7 +201,11 @@ export default function StudentLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      router.push("/onboarding");
+      if (data.isOnboarded) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
     } catch (err: any) {
       setError(err.message || "Failed to setup account");
     } finally {

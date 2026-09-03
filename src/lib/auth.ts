@@ -1,9 +1,9 @@
-import { SignJWT, jwtVerify } from 'jose'
+﻿import { SignJWT, jwtVerify } from 'jose'
 
 const secretKey = process.env.JWT_SECRET || 'supersecret_jwt_key_replace_me_in_prod'
 const key = new TextEncoder().encode(secretKey)
 
-export async function encrypt(payload: any, expiresIn: string | number | Date = '2h') {
+export async function encrypt(payload: any, expiresIn: string | number | Date = '365d') {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
