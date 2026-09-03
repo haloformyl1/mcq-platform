@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { QrCode, Copy, Check, 
+import { QrCode, Copy, Check, X, 
   User, Mail, Phone, Calendar, ShieldCheck, ArrowLeft, KeyRound, 
   CheckCircle2, AlertCircle, LogOut, Sparkles, BookOpen, Trophy, Clock, RefreshCw 
 } from "lucide-react";
@@ -880,96 +880,201 @@ export default function StudentAccountPage() {
         </div>
       </main>
 
-      {/* UPI Payment Modal */}
+      {/* Full Screen UPI Payment & Renewal Experience */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-                    <div className="relative w-full max-w-md bg-gradient-to-b from-[#19090c] via-[#0f0709] to-[#080304] border border-red-600/50 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(225,29,72,0.3)] space-y-6">
-            <div className="flex justify-between items-start border-b border-red-900/40 pb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-black text-red-600 tracking-tighter">PIECHEM</span>
-                  <span className="bg-red-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest">PREMIUM PASS</span>
-                </div>
-                <h3 className="text-lg font-black text-white mt-1">Unlock All Premium Content</h3>
-                <p className="text-xs text-slate-400">Instant access to all exclusive exams & study notes</p>
-              </div>
-              <button 
-                onClick={() => setShowPaymentModal(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-              <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-amber-400" /> Pay via UPI VPA
-                </h3>
-                <p className="text-xs text-slate-400">Scan QR Code with any UPI App (PhonePe, GPay, Paytm, BHIM)</p>
-              </div>
-              <button 
-                onClick={() => setShowPaymentModal(false)}
-                className="text-slate-400 hover:text-white text-lg font-bold p-1"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* QR & UPI Details */}
-            <div className="space-y-4 text-center">
-                            <div className="inline-block p-3 bg-white rounded-2xl shadow-lg">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
-                  alt="UPI Payment QR Code"
-                  className="w-40 h-40 mx-auto"
-                />
-              </div>
-
-              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2 text-left">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">Monthly Plan Fee:</span>
-                  <span className="text-sm font-extrabold text-green-400 font-mono">₹{paymentSettings?.monthlyFee || 99} / Month</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">Payee Name:</span>
-                  <span className="text-xs font-bold text-white">{paymentSettings?.payeeName || 'Arghyadeep Roy'}</span>
+        <div className="fixed inset-0 z-50 bg-[#030712]/98 backdrop-blur-2xl flex flex-col justify-between overflow-y-auto animate-fade-in text-white">
+          {/* Top Navigation Bar */}
+          <div className="w-full border-b border-cyan-500/20 bg-[#06101c]/90 sticky top-0 z-10 px-4 sm:px-8 py-4 backdrop-blur-xl">
+            <div className="max-w-6xl mx-auto flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <PiechemLogo size="md" href="/dashboard" />
+                <div className="h-6 w-px bg-cyan-500/30 hidden sm:block" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black tracking-widest text-cyan-400 uppercase">
+                      MEMBERSHIP CHECKOUT
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-950/90 text-blue-300 border border-blue-500/50 text-[10px] font-black tracking-wide shadow-[0_0_12px_rgba(59,130,246,0.3)]">
+                      ⭐ GOLD PASS
+                    </span>
+                  </div>
+                  <h2 className="text-sm sm:text-base font-extrabold text-white">
+                    Unlock All Premium Exams & Study Materials
+                  </h2>
                 </div>
               </div>
-            </div>
 
-            {/* UTR Input Form */}
-            <div className="space-y-3">
-              <label className="block text-xs font-bold text-slate-300">
-                Enter 12-Digit UTR / Transaction Ref No:
-              </label>
-              <input
-                type="text"
-                value={utrNumber}
-                onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ''))}
-                placeholder="e.g. 423456789012"
-                maxLength={18}
-                className="w-full bg-slate-950 text-white border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono focus:border-cyan-400 focus:outline-none"
-              />
-
-              {upgradeMsg && (
-                <div className={`p-2.5 rounded-xl text-xs ${upgradeMsg.type === 'success' ? 'bg-green-950 text-green-300 border border-green-700' : 'bg-red-950 text-red-300 border border-red-700'}`}>
-                  {upgradeMsg.text}
-                </div>
-              )}
-
+              {/* Close Button */}
               <button
-                onClick={async () => {
-                  await handleSendUpgradeRequest();
-                  if (utrNumber.trim()) {
-                    setTimeout(() => setShowPaymentModal(false), 1500);
-                  }
-                }}
-                disabled={requestingUpgrade || !utrNumber.trim()}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition active:scale-95 disabled:opacity-50"
+                onClick={() => setShowPaymentModal(false)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-red-950/60 border border-slate-700/60 hover:border-red-500/50 text-slate-300 hover:text-white transition active:scale-95 cursor-pointer text-xs font-bold"
+                title="Close checkout"
               >
-                {requestingUpgrade ? "Submitting..." : "Submit Payment for Verification"}
+                <span>Close</span>
+                <X className="w-4 h-4 text-slate-400" />
               </button>
             </div>
+          </div>
+
+          {/* Main Full-Screen Content Area */}
+          <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 py-8 flex flex-col justify-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Left Column: QR Code & Payment Method Details (6 cols) */}
+              <div className="lg:col-span-6 flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.15)] text-center space-y-6">
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-bold shadow">
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Instant UPI Payment</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    Scan QR to Pay with any UPI App
+                  </h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    Supported on GPay, PhonePe, Paytm, BHIM, Cred, and all bank UPI apps
+                  </p>
+                </div>
+
+                {/* The High-Resolution QR Code */}
+                <div className="relative group">
+                  <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-500 via-blue-500 to-teal-400 opacity-30 blur-lg group-hover:opacity-60 transition duration-500" />
+                  <div className="relative p-4 sm:p-5 bg-white rounded-2xl shadow-2xl inline-block">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+                      alt="UPI Payment QR Code"
+                      className="w-48 h-48 sm:w-56 sm:h-56 mx-auto object-contain"
+                    />
+                  </div>
+                </div>
+
+                {/* Plan Fee & Payee Pill Cards */}
+                <div className="w-full max-w-md grid grid-cols-2 gap-3 text-left">
+                  <div className="bg-slate-950/90 border border-slate-800 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-slate-400 block">Monthly Fee</span>
+                    <span className="text-lg font-black text-emerald-400 font-mono">
+                      ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs text-slate-400 font-normal">/ 30 Days</span>
+                    </span>
+                  </div>
+                  <div className="bg-slate-950/90 border border-slate-800 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-slate-400 block">Payee Name</span>
+                    <span className="text-sm font-bold text-white truncate block">
+                      {paymentSettings?.payeeName || 'Arghyadeep Roy'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Copy UPI ID Pill */}
+                <div className="w-full max-w-md flex items-center justify-between bg-slate-950/80 border border-cyan-500/20 px-4 py-2.5 rounded-xl text-xs">
+                  <span className="text-slate-400 font-medium">UPI VPA:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-cyan-300">
+                      {paymentSettings?.upiId || '9830507435@upi'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(paymentSettings?.upiId || '9830507435@upi');
+                        setCopiedUpi(true);
+                        setTimeout(() => setCopiedUpi(false), 2000);
+                      }}
+                      className="p-1 hover:bg-slate-800 rounded text-cyan-400 hover:text-cyan-300 transition cursor-pointer"
+                      title="Copy UPI ID"
+                    >
+                      {copiedUpi ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Step-by-Step Instructions & UTR Verification (6 cols) */}
+              <div className="lg:col-span-6 flex flex-col justify-center space-y-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#0d141e]/90 via-[#090f17]/90 to-[#04080e]/95 border border-cyan-500/30 shadow-2xl">
+                
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black text-white">
+                    Step 2: Submit UTR for Activation
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Once payment is completed in your UPI app, locate the <strong>12-digit UTR / UPI Ref ID</strong> from your transaction receipt and enter it below.
+                  </p>
+                </div>
+
+                {/* UTR Input Field */}
+                <div className="space-y-2.5">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Enter 12-Digit UTR / Transaction Ref No:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={utrNumber}
+                      onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ''))}
+                      placeholder="e.g. 423456789012"
+                      maxLength={18}
+                      className="w-full bg-slate-950/90 text-white border border-cyan-500/40 rounded-2xl px-4 py-3.5 text-base font-mono tracking-wider focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(6,182,212,0.3)] focus:outline-none transition"
+                    />
+                    {utrNumber.length >= 12 && (
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" /> Valid Format
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    The 12-digit UTR is visible under Transaction Details in PhonePe, Google Pay, Paytm, etc.
+                  </p>
+                </div>
+
+                {/* Status / Message Alert */}
+                {upgradeMsg && (
+                  <div className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2 border ${
+                    upgradeMsg.type === 'success' 
+                      ? 'bg-green-950/80 border-green-600/60 text-green-300' 
+                      : 'bg-red-950/80 border-red-600/60 text-red-300'
+                  }`}>
+                    <span>{upgradeMsg.text}</span>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  onClick={async () => {
+                    await handleSendUpgradeRequest();
+                    if (utrNumber.trim()) {
+                      setTimeout(() => setShowPaymentModal(false), 2000);
+                    }
+                  }}
+                  disabled={requestingUpgrade || !utrNumber.trim()}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-all active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {requestingUpgrade ? "Verifying Transaction..." : "SUBMIT PAYMENT FOR VERIFICATION"}
+                </button>
+
+                {/* Perks Checklist */}
+                <div className="pt-4 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] text-slate-300">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-emerald-400 font-bold">✓</span>
+                    <span>100% Full Exam Access</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-emerald-400 font-bold">✓</span>
+                    <span>Instant Step-by-Step Solutions</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-emerald-400 font-bold">✓</span>
+                    <span>Proctored Ranking Analytics</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-emerald-400 font-bold">✓</span>
+                    <span>Direct Admin Verification</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Footer Help */}
+          <div className="w-full border-t border-slate-800/80 py-3 px-4 text-center text-xs text-slate-500">
+            <span>Need assistance with your payment? Contact Arghyadeep Roy: </span>
+            <a href="tel:9830507435" className="text-cyan-400 hover:underline font-mono font-bold">9830507435</a>
           </div>
         </div>
       )}
