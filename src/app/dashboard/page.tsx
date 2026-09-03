@@ -438,7 +438,7 @@ export default function StudentDashboard() {
                     </div>
 
                     <div className="pt-3 border-t border-cyan-950 flex justify-end relative z-10">
-                      {mat.isPremium && student?.subscriptionStatus !== "PAID" ? (
+                      {mat.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
                         <Link
                           href="/dashboard/account"
                           className="w-full text-center py-2 px-3 rounded-lg text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-md uppercase tracking-wider"

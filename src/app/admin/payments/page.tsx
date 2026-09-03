@@ -521,17 +521,19 @@ export default function AdminPaymentsPage() {
                       <td className="px-4 py-3.5">
                         {latestReq?.utrNumber ? (
                           <div>
-                            <div className="inline-flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded border border-slate-800 font-mono font-bold text-cyan-300 text-[11px]">
+                            <div className="inline-flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded border border-cyan-800 font-mono font-bold text-cyan-300 text-[11px] shadow-[0_0_10px_rgba(6,182,212,0.25)]">
                               <span>{latestReq.utrNumber}</span>
                             </div>
-                            <div className="text-[11px] text-green-400 font-mono font-bold mt-1">
-                              Paid: ₹{latestReq.amount || paymentSettings?.monthlyFee || 99}
+                            <div className="text-[11px] text-cyan-400 font-mono font-bold mt-1">
+                              Paid: ₹{latestReq.amount || paymentSettings?.monthlyFee || 199}
                             </div>
                           </div>
                         ) : (
                           <div>
-                            <span className="text-[11px] text-slate-400 font-medium">Admin Manual Upgrade</span>
-                            <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">
+                            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                              💎 COMPLIMENTARY
+                            </span>
+                            <div className="text-[10px] text-blue-300/80 font-mono mt-1">
                               Paid: ₹0 (Complimentary)
                             </div>
                           </div>
@@ -539,7 +541,7 @@ export default function AdminPaymentsPage() {
                       </td>
 
                       {/* Active Since */}
-                      <td className="px-4 py-3.5 font-mono text-emerald-300 font-bold whitespace-nowrap">
+                      <td className="px-4 py-3.5 font-mono text-cyan-300 font-bold whitespace-nowrap">
                         {formatDateTime24(activeSince)}
                       </td>
 
@@ -548,7 +550,7 @@ export default function AdminPaymentsPage() {
                         {expiresAt ? (
                           <span className="text-amber-300 font-bold">{formatDateTime24(expiresAt)}</span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-purple-950/90 text-purple-300 border border-purple-600/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase">
+                          <span className="inline-flex items-center gap-1 bg-blue-950/90 text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase shadow-sm">
                             ♾️ NEVER
                           </span>
                         )}
@@ -560,12 +562,12 @@ export default function AdminPaymentsPage() {
                           <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border font-mono ${
                             isExpired 
                               ? "bg-red-950/80 text-red-400 border-red-800" 
-                              : "bg-emerald-950/80 text-emerald-300 border-emerald-700/60"
+                              : "bg-cyan-950/80 text-cyan-300 border-cyan-600/60 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
                           }`}>
                             {remaining}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-emerald-950/80 text-emerald-300 border border-emerald-600/60 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase font-mono shadow-sm">
+                          <span className="inline-flex items-center gap-1 bg-blue-950/80 text-blue-300 border border-blue-600/60 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase font-mono shadow-sm">
                             ♾️ NEVER
                           </span>
                         )}

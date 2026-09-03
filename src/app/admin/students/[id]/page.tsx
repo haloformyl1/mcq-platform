@@ -12,6 +12,8 @@ interface StudentDetails {
     email: string;
     status: string;
     subscriptionStatus?: string;
+    subscriptionStartedAt?: string | null;
+    subscriptionExpiresAt?: string | null;
     createdAt: string;
     lastLogin: string | null;
   };
@@ -444,7 +446,7 @@ export default function AdminStudentDetails() {
             <div className="flex justify-between items-center">
               <span className="text-gray-500">Subscription Plan</span>
               <select
-                value={student.subscriptionStatus || "FREE"}
+                value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : student.subscriptionStatus === "PAID" ? "PAID" : "FREE"}
                 onChange={async (e) => {
                   const newSub = e.target.value;
                   try {
@@ -453,19 +455,30 @@ export default function AdminStudentDetails() {
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ subscriptionStatus: newSub })
                     });
-                    if (res.ok) fetchStudent();
+                    const resData = await res.json();
+                    if (res.ok) {
+                      fetchStudent();
+                    } else {
+                      alert(resData.error || "Failed to update subscription");
+                    }
                   } catch (err) {
                     console.error(err);
                   }
                 }}
-                className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
-                  student.subscriptionStatus === "PAID"
-                    ? "bg-amber-950/90 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
-                    : "bg-slate-900 text-slate-400 border-slate-700"
+                disabled={student.subscriptionStatus === "PAID" && !!student.subscriptionExpiresAt && new Date(student.subscriptionExpiresAt) > new Date()}
+                className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none transition ${
+                  student.subscriptionStatus === "COMPLIMENTARY"
+                    ? "bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border-blue-500/60 shadow-[0_0_14px_rgba(59,130,246,0.35)] cursor-pointer"
+                    : student.subscriptionStatus === "PAID"
+                    ? "bg-gradient-to-r from-blue-950 via-cyan-950 to-black text-cyan-300 border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.35)] cursor-not-allowed"
+                    : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500 cursor-pointer"
                 }`}
               >
-                <option value="FREE" className="bg-slate-900 text-slate-300">FREE</option>
-                <option value="PAID" className="bg-amber-950 text-amber-300 font-bold">PAID (GOLD)</option>
+                <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE</option>
+                <option value="COMPLIMENTARY" className="bg-blue-950 text-blue-300 font-bold">💎 COMPLIMENTARY</option>
+                {student.subscriptionStatus === "PAID" && (
+                  <option value="PAID" className="bg-cyan-950 text-cyan-300 font-bold">🔒 PAID (UPI)</option>
+                )}
               </select>
             </div>
             <div className="flex justify-between">

@@ -48,7 +48,7 @@ export async function GET(req: Request) {
     });
 
     const activeStudents = await prisma.student.findMany({
-      where: { subscriptionStatus: "PAID" },
+      where: { subscriptionStatus: { in: ["PAID", "COMPLIMENTARY"] } },
       orderBy: [{ subscriptionStartedAt: "desc" }, { updatedAt: "desc" }],
       select: {
         id: true,

@@ -158,15 +158,15 @@ export default function AdminStudents() {
                     <td className="px-4 py-3 whitespace-nowrap">
                       {student.hasActiveUpi ? (
                         <div 
-                          className="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-950 via-red-900 to-black px-2.5 py-1.5 rounded-lg border border-red-500/60 shadow-[0_0_12px_rgba(239,68,68,0.3)] text-red-300 text-xs font-bold cursor-not-allowed select-none"
-                          title={`Locked: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(student.subscriptionExpiresAt)}. Automatically reverts to FREE PASS after expiry, after which admin can edit.`}
+                          className="inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-950 via-cyan-950 to-black px-2.5 py-1.5 rounded-lg border border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.35)] text-cyan-300 text-xs font-bold cursor-not-allowed select-none"
+                          title={`Locked: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(student.subscriptionExpiresAt)}. Automatically reverts to FREE after expiry, after which admin can edit.`}
                         >
                           <span className="text-xs">🔒</span>
                           <span className="font-extrabold tracking-wide">PAID (UPI)</span>
                         </div>
                       ) : (
                         <select
-                          value={student.subscriptionStatus || "FREE"}
+                          value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : "FREE"}
                           onChange={async (e) => {
                             const newSub = e.target.value;
                             try {
@@ -185,14 +185,14 @@ export default function AdminStudents() {
                               console.error("Failed to update subscription", err);
                             }
                           }}
-                          className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer transition ${
-                            student.subscriptionStatus === "PAID"
-                              ? "bg-red-950/90 text-red-400 border-red-600/60 shadow-[0_0_12px_rgba(225,29,72,0.4)]"
+                          className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition ${
+                            student.subscriptionStatus === "COMPLIMENTARY"
+                              ? "bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border-blue-500/60 shadow-[0_0_14px_rgba(59,130,246,0.35)]"
                               : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500"
                           }`}
                         >
-                          <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE PASS</option>
-                          <option value="PAID" className="bg-red-950 text-red-400 font-bold">⭐ PAID (PREMIUM)</option>
+                          <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE</option>
+                          <option value="COMPLIMENTARY" className="bg-blue-950 text-blue-300 font-bold">💎 COMPLIMENTARY</option>
                         </select>
                       )}
                     </td>

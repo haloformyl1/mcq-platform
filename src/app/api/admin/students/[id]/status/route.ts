@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
-import { autoExpireSubscriptions } from "@/lib/subscription";
+import { autoExpireSubscriptions, formatDateTime24 } from "@/lib/subscription";
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     if (subscriptionStatus) {
-      if (subscriptionStatus !== "FREE" && subscriptionStatus !== "PAID") {
+      const validStatuses = ["FREE", "COMPLIMENTARY", "PAID"];
+      if (!validStatuses.includes(subscriptionStatus)) {
         return NextResponse.json({ error: "Invalid subscription status" }, { status: 400 });
       }
 
@@ -57,17 +58,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
       if (hasActiveUpi) {
         return NextResponse.json({
-          error: "Cannot manually change status: Student has an active paid subscription validated by UPI UTR. It will automatically change to FREE PASS after their expiry date & time arrives."
+          error: `Cannot manually change status: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(currentStudent.subscriptionExpiresAt)}. It will automatically downgrade to FREE after their 30-day cycle ends.`
         }, { status: 403 });
       }
 
       updateData.subscriptionStatus = subscriptionStatus;
 
-      if (subscriptionStatus === "PAID") {
-        // Admin Manual Upgrade: NEVER EXPIRES!
+      if (subscriptionStatus === "COMPLIMENTARY") {
+        // Admin Manual Upgrade: Full Premium Access for Free, NEVER EXPIRES!
         updateData.subscriptionStartedAt = new Date();
         updateData.subscriptionExpiresAt = null;
-      } else {
+      } else if (subscriptionStatus === "FREE") {
         updateData.subscriptionStartedAt = null;
         updateData.subscriptionExpiresAt = null;
       }

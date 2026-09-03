@@ -444,7 +444,7 @@ export default function StudentAccountPage() {
               </div>
 
               {/* Upgrade to Gold Action Section (For FREE Students) */}
-              {student.subscriptionStatus !== "PAID" && (
+              {student.subscriptionStatus !== "PAID" && student.subscriptionStatus !== "COMPLIMENTARY" && (
                 <div className="pt-2 border-t border-cyan-500/20 space-y-3">
                   {upgradeMsg && (
                     <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border ${

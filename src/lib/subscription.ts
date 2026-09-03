@@ -20,6 +20,10 @@ export async function autoExpireSubscriptions() {
   }
 }
 
+export function hasPremiumAccess(subscriptionStatus: string | null | undefined): boolean {
+  return subscriptionStatus === "PAID" || subscriptionStatus === "COMPLIMENTARY";
+}
+
 export function formatDateTime24(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return "-";
   const d = new Date(dateInput);

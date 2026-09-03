@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     await autoExpireSubscriptions();
     // Check Subscription Limit for FREE students (Lifetime max 2 tests)
-    const isPaidSubscriber = student.subscriptionStatus === "PAID";
+    const isPaidSubscriber = student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY";
     if (!isPaidSubscriber) {
       const totalSubmittedAttempts = await prisma.testAttempt.count({
         where: { studentId: student.id, status: "SUBMITTED" }
