@@ -589,6 +589,96 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </form>
 
                 {/* Section 2: Student Payment UTR Verification Requests */}
+                                {/* Layer 1 & 2: Quick UTR Lookup & Bulk Statement Importer Tools */}
+                <div className="bg-[#1a1a1a] p-5 rounded-2xl border border-cyan-500/40 space-y-4">
+                  <h4 className="text-sm font-bold text-cyan-400 border-b border-[#333333] pb-2 flex items-center gap-2">
+                    ⚡ Automated UTR Verification Tools (0% Gateway Fee)
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Layer 1: Instant Single UTR Search */}
+                    <div className="bg-[#262626] p-3.5 rounded-xl border border-[#404040] space-y-2">
+                      <label className="block text-xs font-bold text-slate-300">1-Click UTR Verification Lookup</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Paste 12-digit UTR/RRN"
+                          id="singleUtrInput"
+                          className="flex-1 bg-[#1a1a1a] border border-[#404040] rounded-lg px-3 py-1.5 text-xs text-white font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const input = document.getElementById("singleUtrInput") as HTMLInputElement;
+                            const val = input?.value?.trim();
+                            if (!val) return alert("Please paste a 12-digit UTR Ref Number");
+                            try {
+                              const res = await fetch("/api/admin/subscriptions", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ utrQuery: val })
+                              });
+                              const data = await res.json();
+                              alert(data.message || data.error);
+                              if (res.ok) {
+                                input.value = "";
+                                fetchPaymentSettings();
+                              }
+                            } catch (e) {
+                              alert("Network error verifying UTR");
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-lg transition shrink-0"
+                        >
+                          Verify & Grant
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Layer 2: Bulk Statement Importer */}
+                    <div className="bg-[#262626] p-3.5 rounded-xl border border-[#404040] space-y-2">
+                      <label className="block text-xs font-bold text-slate-300">Bulk Statement UTR Batch Auto-Approve</label>
+                      <div className="flex gap-2">
+                        <textarea
+                          rows={1}
+                          placeholder="Paste UPI statement lines / CSV"
+                          id="bulkUtrTextarea"
+                          className="flex-1 bg-[#1a1a1a] border border-[#404040] rounded-lg px-3 py-1.5 text-xs text-white font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const area = document.getElementById("bulkUtrTextarea") as HTMLTextAreaElement;
+                            const text = area?.value;
+                            if (!text) return alert("Please paste statement transaction lines");
+                            // Extract 12-digit numbers
+                            const matches = text.match(/\b\d{12}\b/g) || [];
+                            if (matches.length === 0) return alert("No 12-digit UTR numbers found in text");
+                            try {
+                              const res = await fetch("/api/admin/subscriptions", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ batchUtrList: matches })
+                              });
+                              const data = await res.json();
+                              alert(data.message || data.error);
+                              if (res.ok) {
+                                area.value = "";
+                                fetchPaymentSettings();
+                              }
+                            } catch (e) {
+                              alert("Error executing batch verification");
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition shrink-0"
+                        >
+                          Batch Verify ({`CSV`})
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-[#1a1a1a] p-5 rounded-2xl border border-[#333333] space-y-3">
                   <h4 className="text-sm font-bold text-amber-400 border-b border-[#333333] pb-2">
                     📋 Student Payment UTR Verification Queue ({subRequests.length})

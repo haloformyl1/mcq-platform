@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -27,9 +27,30 @@ export async function POST(req: Request) {
       });
     }
 
+    const { utrNumber, amount } = await req.json().catch(() => ({}));
+    const cleanUtr = utrNumber ? String(utrNumber).trim() : null;
+
+    if (cleanUtr) {
+      // Anti-Fraud check: Prevent re-using already approved UTR
+      const existingApproved = await prisma.subscriptionUpgradeRequest.findFirst({
+        where: {
+          utrNumber: { equals: cleanUtr, mode: "insensitive" },
+          status: "APPROVED"
+        }
+      });
+
+      if (existingApproved) {
+        return NextResponse.json({
+          error: `This UTR Ref Number (${cleanUtr}) has already been used and approved for another subscription. Fraudulent re-use is blocked.`
+        }, { status: 400 });
+      }
+    }
+
     const newRequest = await prisma.subscriptionUpgradeRequest.create({
       data: {
         studentId,
+        utrNumber: cleanUtr,
+        amount: parseFloat(amount) || 99.0,
         status: "PENDING"
       }
     });
