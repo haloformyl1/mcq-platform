@@ -378,7 +378,7 @@ export default function StudentAccountPage() {
             <div className="space-y-3 flex-1 w-full min-w-0">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
                 <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight break-words">{studentName}</h1>
-                {student.subscriptionStatus === "PAID" ? (
+                {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 border border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.5)] tracking-wide uppercase shrink-0">
                     <Sparkles className="w-3.5 h-3.5 text-slate-950 fill-slate-950" /> Subscribed
                   </span>
@@ -425,12 +425,39 @@ export default function StudentAccountPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
                   <span className="text-xs font-semibold text-slate-300">Account Type</span>
-                  {student.subscriptionStatus === "PAID" ? (
-                    <span className="text-xs font-black text-amber-300 bg-amber-950/90 px-2.5 py-1 rounded-md border border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]">Paid Subscriber</span>
+                  {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") ? (
+                    <span className="text-xs font-black text-amber-300 bg-amber-950/90 px-2.5 py-1 rounded-md border border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                      Paid Subscriber
+                    </span>
                   ) : (
-                    <span className="text-xs font-bold text-cyan-300 bg-cyan-950 px-2.5 py-1 rounded-md border border-cyan-700/60">Free Account</span>
+                    <span className="text-xs font-bold text-cyan-300 bg-cyan-950 px-2.5 py-1 rounded-md border border-cyan-700/60">
+                      Free Account
+                    </span>
                   )}
                 </div>
+
+                {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") && (
+                  <div className="bg-gradient-to-b from-amber-950/40 via-slate-950/80 to-black p-4 rounded-xl border border-amber-500/40 space-y-2.5 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-400 font-medium">Active Since:</span>
+                      <span className="font-mono font-black text-emerald-400">
+                        {formatDateTime24(student.subscriptionStartedAt || student.updatedAt)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs border-t border-slate-800/80 pt-2">
+                      <span className="text-slate-400 font-medium">Next Payment / Expiry:</span>
+                      <span className="font-mono font-black text-amber-300">
+                        {student.subscriptionExpiresAt ? formatDateTime24(student.subscriptionExpiresAt) : "NEVER (Lifetime Pass)"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] border-t border-slate-800/80 pt-1.5 text-slate-500">
+                      <span>Status:</span>
+                      <span className="font-bold text-green-400 uppercase tracking-wider">
+                        {student.subscriptionExpiresAt ? "Active 30-Day Paid Pass" : "Active Lifetime VIP Pass"}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex justify-between items-center bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
                   <span className="text-xs font-semibold text-slate-300">Tests Completed</span>
