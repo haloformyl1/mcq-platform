@@ -26,7 +26,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { upiId, payeeName, monthlyFee, qrImageUrl } = await req.json();
+    const { upiId, payeeName, monthlyFee, qrImageUrl, paytmMid, paytmMerchantKey, paytmWebsite, paytmMode } = await req.json();
+
+    try {
+      await prisma.$executeRawUnsafe(`ALTER TABLE "PaymentSetting" ADD COLUMN IF NOT EXISTS "paytmMid" TEXT DEFAULT '';`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "PaymentSetting" ADD COLUMN IF NOT EXISTS "paytmMerchantKey" TEXT DEFAULT '';`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "PaymentSetting" ADD COLUMN IF NOT EXISTS "paytmWebsite" TEXT DEFAULT 'DEFAULT';`);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "PaymentSetting" ADD COLUMN IF NOT EXISTS "paytmMode" TEXT DEFAULT 'TEST';`);
+      
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "PaytmTransaction" (
+          "id" TEXT PRIMARY KEY,
+          "orderId" TEXT UNIQUE NOT NULL,
+          "studentId" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "txnId" TEXT,
+          "status" TEXT NOT NULL DEFAULT 'PENDING',
+          "gatewayResponse" JSONB,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL
+        );
+      `);
+    } catch (migErr) {
+      console.log("Paytm auto migration status:", migErr);
+    }
 
     const settings = await prisma.paymentSetting.upsert({
       where: { id: "default" },
@@ -34,14 +57,14 @@ export async function POST(req: Request) {
         upiId: upiId || "9830507435@upi",
         payeeName: payeeName || "Arghyadeep Roy",
         monthlyFee: parseFloat(monthlyFee) || 99.0,
-        qrImageUrl: qrImageUrl || ""
+        qrImageUrl: qrImageUrl || "", paytmMid: paytmMid || "", paytmMerchantKey: paytmMerchantKey || "", paytmWebsite: paytmWebsite || "DEFAULT", paytmMode: paytmMode || "TEST"
       },
       create: {
         id: "default",
         upiId: upiId || "9830507435@upi",
         payeeName: payeeName || "Arghyadeep Roy",
         monthlyFee: parseFloat(monthlyFee) || 99.0,
-        qrImageUrl: qrImageUrl || ""
+        qrImageUrl: qrImageUrl || "", paytmMid: paytmMid || "", paytmMerchantKey: paytmMerchantKey || "", paytmWebsite: paytmWebsite || "DEFAULT", paytmMode: paytmMode || "TEST"
       }
     });
 

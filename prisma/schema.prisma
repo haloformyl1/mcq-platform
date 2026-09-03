@@ -240,5 +240,24 @@ model PaymentSetting {
   payeeName    String   @default("Arghyadeep Roy")
   monthlyFee   Float    @default(99.0)
   qrImageUrl   String?  @default("")
+  
+  // Paytm Business Gateway Configs
+  paytmMid         String?  @default("")
+  paytmMerchantKey String?  @default("")
+  paytmWebsite     String?  @default("DEFAULT") // DEFAULT or WEBSTAGING
+  paytmMode        String?  @default("TEST") // TEST or LIVE
+  
   updatedAt    DateTime @updatedAt
+}
+
+model PaytmTransaction {
+  id            String   @id @default(uuid())
+  orderId       String   @unique
+  studentId     String
+  amount        Float
+  txnId         String?
+  status        String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  gatewayResponse Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
