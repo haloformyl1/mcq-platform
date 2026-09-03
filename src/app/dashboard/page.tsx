@@ -8,6 +8,7 @@ import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, LogOut
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -98,6 +99,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex flex-col items-center justify-center p-4">
         <AdminPreviewBanner />
+      <SubscriptionExpiredModal student={data?.student} />
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-xl font-bold mb-4">Unable to load dashboard</h2>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#262626] rounded-md hover:bg-[#333333]">Retry</button>
@@ -187,6 +189,7 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white font-sans pb-20">
       <AdminPreviewBanner />
+      <SubscriptionExpiredModal student={data?.student} />
 
             {/* Unified Navigation & Curriculum Command Bar */}
       <header className="border-b border-cyan-500/25 bg-[#061019]/95 backdrop-blur-2xl sticky top-0 z-40 shadow-[0_10px_35px_rgba(0,0,0,0.6)]">

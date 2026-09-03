@@ -10,6 +10,7 @@ import { QrCode, Copy, Check,
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
 
 function formatDateTime24(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return "-";
@@ -28,6 +29,12 @@ function formatDateTime24(dateInput: string | Date | null | undefined): string {
 export default function StudentAccountPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#renew") {
+      setShowPaymentModal(true);
+      fetchUpgradeRequest();
+    }
+  }, []);
   
   // Unisex Avatar Options
   const AVATAR_OPTIONS = [
@@ -295,6 +302,7 @@ export default function StudentAccountPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans pb-20">
       <AdminPreviewBanner />
+      <SubscriptionExpiredModal student={student} />
 
       {/* Modern Premium Header Bar */}
       <header className="border-b border-cyan-500/20 bg-[#061019]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
@@ -470,9 +478,9 @@ export default function StudentAccountPage() {
                 </div>
               </div>
 
-              {/* Upgrade to Gold Action Section (For FREE Students) */}
+              {/* Upgrade / Renewal Action Section (For FREE Students) */}
               {student.subscriptionStatus !== "PAID" && student.subscriptionStatus !== "COMPLIMENTARY" && (
-                <div className="pt-2 border-t border-cyan-500/20 space-y-3">
+                <div id="renew" className="pt-2 border-t border-cyan-500/20 space-y-3">
                   {upgradeMsg && (
                     <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
                       upgradeMsg.type === "success" ? "bg-green-950/80 border-green-600/60 text-green-300" : "bg-red-950/80 border-red-600/60 text-red-300"
@@ -504,7 +512,7 @@ export default function StudentAccountPage() {
                         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                       >
                         <Sparkles className="w-4 h-4 fill-slate-950" />
-                        <span>{requestingUpgrade ? "Sending Request..." : "Request Upgrade to Gold"}</span>
+                        <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "⚡ Renew Premium Pass (UPI)" : "⭐ Upgrade to Premium Pass"}</span>
                       </button>
                     </div>
                   ) : (
@@ -514,7 +522,7 @@ export default function StudentAccountPage() {
                       className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                       <Sparkles className="w-4 h-4 fill-slate-950" />
-                      <span>{requestingUpgrade ? "Sending Request..." : "Upgrade to Gold"}</span>
+                      <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "⚡ Renew Premium Pass (UPI)" : "⭐ Upgrade to Premium Pass"}</span>
                     </button>
                   )}
                 </div>
