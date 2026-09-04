@@ -112,7 +112,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 24,
+      maxAge: 60 * 60 * 24 * 400,
       path: "/",
     });
 
@@ -133,3 +133,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to update administrator credentials." }, { status: 500 });
   }
 }
+

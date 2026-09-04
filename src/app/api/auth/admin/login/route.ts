@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { encrypt } from "@/lib/auth";
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24 * 400, // 1 day
       path: '/',
     });
 
@@ -112,3 +112,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error?.message || "Login failed" }, { status: 500 });
   }
 }
+

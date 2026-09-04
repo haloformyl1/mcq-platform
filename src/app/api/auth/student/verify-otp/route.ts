@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     cookieStore.set("session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24 * 400, // 1 day
       path: "/",
     });
 
@@ -50,3 +50,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }
+

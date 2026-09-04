@@ -29,6 +29,12 @@ export async function GET(req: Request) {
     }
 
     const studentId = payload.id;
+    cookieStore.set('session', session, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 400,
+      path: '/',
+    });
     await autoExpireSubscriptions();
 
     // Recalculate all submitted attempts for this student to guarantee latest scores
