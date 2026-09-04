@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Name is required for new students" }, { status: 400 });
       }
       await prisma.student.create({
-        data: { email, name, otp, otpExpiry: expiry },
+        data: { email, name, otp, otpExpiry: expiry, board: null, academicLevel: null },
       });
     }
 

@@ -53,7 +53,8 @@ export async function POST(req: Request) {
       path: "/",
     });
 
-    return NextResponse.json({ success: true });
+    const isOnboarded = Boolean(updatedStudent.board && updatedStudent.academicLevel);
+    return NextResponse.json({ success: true, isOnboarded });
   } catch (error) {
     console.error("Setup Account Error:", error);
     return NextResponse.json({ error: "Failed to setup account" }, { status: 500 });

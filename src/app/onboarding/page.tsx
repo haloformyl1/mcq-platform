@@ -27,6 +27,9 @@ export default function OnboardingPage() {
       })
       .then((data) => {
         if (data.student) {
+          if (data.student.board && data.student.academicLevel) {
+            return router.replace("/dashboard");
+          }
           if (data.student.board) {
             setSelectedBoard(data.student.board as BoardOption);
           }

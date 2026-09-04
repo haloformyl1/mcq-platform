@@ -15,8 +15,8 @@ model Student {
   phone     String?
   gender    String?  @default("Male")
   dob       DateTime?
-  board     String?  @default("CBSE")
-  academicLevel String? @default("11")
+  board     String?
+  academicLevel String?
   otp       String?
   otpExpiry DateTime?
   status    String   @default("ACTIVE") // ACTIVE, SUSPENDED

@@ -52,7 +52,8 @@ export async function POST(req: Request) {
       data: { lastLogin: new Date() }
     });
 
-    return NextResponse.json({ success: true });
+    const isOnboarded = Boolean(student.board && student.academicLevel);
+    return NextResponse.json({ success: true, isOnboarded });
   } catch (error) {
     console.error("Login Error:", error);
     return NextResponse.json({ error: "Authentication failed" }, { status: 500 });
