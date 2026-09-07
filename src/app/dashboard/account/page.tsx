@@ -59,6 +59,7 @@ export default function StudentAccountPage() {
   const [upgradeReq, setUpgradeReq] = useState<any>(null);
   const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
   const [utrNumber, setUtrNumber] = useState("");
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
@@ -296,6 +297,26 @@ export default function StudentAccountPage() {
   const { student, allAttempts = [] } = data;
   const completedAttempts = allAttempts.filter((a: any) => a.status === "SUBMITTED");
   const isGold = student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY";
+
+  // Check if student is currently at the highest plan available
+  // Currently, 1 paid plan exists: Gold Membership
+  // If admin ever provides multiple active plans, check if student has reached the top tier
+  const availablePlans = paymentSettings?.plans || [
+    { id: "free", name: "Basic Student Plan", tier: 0 },
+    { id: "gold", name: "Gold Membership", tier: 1 }
+  ];
+  const maxTier = Math.max(...availablePlans.map((p: any) => p.tier ?? 1), 1);
+  const studentTier = isGold ? 1 : 0;
+  const isAtHighestPlan = studentTier >= maxTier;
+
+  const handleChangePlanClick = () => {
+    if (isAtHighestPlan) {
+      setShowHighestPlanModal(true);
+    } else {
+      setShowPaymentModal(true);
+      fetchUpgradeRequest();
+    }
+  };
 
   const memberSinceFormatted = student.createdAt
     ? new Date(student.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
@@ -616,10 +637,7 @@ export default function StudentAccountPage() {
                     
                     {/* Change Plan */}
                     <button
-                      onClick={() => {
-                        setShowPaymentModal(true);
-                        fetchUpgradeRequest();
-                      }}
+                      onClick={handleChangePlanClick}
                       className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
@@ -631,7 +649,9 @@ export default function StudentAccountPage() {
                             Change plan
                           </span>
                           <span className="text-xs text-slate-400 font-normal">
-                            Upgrade to Gold Pass or renew current active membership
+                            {isAtHighestPlan 
+                              ? "You are at the highest enrolled plan (Gold Membership)"
+                              : "Upgrade to Gold Pass or renew current active membership"}
                           </span>
                         </div>
                       </div>
@@ -1440,6 +1460,81 @@ export default function StudentAccountPage() {
                 </div>
               </div>
 
+            </div>
+
+          </div>
+        </div>
+      )}
+
+
+      {/* 4. HIGHEST ENROLLED PLAN MODAL */}
+      {showHighestPlanModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="relative w-full max-w-md bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 p-6 sm:p-8 text-center space-y-5 animate-in zoom-in-95 duration-200 my-auto">
+            
+            <button
+              onClick={() => setShowHighestPlanModal(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Glowing Trophy / Badge Icon */}
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500/20 via-yellow-400/20 to-cyan-400/20 border border-amber-400/40 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+              <Sparkles className="w-8 h-8 text-amber-400" />
+            </div>
+
+            {/* Top Tier Badge */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-bold shadow-sm">
+              <span>★ TOP TIER ENROLLED</span>
+            </div>
+
+            {/* Heading & Exact Requested Message */}
+            <div className="space-y-2">
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Highest Plan Enrolled
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                You are at the highest enrolled plan currently and no more upgrade option available. Thank you!!
+              </p>
+            </div>
+
+            {/* Current Plan Card */}
+            <div className="bg-slate-950/80 border border-cyan-500/30 rounded-2xl p-4 text-left space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400 font-medium">Active Membership</span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                </span>
+              </div>
+              <p className="text-sm font-bold text-white flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-400" /> Gold Membership (Premium)
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                You already have full access to all 50+ exams, 3D molecular models, full solutions, and proctored analytics.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2.5 pt-1">
+              <button
+                onClick={() => setShowHighestPlanModal(false)}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer transition"
+              >
+                GOT IT, THANK YOU!
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowHighestPlanModal(false);
+                  setShowPaymentModal(true);
+                  fetchUpgradeRequest();
+                }}
+                className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
+              >
+                Need to renew or extend your 30-day pass instead?
+              </button>
             </div>
 
           </div>
