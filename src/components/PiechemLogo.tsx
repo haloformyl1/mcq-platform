@@ -9,6 +9,7 @@ interface PiechemLogoProps {
   className?: string;
   href?: string;
   isGoldMember?: boolean;
+  theme?: 'dark' | 'light';
 }
 
 export default function PiechemLogo({
@@ -16,7 +17,8 @@ export default function PiechemLogo({
   showText = true,
   className = "",
   href,
-  isGoldMember
+  isGoldMember,
+  theme = 'dark'
 }: PiechemLogoProps) {
   const [isGold, setIsGold] = useState<boolean>(isGoldMember ?? false);
 
@@ -204,7 +206,7 @@ export default function PiechemLogo({
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
                   PIE
                 </span>
-                <span className="text-white tracking-tight ml-0.5">
+                <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' tracking-tight ml-0.5'}>
                   CHEM
                 </span>
               </>
@@ -213,7 +215,7 @@ export default function PiechemLogo({
           <div
             className={
               "text-[9px] sm:text-[10px] tracking-[0.25em] font-semibold uppercase mt-1 " +
-              (isGold ? "text-amber-300/90 font-bold" : "text-cyan-300/70")
+              (isGold ? (theme === 'light' ? 'text-amber-600 font-bold' : 'text-amber-300/90 font-bold') : (theme === 'light' ? 'text-cyan-700 font-bold' : 'text-cyan-300/70'))
             }
           >
             {isGold ? "GOLD EXAM PLATFORM" : "Exam Platform"}

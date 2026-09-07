@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { QrCode, Copy, Check, X, 
-  User, Mail, Phone, Calendar, ShieldCheck, ArrowLeft, KeyRound, 
-  CheckCircle2, AlertCircle, LogOut, Sparkles, BookOpen, Trophy, Clock, RefreshCw 
+import { 
+  Copy, Check, X, User, Mail, Phone, ShieldCheck, 
+  ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
+  Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
+  ChevronDown, Layers, Laptop, Shield, CheckCircle
 } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -29,13 +31,9 @@ function formatDateTime24(dateInput: string | Date | null | undefined): string {
 export default function StudentAccountPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash === "#renew") {
-      setShowPaymentModal(true);
-      fetchUpgradeRequest();
-    }
-  }, []);
-  
+  const [activeTab, setActiveTab] = useState<"overview" | "membership" | "security" | "devices" | "profiles">("overview");
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
   // Unisex Avatar Options
   const AVATAR_OPTIONS = [
     { id: "atom", name: "Quantum Atom", url: "/avatars/atom.jpg" },
@@ -52,7 +50,7 @@ export default function StudentAccountPage() {
   const [gender, setGender] = useState("Male");
   const [dob, setDob] = useState("");
   const [board, setBoard] = useState("CBSE");
-  const [academicLevel, setAcademicLevel] = useState("11"); // Class 11/12 OR SEM-I/SEM-II/SEM-III/SEM-IV
+  const [academicLevel, setAcademicLevel] = useState("11");
   const [avatarUrl, setAvatarUrl] = useState("/avatars/atom.jpg");
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -97,15 +95,19 @@ export default function StudentAccountPage() {
 
   const fetchUpgradeRequest = () => {
     fetch("/api/student/upgrade-request")
-      .then(res => res.json())
-      .then(d => {
+      .then((res) => res.json())
+      .then((d) => {
         if (d.request) setUpgradeReq(d.request);
         if (d.paymentSettings) setPaymentSettings(d.paymentSettings);
       })
       .catch(() => {});
   };
 
-    useEffect(() => {
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#renew") {
+      setShowPaymentModal(true);
+      setActiveTab("membership");
+    }
     fetchUpgradeRequest();
   }, []);
 
@@ -122,7 +124,7 @@ export default function StudentAccountPage() {
           setPhone(resData.student.phone || "");
           setEmail(resData.student.email || "");
           setGender(resData.student.gender || "Male");
-          setDob(resData.student.dob ? new Date(resData.student.dob).toISOString().split('T')[0] : "");
+          setDob(resData.student.dob ? new Date(resData.student.dob).toISOString().split("T")[0] : "");
           const b = resData.student.board || "CBSE";
           setBoard(b);
           setAcademicLevel(resData.student.academicLevel || (b === "WBCHSE" ? "SEM-I" : "11"));
@@ -133,10 +135,7 @@ export default function StudentAccountPage() {
       .catch(() => {
         router.push("/login");
       });
-
-    fetchUpgradeRequest();
   }, [router]);
-
   const handleSendUpgradeRequest = async () => {
     if (!utrNumber.trim()) {
       setUpgradeMsg({ type: "error", text: "Please enter your 12-digit UTR / Payment Reference Number." });
@@ -190,7 +189,7 @@ export default function StudentAccountPage() {
 
       if (res.ok) {
         const levelLabel = board === "WBCHSE" ? academicLevel : `Class ${academicLevel}`;
-        setProfileMsg({ type: "success", text: `Profile saved successfully! Main screen view updated for ${board} (${levelLabel}).` });
+        setProfileMsg({ type: "success", text: `Profile updated successfully! Board set to ${board} (${levelLabel}).` });
         if (resData.student) {
           setData((prev: any) => ({
             ...prev,
@@ -224,7 +223,7 @@ export default function StudentAccountPage() {
       const resData = await res.json();
 
       if (res.ok) {
-        setOtpSentMsg(`Verification OTP sent to your registered email (${email}). Please check your inbox/spam folder.`);
+        setOtpSentMsg(`Verification OTP sent to ${email}. Please check your inbox.`);
         setResendCooldown(30);
       } else {
         setPassMsg({ type: "error", text: resData.error || "Failed to send OTP to email." });
@@ -295,717 +294,1128 @@ export default function StudentAccountPage() {
   if (loading || !data) return <PiFiringLoader fullScreen={true} />;
 
   const { student, allAttempts = [] } = data;
-  const completedAttempts = allAttempts.filter((a: any) => a.status === 'SUBMITTED');
-  const studentName = student.name || student.email.split('@')[0];
-  const joinedDate = student.createdAt ? new Date(student.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Active Student';
+  const completedAttempts = allAttempts.filter((a: any) => a.status === "SUBMITTED");
+  const isGold = student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY";
+
+  const memberSinceFormatted = student.createdAt
+    ? new Date(student.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    : "August 2026";
+
+  const nextPaymentFormatted = student.subscriptionExpiresAt
+    ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+    : "Never (Lifetime Pass)";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans pb-20">
+    <div className="min-h-screen bg-[#f3f4f6] text-neutral-900 font-sans selection:bg-red-500 selection:text-white pb-24">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={student} />
 
-      {/* Modern Premium Header Bar */}
-      <header className="sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-          <div className="flex justify-between items-center gap-3">
-            
-            {/* Logo & Compact Designer Badge (Image 2 style) */}
-            <div className="flex flex-col items-start gap-1.5 shrink-0">
-              <PiechemLogo size="md" href="/dashboard" />
-              
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[11px] font-medium shadow-sm">
-                <span className="text-slate-400">Designed by</span>
-                <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                <span className="text-cyan-500/60 text-[10px]">•</span>
-                <a 
-                  href="tel:9830507435" 
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[10px]"
-                  title="Call Arghyadeep Roy"
-                >
-                  <svg className="w-2.5 h-2.5 fill-current text-cyan-400" viewBox="0 0 24 24">
-                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.58.57a1 1 0 011 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                  </svg>
-                  <span>9830507435</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Right: Back to Dashboard + Logout */}
-            <div className="flex items-center gap-2.5 shrink-0">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white transition-all px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md shadow-sm active:scale-95"
-              >
-                <ArrowLeft className="w-4 h-4 text-cyan-400" /> 
-                <span>Back to Dashboard</span>
-              </Link>
-
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 text-red-400 hover:text-red-300 transition"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-6xl mx-auto py-6 sm:py-10 px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-10">
-        
-        {/* Premium Account Profile Banner */}
-        <div className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-r from-[#0d1d2b] via-[#091520] to-[#050b11] p-5 sm:p-10 shadow-[0_10px_40px_rgba(0,153,255,0.15)]">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-500/10 via-blue-600/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
-
-          <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-5 sm:gap-6 text-center md:text-left">
-            {/* Avatar Pill with Glowing Ring */}
-            <div className="relative shrink-0">
-              <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-cyan-600 via-teal-500 to-blue-600 p-1 shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-                <div className="w-full h-full bg-[#07111a] rounded-[22px] overflow-hidden flex items-center justify-center">
-                  <img
-                    src={avatarUrl || "/avatars/atom.jpg"}
-                    alt="Student Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-              <span className="absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 border-2 border-[#07111a] rounded-full animate-pulse" title="Active Account"></span>
-            </div>
-
-            {/* Profile Info */}
-            <div className="space-y-3 flex-1 w-full min-w-0">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
-                <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight break-words">{studentName}</h1>
-                {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-slate-950 border border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.5)] tracking-wide uppercase shrink-0">
-                    <Sparkles className="w-3.5 h-3.5 text-slate-950 fill-slate-950" /> Gold Member
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow shrink-0">
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Student Account
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-col sm:flex-row flex-wrap justify-center md:justify-start items-center gap-2 sm:gap-4 text-xs text-slate-400 pt-1">
-                <span className="flex items-center gap-1.5 break-all max-w-full">
-                  <Mail className="w-4 h-4 text-cyan-400 shrink-0" /> {student.email || 'N/A'}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Phone className="w-4 h-4 text-teal-400 shrink-0" /> {student.phone || 'Not Linked'}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-blue-400" /> Enrolled: {joinedDate}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Profile Details & Security Settings Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* 1. TOP NAVBAR (NETFLIX MINIMAL WHITE HEADER INSPIRATION) */}
+      <header className="sticky top-0 z-40 bg-white border-b border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
-          {/* Left Column: Membership Info & Quick Overview (1 col) */}
-          <div className="lg:col-span-1 space-y-6">
+          {/* Left: Brand Identity & Designer Attribution */}
+          <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+            <PiechemLogo size="md" theme="light" href="/dashboard" />
             
-            {/* Membership Plan Card */}
-            <div className="bg-gradient-to-b from-[#0e1a26]/90 via-[#0a131d]/90 to-[#060c13]/90 border border-cyan-500/30 p-6 rounded-2xl shadow-xl space-y-5">
-              <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4">
-                <div className="p-2.5 bg-cyan-950/80 rounded-xl border border-cyan-500/40 text-cyan-300">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-white text-base">Membership & Plan</h3>
-                  <p className="text-xs text-slate-400">Exam Platform Subscription</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex justify-between items-center bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
-                  <span className="text-xs font-semibold text-slate-300">Account Type</span>
-                  {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") ? (
-                    <span className="text-xs font-black text-amber-300 bg-amber-950/90 px-2.5 py-1 rounded-md border border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                      Gold Membership
-                    </span>
-                  ) : (
-                    <span className="text-xs font-bold text-cyan-300 bg-cyan-950 px-2.5 py-1 rounded-md border border-cyan-700/60">
-                      Free Account
-                    </span>
-                  )}
-                </div>
-
-                {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") && (
-                  <div className="bg-gradient-to-b from-amber-950/40 via-slate-950/80 to-black p-4 rounded-xl border border-amber-500/40 space-y-2.5 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-400 font-medium">Active Since:</span>
-                      <span className="font-mono font-black text-emerald-400">
-                        {formatDateTime24(student.subscriptionStartedAt || student.updatedAt)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs border-t border-slate-800/80 pt-2">
-                      <span className="text-slate-400 font-medium">Next Payment / Expiry:</span>
-                      <span className="font-mono font-black text-amber-300">
-                        {student.subscriptionExpiresAt ? formatDateTime24(student.subscriptionExpiresAt) : "NEVER (Lifetime Pass)"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[10px] border-t border-slate-800/80 pt-1.5 text-slate-500">
-                      <span>Status:</span>
-                      <span className="font-bold text-green-400 uppercase tracking-wider">
-                        {student.subscriptionExpiresAt ? "ACTIVE 30-DAY GOLD PASS" : "ACTIVE LIFETIME GOLD PASS"}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
-                  <span className="text-xs font-semibold text-slate-300">Tests Completed</span>
-                  <span className="text-xs font-mono font-bold text-green-400">{completedAttempts.length} Attempted</span>
-                </div>
-
-                <div className="flex justify-between items-center bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
-                  <span className="text-xs font-semibold text-slate-300">Proctoring Status</span>
-                  <span className="text-xs font-bold text-teal-300 bg-teal-950 px-2.5 py-1 rounded-md border border-teal-700/60">Verified Active</span>
-                </div>
-              </div>
-
-              {/* Upgrade / Renewal Action Section (For FREE Students) */}
-              {student.subscriptionStatus !== "PAID" && student.subscriptionStatus !== "COMPLIMENTARY" && (
-                <div id="renew" className="pt-2 border-t border-cyan-500/20 space-y-3">
-                  {upgradeMsg && (
-                    <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
-                      upgradeMsg.type === "success" ? "bg-green-950/80 border-green-600/60 text-green-300" : "bg-red-950/80 border-red-600/60 text-red-300"
-                    }`}>
-                      <span>{upgradeMsg.text}</span>
-                    </div>
-                  )}
-
-                  {upgradeReq?.status === "PENDING" ? (
-                    <div className="w-full text-center py-3 px-4 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-300 text-xs font-bold space-y-1 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                      <div className="flex items-center justify-center gap-2">
-                        <Clock className="w-4 h-4 text-amber-400 animate-spin" />
-                        <span>Upgrade Request Pending Admin Approval</span>
-                      </div>
-                      <p className="text-[11px] text-amber-200/80 font-normal">Admin will review and approve your Gold subscription shortly.</p>
-                    </div>
-                  ) : upgradeReq?.status === "REJECTED" ? (
-                    <div className="space-y-2">
-                      <div className="p-3 rounded-xl bg-red-950/80 border border-red-600/60 text-red-300 text-xs space-y-1">
-                        <div className="font-bold flex items-center gap-1.5">
-                          <AlertCircle className="w-4 h-4 text-red-400" />
-                          <span>Previous Upgrade Request Declined</span>
-                        </div>
-                        <p className="text-[11px] text-red-200/80">You are currently on the Free plan. You may submit a new request below.</p>
-                      </div>
-                      <button
-                        onClick={() => { setShowPaymentModal(true); fetchUpgradeRequest(); }}
-                        disabled={requestingUpgrade}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
-                      >
-                        <Sparkles className="w-4 h-4 fill-slate-950" />
-                        <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "Renew Gold Membership" : "Upgrade to Gold Membership"}</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => { setShowPaymentModal(true); fetchUpgradeRequest(); }}
-                      disabled={requestingUpgrade}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] transition active:scale-95 cursor-pointer disabled:opacity-50"
-                    >
-                      <Sparkles className="w-4 h-4 fill-slate-950" />
-                      <span>{requestingUpgrade ? "Sending Request..." : student?.subscriptionExpiresAt ? "Renew Gold Membership" : "Upgrade to Gold Membership"}</span>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Quick Access Card */}
-            <div className="bg-gradient-to-br from-cyan-950/40 via-slate-950/60 to-blue-950/40 border border-cyan-500/20 p-6 rounded-2xl space-y-4">
-              <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-amber-400" /> Academic Profile Verified
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Keep your Board and Class / Semester details up to date to receive customized mock exams and study notes tailored to your curriculum!
-              </p>
+            <div className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-neutral-200 bg-neutral-100 text-[10px] text-neutral-600 font-medium">
+              <span>Designed by</span>
+              <span className="font-semibold text-neutral-900">Arghyadeep Roy</span>
+              <span className="text-neutral-400">•</span>
+              <a 
+                href="tel:9830507435" 
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neutral-200 text-neutral-800 hover:text-red-600 transition font-mono text-[9px]"
+                title="Call Arghyadeep Roy"
+              >
+                <Phone className="w-2.5 h-2.5 text-red-600 fill-current" />
+                <span>9830507435</span>
+              </a>
             </div>
           </div>
 
-          {/* Right Column: Personal Details & Password Security Forms (2 cols) */}
-          <div className="lg:col-span-2 space-y-8">
-            
-            {/* 1. Personal & Academic Profile Details Form */}
-            <div className="bg-gradient-to-b from-[#0e1a26]/90 via-[#0a131d]/90 to-[#060c13]/90 border border-cyan-500/30 p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
-              <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4">
-                <div className="p-2.5 bg-teal-950/80 rounded-xl border border-teal-500/40 text-teal-300">
-                  <User className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-white text-lg">Personal & Academic Details</h3>
-                  <p className="text-xs text-slate-400">Manage your profile information and board curriculum settings</p>
-                </div>
+          {/* Right: Netflix-Style Profile Dropdown Trigger */}
+          <div className="relative flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-neutral-100 transition cursor-pointer group"
+              title="Account Menu"
+            >
+              <div className="w-8 h-8 rounded-md overflow-hidden bg-neutral-900 ring-1 ring-neutral-300 group-hover:ring-neutral-400 transition shrink-0">
+                <img
+                  src={student?.avatarUrl || "/avatars/atom.jpg"}
+                  alt={student?.name || "Avatar"}
+                  className="w-full h-full object-cover"
+                />
               </div>
+              <ChevronDown className={`w-4 h-4 text-neutral-600 group-hover:text-neutral-900 transition-transform ${profileDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
 
-              {/* Profile Save Feedback Alert */}
-              {profileMsg && (
-                <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
-                  profileMsg.type === "success" 
-                    ? "bg-green-950/80 border-green-600/60 text-green-300" 
-                    : "bg-red-950/80 border-red-600/60 text-red-300"
-                }`}>
-                  {profileMsg.type === "success" ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
-                  <span>{profileMsg.text}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleProfileSave} className="space-y-6">
-                
-                {/* Unisex Avatar Selector Grid */}
-                <div className="space-y-2.5">
-                  <label className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center justify-between">
-                    <span>Choose Profile Avatar</span>
-                    <span className="text-[11px] text-slate-400 font-normal">Click to switch avatar</span>
-                  </label>
-                  <div className="grid grid-cols-5 gap-3 p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
-                    {AVATAR_OPTIONS.map((av) => {
-                      const isSelected = avatarUrl === av.url;
-                      return (
-                        <button
-                          key={av.id}
-                          type="button"
-                          onClick={() => setAvatarUrl(av.url)}
-                          className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer group ${
-                            isSelected
-                              ? "border-cyan-400 ring-2 ring-cyan-500/50 scale-105 shadow-[0_0_15px_rgba(6,182,212,0.5)]"
-                              : "border-slate-800 hover:border-cyan-500/50 opacity-70 hover:opacity-100"
-                          }`}
-                          title={av.name}
-                        >
-                          <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
-                          {isSelected && (
-                            <span className="absolute top-1 right-1 w-4 h-4 bg-cyan-500 rounded-full flex items-center justify-center text-slate-950 text-[10px] font-black">
-                              ✓
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {/* Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Student Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter full name"
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
-                    />
-                  </div>
-
-                  {/* Phone Number */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Phone Number</label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="10-digit mobile number"
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition font-mono"
-                    />
-                  </div>
-
-                  {/* Mail ID */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Mail ID (Read-only)</label>
-                    <input
-                      type="email"
-                      value={email}
-                      disabled
-                      className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed font-mono"
-                    />
-                  </div>
-
-                  {/* Gender Options (Male, Female, Others) */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Gender</label>
-                    <select
-                      value={gender}
-                      onChange={(e) => setGender(e.target.value)}
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
-                    >
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Others">Others</option>
-                    </select>
-                  </div>
-
-                  {/* Date of Birth */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Date of Birth</label>
-                    <input
-                      type="date"
-                      value={dob}
-                      onChange={(e) => setDob(e.target.value)}
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
-                    />
-                  </div>
-
-                  {/* Board (CBSE, ICSE, WBCHSE) */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Board</label>
-                    <select
-                      value={board}
-                      onChange={(e) => {
-                        const newBoard = e.target.value;
-                        setBoard(newBoard);
-                        if (newBoard === "WBCHSE") {
-                          setAcademicLevel("SEM-I");
-                        } else {
-                          setAcademicLevel("11");
-                        }
-                      }}
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
-                    >
-                      <option value="CBSE">CBSE</option>
-                      <option value="ICSE">ICSE</option>
-                      <option value="WBCHSE">WBCHSE</option>
-                    </select>
-                  </div>
-
-                  {/* Dynamic Field: Class (for CBSE/ICSE) OR Semester (for WBCHSE) */}
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">
-                      {board === "WBCHSE" ? "Semester (WBCHSE)" : `Class (${board})`}
-                    </label>
-                    {board === "WBCHSE" ? (
-                      <select
-                        value={academicLevel}
-                        onChange={(e) => setAcademicLevel(e.target.value)}
-                        className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
-                      >
-                        <option value="SEM-I">SEM-I</option>
-                        <option value="SEM-II">SEM-II</option>
-                        <option value="SEM-III">SEM-III</option>
-                        <option value="SEM-IV">SEM-IV</option>
-                      </select>
+            {/* Profile Dropdown Menu */}
+            {profileDropdownOpen && (
+              <div className="absolute right-0 top-12 w-64 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="px-4 py-3 border-b border-neutral-100">
+                  <p className="text-sm font-bold text-neutral-900 truncate">{student.name || "Student"}</p>
+                  <p className="text-xs text-neutral-500 truncate mt-0.5 font-mono">{student.email}</p>
+                  <div className="mt-2">
+                    {isGold ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                        <Sparkles className="w-3 h-3 text-amber-600" /> Gold Member
+                      </span>
                     ) : (
-                      <select
-                        value={academicLevel}
-                        onChange={(e) => setAcademicLevel(e.target.value)}
-                        className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
-                      >
-                        <option value="11">Class 11</option>
-                        <option value="12">Class 12</option>
-                      </select>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-700 border border-neutral-200">
+                        Free Account
+                      </span>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-3 flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={profileLoading}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 hover:from-teal-500 hover:to-blue-500 text-white text-xs font-extrabold tracking-wide uppercase transition-all shadow-[0_0_20px_rgba(20,184,166,0.3)] active:scale-95 disabled:opacity-50 cursor-pointer"
+                <div className="py-1">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 transition"
                   >
-                    {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                    <span>{profileLoading ? "Saving Changes..." : "Save Profile Details"}</span>
+                    <ArrowLeft className="w-4 h-4 text-neutral-400" />
+                    <span>Back to Dashboard</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      setActiveTab("profiles");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 transition text-left cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-neutral-400" />
+                    <span>Edit Profile Details</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      setActiveTab("security");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 transition text-left cursor-pointer"
+                  >
+                    <KeyRound className="w-4 h-4 text-neutral-400" />
+                    <span>Security & Password</span>
                   </button>
                 </div>
-              </form>
+
+                <div className="border-t border-neutral-100 pt-1 mt-1">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-red-500" />
+                    <span>Sign out of Piechem</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+      {/* 2. MAIN LAYOUT (TWO-COLUMN NETFLIX ACCOUNT SETTINGS PAGE) */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          
+          {/* LEFT SIDEBAR NAVIGATION (Exact Netflix Image 1 Style) */}
+          <aside className="lg:col-span-3 space-y-6 shrink-0">
+            
+            {/* Back Link with Arrow */}
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-red-600 transition group"
+            >
+              <ArrowLeft className="w-4 h-4 text-neutral-500 group-hover:text-red-600 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Back to Dashboard</span>
+            </Link>
+
+            {/* Vertical Navigation Rail for Desktop */}
+            <nav className="hidden lg:flex flex-col space-y-1 pt-2">
+              <button
+                onClick={() => setActiveTab("overview")}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
+                  activeTab === "overview"
+                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
+              >
+                <div className={`w-5 h-5 flex items-center justify-center ${activeTab === "overview" ? "text-neutral-950 font-bold" : "text-neutral-500"}`}>
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                  </svg>
+                </div>
+                <span>Overview</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("membership")}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
+                  activeTab === "membership"
+                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
+              >
+                <CreditCard className={`w-5 h-5 ${activeTab === "membership" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <span>Membership</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("security")}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
+                  activeTab === "security"
+                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
+              >
+                <ShieldCheck className={`w-5 h-5 ${activeTab === "security" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <span>Security</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("devices")}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
+                  activeTab === "devices"
+                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
+              >
+                <MonitorSmartphone className={`w-5 h-5 ${activeTab === "devices" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <span>Devices</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("profiles")}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
+                  activeTab === "profiles"
+                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
+              >
+                <User className={`w-5 h-5 ${activeTab === "profiles" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <span>Profiles</span>
+              </button>
+            </nav>
+
+            {/* Horizontal Pill Tabs for Mobile / Tablet */}
+            <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pt-1 -mx-4 px-4 border-b border-neutral-200">
+              {[
+                { id: "overview", label: "Overview", icon: Sparkles },
+                { id: "membership", label: "Membership", icon: CreditCard },
+                { id: "security", label: "Security", icon: ShieldCheck },
+                { id: "devices", label: "Devices", icon: MonitorSmartphone },
+                { id: "profiles", label: "Profiles", icon: User },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isSelected = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                      isSelected
+                        ? "bg-neutral-900 text-white shadow-sm"
+                        : "bg-white text-neutral-600 hover:bg-neutral-200/70 border border-neutral-200"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+
+          {/* RIGHT MAIN CONTENT AREA */}
+          <div className="lg:col-span-9 space-y-6 sm:space-y-8">
+            
+            {/* Header Titles */}
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight">
+                Account
+              </h1>
+              <p className="text-sm font-medium text-neutral-500 mt-1">
+                Membership details
+              </p>
             </div>
 
-            {/* 2. Security & Credentials Card */}
-            <div className="bg-gradient-to-b from-[#0e1a26]/90 via-[#0a131d]/90 to-[#060c13]/90 border border-cyan-500/30 p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
-              <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4">
-                <div className="p-2.5 bg-blue-950/80 rounded-xl border border-blue-500/40 text-blue-300">
-                  <KeyRound className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-white text-lg">Security & Password</h3>
-                  <p className="text-xs text-slate-400">Update your account password to protect your test attempts</p>
-                </div>
-              </div>
-
-              {/* OTP Verification & Password Policy Instructions */}
-              <div className="bg-slate-950/80 p-4 rounded-xl border border-cyan-500/30 space-y-3">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                  <div>
-                    <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">Email OTP Verification Required</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">Send a verification code to <strong className="text-white font-mono">{email}</strong> to verify student identity</p>
+            {/* VIEW A: OVERVIEW TAB (Exact match to Netflix Image 1) */}
+            {activeTab === "overview" && (
+              <div className="space-y-8 animate-in fade-in duration-200">
+                
+                {/* 1. The Iconic Netflix Membership Box */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 relative overflow-hidden transition hover:shadow-md">
+                  
+                  {/* Member Since Badge (Purple/crimson pill as in Image 1) */}
+                  <div className="inline-flex items-center px-3.5 py-1 rounded-full bg-gradient-to-r from-[#221f52] to-[#6d132c] text-white text-xs font-semibold shadow-sm mb-4">
+                    Member since {memberSinceFormatted}
                   </div>
+
+                  {/* Plan Name & Type */}
+                  <div className="space-y-1">
+                    <h2 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
+                      {isGold ? "Premium plan" : "Basic Student Plan"}
+                    </h2>
+                    <p className="text-xs sm:text-sm font-semibold text-neutral-500">
+                      {isGold 
+                        ? (student.subscriptionExpiresAt ? "Active 30-Day Gold Membership" : "Lifetime Unlimited Pass")
+                        : "Free Tier / Practice Account"}
+                    </p>
+                  </div>
+
+                  {/* Payment / Renewal Info */}
+                  <div className="pt-3 text-sm text-neutral-700 font-medium space-y-2">
+                    <p>
+                      {isGold ? (
+                        <>
+                          <span className="text-neutral-500">First payment / Next renewal: </span>
+                          <span className="font-bold text-neutral-900 font-mono">{nextPaymentFormatted}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-neutral-500">Status: </span>
+                          <span className="font-bold text-neutral-800">Upgrade anytime for unlimited test series & proctored analytics</span>
+                        </>
+                      )}
+                    </p>
+
+                    {/* Payment Handle Pill (UPI / Card) */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-100 border border-neutral-200 text-xs font-mono font-medium text-neutral-800">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="font-bold text-purple-700">UPI</span>
+                        <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
+                      </div>
+                      <span className="text-xs text-neutral-400 font-mono">
+                        Payee: {paymentSettings?.payeeName || "Arghyadeep Roy"} (₹{paymentSettings?.monthlyFee || 99}/mo)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Divider & Manage Membership Link Row */}
+                  <div className="pt-5 mt-5 border-t border-neutral-100 flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        setShowPaymentModal(true);
+                        fetchUpgradeRequest();
+                      }}
+                      className="w-full flex items-center justify-between text-sm font-bold text-neutral-900 hover:text-red-600 transition group cursor-pointer text-left py-1"
+                    >
+                      <span>Manage membership</span>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-red-600 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+                {/* 2. Quick Links Card (Exact match to Netflix Image 1) */}
+                <div className="space-y-3">
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 tracking-tight">
+                    Quick links
+                  </h3>
+
+                  <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm divide-y divide-neutral-100 overflow-hidden">
+                    
+                    {/* Change Plan */}
+                    <button
+                      onClick={() => {
+                        setShowPaymentModal(true);
+                        fetchUpgradeRequest();
+                      }}
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                          <Layers className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                            Change plan
+                          </span>
+                          <span className="text-xs text-neutral-500 font-normal">
+                            Upgrade to Gold Pass or renew current active membership
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Manage Payment Method */}
+                    <button
+                      onClick={() => {
+                        setShowPaymentModal(true);
+                        fetchUpgradeRequest();
+                      }}
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                          <CreditCard className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                            Manage payment method
+                          </span>
+                          <span className="text-xs text-neutral-500 font-normal">
+                            Scan UPI QR code (GPay, PhonePe, Paytm) & submit UTR verification
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Manage Access and Devices */}
+                    <button
+                      onClick={() => setActiveTab("devices")}
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                          <MonitorSmartphone className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                            Manage access and devices
+                          </span>
+                          <span className="text-xs text-neutral-500 font-normal">
+                            View active sessions, proctoring security status & signed-in browsers
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Edit Student Profile & Curriculum */}
+                    <button
+                      onClick={() => setActiveTab("profiles")}
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                            Edit student & academic profile
+                          </span>
+                          <span className="text-xs text-neutral-500 font-normal">
+                            Change avatar, update student name, phone, CBSE / ICSE / WBCHSE board
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Update Password & Security */}
+                    <button
+                      onClick={() => setActiveTab("security")}
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                          <KeyRound className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                            Update password & credentials
+                          </span>
+                          <span className="text-xs text-neutral-500 font-normal">
+                            Send verification OTP to email and set a new strong password
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Summary Profile Spotlight */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-5">
+                  <div className="flex items-center gap-4 text-center sm:text-left">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-neutral-900 ring-2 ring-neutral-200 shrink-0 shadow-sm">
+                      <img
+                        src={avatarUrl || "/avatars/atom.jpg"}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-bold text-neutral-900">{name || "Student"}</h4>
+                      <p className="text-xs text-neutral-500 font-mono mt-0.5">{email}</p>
+                      <div className="flex items-center gap-2 mt-1.5 justify-center sm:justify-start">
+                        <span className="text-xs font-bold text-neutral-800 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-200">
+                          {board} ({board === "WBCHSE" ? academicLevel : `Class ${academicLevel}`})
+                        </span>
+                        <span className="text-xs text-neutral-500 font-medium">
+                          • {completedAttempts.length} Tests Attempted
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   <button
-                    type="button"
-                    onClick={handleSendPasswordOtp}
-                    disabled={sendingOtp || resendCooldown > 0}
-                    className="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white rounded-xl text-xs font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    onClick={() => setActiveTab("profiles")}
+                    className="px-4 py-2 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-800 hover:bg-neutral-100 transition cursor-pointer shrink-0"
                   >
-                    {sendingOtp ? "Sending OTP..." : resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Send Email OTP"}
+                    Edit Profile
                   </button>
                 </div>
-                {otpSentMsg && (
-                  <div className="p-3 rounded-lg bg-green-950/80 border border-green-600/50 text-green-300 text-xs font-semibold flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    <span>{otpSentMsg}</span>
-                  </div>
-                )}
+
               </div>
+            )}
 
-              {/* Password Feedback Alerts */}
-              {passMsg && (
-                <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
-                  passMsg.type === "success" 
-                    ? "bg-green-950/80 border-green-600/60 text-green-300" 
-                    : "bg-red-950/80 border-red-600/60 text-red-300"
-                }`}>
-                  {passMsg.type === "success" ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
-                  <span>{passMsg.text}</span>
-                </div>
-              )}
+            {/* VIEW B: MEMBERSHIP TAB */}
+            {activeTab === "membership" && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                
+                {/* Membership Overview Card */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-5">
+                    <div>
+                      <span className="text-xs font-extrabold tracking-wider uppercase text-neutral-500 block mb-1">
+                        Current Plan
+                      </span>
+                      <h2 className="text-2xl font-black text-neutral-900 flex items-center gap-2">
+                        {isGold ? "Gold Membership (Unlimited)" : "Free Student Tier"}
+                        {isGold && <Sparkles className="w-5 h-5 text-amber-500" />}
+                      </h2>
+                    </div>
 
-              <form onSubmit={handlePasswordChange} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* OTP Input */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center justify-between">
-                      <span>Verification OTP *</span>
-                      <span className="text-[11px] text-slate-400 font-normal">Check your inbox</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={passwordOtp}
-                      onChange={(e) => setPasswordOtp(e.target.value)}
-                      placeholder="6-digit OTP code"
-                      className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition font-mono tracking-widest"
-                    />
-                  </div>
-
-                  {/* Current Password (Optional) */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Current Password (Optional)</label>
-                    <input
-                      type="password"
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                      placeholder="Enter current password if set"
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* New Password */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">New Password *</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter strong new password"
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
-                    />
-                  </div>
-
-                  {/* Confirm New Password */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-                      <span>Confirm New Password *</span>
-                      {confirmPassword && (
-                        <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-green-400" : "text-red-400"}`}>
-                          {newPassword === confirmPassword ? "✓ Passwords Match" : "✗ Passwords Mismatch"}
+                    <div>
+                      {isGold ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <CheckCircle className="w-3.5 h-3.5" /> Active Subscription
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-neutral-100 text-neutral-700 border border-neutral-300">
+                          Free Account
                         </span>
                       )}
-                    </label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat new password"
-                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition"
-                    />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                      <span className="text-neutral-500 block">Monthly Rate</span>
+                      <span className="text-lg font-black text-neutral-900 font-mono mt-0.5 block">
+                        ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-neutral-500">/ 30 Days</span>
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                      <span className="text-neutral-500 block">Payment Details</span>
+                      <span className="text-sm font-bold text-neutral-800 truncate block mt-1 font-mono">
+                        {paymentSettings?.upiId || "9830507435@upi"}
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                      <span className="text-neutral-500 block">Next Payment / Expiry</span>
+                      <span className="text-sm font-bold text-neutral-900 font-mono mt-1 block">
+                        {nextPaymentFormatted}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Pending Upgrade Alert */}
+                  {upgradeReq?.status === "PENDING" && (
+                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-3">
+                      <Clock className="w-5 h-5 text-amber-600 animate-spin shrink-0" />
+                      <div>
+                        <strong className="font-bold block">Upgrade Verification Pending</strong>
+                        <p className="text-amber-800 mt-0.5">
+                          Your UTR submission (<span className="font-mono font-bold">{upgradeReq.utrNumber}</span>) has been received and is being verified by Admin.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Button */}
+                  <div className="pt-2 flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setShowPaymentModal(true);
+                        fetchUpgradeRequest();
+                      }}
+                      className="px-6 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+                    >
+                      {isGold ? "Renew / Extend Gold Pass" : "Upgrade to Gold Membership (₹99)"}
+                    </button>
                   </div>
                 </div>
 
-                {/* Password Policy Security Checklist */}
-                <div className="bg-slate-950/90 p-4 rounded-xl border border-slate-800 space-y-2">
-                  <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">
-                    Password Security Policy Checklist:
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <div className={`flex items-center gap-2 font-medium ${reqLength ? "text-green-400 font-bold" : "text-slate-500"}`}>
-                      <span>{reqLength ? "✓" : "○"}</span> Minimum 8 characters long
+                {/* Plan Benefits Checklist */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-4">
+                  <h3 className="text-base font-bold text-neutral-900">What is included in Gold Membership</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-neutral-700">
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Full Access to All 50+ Chemistry Exam Tests</span>
                     </div>
-                    <div className={`flex items-center gap-2 font-medium ${reqUpper ? "text-green-400 font-bold" : "text-slate-500"}`}>
-                      <span>{reqUpper ? "✓" : "○"}</span> At least 1 uppercase letter (A-Z)
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Instant Step-by-Step Answer Explanations</span>
                     </div>
-                    <div className={`flex items-center gap-2 font-medium ${reqLower ? "text-green-400 font-bold" : "text-slate-500"}`}>
-                      <span>{reqLower ? "✓" : "○"}</span> At least 1 lowercase letter (a-z)
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Proctored Ranking & Percentile Analytics</span>
                     </div>
-                    <div className={`flex items-center gap-2 font-medium ${reqNumber ? "text-green-400 font-bold" : "text-slate-500"}`}>
-                      <span>{reqNumber ? "✓" : "○"}</span> At least 1 numeric digit (0-9)
-                    </div>
-                    <div className={`flex items-center gap-2 font-medium ${reqSpecial ? "text-green-400 font-bold" : "text-slate-500"}`}>
-                      <span>{reqSpecial ? "✓" : "○"}</span> At least 1 special character (@, #, $, %, etc.)
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Direct Admin Activation & WhatsApp Support</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={passLoading || !passwordOtp || !allReqsMet || newPassword !== confirmPassword}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-extrabold tracking-wide uppercase transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    {passLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
-                    <span>{passLoading ? "Updating Password..." : "Verify OTP & Save Password"}</span>
-                  </button>
+              </div>
+            )}
+            {/* VIEW C: SECURITY TAB */}
+            {activeTab === "security" && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                  
+                  <div className="border-b border-neutral-100 pb-4">
+                    <h2 className="text-xl font-bold text-neutral-900">Security & Password</h2>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Update your account credentials to protect your proctored exam history.
+                    </p>
+                  </div>
+
+                  {/* Email OTP Verification Section */}
+                  <div className="bg-neutral-50 p-4 sm:p-5 rounded-xl border border-neutral-200 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h4 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider">
+                          Email OTP Verification Required
+                        </h4>
+                        <p className="text-xs text-neutral-500 mt-0.5">
+                          To change your password, send a 6-digit code to <strong className="text-neutral-900 font-mono">{email}</strong>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendPasswordOtp}
+                        disabled={sendingOtp || resendCooldown > 0}
+                        className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+                      >
+                        {sendingOtp ? "Sending OTP..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Send Email OTP"}
+                      </button>
+                    </div>
+
+                    {otpSentMsg && (
+                      <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>{otpSentMsg}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Feedback Message */}
+                  {passMsg && (
+                    <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
+                      passMsg.type === "success"
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+                        : "bg-red-50 border-red-300 text-red-900"
+                    }`}>
+                      {passMsg.type === "success" ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                      )}
+                      <span>{passMsg.text}</span>
+                    </div>
+                  )}
+
+                  {/* Password Form */}
+                  <form onSubmit={handlePasswordChange} className="space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      
+                      {/* OTP Input */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex justify-between">
+                          <span>Verification OTP *</span>
+                          <span className="text-[11px] text-neutral-400 font-normal">6 digits</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={passwordOtp}
+                          onChange={(e) => setPasswordOtp(e.target.value)}
+                          placeholder="Enter 6-digit OTP"
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 font-mono tracking-wider outline-none transition"
+                        />
+                      </div>
+
+                      {/* Current Password */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Current Password (Optional)
+                        </label>
+                        <input
+                          type="password"
+                          value={oldPassword}
+                          onChange={(e) => setOldPassword(e.target.value)}
+                          placeholder="Enter current password if set"
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      
+                      {/* New Password */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          New Password *
+                        </label>
+                        <input
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="Create strong password"
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                        />
+                      </div>
+
+                      {/* Confirm New Password */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex justify-between">
+                          <span>Confirm New Password *</span>
+                          {confirmPassword && (
+                            <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-emerald-600" : "text-red-600"}`}>
+                              {newPassword === confirmPassword ? "✓ Match" : "✗ Mismatch"}
+                            </span>
+                          )}
+                        </label>
+                        <input
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Repeat new password"
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Password Policy Checklist */}
+                    <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200 space-y-2">
+                      <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block">
+                        Security Requirements:
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        <div className={`flex items-center gap-1.5 ${reqLength ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                          <span>{reqLength ? "✓" : "○"}</span> 8+ Characters
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${reqUpper ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                          <span>{reqUpper ? "✓" : "○"}</span> 1 Uppercase (A-Z)
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${reqLower ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                          <span>{reqLower ? "✓" : "○"}</span> 1 Lowercase (a-z)
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${reqNumber ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                          <span>{reqNumber ? "✓" : "○"}</span> 1 Number (0-9)
+                        </div>
+                        <div className={`flex items-center gap-1.5 ${reqSpecial ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                          <span>{reqSpecial ? "✓" : "○"}</span> 1 Special Char
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="submit"
+                        disabled={passLoading || !passwordOtp || !allReqsMet || newPassword !== confirmPassword}
+                        className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {passLoading ? "Updating Password..." : "Update Password"}
+                      </button>
+                    </div>
+                  </form>
+
                 </div>
-              </form>
-            </div>
+
+              </div>
+            )}
+            {/* VIEW D: PROFILES TAB */}
+            {activeTab === "profiles" && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                  
+                  <div className="border-b border-neutral-100 pb-4">
+                    <h2 className="text-xl font-bold text-neutral-900">Student & Academic Profile</h2>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Customize your display avatar and update your board details to receive personalized exam recommendations.
+                    </p>
+                  </div>
+
+                  {/* Feedback Message */}
+                  {profileMsg && (
+                    <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
+                      profileMsg.type === "success"
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+                        : "bg-red-50 border-red-300 text-red-900"
+                    }`}>
+                      {profileMsg.type === "success" ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                      )}
+                      <span>{profileMsg.text}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleProfileSave} className="space-y-6">
+                    
+                    {/* Avatar Picker */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider block">
+                        Choose Avatar Icon
+                      </label>
+                      <div className="grid grid-cols-5 gap-3 max-w-sm">
+                        {AVATAR_OPTIONS.map((av) => {
+                          const isSelected = avatarUrl === av.url;
+                          return (
+                            <button
+                              key={av.id}
+                              type="button"
+                              onClick={() => setAvatarUrl(av.url)}
+                              className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
+                                isSelected
+                                  ? "border-neutral-900 ring-2 ring-neutral-400 scale-105 shadow-md"
+                                  : "border-neutral-200 hover:border-neutral-400 opacity-70 hover:opacity-100"
+                              }`}
+                              title={av.name}
+                            >
+                              <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
+                              {isSelected && (
+                                <span className="absolute top-1 right-1 w-4 h-4 bg-neutral-900 text-white rounded-full flex items-center justify-center text-[9px] font-black">
+                                  ✓
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      
+                      {/* Name */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Student Name
+                        </label>
+                        <input
+                          type="text"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Enter your name"
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                        />
+                      </div>
+
+                      {/* Phone */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="10-digit mobile number"
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 font-mono outline-none transition"
+                        />
+                      </div>
+
+                      {/* Mail ID (Read-only) */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Registered Email (Read-only)
+                        </label>
+                        <input
+                          type="email"
+                          value={email}
+                          disabled
+                          className="w-full bg-neutral-100 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm text-neutral-500 font-mono cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Gender */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Gender
+                        </label>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer"
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Others">Others</option>
+                        </select>
+                      </div>
+
+                      {/* Date of Birth */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Date of Birth
+                        </label>
+                        <input
+                          type="date"
+                          value={dob}
+                          onChange={(e) => setDob(e.target.value)}
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer"
+                        />
+                      </div>
+
+                      {/* Board */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                          Education Board
+                        </label>
+                        <select
+                          value={board}
+                          onChange={(e) => {
+                            const newBoard = e.target.value;
+                            setBoard(newBoard);
+                            if (newBoard === "WBCHSE") {
+                              setAcademicLevel("SEM-I");
+                            } else {
+                              setAcademicLevel("11");
+                            }
+                          }}
+                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer font-bold"
+                        >
+                          <option value="CBSE">CBSE</option>
+                          <option value="ICSE">ICSE</option>
+                          <option value="WBCHSE">WBCHSE</option>
+                        </select>
+                      </div>
+
+                      {/* Dynamic Academic Level (Class or Semester) */}
+                      <div className="space-y-1.5 sm:col-span-2">
+                        <label className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
+                          {board === "WBCHSE" ? "Semester (WBCHSE Curriculum)" : `Class (${board})`}
+                        </label>
+                        {board === "WBCHSE" ? (
+                          <select
+                            value={academicLevel}
+                            onChange={(e) => setAcademicLevel(e.target.value)}
+                            className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer font-bold"
+                          >
+                            <option value="SEM-I">SEM-I</option>
+                            <option value="SEM-II">SEM-II</option>
+                            <option value="SEM-III">SEM-III</option>
+                            <option value="SEM-IV">SEM-IV</option>
+                          </select>
+                        ) : (
+                          <select
+                            value={academicLevel}
+                            onChange={(e) => setAcademicLevel(e.target.value)}
+                            className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer font-bold"
+                          >
+                            <option value="11">Class 11</option>
+                            <option value="12">Class 12</option>
+                          </select>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="submit"
+                        disabled={profileLoading}
+                        className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                      >
+                        {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                        <span>{profileLoading ? "Saving..." : "Save Profile Details"}</span>
+                      </button>
+                    </div>
+                  </form>
+
+                </div>
+
+              </div>
+            )}
+
+            {/* VIEW E: DEVICES TAB */}
+            {activeTab === "devices" && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                
+                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                  
+                  <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-bold text-neutral-900">Access & Devices</h2>
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Review active browsers and security devices connected to your student profile.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={handleLogout}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition border border-red-200 self-start sm:self-auto cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign out of all sessions</span>
+                    </button>
+                  </div>
+
+                  {/* Active Device Card */}
+                  <div className="p-5 rounded-xl border border-neutral-200 bg-neutral-50 flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="p-3 rounded-xl bg-white border border-neutral-200 shadow-sm text-neutral-900 shrink-0">
+                        <Laptop className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-neutral-900">Current Active Web Browser</h4>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active Now
+                          </span>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1 font-mono">
+                          Account: {student.email}
+                        </p>
+                        <p className="text-[11px] text-neutral-400 mt-0.5">
+                          Last session refresh: {formatDateTime24(new Date())}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Proctoring & Integrity Details */}
+                  <div className="p-5 rounded-xl border border-neutral-200 bg-white space-y-3">
+                    <h4 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-emerald-600" />
+                      Exam Integrity & Security Posture
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-neutral-600">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-100">
+                        <span>Anti-Cheat Proctoring:</span>
+                        <span className="font-bold text-emerald-600">VERIFIED ACTIVE</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-100">
+                        <span>Completed Attempts:</span>
+                        <span className="font-mono font-bold text-neutral-900">{completedAttempts.length} Submitted</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            )}
 
           </div>
-
         </div>
       </main>
-
-      {/* Full Screen UPI Payment & Renewal Experience */}
+      {/* 3. INSTANT UPI QR CODE MODAL (NETFLIX STYLE POPUP) */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-[#030712]/98 backdrop-blur-2xl flex flex-col justify-between overflow-y-auto animate-fade-in text-white">
-          {/* Top Navigation Bar */}
-          <div className="w-full border-b border-cyan-500/20 bg-[#06101c]/90 sticky top-0 z-10 px-4 sm:px-8 py-4 backdrop-blur-xl">
-            <div className="max-w-6xl mx-auto flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <PiechemLogo size="md" href="/dashboard" />
-                <div className="h-6 w-px bg-cyan-500/30 hidden sm:block" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black tracking-widest text-cyan-400 uppercase">
-                      MEMBERSHIP CHECKOUT
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-blue-950/90 text-blue-300 border border-blue-500/50 text-[10px] font-black tracking-wide shadow-[0_0_12px_rgba(59,130,246,0.3)]">
-                      ⭐ GOLD PASS
-                    </span>
-                  </div>
-                  <h2 className="text-sm sm:text-base font-extrabold text-white">
-                    Unlock All Premium Exams & Study Materials
-                  </h2>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-neutral-200 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="p-6 sm:p-7 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/70">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-100 border border-purple-200 text-purple-900 text-xs font-bold mb-1">
+                  <Sparkles className="w-3 h-3 text-purple-600" />
+                  <span>Instant UPI Activation</span>
                 </div>
+                <h3 className="text-xl font-black text-neutral-900 tracking-tight">
+                  Scan QR to Pay with any UPI App
+                </h3>
               </div>
 
-              {/* Close Button */}
               <button
                 onClick={() => setShowPaymentModal(false)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-red-950/60 border border-slate-700/60 hover:border-red-500/50 text-slate-300 hover:text-white transition active:scale-95 cursor-pointer text-xs font-bold"
-                title="Close checkout"
+                className="p-2 rounded-xl text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition cursor-pointer"
+                title="Close"
               >
-                <span>Close</span>
-                <X className="w-4 h-4 text-slate-400" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-          </div>
 
-          {/* Main Full-Screen Content Area */}
-          <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 py-8 flex flex-col justify-center">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Modal Body */}
+            <div className="p-6 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               
-              {/* Left Column: QR Code & Payment Method Details (6 cols) */}
-              <div className="lg:col-span-6 flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.15)] text-center space-y-6">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-bold shadow">
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Instant UPI Payment</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                    Scan QR to Pay with any UPI App
-                  </h3>
-                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                    Supported on GPay, PhonePe, Paytm, BHIM, Cred, and all bank UPI apps
-                  </p>
+              {/* QR Code Column */}
+              <div className="flex flex-col items-center justify-center text-center space-y-4">
+                <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-md inline-block">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+                    alt="UPI Payment QR Code"
+                    className="w-44 h-44 sm:w-48 sm:h-48 mx-auto object-contain"
+                  />
                 </div>
 
-                {/* The High-Resolution QR Code */}
-                <div className="relative group">
-                  <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-500 via-blue-500 to-teal-400 opacity-30 blur-lg group-hover:opacity-60 transition duration-500" />
-                  <div className="relative p-4 sm:p-5 bg-white rounded-2xl shadow-2xl inline-block">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
-                      alt="UPI Payment QR Code"
-                      className="w-48 h-48 sm:w-56 sm:h-56 mx-auto object-contain"
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-neutral-500 block">Monthly Subscription</span>
+                  <span className="text-2xl font-black text-neutral-900 font-mono">
+                    ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-neutral-500">/ 30 Days</span>
+                  </span>
                 </div>
 
-                {/* Plan Fee & Payee Pill Cards */}
-                <div className="w-full max-w-md grid grid-cols-2 gap-3 text-left">
-                  <div className="bg-slate-950/90 border border-slate-800 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-slate-400 block">Monthly Fee</span>
-                    <span className="text-lg font-black text-emerald-400 font-mono">
-                      ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs text-slate-400 font-normal">/ 30 Days</span>
-                    </span>
-                  </div>
-                  <div className="bg-slate-950/90 border border-slate-800 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-slate-400 block">Payee Name</span>
-                    <span className="text-sm font-bold text-white truncate block">
-                      {paymentSettings?.payeeName || 'Arghyadeep Roy'}
-                    </span>
-                  </div>
+                {/* Copy UPI ID */}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
+                  <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(paymentSettings?.upiId || "9830507435@upi");
+                      setCopiedUpi(true);
+                      setTimeout(() => setCopiedUpi(false), 2000);
+                    }}
+                    className="text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                    title="Copy UPI ID"
+                  >
+                    {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
                 </div>
-
-
               </div>
 
-              {/* Right Column: Step-by-Step Instructions & UTR Verification (6 cols) */}
-              <div className="lg:col-span-6 flex flex-col justify-center space-y-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#0d141e]/90 via-[#090f17]/90 to-[#04080e]/95 border border-cyan-500/30 shadow-2xl">
-                
-                <div className="space-y-2">
-                  <h3 className="text-xl font-black text-white">
-                    Step 2: Submit UTR for Activation
-                  </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Once payment is completed in your UPI app, locate the <strong>12-digit UTR / UPI Ref ID</strong> from your transaction receipt and enter it below.
+              {/* Step 2 Column: Enter UTR */}
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <h4 className="text-sm font-bold text-neutral-900">
+                    Step 2: Submit 12-Digit UTR
+                  </h4>
+                  <p className="text-xs text-neutral-500 leading-relaxed">
+                    After scanning and completing the transaction in GPay, PhonePe, Paytm, or BHIM, enter your 12-digit UTR reference number below.
                   </p>
                 </div>
 
-                {/* UTR Input Field */}
-                <div className="space-y-2.5">
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    Enter 12-Digit UTR / Transaction Ref No:
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider block">
+                    12-Digit UTR / Ref No:
                   </label>
                   <div className="relative">
                     <input
                       type="text"
                       value={utrNumber}
-                      onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ''))}
+                      onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ""))}
                       placeholder="e.g. 423456789012"
                       maxLength={18}
-                      className="w-full bg-slate-950/90 text-white border border-cyan-500/40 rounded-2xl px-4 py-3.5 text-base font-mono tracking-wider focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(6,182,212,0.3)] focus:outline-none transition"
+                      className="w-full bg-white text-neutral-900 border border-neutral-300 focus:border-neutral-900 rounded-xl px-4 py-3 text-sm font-mono tracking-wider outline-none transition"
                     />
                     {utrNumber.length >= 12 && (
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-600 flex items-center gap-1">
                         <CheckCircle2 className="w-4 h-4" /> Valid Format
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    The 12-digit UTR is visible under Transaction Details in PhonePe, Google Pay, Paytm, etc.
-                  </p>
                 </div>
 
-                {/* Status / Message Alert */}
                 {upgradeMsg && (
-                  <div className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2 border ${
-                    upgradeMsg.type === 'success' 
-                      ? 'bg-green-950/80 border-green-600/60 text-green-300' 
-                      : 'bg-red-950/80 border-red-600/60 text-red-300'
+                  <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
+                    upgradeMsg.type === "success"
+                      ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+                      : "bg-red-50 border-red-300 text-red-900"
                   }`}>
                     <span>{upgradeMsg.text}</span>
                   </div>
                 )}
 
-                {/* Submit Button */}
                 <button
                   onClick={async () => {
                     await handleSendUpgradeRequest();
@@ -1014,42 +1424,34 @@ export default function StudentAccountPage() {
                     }
                   }}
                   disabled={requestingUpgrade || !utrNumber.trim()}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-all active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full py-3.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider shadow-md transition active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {requestingUpgrade ? "Verifying Transaction..." : "SUBMIT PAYMENT FOR VERIFICATION"}
+                  {requestingUpgrade ? "Submitting Verification..." : "SUBMIT PAYMENT FOR ACTIVATION"}
                 </button>
 
-                {/* Perks Checklist */}
-                <div className="pt-4 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-[11px] text-slate-300">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-emerald-400 font-bold">✓</span>
-                    <span>100% Full Exam Access</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-emerald-400 font-bold">✓</span>
-                    <span>Instant Step-by-Step Solutions</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-emerald-400 font-bold">✓</span>
-                    <span>Proctored Ranking Analytics</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-emerald-400 font-bold">✓</span>
-                    <span>Direct Admin Verification</span>
-                  </div>
+                <div className="pt-2 text-[11px] text-neutral-500 text-center">
+                  <span>Assistance / Issues? Call Arghyadeep Roy: </span>
+                  <a href="tel:9830507435" className="font-mono font-bold text-neutral-900 hover:underline">
+                    9830507435
+                  </a>
                 </div>
-
               </div>
-            </div>
-          </div>
 
-          {/* Bottom Footer Help */}
-          <div className="w-full border-t border-slate-800/80 py-3 px-4 text-center text-xs text-slate-500">
-            <span>Need assistance with your payment? Contact Arghyadeep Roy: </span>
-            <a href="tel:9830507435" className="text-cyan-400 hover:underline font-mono font-bold">9830507435</a>
+            </div>
+
           </div>
         </div>
       )}
+
+      {/* Footer Support */}
+      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-center text-xs text-neutral-400 border-t border-neutral-200 mt-12">
+        <p>
+          Need assistance with your PIECHEM account? Contact Administrator Arghyadeep Roy:{" "}
+          <a href="tel:9830507435" className="font-bold text-neutral-700 hover:underline font-mono">
+            9830507435
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
