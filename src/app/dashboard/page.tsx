@@ -8,7 +8,7 @@ import {
   BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, 
   LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, 
   Download, ExternalLink, FolderOpen, Clock, User, Play, Info, Sparkles, 
-  Flame, ShieldCheck, CheckCircle2, Award, Bell
+  Flame, ShieldCheck, CheckCircle2, Award, Bell, Phone
 } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
