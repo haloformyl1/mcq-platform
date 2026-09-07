@@ -306,28 +306,28 @@ export default function StudentAccountPage() {
     : "Never (Lifetime Pass)";
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] text-neutral-900 font-sans selection:bg-red-500 selection:text-white pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans selection:bg-cyan-500 selection:text-black pb-24">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={student} />
 
-      {/* 1. TOP NAVBAR (NETFLIX MINIMAL WHITE HEADER INSPIRATION) */}
-      <header className="sticky top-0 z-40 bg-white border-b border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      {/* 1. TOP NAVBAR (ELECTRIC BLACKISH-BLUE THEME) */}
+      <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           {/* Left: Brand Identity & Designer Attribution */}
           <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-            <PiechemLogo size="md" theme="light" href="/dashboard" />
+            <PiechemLogo size="md" theme="dark" href="/dashboard" />
             
-            <div className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-neutral-200 bg-neutral-100 text-[10px] text-neutral-600 font-medium">
-              <span>Designed by</span>
-              <span className="font-semibold text-neutral-900">Arghyadeep Roy</span>
-              <span className="text-neutral-400">•</span>
+            <div className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[10px] text-slate-300 font-medium shadow-sm">
+              <span className="text-slate-400">Designed by</span>
+              <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+              <span className="text-cyan-500/60">•</span>
               <a 
                 href="tel:9830507435" 
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neutral-200 text-neutral-800 hover:text-red-600 transition font-mono text-[9px]"
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
                 title="Call Arghyadeep Roy"
               >
-                <Phone className="w-2.5 h-2.5 text-red-600 fill-current" />
+                <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
                 <span>9830507435</span>
               </a>
             </div>
@@ -337,32 +337,32 @@ export default function StudentAccountPage() {
           <div className="relative flex items-center gap-3 shrink-0">
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-              className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-neutral-100 transition cursor-pointer group"
+              className="flex items-center gap-1.5 p-1 rounded-xl hover:bg-white/5 transition cursor-pointer group"
               title="Account Menu"
             >
-              <div className="w-8 h-8 rounded-md overflow-hidden bg-neutral-900 ring-1 ring-neutral-300 group-hover:ring-neutral-400 transition shrink-0">
+              <div className="w-8 h-8 rounded-lg overflow-hidden bg-cyan-950 ring-1 ring-cyan-500/40 group-hover:ring-cyan-400 transition shrink-0">
                 <img
                   src={student?.avatarUrl || "/avatars/atom.jpg"}
                   alt={student?.name || "Avatar"}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <ChevronDown className={`w-4 h-4 text-neutral-600 group-hover:text-neutral-900 transition-transform ${profileDropdownOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-cyan-300 transition-transform ${profileDropdownOpen ? "rotate-180" : ""}`} />
             </button>
 
             {/* Profile Dropdown Menu */}
             {profileDropdownOpen && (
-              <div className="absolute right-0 top-12 w-64 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-3 border-b border-neutral-100">
-                  <p className="text-sm font-bold text-neutral-900 truncate">{student.name || "Student"}</p>
-                  <p className="text-xs text-neutral-500 truncate mt-0.5 font-mono">{student.email}</p>
+              <div className="absolute right-0 top-12 w-64 bg-[#061421]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-cyan-500/30 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="px-4 py-3 border-b border-cyan-500/15">
+                  <p className="text-sm font-bold text-white truncate">{student.name || "Student"}</p>
+                  <p className="text-xs text-slate-400 truncate mt-0.5 font-mono">{student.email}</p>
                   <div className="mt-2">
                     {isGold ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                        <Sparkles className="w-3 h-3 text-amber-600" /> Gold Member
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+                        <Sparkles className="w-3 h-3 text-amber-400" /> Gold Member
                       </span>
                     ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-700 border border-neutral-200">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
                         Free Account
                       </span>
                     )}
@@ -373,9 +373,9 @@ export default function StudentAccountPage() {
                   <Link
                     href="/dashboard"
                     onClick={() => setProfileDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 transition"
+                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition"
                   >
-                    <ArrowLeft className="w-4 h-4 text-neutral-400" />
+                    <ArrowLeft className="w-4 h-4 text-cyan-400" />
                     <span>Back to Dashboard</span>
                   </Link>
                   <button
@@ -383,9 +383,9 @@ export default function StudentAccountPage() {
                       setProfileDropdownOpen(false);
                       setActiveTab("profiles");
                     }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 transition text-left cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition text-left cursor-pointer"
                   >
-                    <User className="w-4 h-4 text-neutral-400" />
+                    <User className="w-4 h-4 text-cyan-400" />
                     <span>Edit Profile Details</span>
                   </button>
                   <button
@@ -393,19 +393,19 @@ export default function StudentAccountPage() {
                       setProfileDropdownOpen(false);
                       setActiveTab("security");
                     }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950 transition text-left cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition text-left cursor-pointer"
                   >
-                    <KeyRound className="w-4 h-4 text-neutral-400" />
+                    <KeyRound className="w-4 h-4 text-cyan-400" />
                     <span>Security & Password</span>
                   </button>
                 </div>
 
-                <div className="border-t border-neutral-100 pt-1 mt-1">
+                <div className="border-t border-cyan-500/15 pt-1 mt-1">
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-950/30 transition text-left cursor-pointer"
                   >
-                    <LogOut className="w-4 h-4 text-red-500" />
+                    <LogOut className="w-4 h-4 text-red-400" />
                     <span>Sign out of Piechem</span>
                   </button>
                 </div>
@@ -418,29 +418,29 @@ export default function StudentAccountPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* LEFT SIDEBAR NAVIGATION (Exact Netflix Image 1 Style) */}
+          {/* LEFT SIDEBAR NAVIGATION (Electric Blackish Blue Style) */}
           <aside className="lg:col-span-3 space-y-6 shrink-0">
             
             {/* Back Link with Arrow */}
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 text-sm font-bold text-neutral-800 hover:text-red-600 transition group"
+              className="inline-flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-cyan-300 transition group"
             >
-              <ArrowLeft className="w-4 h-4 text-neutral-500 group-hover:text-red-600 group-hover:-translate-x-0.5 transition-transform" />
+              <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
               <span>Back to Dashboard</span>
             </Link>
 
             {/* Vertical Navigation Rail for Desktop */}
-            <nav className="hidden lg:flex flex-col space-y-1 pt-2">
+            <nav className="hidden lg:flex flex-col space-y-1.5 pt-2">
               <button
                 onClick={() => setActiveTab("overview")}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
                   activeTab === "overview"
-                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <div className={`w-5 h-5 flex items-center justify-center ${activeTab === "overview" ? "text-neutral-950 font-bold" : "text-neutral-500"}`}>
+                <div className={`w-5 h-5 flex items-center justify-center ${activeTab === "overview" ? "text-cyan-300 font-bold" : "text-slate-400"}`}>
                   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                     <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                   </svg>
@@ -452,11 +452,11 @@ export default function StudentAccountPage() {
                 onClick={() => setActiveTab("membership")}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
                   activeTab === "membership"
-                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <CreditCard className={`w-5 h-5 ${activeTab === "membership" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <CreditCard className={`w-5 h-5 ${activeTab === "membership" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
                 <span>Membership</span>
               </button>
 
@@ -464,11 +464,11 @@ export default function StudentAccountPage() {
                 onClick={() => setActiveTab("security")}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
                   activeTab === "security"
-                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <ShieldCheck className={`w-5 h-5 ${activeTab === "security" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <ShieldCheck className={`w-5 h-5 ${activeTab === "security" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
                 <span>Security</span>
               </button>
 
@@ -476,11 +476,11 @@ export default function StudentAccountPage() {
                 onClick={() => setActiveTab("devices")}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
                   activeTab === "devices"
-                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <MonitorSmartphone className={`w-5 h-5 ${activeTab === "devices" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <MonitorSmartphone className={`w-5 h-5 ${activeTab === "devices" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
                 <span>Devices</span>
               </button>
 
@@ -488,17 +488,17 @@ export default function StudentAccountPage() {
                 onClick={() => setActiveTab("profiles")}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
                   activeTab === "profiles"
-                    ? "font-black text-neutral-950 bg-neutral-200/70 shadow-sm"
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <User className={`w-5 h-5 ${activeTab === "profiles" ? "text-neutral-950 stroke-[2.5]" : "text-neutral-500"}`} />
+                <User className={`w-5 h-5 ${activeTab === "profiles" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
                 <span>Profiles</span>
               </button>
             </nav>
 
             {/* Horizontal Pill Tabs for Mobile / Tablet */}
-            <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pt-1 -mx-4 px-4 border-b border-neutral-200">
+            <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pt-1 -mx-4 px-4 border-b border-cyan-500/20">
               {[
                 { id: "overview", label: "Overview", icon: Sparkles },
                 { id: "membership", label: "Membership", icon: CreditCard },
@@ -514,8 +514,8 @@ export default function StudentAccountPage() {
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                       isSelected
-                        ? "bg-neutral-900 text-white shadow-sm"
-                        : "bg-white text-neutral-600 hover:bg-neutral-200/70 border border-neutral-200"
+                        ? "bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                        : "bg-[#061421]/90 text-slate-400 hover:text-white border border-cyan-500/30"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -531,32 +531,32 @@ export default function StudentAccountPage() {
             
             {/* Header Titles */}
             <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                 Account
               </h1>
-              <p className="text-sm font-medium text-neutral-500 mt-1">
+              <p className="text-sm font-medium text-slate-400 mt-1">
                 Membership details
               </p>
             </div>
 
-            {/* VIEW A: OVERVIEW TAB (Exact match to Netflix Image 1) */}
+            {/* VIEW A: OVERVIEW TAB */}
             {activeTab === "overview" && (
               <div className="space-y-8 animate-in fade-in duration-200">
                 
-                {/* 1. The Iconic Netflix Membership Box */}
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 relative overflow-hidden transition hover:shadow-md">
+                {/* 1. The Iconic Netflix Membership Box (Electric Blue Style) */}
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-[0_0_40px_rgba(6,182,212,0.12)] p-6 sm:p-7 relative overflow-hidden transition hover:border-cyan-500/50">
                   
-                  {/* Member Since Badge (Purple/crimson pill as in Image 1) */}
-                  <div className="inline-flex items-center px-3.5 py-1 rounded-full bg-gradient-to-r from-[#221f52] to-[#6d132c] text-white text-xs font-semibold shadow-sm mb-4">
+                  {/* Member Since Badge */}
+                  <div className="inline-flex items-center px-3.5 py-1 rounded-full bg-gradient-to-r from-[#221f52] via-[#4a1236] to-[#6d132c] border border-purple-500/40 text-white text-xs font-semibold shadow-md mb-4">
                     Member since {memberSinceFormatted}
                   </div>
 
                   {/* Plan Name & Type */}
                   <div className="space-y-1">
-                    <h2 className="text-xl sm:text-2xl font-black text-neutral-900 tracking-tight">
+                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                       {isGold ? "Premium plan" : "Basic Student Plan"}
                     </h2>
-                    <p className="text-xs sm:text-sm font-semibold text-neutral-500">
+                    <p className="text-xs sm:text-sm font-semibold text-cyan-400">
                       {isGold 
                         ? (student.subscriptionExpiresAt ? "Active 30-Day Gold Membership" : "Lifetime Unlimited Pass")
                         : "Free Tier / Practice Account"}
@@ -564,55 +564,55 @@ export default function StudentAccountPage() {
                   </div>
 
                   {/* Payment / Renewal Info */}
-                  <div className="pt-3 text-sm text-neutral-700 font-medium space-y-2">
+                  <div className="pt-3 text-sm text-slate-300 font-medium space-y-2">
                     <p>
                       {isGold ? (
                         <>
-                          <span className="text-neutral-500">First payment / Next renewal: </span>
-                          <span className="font-bold text-neutral-900 font-mono">{nextPaymentFormatted}</span>
+                          <span className="text-slate-400">First payment / Next renewal: </span>
+                          <span className="font-bold text-amber-300 font-mono">{nextPaymentFormatted}</span>
                         </>
                       ) : (
                         <>
-                          <span className="text-neutral-500">Status: </span>
-                          <span className="font-bold text-neutral-800">Upgrade anytime for unlimited test series & proctored analytics</span>
+                          <span className="text-slate-400">Status: </span>
+                          <span className="font-bold text-cyan-300">Upgrade anytime for unlimited test series & proctored analytics</span>
                         </>
                       )}
                     </p>
 
                     {/* Payment Handle Pill (UPI / Card) */}
-                    <div className="flex items-center gap-2 pt-1">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-100 border border-neutral-200 text-xs font-mono font-medium text-neutral-800">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span className="font-bold text-purple-700">UPI</span>
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#061421] border border-cyan-500/40 text-xs font-mono font-medium text-slate-200">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        <span className="font-bold text-cyan-400">UPI</span>
                         <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
                       </div>
-                      <span className="text-xs text-neutral-400 font-mono">
+                      <span className="text-xs text-slate-400 font-mono">
                         Payee: {paymentSettings?.payeeName || "Arghyadeep Roy"} (₹{paymentSettings?.monthlyFee || 99}/mo)
                       </span>
                     </div>
                   </div>
 
                   {/* Divider & Manage Membership Link Row */}
-                  <div className="pt-5 mt-5 border-t border-neutral-100 flex items-center justify-between">
+                  <div className="pt-5 mt-5 border-t border-cyan-500/15 flex items-center justify-between">
                     <button
                       onClick={() => {
                         setShowPaymentModal(true);
                         fetchUpgradeRequest();
                       }}
-                      className="w-full flex items-center justify-between text-sm font-bold text-neutral-900 hover:text-red-600 transition group cursor-pointer text-left py-1"
+                      className="w-full flex items-center justify-between text-sm font-bold text-white hover:text-cyan-300 transition group cursor-pointer text-left py-1"
                     >
                       <span>Manage membership</span>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-red-600 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
                     </button>
                   </div>
                 </div>
-                {/* 2. Quick Links Card (Exact match to Netflix Image 1) */}
+                {/* 2. Quick Links Card (Electric Blue Style) */}
                 <div className="space-y-3">
-                  <h3 className="text-base sm:text-lg font-bold text-neutral-900 tracking-tight">
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                     Quick links
                   </h3>
 
-                  <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm divide-y divide-neutral-100 overflow-hidden">
+                  <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl divide-y divide-cyan-500/15 overflow-hidden">
                     
                     {/* Change Plan */}
                     <button
@@ -620,22 +620,22 @@ export default function StudentAccountPage() {
                         setShowPaymentModal(true);
                         fetchUpgradeRequest();
                       }}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
                           <Layers className="w-5 h-5" />
                         </div>
                         <div>
-                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
                             Change plan
                           </span>
-                          <span className="text-xs text-neutral-500 font-normal">
+                          <span className="text-xs text-slate-400 font-normal">
                             Upgrade to Gold Pass or renew current active membership
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Manage Payment Method */}
@@ -644,93 +644,93 @@ export default function StudentAccountPage() {
                         setShowPaymentModal(true);
                         fetchUpgradeRequest();
                       }}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
                           <CreditCard className="w-5 h-5" />
                         </div>
                         <div>
-                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
                             Manage payment method
                           </span>
-                          <span className="text-xs text-neutral-500 font-normal">
+                          <span className="text-xs text-slate-400 font-normal">
                             Scan UPI QR code (GPay, PhonePe, Paytm) & submit UTR verification
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Manage Access and Devices */}
                     <button
                       onClick={() => setActiveTab("devices")}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
                           <MonitorSmartphone className="w-5 h-5" />
                         </div>
                         <div>
-                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
                             Manage access and devices
                           </span>
-                          <span className="text-xs text-neutral-500 font-normal">
+                          <span className="text-xs text-slate-400 font-normal">
                             View active sessions, proctoring security status & signed-in browsers
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Edit Student Profile & Curriculum */}
                     <button
                       onClick={() => setActiveTab("profiles")}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
                           <User className="w-5 h-5" />
                         </div>
                         <div>
-                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
                             Edit student & academic profile
                           </span>
-                          <span className="text-xs text-neutral-500 font-normal">
+                          <span className="text-xs text-slate-400 font-normal">
                             Change avatar, update student name, phone, CBSE / ICSE / WBCHSE board
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Update Password & Security */}
                     <button
                       onClick={() => setActiveTab("security")}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-neutral-50/80 transition cursor-pointer group"
+                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-neutral-100 text-neutral-700 group-hover:text-red-600 transition">
+                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
                           <KeyRound className="w-5 h-5" />
                         </div>
                         <div>
-                          <span className="text-sm font-bold text-neutral-900 group-hover:text-red-600 transition block">
+                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
                             Update password & credentials
                           </span>
-                          <span className="text-xs text-neutral-500 font-normal">
+                          <span className="text-xs text-slate-400 font-normal">
                             Send verification OTP to email and set a new strong password
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
                     </button>
                   </div>
                 </div>
 
                 {/* 3. Summary Profile Spotlight */}
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-5">
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-5">
                   <div className="flex items-center gap-4 text-center sm:text-left">
-                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-neutral-900 ring-2 ring-neutral-200 shrink-0 shadow-sm">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-cyan-950 ring-2 ring-cyan-500/40 shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                       <img
                         src={avatarUrl || "/avatars/atom.jpg"}
                         alt="Avatar"
@@ -738,13 +738,13 @@ export default function StudentAccountPage() {
                       />
                     </div>
                     <div>
-                      <h4 className="text-base font-bold text-neutral-900">{name || "Student"}</h4>
-                      <p className="text-xs text-neutral-500 font-mono mt-0.5">{email}</p>
-                      <div className="flex items-center gap-2 mt-1.5 justify-center sm:justify-start">
-                        <span className="text-xs font-bold text-neutral-800 bg-neutral-100 px-2.5 py-0.5 rounded-full border border-neutral-200">
+                      <h4 className="text-base font-bold text-white">{name || "Student"}</h4>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">{email}</p>
+                      <div className="flex items-center gap-2 mt-2 justify-center sm:justify-start">
+                        <span className="text-xs font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-0.5 rounded-full border border-cyan-500/40">
                           {board} ({board === "WBCHSE" ? academicLevel : `Class ${academicLevel}`})
                         </span>
-                        <span className="text-xs text-neutral-500 font-medium">
+                        <span className="text-xs text-slate-400 font-medium">
                           • {completedAttempts.length} Tests Attempted
                         </span>
                       </div>
@@ -753,7 +753,7 @@ export default function StudentAccountPage() {
 
                   <button
                     onClick={() => setActiveTab("profiles")}
-                    className="px-4 py-2 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-800 hover:bg-neutral-100 transition cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-xl border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:bg-cyan-950/60 hover:text-white transition cursor-pointer shrink-0"
                   >
                     Edit Profile
                   </button>
@@ -767,25 +767,25 @@ export default function StudentAccountPage() {
               <div className="space-y-6 animate-in fade-in duration-200">
                 
                 {/* Membership Overview Card */}
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-5">
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-cyan-500/15 pb-5">
                     <div>
-                      <span className="text-xs font-extrabold tracking-wider uppercase text-neutral-500 block mb-1">
+                      <span className="text-xs font-extrabold tracking-wider uppercase text-slate-400 block mb-1">
                         Current Plan
                       </span>
-                      <h2 className="text-2xl font-black text-neutral-900 flex items-center gap-2">
+                      <h2 className="text-2xl font-black text-white flex items-center gap-2">
                         {isGold ? "Gold Membership (Unlimited)" : "Free Student Tier"}
-                        {isGold && <Sparkles className="w-5 h-5 text-amber-500" />}
+                        {isGold && <Sparkles className="w-5 h-5 text-amber-400" />}
                       </h2>
                     </div>
 
                     <div>
                       {isGold ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                          <CheckCircle className="w-3.5 h-3.5" /> Active Subscription
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-950/80 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                          <CheckCircle className="w-3.5 h-3.5 text-amber-400" /> Active Subscription
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-neutral-100 text-neutral-700 border border-neutral-300">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
                           Free Account
                         </span>
                       )}
@@ -793,23 +793,23 @@ export default function StudentAccountPage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                      <span className="text-neutral-500 block">Monthly Rate</span>
-                      <span className="text-lg font-black text-neutral-900 font-mono mt-0.5 block">
-                        ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-neutral-500">/ 30 Days</span>
+                    <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <span className="text-slate-400 block">Monthly Rate</span>
+                      <span className="text-lg font-black text-emerald-400 font-mono mt-0.5 block">
+                        ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-slate-400">/ 30 Days</span>
                       </span>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                      <span className="text-neutral-500 block">Payment Details</span>
-                      <span className="text-sm font-bold text-neutral-800 truncate block mt-1 font-mono">
+                    <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <span className="text-slate-400 block">Payment Details</span>
+                      <span className="text-sm font-bold text-slate-200 truncate block mt-1 font-mono">
                         {paymentSettings?.upiId || "9830507435@upi"}
                       </span>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                      <span className="text-neutral-500 block">Next Payment / Expiry</span>
-                      <span className="text-sm font-bold text-neutral-900 font-mono mt-1 block">
+                    <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <span className="text-slate-400 block">Next Payment / Expiry</span>
+                      <span className="text-sm font-bold text-amber-300 font-mono mt-1 block">
                         {nextPaymentFormatted}
                       </span>
                     </div>
@@ -817,12 +817,12 @@ export default function StudentAccountPage() {
 
                   {/* Pending Upgrade Alert */}
                   {upgradeReq?.status === "PENDING" && (
-                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-3">
-                      <Clock className="w-5 h-5 text-amber-600 animate-spin shrink-0" />
+                    <div className="p-4 rounded-xl bg-amber-950/70 border border-amber-500/50 text-amber-200 text-xs flex items-center gap-3 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                      <Clock className="w-5 h-5 text-amber-400 animate-spin shrink-0" />
                       <div>
-                        <strong className="font-bold block">Upgrade Verification Pending</strong>
-                        <p className="text-amber-800 mt-0.5">
-                          Your UTR submission (<span className="font-mono font-bold">{upgradeReq.utrNumber}</span>) has been received and is being verified by Admin.
+                        <strong className="font-bold text-amber-300 block">Upgrade Verification Pending</strong>
+                        <p className="mt-0.5 text-amber-200/80">
+                          Your UTR submission (<span className="font-mono font-bold text-white">{upgradeReq.utrNumber}</span>) has been received and is being verified by Admin.
                         </p>
                       </div>
                     </div>
@@ -835,7 +835,7 @@ export default function StudentAccountPage() {
                         setShowPaymentModal(true);
                         fetchUpgradeRequest();
                       }}
-                      className="px-6 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider transition shadow-sm cursor-pointer"
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer"
                     >
                       {isGold ? "Renew / Extend Gold Pass" : "Upgrade to Gold Membership (₹99)"}
                     </button>
@@ -843,24 +843,24 @@ export default function StudentAccountPage() {
                 </div>
 
                 {/* Plan Benefits Checklist */}
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-4">
-                  <h3 className="text-base font-bold text-neutral-900">What is included in Gold Membership</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-neutral-700">
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Full Access to All 50+ Chemistry Exam Tests</span>
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-4">
+                  <h3 className="text-base font-bold text-white">What is included in Gold Membership</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Full Access to All Chemistry Exam Tests</span>
                     </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                       <span>Instant Step-by-Step Answer Explanations</span>
                     </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                       <span>Proctored Ranking & Percentile Analytics</span>
                     </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Direct Admin Activation & WhatsApp Support</span>
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Direct Admin Activation & Phone Support</span>
                     </div>
                   </div>
                 </div>
@@ -871,39 +871,39 @@ export default function StudentAccountPage() {
             {activeTab === "security" && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
-                  <div className="border-b border-neutral-100 pb-4">
-                    <h2 className="text-xl font-bold text-neutral-900">Security & Password</h2>
-                    <p className="text-xs text-neutral-500 mt-1">
+                  <div className="border-b border-cyan-500/15 pb-4">
+                    <h2 className="text-xl font-bold text-white">Security & Password</h2>
+                    <p className="text-xs text-slate-400 mt-1">
                       Update your account credentials to protect your proctored exam history.
                     </p>
                   </div>
 
                   {/* Email OTP Verification Section */}
-                  <div className="bg-neutral-50 p-4 sm:p-5 rounded-xl border border-neutral-200 space-y-3">
+                  <div className="bg-slate-950/80 p-4 sm:p-5 rounded-xl border border-cyan-500/30 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <h4 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider">
+                        <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">
                           Email OTP Verification Required
                         </h4>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          To change your password, send a 6-digit code to <strong className="text-neutral-900 font-mono">{email}</strong>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          To change your password, send a 6-digit code to <strong className="text-white font-mono">{email}</strong>
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={handleSendPasswordOtp}
                         disabled={sendingOtp || resendCooldown > 0}
-                        className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+                        className="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white rounded-xl text-xs font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
                       >
                         {sendingOtp ? "Sending OTP..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Send Email OTP"}
                       </button>
                     </div>
 
                     {otpSentMsg && (
-                      <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <div className="p-3 rounded-lg bg-green-950/80 border border-green-600/50 text-green-300 text-xs font-semibold flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
                         <span>{otpSentMsg}</span>
                       </div>
                     )}
@@ -913,13 +913,13 @@ export default function StudentAccountPage() {
                   {passMsg && (
                     <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
                       passMsg.type === "success"
-                        ? "bg-emerald-50 border-emerald-300 text-emerald-900"
-                        : "bg-red-50 border-red-300 text-red-900"
+                        ? "bg-green-950/80 border-green-600/60 text-green-300"
+                        : "bg-red-950/80 border-red-600/60 text-red-300"
                     }`}>
                       {passMsg.type === "success" ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
                       ) : (
-                        <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
                       )}
                       <span>{passMsg.text}</span>
                     </div>
@@ -931,22 +931,22 @@ export default function StudentAccountPage() {
                       
                       {/* OTP Input */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex justify-between">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
                           <span>Verification OTP *</span>
-                          <span className="text-[11px] text-neutral-400 font-normal">6 digits</span>
+                          <span className="text-[11px] text-slate-500 font-normal">6 digits</span>
                         </label>
                         <input
                           type="text"
                           value={passwordOtp}
                           onChange={(e) => setPasswordOtp(e.target.value)}
                           placeholder="Enter 6-digit OTP"
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 font-mono tracking-wider outline-none transition"
+                          className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white font-mono tracking-wider outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                         />
                       </div>
 
                       {/* Current Password */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Current Password (Optional)
                         </label>
                         <input
@@ -954,7 +954,7 @@ export default function StudentAccountPage() {
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
                           placeholder="Enter current password if set"
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
                         />
                       </div>
                     </div>
@@ -963,7 +963,7 @@ export default function StudentAccountPage() {
                       
                       {/* New Password */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           New Password *
                         </label>
                         <input
@@ -971,16 +971,16 @@ export default function StudentAccountPage() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder="Create strong password"
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
                         />
                       </div>
 
                       {/* Confirm New Password */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex justify-between">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
                           <span>Confirm New Password *</span>
                           {confirmPassword && (
-                            <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-emerald-600" : "text-red-600"}`}>
+                            <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-emerald-400" : "text-red-400"}`}>
                               {newPassword === confirmPassword ? "✓ Match" : "✗ Mismatch"}
                             </span>
                           )}
@@ -990,30 +990,30 @@ export default function StudentAccountPage() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Repeat new password"
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
                         />
                       </div>
                     </div>
 
                     {/* Password Policy Checklist */}
-                    <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200 space-y-2">
-                      <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block">
+                    <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                         Security Requirements:
                       </span>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                        <div className={`flex items-center gap-1.5 ${reqLength ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                        <div className={`flex items-center gap-1.5 ${reqLength ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
                           <span>{reqLength ? "✓" : "○"}</span> 8+ Characters
                         </div>
-                        <div className={`flex items-center gap-1.5 ${reqUpper ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                        <div className={`flex items-center gap-1.5 ${reqUpper ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
                           <span>{reqUpper ? "✓" : "○"}</span> 1 Uppercase (A-Z)
                         </div>
-                        <div className={`flex items-center gap-1.5 ${reqLower ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                        <div className={`flex items-center gap-1.5 ${reqLower ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
                           <span>{reqLower ? "✓" : "○"}</span> 1 Lowercase (a-z)
                         </div>
-                        <div className={`flex items-center gap-1.5 ${reqNumber ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                        <div className={`flex items-center gap-1.5 ${reqNumber ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
                           <span>{reqNumber ? "✓" : "○"}</span> 1 Number (0-9)
                         </div>
-                        <div className={`flex items-center gap-1.5 ${reqSpecial ? "text-emerald-700 font-bold" : "text-neutral-400"}`}>
+                        <div className={`flex items-center gap-1.5 ${reqSpecial ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
                           <span>{reqSpecial ? "✓" : "○"}</span> 1 Special Char
                         </div>
                       </div>
@@ -1023,7 +1023,7 @@ export default function StudentAccountPage() {
                       <button
                         type="submit"
                         disabled={passLoading || !passwordOtp || !allReqsMet || newPassword !== confirmPassword}
-                        className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                       >
                         {passLoading ? "Updating Password..." : "Update Password"}
                       </button>
@@ -1038,11 +1038,11 @@ export default function StudentAccountPage() {
             {activeTab === "profiles" && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
-                  <div className="border-b border-neutral-100 pb-4">
-                    <h2 className="text-xl font-bold text-neutral-900">Student & Academic Profile</h2>
-                    <p className="text-xs text-neutral-500 mt-1">
+                  <div className="border-b border-cyan-500/15 pb-4">
+                    <h2 className="text-xl font-bold text-white">Student & Academic Profile</h2>
+                    <p className="text-xs text-slate-400 mt-1">
                       Customize your display avatar and update your board details to receive personalized exam recommendations.
                     </p>
                   </div>
@@ -1051,13 +1051,13 @@ export default function StudentAccountPage() {
                   {profileMsg && (
                     <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
                       profileMsg.type === "success"
-                        ? "bg-emerald-50 border-emerald-300 text-emerald-900"
-                        : "bg-red-50 border-red-300 text-red-900"
+                        ? "bg-green-950/80 border-green-600/60 text-green-300"
+                        : "bg-red-950/80 border-red-600/60 text-red-300"
                     }`}>
                       {profileMsg.type === "success" ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
                       ) : (
-                        <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
                       )}
                       <span>{profileMsg.text}</span>
                     </div>
@@ -1067,7 +1067,7 @@ export default function StudentAccountPage() {
                     
                     {/* Avatar Picker */}
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider block">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
                         Choose Avatar Icon
                       </label>
                       <div className="grid grid-cols-5 gap-3 max-w-sm">
@@ -1080,14 +1080,14 @@ export default function StudentAccountPage() {
                               onClick={() => setAvatarUrl(av.url)}
                               className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
                                 isSelected
-                                  ? "border-neutral-900 ring-2 ring-neutral-400 scale-105 shadow-md"
-                                  : "border-neutral-200 hover:border-neutral-400 opacity-70 hover:opacity-100"
+                                  ? "border-cyan-400 ring-2 ring-cyan-500/50 scale-105 shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+                                  : "border-slate-800 hover:border-cyan-500/50 opacity-70 hover:opacity-100"
                               }`}
                               title={av.name}
                             >
                               <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
                               {isSelected && (
-                                <span className="absolute top-1 right-1 w-4 h-4 bg-neutral-900 text-white rounded-full flex items-center justify-center text-[9px] font-black">
+                                <span className="absolute top-1 right-1 w-4 h-4 bg-cyan-500 text-slate-950 rounded-full flex items-center justify-center text-[9px] font-black">
                                   ✓
                                 </span>
                               )}
@@ -1101,7 +1101,7 @@ export default function StudentAccountPage() {
                       
                       {/* Name */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Student Name
                         </label>
                         <input
@@ -1109,13 +1109,13 @@ export default function StudentAccountPage() {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Enter your name"
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
                         />
                       </div>
 
                       {/* Phone */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Phone Number
                         </label>
                         <input
@@ -1123,32 +1123,32 @@ export default function StudentAccountPage() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="10-digit mobile number"
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 font-mono outline-none transition"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white font-mono outline-none transition"
                         />
                       </div>
 
                       {/* Mail ID (Read-only) */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Registered Email (Read-only)
                         </label>
                         <input
                           type="email"
                           value={email}
                           disabled
-                          className="w-full bg-neutral-100 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm text-neutral-500 font-mono cursor-not-allowed"
+                          className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-400 font-mono cursor-not-allowed"
                         />
                       </div>
 
                       {/* Gender */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Gender
                         </label>
                         <select
                           value={gender}
                           onChange={(e) => setGender(e.target.value)}
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer"
                         >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -1158,20 +1158,20 @@ export default function StudentAccountPage() {
 
                       {/* Date of Birth */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Date of Birth
                         </label>
                         <input
                           type="date"
                           value={dob}
                           onChange={(e) => setDob(e.target.value)}
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer"
                         />
                       </div>
 
                       {/* Board */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                           Education Board
                         </label>
                         <select
@@ -1185,7 +1185,7 @@ export default function StudentAccountPage() {
                               setAcademicLevel("11");
                             }
                           }}
-                          className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer font-bold"
+                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
                         >
                           <option value="CBSE">CBSE</option>
                           <option value="ICSE">ICSE</option>
@@ -1195,14 +1195,14 @@ export default function StudentAccountPage() {
 
                       {/* Dynamic Academic Level (Class or Semester) */}
                       <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
+                        <label className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
                           {board === "WBCHSE" ? "Semester (WBCHSE Curriculum)" : `Class (${board})`}
                         </label>
                         {board === "WBCHSE" ? (
                           <select
                             value={academicLevel}
                             onChange={(e) => setAcademicLevel(e.target.value)}
-                            className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer font-bold"
+                            className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
                           >
                             <option value="SEM-I">SEM-I</option>
                             <option value="SEM-II">SEM-II</option>
@@ -1213,7 +1213,7 @@ export default function StudentAccountPage() {
                           <select
                             value={academicLevel}
                             onChange={(e) => setAcademicLevel(e.target.value)}
-                            className="w-full bg-white border border-neutral-300 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 rounded-xl px-4 py-2.5 text-sm text-neutral-900 outline-none transition cursor-pointer font-bold"
+                            className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
                           >
                             <option value="11">Class 11</option>
                             <option value="12">Class 12</option>
@@ -1226,7 +1226,7 @@ export default function StudentAccountPage() {
                       <button
                         type="submit"
                         disabled={profileLoading}
-                        className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                        className="px-6 py-3 bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 hover:from-teal-500 hover:to-blue-500 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition shadow-[0_0_20px_rgba(20,184,166,0.3)] disabled:opacity-50 cursor-pointer flex items-center gap-2 active:scale-98"
                       >
                         {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                         <span>{profileLoading ? "Saving..." : "Save Profile Details"}</span>
@@ -1243,19 +1243,19 @@ export default function StudentAccountPage() {
             {activeTab === "devices" && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 
-                <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-6 sm:p-7 space-y-6">
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
-                  <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="border-b border-cyan-500/15 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <h2 className="text-xl font-bold text-neutral-900">Access & Devices</h2>
-                      <p className="text-xs text-neutral-500 mt-1">
+                      <h2 className="text-xl font-bold text-white">Access & Devices</h2>
+                      <p className="text-xs text-slate-400 mt-1">
                         Review active browsers and security devices connected to your student profile.
                       </p>
                     </div>
 
                     <button
                       onClick={handleLogout}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition border border-red-200 self-start sm:self-auto cursor-pointer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 text-red-400 text-xs font-bold transition self-start sm:self-auto cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign out of all sessions</span>
@@ -1263,22 +1263,22 @@ export default function StudentAccountPage() {
                   </div>
 
                   {/* Active Device Card */}
-                  <div className="p-5 rounded-xl border border-neutral-200 bg-neutral-50 flex items-start justify-between gap-4">
+                  <div className="p-5 rounded-xl border border-cyan-500/20 bg-slate-950/80 flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3.5">
-                      <div className="p-3 rounded-xl bg-white border border-neutral-200 shadow-sm text-neutral-900 shrink-0">
+                      <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/30 shadow-sm text-cyan-400 shrink-0">
                         <Laptop className="w-6 h-6" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-neutral-900">Current Active Web Browser</h4>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active Now
+                          <h4 className="text-sm font-bold text-white">Current Active Web Browser</h4>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-500/40">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active Now
                           </span>
                         </div>
-                        <p className="text-xs text-neutral-500 mt-1 font-mono">
+                        <p className="text-xs text-slate-400 mt-1 font-mono">
                           Account: {student.email}
                         </p>
-                        <p className="text-[11px] text-neutral-400 mt-0.5">
+                        <p className="text-[11px] text-slate-500 mt-0.5">
                           Last session refresh: {formatDateTime24(new Date())}
                         </p>
                       </div>
@@ -1286,19 +1286,19 @@ export default function StudentAccountPage() {
                   </div>
 
                   {/* Proctoring & Integrity Details */}
-                  <div className="p-5 rounded-xl border border-neutral-200 bg-white space-y-3">
-                    <h4 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-emerald-600" />
+                  <div className="p-5 rounded-xl border border-cyan-500/20 bg-slate-950/80 space-y-3">
+                    <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-cyan-400" />
                       Exam Integrity & Security Posture
                     </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-neutral-600">
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-100">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
                         <span>Anti-Cheat Proctoring:</span>
-                        <span className="font-bold text-emerald-600">VERIFIED ACTIVE</span>
+                        <span className="font-bold text-emerald-400">VERIFIED ACTIVE</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-100">
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
                         <span>Completed Attempts:</span>
-                        <span className="font-mono font-bold text-neutral-900">{completedAttempts.length} Submitted</span>
+                        <span className="font-mono font-bold text-white">{completedAttempts.length} Submitted</span>
                       </div>
                     </div>
                   </div>
@@ -1311,26 +1311,26 @@ export default function StudentAccountPage() {
           </div>
         </div>
       </main>
-      {/* 3. INSTANT UPI QR CODE MODAL (NETFLIX STYLE POPUP) */}
+      {/* 3. INSTANT UPI QR CODE MODAL (ELECTRIC BLACKISH BLUE THEME) */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-neutral-200 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.25)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
-            <div className="p-6 sm:p-7 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/70">
+            <div className="p-6 sm:p-7 border-b border-cyan-500/20 flex items-center justify-between bg-[#061421]/90">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-100 border border-purple-200 text-purple-900 text-xs font-bold mb-1">
-                  <Sparkles className="w-3 h-3 text-purple-600" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-bold mb-1 shadow">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Instant UPI Activation</span>
                 </div>
-                <h3 className="text-xl font-black text-neutral-900 tracking-tight">
+                <h3 className="text-xl font-black text-white tracking-tight">
                   Scan QR to Pay with any UPI App
                 </h3>
               </div>
 
               <button
                 onClick={() => setShowPaymentModal(false)}
-                className="p-2 rounded-xl text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition cursor-pointer"
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -1342,23 +1342,26 @@ export default function StudentAccountPage() {
               
               {/* QR Code Column */}
               <div className="flex flex-col items-center justify-center text-center space-y-4">
-                <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-md inline-block">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
-                    alt="UPI Payment QR Code"
-                    className="w-44 h-44 sm:w-48 sm:h-48 mx-auto object-contain"
-                  />
+                <div className="relative group">
+                  <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-500 via-blue-500 to-teal-400 opacity-30 blur-lg group-hover:opacity-60 transition duration-500" />
+                  <div className="relative p-4 sm:p-5 bg-white rounded-2xl shadow-2xl inline-block">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+                      alt="UPI Payment QR Code"
+                      className="w-44 h-44 sm:w-48 sm:h-48 mx-auto object-contain"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-neutral-500 block">Monthly Subscription</span>
-                  <span className="text-2xl font-black text-neutral-900 font-mono">
-                    ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-neutral-500">/ 30 Days</span>
+                  <span className="text-xs font-semibold text-slate-400 block">Monthly Subscription</span>
+                  <span className="text-2xl font-black text-emerald-400 font-mono">
+                    ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-slate-400">/ 30 Days</span>
                   </span>
                 </div>
 
                 {/* Copy UPI ID */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/90 border border-cyan-500/40 text-xs font-mono text-cyan-300">
                   <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
                   <button
                     onClick={() => {
@@ -1366,10 +1369,10 @@ export default function StudentAccountPage() {
                       setCopiedUpi(true);
                       setTimeout(() => setCopiedUpi(false), 2000);
                     }}
-                    className="text-neutral-500 hover:text-neutral-900 cursor-pointer"
+                    className="text-slate-400 hover:text-white cursor-pointer"
                     title="Copy UPI ID"
                   >
-                    {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -1377,16 +1380,16 @@ export default function StudentAccountPage() {
               {/* Step 2 Column: Enter UTR */}
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <h4 className="text-sm font-bold text-neutral-900">
+                  <h4 className="text-sm font-bold text-white">
                     Step 2: Submit 12-Digit UTR
                   </h4>
-                  <p className="text-xs text-neutral-500 leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed">
                     After scanning and completing the transaction in GPay, PhonePe, Paytm, or BHIM, enter your 12-digit UTR reference number below.
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
                     12-Digit UTR / Ref No:
                   </label>
                   <div className="relative">
@@ -1396,10 +1399,10 @@ export default function StudentAccountPage() {
                       onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ""))}
                       placeholder="e.g. 423456789012"
                       maxLength={18}
-                      className="w-full bg-white text-neutral-900 border border-neutral-300 focus:border-neutral-900 rounded-xl px-4 py-3 text-sm font-mono tracking-wider outline-none transition"
+                      className="w-full bg-slate-950/90 text-white border border-cyan-500/40 focus:border-cyan-400 rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wider outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                     />
                     {utrNumber.length >= 12 && (
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-600 flex items-center gap-1">
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
                         <CheckCircle2 className="w-4 h-4" /> Valid Format
                       </span>
                     )}
@@ -1409,8 +1412,8 @@ export default function StudentAccountPage() {
                 {upgradeMsg && (
                   <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
                     upgradeMsg.type === "success"
-                      ? "bg-emerald-50 border-emerald-300 text-emerald-900"
-                      : "bg-red-50 border-red-300 text-red-900"
+                      ? "bg-green-950/80 border-green-600/60 text-green-300"
+                      : "bg-red-950/80 border-red-600/60 text-red-300"
                   }`}>
                     <span>{upgradeMsg.text}</span>
                   </div>
@@ -1424,14 +1427,14 @@ export default function StudentAccountPage() {
                     }
                   }}
                   disabled={requestingUpgrade || !utrNumber.trim()}
-                  className="w-full py-3.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider shadow-md transition active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {requestingUpgrade ? "Submitting Verification..." : "SUBMIT PAYMENT FOR ACTIVATION"}
+                  {requestingUpgrade ? "Verifying Transaction..." : "SUBMIT PAYMENT FOR ACTIVATION"}
                 </button>
 
-                <div className="pt-2 text-[11px] text-neutral-500 text-center">
+                <div className="pt-2 text-[11px] text-slate-400 text-center">
                   <span>Assistance / Issues? Call Arghyadeep Roy: </span>
-                  <a href="tel:9830507435" className="font-mono font-bold text-neutral-900 hover:underline">
+                  <a href="tel:9830507435" className="font-mono font-bold text-cyan-400 hover:underline">
                     9830507435
                   </a>
                 </div>
@@ -1444,10 +1447,10 @@ export default function StudentAccountPage() {
       )}
 
       {/* Footer Support */}
-      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-center text-xs text-neutral-400 border-t border-neutral-200 mt-12">
+      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-center text-xs text-slate-500 border-t border-cyan-500/15 mt-12">
         <p>
           Need assistance with your PIECHEM account? Contact Administrator Arghyadeep Roy:{" "}
-          <a href="tel:9830507435" className="font-bold text-neutral-700 hover:underline font-mono">
+          <a href="tel:9830507435" className="font-bold text-cyan-400 hover:underline font-mono">
             9830507435
           </a>
         </p>
