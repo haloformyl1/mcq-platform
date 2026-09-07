@@ -259,15 +259,24 @@ export default function StudentLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black relative font-sans text-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      {/* Header with PIECHEM logo */}
-      <div className="absolute top-0 left-0 w-full z-20 text-center py-2.5 px-4 bg-gradient-to-r from-cyan-500/10 via-blue-500/20 to-purple-500/10 border-b border-cyan-500/20 backdrop-blur-md shadow-sm">
-        <p className="text-xs sm:text-sm font-medium text-cyan-300 tracking-wide">
-          Designed by <span className="font-semibold text-white">Arghyadeep Roy</span> <span className="text-cyan-400/80 mx-1.5">&bull;</span> <span className="text-slate-300">Contact: <a href="tel:9830507435" className="hover:underline font-mono text-cyan-300">9830507435</a></span>
-        </p>
-      </div>
-
-      <header className="absolute top-10 left-0 w-full p-6 sm:p-8 flex items-center">
+      {/* Header with PIECHEM logo and Designer credit badge */}
+      <header className="absolute top-0 left-0 p-6 sm:p-8 flex flex-col items-start gap-3 z-20">
         <PiechemLogo size="lg" />
+        <div className="inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full border border-cyan-500/30 bg-[#03111c]/95 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+          <span className="text-xs sm:text-sm text-slate-300 font-medium">
+            Designed by <span className="font-bold text-cyan-400">Arghyadeep Roy</span>
+          </span>
+          <span className="text-cyan-400 text-xs font-bold leading-none">•</span>
+          <a
+            href="tel:9830507435"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 rounded-full border border-cyan-500/60 bg-[#041d2d]/80 text-cyan-400 hover:text-cyan-300 hover:border-cyan-400 transition-colors text-xs sm:text-sm font-bold tracking-wide group"
+          >
+            <svg className="w-3.5 h-3.5 fill-current shrink-0 group-hover:scale-105 transition-transform" viewBox="0 0 24 24">
+              <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z" />
+            </svg>
+            <span>9830507435</span>
+          </a>
+        </div>
       </header>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-[450px] mt-10">
