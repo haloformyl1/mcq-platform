@@ -233,91 +233,93 @@ export default function StudentDashboard() {
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
       <header className="sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-wrap lg:flex-nowrap justify-between items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+          <div className="flex items-center justify-between gap-4">
             
-            {/* Left: Logo & Compact Designer Badge (Image 2 style) */}
-            <div className="flex items-center gap-3 shrink-0">
-              <PiechemLogo size="md" href="/dashboard" />
+            {/* Left Group: Brand Identity (Stacked Logo + Badge) & Netflix Nav Tabs */}
+            <div className="flex items-center gap-6 lg:gap-8 min-w-0">
               
-              <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[11px] font-medium shadow-sm">
-                <span className="text-slate-400">Designed by</span>
-                <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                <span className="text-cyan-500/60 text-[10px]">•</span>
-                <a 
-                  href="tel:9830507435" 
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[10px]"
-                  title="Call Arghyadeep Roy"
-                >
-                  <svg className="w-2.5 h-2.5 fill-current text-cyan-400" viewBox="0 0 24 24">
-                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
-                  </svg>
-                  <span>9830507435</span>
-                </a>
+              {/* Stacked Logo + Compact Designer Badge (Image 2 style) */}
+              <div className="flex flex-col items-start gap-1 shrink-0">
+                <PiechemLogo size="md" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[10px] font-medium shadow-sm">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60 text-[9px]">•</span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <Phone className="w-2.5 h-2.5 fill-current text-cyan-400" />
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
+
+              {/* Netflix-Style Nav Tabs (Desktop - directly adjacent to logo) */}
+              <nav className="hidden lg:flex items-center gap-1.5 shrink-0">
+                <a 
+                  href="#overview" 
+                  onClick={() => setActiveTab("overview")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === "overview" 
+                      ? "bg-white text-black shadow-md shadow-white/10" 
+                      : "text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  Overview
+                </a>
+                <a 
+                  href="#tests" 
+                  onClick={() => setActiveTab("tests")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === "tests" 
+                      ? "bg-white text-black shadow-md shadow-white/10" 
+                      : "text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  Available Tests
+                </a>
+                <a 
+                  href="#materials" 
+                  onClick={() => setActiveTab("materials")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === "materials" 
+                      ? "bg-white text-black shadow-md shadow-white/10" 
+                      : "text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  3D Notes & Lab
+                </a>
+                <a 
+                  href="#leaderboard" 
+                  onClick={() => setActiveTab("leaderboard")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === "leaderboard" 
+                      ? "bg-white text-black shadow-md shadow-white/10" 
+                      : "text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  Top Performers
+                </a>
+                <a 
+                  href="#performance" 
+                  onClick={() => setActiveTab("performance")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === "performance" 
+                      ? "bg-white text-black shadow-md shadow-white/10" 
+                      : "text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  My Tracker
+                </a>
+              </nav>
             </div>
 
-            {/* Center: Netflix-Style Navigation Tabs (Pills) */}
-            <nav className="order-3 lg:order-2 w-full lg:w-auto flex items-center justify-start lg:justify-center gap-1 overflow-x-auto no-scrollbar py-1">
-              <a 
-                href="#overview" 
-                onClick={() => setActiveTab("overview")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                  activeTab === "overview" 
-                    ? "bg-white text-black shadow-md shadow-white/10" 
-                    : "text-slate-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                Overview
-              </a>
-              <a 
-                href="#tests" 
-                onClick={() => setActiveTab("tests")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                  activeTab === "tests" 
-                    ? "bg-white text-black shadow-md shadow-white/10" 
-                    : "text-slate-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                Available Tests
-              </a>
-              <a 
-                href="#materials" 
-                onClick={() => setActiveTab("materials")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                  activeTab === "materials" 
-                    ? "bg-white text-black shadow-md shadow-white/10" 
-                    : "text-slate-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                3D Notes & Lab
-              </a>
-              <a 
-                href="#leaderboard" 
-                onClick={() => setActiveTab("leaderboard")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                  activeTab === "leaderboard" 
-                    ? "bg-white text-black shadow-md shadow-white/10" 
-                    : "text-slate-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                Top Performers
-              </a>
-              <a 
-                href="#performance" 
-                onClick={() => setActiveTab("performance")}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                  activeTab === "performance" 
-                    ? "bg-white text-black shadow-md shadow-white/10" 
-                    : "text-slate-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                My Tracker
-              </a>
-            </nav>
-
-            {/* Right: Curriculum Switcher + Account Profile + Logout */}
-            <div className="order-2 lg:order-3 flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* Right Group: Curriculum Switcher + Account Profile + Logout */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
               {/* Sleek Curriculum Selector Pill */}
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#061421]/90 border border-cyan-500/30 text-xs shadow-inner">
@@ -369,14 +371,14 @@ export default function StudentDashboard() {
                 {updatingCurriculum ? (
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping ml-1" />
                 ) : (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1" title="Active Curriculum" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-0.5" title="Active Curriculum" />
                 )}
               </div>
 
               {/* My Account Button (Netflix Profile Pill) */}
               <Link 
                 href="/dashboard/account"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm shrink-0"
               >
                 <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0">
                   <img
@@ -393,12 +395,71 @@ export default function StudentDashboard() {
               {/* Logout Button */}
               <button 
                 onClick={handleLogout} 
-                className="p-1.5 rounded-xl bg-red-950/30 hover:bg-red-900/60 border border-red-800/40 text-red-400 hover:text-red-300 transition"
+                className="p-1.5 rounded-xl bg-red-950/30 hover:bg-red-900/60 border border-red-800/40 text-red-400 hover:text-red-300 transition shrink-0"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
+          </div>
+
+          {/* Mobile / Tablet Dedicated Navigation Rail (Zero Scrollbar) */}
+          <div className="lg:hidden w-full pt-2.5 mt-2 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-1.5">
+            <a 
+              href="#overview" 
+              onClick={() => setActiveTab("overview")}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                activeTab === "overview" 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              Overview
+            </a>
+            <a 
+              href="#tests" 
+              onClick={() => setActiveTab("tests")}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                activeTab === "tests" 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              Available Tests
+            </a>
+            <a 
+              href="#materials" 
+              onClick={() => setActiveTab("materials")}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                activeTab === "materials" 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              3D Notes & Lab
+            </a>
+            <a 
+              href="#leaderboard" 
+              onClick={() => setActiveTab("leaderboard")}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                activeTab === "leaderboard" 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              Top Performers
+            </a>
+            <a 
+              href="#performance" 
+              onClick={() => setActiveTab("performance")}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                activeTab === "performance" 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              My Tracker
+            </a>
           </div>
         </div>
       </header>
