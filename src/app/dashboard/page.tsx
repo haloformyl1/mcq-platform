@@ -1,10 +1,15 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, Download, ExternalLink, FolderOpen, Clock, User } from 'lucide-react';
+import { 
+  BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, 
+  LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, 
+  Download, ExternalLink, FolderOpen, Clock, User, Play, Info, Sparkles, 
+  Flame, ShieldCheck, CheckCircle2, Award, Bell
+} from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
@@ -16,13 +21,9 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(new Date());
 
-  // Collapsible Folder Accordion States
-  const [openUpcoming, setOpenUpcoming] = useState(true);
-  const [openLive, setOpenLive] = useState(true);
-  const [openExpired, setOpenExpired] = useState(true);
   const router = useRouter();
-
   const [updatingCurriculum, setUpdatingCurriculum] = useState(false);
+  const [activeTab, setActiveTab] = useState<"overview" | "tests" | "materials" | "leaderboard" | "performance">("overview");
 
   const fetchDashboardData = async () => {
     try {
@@ -99,7 +100,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex flex-col items-center justify-center p-4">
         <AdminPreviewBanner />
-      <SubscriptionExpiredModal student={data?.student} />
+        <SubscriptionExpiredModal student={data?.student} />
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-xl font-bold mb-4">Unable to load dashboard</h2>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#262626] rounded-md hover:bg-[#333333]">Retry</button>
@@ -107,7 +108,7 @@ export default function StudentDashboard() {
     );
   }
 
-  const { student, availableTests, allAttempts, lastExamTopStudents, lastExamTitle } = data;
+  const { student, availableTests = [], allAttempts = [], lastExamTopStudents = [], lastExamTitle = "" } = data;
   const completedAttempts = allAttempts.filter((a: any) => a.status === 'SUBMITTED');
   
   // Analytics Calculations
@@ -119,7 +120,7 @@ export default function StudentDashboard() {
   const totalQuestionsAttempted = completedAttempts.reduce((acc: number, a: any) => acc + (a.correctCount || 0) + (a.incorrectCount || 0), 0);
   const avgAccuracy = totalQuestionsAttempted > 0 ? ((totalCorrect / totalQuestionsAttempted) * 100).toFixed(1) : 0;
 
-  // Graph Data (Oldest to Newest for chronological graph)
+  // Graph Data
   const graphData = [...completedAttempts].reverse().map((a: any, i: number) => ({
     attempt: `Test ${i + 1}`,
     percentage: a.percentage || 0,
@@ -128,7 +129,6 @@ export default function StudentDashboard() {
 
   const recentAttempts = completedAttempts.slice(0, 5);
   const last25Attempts = completedAttempts.slice(0, 25);
-
   const studentName = student.name || student.email.split('@')[0];
 
   const formatDateTime = (dateInput: Date | string | null | undefined) => {
@@ -148,6 +148,60 @@ export default function StudentDashboard() {
     return `${day}/${month}/${year} ${pad(hours)}:${minutes}:${seconds} ${ampm}`;
   };
 
+  // Categorize Tests
+  const currentAvailableTests: any[] = [];
+  const upcomingTests: any[] = [];
+  const expiredTests: any[] = [];
+
+  availableTests.forEach((test: any) => {
+    const lockDate = test.lockAt ? new Date(test.lockAt) : null;
+    const unlockDate = test.unlockAt ? new Date(test.unlockAt) : null;
+
+    if (test.status === "LIVE" || test.status === "PUBLISHED") {
+      currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS" });
+    } else if (test.status === "EXPIRED" || test.status === "CLOSED" || test.status === "LOCKED") {
+      if (test.hasIndividualAccess) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+      } else {
+        expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
+      }
+    } else if (test.status === "SCHEDULE_EXPIRED") {
+      if (!lockDate || now < lockDate) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
+      } else if (test.hasIndividualAccess) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
+      } else {
+        expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
+      }
+    } else if (test.status === "UPCOMING") {
+      const holdMinutes = test.postLockHoldMinutes ?? 0;
+      const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
+
+      if (!lockDate || (autoLiveDate && now < autoLiveDate)) {
+        upcomingTests.push({ 
+          ...test, 
+          category: unlockDate && now < unlockDate ? "UPCOMING" : (lockDate && now >= lockDate ? "HOLDING" : "UPCOMING_LIVE"), 
+          lockState: unlockDate && now < unlockDate ? "BEFORE_UNLOCK" : (lockDate && now >= lockDate ? "POST_LOCK_HOLDING" : "SCHEDULED_OPEN"), 
+          unlockDate, 
+          lockDate, 
+          autoLiveDate 
+        });
+      } else {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", unlockDate, lockDate, autoLiveDate });
+      }
+    }
+  });
+
+  // Pick Spotlight Featured Item (Netflix Billboard)
+  const activeAttemptTest = currentAvailableTests.find((t: any) => 
+    allAttempts.some((a: any) => a.testId === t.id && a.status === 'IN_PROGRESS')
+  );
+  const unattemptedTest = currentAvailableTests.find((t: any) => 
+    !allAttempts.some((a: any) => a.testId === t.id && a.status === 'SUBMITTED')
+  );
+  const spotlightTest = activeAttemptTest || unattemptedTest || currentAvailableTests[0] || upcomingTests[0] || null;
+
+  // Upcoming Alert Banner Items
   const bannerItems: any[] = [];
   (availableTests || []).forEach((t: any) => {
     const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
@@ -155,80 +209,121 @@ export default function StudentDashboard() {
 
     if (t.status === "UPCOMING") {
       if (unlock && now < unlock) {
-        // State 3: Before getting live (not live yet)
         bannerItems.push({
           type: "UPCOMING",
           test: t,
-          message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
+          message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt!`
         });
       } else if (!lock || now < lock) {
-        // State 1: At unlock state (currently live)
         bannerItems.push({
           type: "UPCOMING",
           test: t,
-          message: `🔥 Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `It will conclude on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
+          message: `Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `Concludes on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
         });
-      } else {
-        // State 2: Concluded (live window passed)
-        // Show notification for next 72 hours from the time it concluded; after that stop the notification.
-        const concludedAt = lock;
-        const msSinceConclusion = concludedAt ? now.getTime() - concludedAt.getTime() : Infinity;
-        const maxHoldMs = 72 * 60 * 60 * 1000; // 72 hours
-
-        if (concludedAt && msSinceConclusion >= 0 && msSinceConclusion <= maxHoldMs) {
-          bannerItems.push({
-            type: "UPCOMING",
-            test: t,
-            message: `⌛ Upcoming Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> concluded at <strong class="text-red-300 font-mono">${formatDateTime(lock)}</strong>. Students who missed this test may request the Admin to unlock access.`
-          });
-        }
       }
     }
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white font-sans pb-20">
+    <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={data?.student} />
 
-            {/* Unified Navigation & Curriculum Command Bar */}
-      <header className="border-b border-cyan-500/25 bg-[#061019]/95 backdrop-blur-2xl sticky top-0 z-40 shadow-[0_10px_35px_rgba(0,0,0,0.6)]">
-        <div className="w-full py-2.5 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap lg:flex-nowrap justify-between items-center gap-3 sm:gap-4">
+      {/* ========================================================= */}
+      {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
+      {/* ========================================================= */}
+      <header className="sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex flex-wrap lg:flex-nowrap justify-between items-center gap-3">
             
-            {/* Left: Brand Identity & Designer Contact */}
+            {/* Left: Logo & Compact Designer Badge (Image 2 style) */}
             <div className="flex items-center gap-3 shrink-0">
               <PiechemLogo size="md" href="/dashboard" />
               
-              <div className="hidden sm:flex px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.15)] text-[11px] text-slate-300 font-semibold tracking-wide items-center space-x-1.5">
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[11px] font-medium shadow-sm">
                 <span className="text-slate-400">Designed by</span>
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
-                  Arghyadeep Roy
-                </span>
-                <span className="text-cyan-500/40">·</span>
+                <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                <span className="text-cyan-500/60 text-[10px]">•</span>
                 <a 
                   href="tel:9830507435" 
-                  className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/40 transition-all font-mono text-[10px]"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[10px]"
                   title="Call Arghyadeep Roy"
                 >
-                  <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
-                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                  <svg className="w-2.5 h-2.5 fill-current text-cyan-400" viewBox="0 0 24 24">
+                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
                   </svg>
                   <span>9830507435</span>
                 </a>
               </div>
             </div>
 
-            {/* Center: Integrated Active Curriculum Switcher */}
-            <div className="order-3 lg:order-2 w-full lg:w-auto flex items-center justify-center sm:justify-start lg:justify-center gap-2 bg-slate-950/70 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.12)]">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 hidden xl:inline">Curriculum:</span>
-              </div>
+            {/* Center: Netflix-Style Navigation Tabs (Pills) */}
+            <nav className="order-3 lg:order-2 w-full lg:w-auto flex items-center justify-start lg:justify-center gap-1 overflow-x-auto no-scrollbar py-1">
+              <a 
+                href="#overview" 
+                onClick={() => setActiveTab("overview")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === "overview" 
+                    ? "bg-white text-black shadow-md shadow-white/10" 
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Overview
+              </a>
+              <a 
+                href="#tests" 
+                onClick={() => setActiveTab("tests")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === "tests" 
+                    ? "bg-white text-black shadow-md shadow-white/10" 
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Available Tests
+              </a>
+              <a 
+                href="#materials" 
+                onClick={() => setActiveTab("materials")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === "materials" 
+                    ? "bg-white text-black shadow-md shadow-white/10" 
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                3D Notes & Lab
+              </a>
+              <a 
+                href="#leaderboard" 
+                onClick={() => setActiveTab("leaderboard")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === "leaderboard" 
+                    ? "bg-white text-black shadow-md shadow-white/10" 
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Top Performers
+              </a>
+              <a 
+                href="#performance" 
+                onClick={() => setActiveTab("performance")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === "performance" 
+                    ? "bg-white text-black shadow-md shadow-white/10" 
+                    : "text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                My Tracker
+              </a>
+            </nav>
 
-              {/* Board Selector */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Board:</span>
+            {/* Right: Curriculum Switcher + Account Profile + Logout */}
+            <div className="order-2 lg:order-3 flex items-center gap-2 sm:gap-2.5 shrink-0">
+              
+              {/* Sleek Curriculum Selector Pill */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#061421]/90 border border-cyan-500/30 text-xs shadow-inner">
+                <BookOpen className="w-3.5 h-3.5 text-cyan-400 hidden sm:block shrink-0" />
+                
+                {/* Board Dropdown */}
                 <select
                   value={student.board || 'CBSE'}
                   disabled={updatingCurriculum}
@@ -237,166 +332,329 @@ export default function StudentDashboard() {
                     const defaultLevel = nb === 'WBCHSE' ? 'SEM-I' : '11';
                     handleCurriculumChange(nb, defaultLevel);
                   }}
-                  className="bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 rounded-lg px-2.5 py-1 text-xs font-black tracking-wide focus:outline-none cursor-pointer transition shadow-inner"
+                  className="bg-transparent text-cyan-300 font-extrabold text-xs focus:outline-none cursor-pointer"
                 >
-                  <option value="CBSE" className="bg-[#08131e] text-cyan-300 font-bold">CBSE</option>
-                  <option value="ICSE" className="bg-[#08131e] text-cyan-300 font-bold">ICSE</option>
-                  <option value="WBCHSE" className="bg-[#08131e] text-cyan-300 font-bold">WBCHSE</option>
+                  <option value="CBSE" className="bg-[#040e17] text-cyan-300">CBSE</option>
+                  <option value="ICSE" className="bg-[#040e17] text-cyan-300">ICSE</option>
+                  <option value="WBCHSE" className="bg-[#040e17] text-cyan-300">WBCHSE</option>
                 </select>
-              </div>
 
-              {/* Semester / Class Selector */}
-              <div className="flex items-center gap-1.5 ml-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">
-                  {student.board === 'WBCHSE' ? 'Sem:' : 'Class:'}
-                </span>
+                <span className="text-slate-500 text-[10px]">•</span>
+
+                {/* Level Dropdown */}
                 {student.board === 'WBCHSE' ? (
                   <select
                     value={student.academicLevel || 'SEM-I'}
                     disabled={updatingCurriculum}
                     onChange={(e) => handleCurriculumChange(student.board || 'WBCHSE', e.target.value)}
-                    className="bg-teal-950/80 text-teal-300 border border-teal-500/50 hover:border-teal-400 rounded-lg px-2.5 py-1 text-xs font-black tracking-wide focus:outline-none cursor-pointer transition shadow-inner"
+                    className="bg-transparent text-teal-300 font-extrabold text-xs focus:outline-none cursor-pointer"
                   >
-                    <option value="SEM-I" className="bg-[#08131e] text-teal-300 font-bold">SEM-I</option>
-                    <option value="SEM-II" className="bg-[#08131e] text-teal-300 font-bold">SEM-II</option>
-                    <option value="SEM-III" className="bg-[#08131e] text-teal-300 font-bold">SEM-III</option>
-                    <option value="SEM-IV" className="bg-[#08131e] text-teal-300 font-bold">SEM-IV</option>
+                    <option value="SEM-I" className="bg-[#040e17] text-teal-300">SEM-I</option>
+                    <option value="SEM-II" className="bg-[#040e17] text-teal-300">SEM-II</option>
+                    <option value="SEM-III" className="bg-[#040e17] text-teal-300">SEM-III</option>
+                    <option value="SEM-IV" className="bg-[#040e17] text-teal-300">SEM-IV</option>
                   </select>
                 ) : (
                   <select
                     value={student.academicLevel || '11'}
                     disabled={updatingCurriculum}
                     onChange={(e) => handleCurriculumChange(student.board || 'CBSE', e.target.value)}
-                    className="bg-teal-950/80 text-teal-300 border border-teal-500/50 hover:border-teal-400 rounded-lg px-2.5 py-1 text-xs font-black tracking-wide focus:outline-none cursor-pointer transition shadow-inner"
+                    className="bg-transparent text-teal-300 font-extrabold text-xs focus:outline-none cursor-pointer"
                   >
-                    <option value="11" className="bg-[#08131e] text-teal-300 font-bold">Class 11</option>
-                    <option value="12" className="bg-[#08131e] text-teal-300 font-bold">Class 12</option>
+                    <option value="11" className="bg-[#040e17] text-teal-300">Class 11</option>
+                    <option value="12" className="bg-[#040e17] text-teal-300">Class 12</option>
                   </select>
+                )}
+
+                {updatingCurriculum ? (
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping ml-1" />
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1" title="Active Curriculum" />
                 )}
               </div>
 
-              {updatingCurriculum ? (
-                <span className="text-[10px] text-cyan-400 font-mono animate-pulse ml-1">Updating...</span>
-              ) : (
-                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full ml-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Active
-                </span>
-              )}
-            </div>
-
-            {/* Right: Greeting + My Account + Logout */}
-            <div className="order-2 lg:order-3 flex items-center gap-2.5 shrink-0">
-              {/* Student Greeting */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-xs text-slate-300 shadow-sm">
-                <span className="text-slate-400 text-[11px]">Welcome,</span>
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-teal-200">
-                  {studentName.split(' ')[0]}
-                </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              </div>
-
-              {/* My Account Button */}
+              {/* My Account Button (Netflix Profile Pill) */}
               <Link 
                 href="/dashboard/account"
-                className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-600/90 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm"
               >
-                <User className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
-                <span>My Account</span>
+                <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0">
+                  <img
+                    src={student.avatarUrl || "/avatars/atom.jpg"}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                    onError={(e: any) => { e.target.style.display = 'none'; }}
+                  />
+                  <User className="w-3 h-3 text-white" />
+                </div>
+                <span className="hidden sm:inline">{studentName.split(' ')[0]}</span>
               </Link>
 
               {/* Logout Button */}
               <button 
                 onClick={handleLogout} 
-                className="flex items-center text-xs font-bold text-slate-400 hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-950/40 border border-slate-800 hover:border-red-900/50 cursor-pointer"
+                className="p-1.5 rounded-xl bg-red-950/30 hover:bg-red-900/60 border border-red-800/40 text-red-400 hover:text-red-300 transition"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
           </div>
-
-          {/* Mobile Developer Contact Ribbon */}
-          <div className="flex sm:hidden justify-between items-center w-full pt-2 mt-2 border-t border-cyan-500/15 text-[10px]">
-            <div className="flex items-center space-x-1 text-slate-400">
-              <span>Designed by</span>
-              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                Arghyadeep Roy
-              </span>
-            </div>
-            <a 
-              href="tel:9830507435" 
-              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono"
-            >
-              <span>📞 9830507435</span>
-            </a>
-          </div>
         </div>
       </header>
 
-      <main className="w-full py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+      {/* Main Container */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 pt-6">
 
-        {/* 1. UPCOMING TEST ALERT BANNER (Shown at Top of Main Page) */}
-        {(() => {
-          const upcomingBannerItems = bannerItems.filter((item: any) => item.type === "UPCOMING");
-          const cfg = data.testAlertSettings || {
-            badgeText: "TEST ALERT",
-            bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
-            badgeColor: "bg-amber-500 text-black",
-            textColor: "text-amber-200",
-            marqueeSpeed: "normal"
-          };
-          const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-          if (upcomingBannerItems.length === 0) return null;
-
-          return (
-            <div className={`bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-3 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)]`}>
-              <div className="flex items-center gap-3 overflow-hidden">
-                <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                  <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                  TEST ALERT
-                </span>
-                <div className="flex-1 overflow-hidden relative">
-                  <div 
-                    className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
-                    style={{ animationDuration: speedDuration }}
-                  >
-                    {upcomingBannerItems.map((item: any) => (
-                      <span
-                        key={item.test.id}
-                        className="mr-16"
-                        dangerouslySetInnerHTML={{ __html: item.message }}
-                      />
-                    ))}
-                  </div>
+        {/* ========================================================= */}
+        {/* 2. UPCOMING TEST MARQUEE ALERT BANNER                    */}
+        {/* ========================================================= */}
+        {bannerItems.length > 0 && (
+          <div className="bg-gradient-to-r from-amber-950/80 via-[#1a140d]/90 to-amber-950/80 border border-amber-500/40 rounded-2xl overflow-hidden py-2.5 px-4 shadow-lg shadow-amber-950/30">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <span className="shrink-0 text-[11px] font-extrabold bg-amber-500 text-black px-2.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
+                <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
+                Test Alert
+              </span>
+              <div className="flex-1 overflow-hidden relative">
+                <div className="animate-marquee whitespace-nowrap inline-block text-xs sm:text-sm font-semibold text-amber-200">
+                  {bannerItems.map((item: any, idx: number) => (
+                    <span key={idx} className="mr-16" dangerouslySetInnerHTML={{ __html: item.message }} />
+                  ))}
                 </div>
               </div>
             </div>
-          );
-        })()}
-        
-        {/* Study Materials & Reference Resources Section */}
-        <section className="bg-gradient-to-b from-[#122230]/90 via-[#0d1722]/90 to-[#080d14]/90 border border-cyan-500/30 p-6 rounded-2xl backdrop-blur-xl shadow-[0_10px_30px_rgba(6,182,212,0.1)] space-y-6">
-          <div className="flex justify-between items-center border-b border-cyan-500/20 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-xl border border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                <FolderOpen className="w-5 h-5 shrink-0" />
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* 3. FEATURED SPOTLIGHT BILLBOARD (NETFLIX HERO - IMAGE 2) */}
+        {/* ========================================================= */}
+        <section id="overview" className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_20px_60px_rgba(0,180,255,0.15)]">
+          
+          {/* Ambient Lighting & Abstract Chemistry Backdrop */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_75%_35%,rgba(0,195,255,0.18),transparent_65%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#02070c] via-transparent to-transparent pointer-events-none" />
+          
+          {/* Faint Orbital Graphic Texture */}
+          <div className="absolute -right-10 -bottom-10 w-96 h-96 border border-cyan-500/10 rounded-full pointer-events-none blur-[1px]" />
+          <div className="absolute -right-20 -bottom-20 w-[500px] h-[500px] border border-cyan-500/5 rounded-full pointer-events-none" />
+
+          {/* Billboard Content */}
+          <div className="relative z-10 p-6 sm:p-10 lg:p-12 max-w-3xl flex flex-col justify-between min-h-[360px] sm:min-h-[420px]">
+            
+            <div>
+              {/* Category / Meta Badges Row */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(0,195,255,0.4)] uppercase tracking-wider">
+                  <Flame className="w-3.5 h-3.5 fill-current" />
+                  {spotlightTest ? (spotlightTest.lockState === "SCHEDULED_OPEN" ? "Live Now" : "Featured Mock") : "Master Series"}
+                </span>
+                
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-slate-200 border border-white/10">
+                  {student.board || 'CBSE'} • {student.board === 'WBCHSE' ? student.academicLevel : `Class ${student.academicLevel}`}
+                </span>
+
+                {spotlightTest?.durationMinutes && (
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-cyan-300 border border-white/10 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {spotlightTest.durationMinutes} Mins
+                  </span>
+                )}
+
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  AI Proctored
+                </span>
               </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-wide">Study Materials & Notes</h2>
-                <p className="text-xs text-slate-400">Interactive 3D models, visual guides, and reference resources</p>
-              </div>
+
+              {/* Big Stylized Title (Image 2 Netflix billboard title) */}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+                {spotlightTest ? spotlightTest.title : "PIE CHEM EXAM SERIES 2026"}
+              </h1>
+
+              {/* Description */}
+              <p className="text-sm sm:text-base text-slate-200/90 max-w-2xl leading-relaxed mb-8 drop-shadow">
+                {spotlightTest?.description 
+                  ? spotlightTest.description 
+                  : "Practice full-length timed chemistry mocks designed specifically for board exam perfection and competitive entrance benchmark rankings with instant AI evaluation."}
+              </p>
             </div>
-            <span className="text-xs bg-gradient-to-r from-cyan-950/80 to-blue-950/80 text-cyan-300 px-3.5 py-1 rounded-full border border-cyan-500/40 font-mono font-bold shadow">
-              {studyMaterials.length} Available
+
+            {/* Actions & Floating Tags Row (Netflix Style) */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-cyan-500/20">
+              
+              {/* Action CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-3">
+                {spotlightTest ? (
+                  activeAttemptTest ? (
+                    <Link
+                      href={`/exam/start/${spotlightTest.id}`}
+                      className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
+                    >
+                      <Play className="w-5 h-5 fill-current text-black" />
+                      <span>Resume Test</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/exam/start/${spotlightTest.id}`}
+                      className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
+                    >
+                      <Play className="w-5 h-5 fill-current text-black" />
+                      <span>Start Test</span>
+                    </Link>
+                  )
+                ) : (
+                  <a
+                    href="#tests"
+                    className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
+                  >
+                    <Play className="w-5 h-5 fill-current text-black" />
+                    <span>Explore Tests</span>
+                  </a>
+                )}
+
+                <a
+                  href="#materials"
+                  className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95"
+                >
+                  <Info className="w-5 h-5 text-cyan-300" />
+                  <span>3D Notes & Lab</span>
+                </a>
+              </div>
+
+              {/* Floating Bottom-Right Badges (Image 2 style: "Highly rewatched", "Emmy Nominee") */}
+              <div className="flex items-center gap-2.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-cyan-500/30 text-xs font-bold text-cyan-300 shadow">
+                  <Flame className="w-3.5 h-3.5 fill-current text-cyan-400" />
+                  <span>Most Attempted Mock</span>
+                </div>
+                <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-amber-500/30 text-xs font-bold text-amber-300 shadow">
+                  <Sparkles className="w-3.5 h-3.5 fill-current text-amber-400" />
+                  <span>High Yield Content</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* 4. CONTENT ROW 1: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
+        {/* ========================================================= */}
+        <section id="tests" className="space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>Available Tests & Exam Series</span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30 font-mono font-bold">
+                  {currentAvailableTests.length} Live
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">Timed, AI-proctored mock exams aligned to your curriculum</p>
+            </div>
+
+            <span className="text-xs text-slate-400">
+              Curriculum: <strong className="text-cyan-300">{student.board}</strong>
             </span>
           </div>
 
+          {/* Category Folders Grid (Netflix Style Cards) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+            
+            {/* Live Tests Card */}
+            <Link
+              href="/dashboard/category/available"
+              className="bg-gradient-to-b from-[#0e241b]/90 to-[#07130e]/90 border border-green-500/40 hover:border-green-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[160px]"
+            >
+              <div className="flex justify-between items-start">
+                <div className="p-3 rounded-xl bg-green-950 border border-green-600/50 shadow group-hover:scale-110 transition-transform">
+                  <PiechemLogo size="sm" showText={false} />
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-green-500/20 text-green-300 border border-green-500/40 font-mono">
+                  {currentAvailableTests.length} Live
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center justify-between group-hover:text-green-300 transition">
+                  <span className="flex items-center gap-2">
+                    Available Tests
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-green-400 group-hover:translate-x-1 transition-transform" />
+                </h3>
+                <p className="text-xs text-slate-300/80 mt-1">Tests ready to attempt right now with instant scorecards</p>
+              </div>
+            </Link>
+
+            {/* Upcoming Tests Card */}
+            <Link
+              href="/dashboard/category/upcoming"
+              className="bg-gradient-to-b from-[#241a0e]/90 to-[#130e07]/90 border border-amber-500/40 hover:border-amber-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[160px]"
+            >
+              <div className="flex justify-between items-start">
+                <div className="p-3 rounded-xl bg-amber-950 border border-amber-600/50 shadow group-hover:scale-110 transition-transform">
+                  <Clock className="w-5 h-5 text-amber-300" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
+                  {upcomingTests.length} Scheduled
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center justify-between group-hover:text-amber-300 transition">
+                  <span>Upcoming Tests</span>
+                  <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                </h3>
+                <p className="text-xs text-slate-300/80 mt-1">Upcoming scheduled exams with countdown unlock windows</p>
+              </div>
+            </Link>
+
+            {/* Expired Tests Card */}
+            <Link
+              href="/dashboard/category/expired"
+              className="bg-gradient-to-b from-[#240e11]/90 to-[#130708]/90 border border-red-500/40 hover:border-red-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[160px]"
+            >
+              <div className="flex justify-between items-start">
+                <div className="p-3 rounded-xl bg-red-950 border border-red-600/50 shadow group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-5 h-5 text-red-300" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-red-500/20 text-red-300 border border-red-500/40 font-mono">
+                  {expiredTests.length} Expired
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center justify-between group-hover:text-red-300 transition">
+                  <span>Concluded Archive</span>
+                  <ChevronRight className="w-5 h-5 text-red-400 group-hover:translate-x-1 transition-transform" />
+                </h3>
+                <p className="text-xs text-slate-300/80 mt-1">Past papers; request admin access for re-attempts</p>
+              </div>
+            </Link>
+
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* 5. CONTENT ROW 2: STUDY MATERIALS & 3D CHEMISTRY LAB      */}
+        {/* ========================================================= */}
+        <section id="materials" className="space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>Interactive 3D Laboratory & Study Vault</span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30 font-mono font-bold">
+                  {studyMaterials.length} Available
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">Manipulate molecular lattices, 3D crystal voids & download curated PDF guides</p>
+            </div>
+          </div>
+
           {studyMaterials.length === 0 ? (
-            <div className="bg-slate-950/60 border border-cyan-900/30 p-8 rounded-xl text-center text-slate-400 space-y-2">
+            <div className="bg-[#071420]/80 border border-cyan-900/30 p-8 rounded-2xl text-center text-slate-400 space-y-2">
               <BookOpen className="w-8 h-8 text-cyan-500/50 mx-auto" />
-              <p className="text-sm font-medium">No study materials published yet.</p>
+              <p className="text-sm font-medium">No study materials published yet for this curriculum.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -407,10 +665,8 @@ export default function StudentDashboard() {
                 return (
                   <div 
                     key={mat.id} 
-                    className="group bg-gradient-to-br from-[#121c27] via-[#0d1620] to-[#0a0f16] border border-cyan-500/20 hover:border-cyan-400/60 p-5 rounded-xl flex flex-col justify-between gap-4 shadow-lg hover:shadow-[0_0_25px_rgba(6,182,212,0.2)] transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
+                    className="group bg-gradient-to-b from-[#0c1a27] to-[#061019] border border-cyan-500/25 hover:border-cyan-400/60 p-6 rounded-2xl flex flex-col justify-between gap-5 shadow-xl hover:shadow-[0_0_30px_rgba(0,195,255,0.2)] transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-cyan-500/10 via-blue-500/5 to-transparent rounded-bl-full pointer-events-none group-hover:from-cyan-400/20 transition-all"></div>
-
                     <div className="space-y-3 relative z-10">
                       <div className="flex items-center justify-between">
                         <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 shadow ${
@@ -418,39 +674,44 @@ export default function StudentDashboard() {
                             ? "bg-red-950/90 text-red-300 border border-red-800/60"
                             : isImage
                             ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
-                            : "bg-blue-950/90 text-cyan-300 border border-cyan-500/50"
+                            : "bg-cyan-950/90 text-cyan-300 border border-cyan-500/50"
                         }`}>
-                          
-                        {isPdf && <FileText className="w-3.5 h-3.5" />}
+                          {isPdf && <FileText className="w-3.5 h-3.5" />}
                           {isImage && <ImageIcon className="w-3.5 h-3.5" />}
                           {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
-                          {mat.type}
+                          {mat.type === "LINK" ? "3D Interactive Lab" : mat.type}
                         </span>
-                        {mat.fileSize && <span className="text-[11px] text-slate-400 font-mono font-semibold">{mat.fileSize}</span>}
+                        {mat.fileSize && <span className="text-[11px] text-slate-400 font-mono">{mat.fileSize}</span>}
                       </div>
 
-                      <h3 className="font-bold text-white text-base group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug">{mat.title}</h3>
-                      {mat.description && <p className="text-xs text-slate-300/90 line-clamp-3 leading-relaxed">{mat.description}</p>}
+                      <h3 className="font-bold text-white text-base sm:text-lg group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug">
+                        {mat.title}
+                      </h3>
+                      {mat.description && (
+                        <p className="text-xs text-slate-300/80 line-clamp-3 leading-relaxed">
+                          {mat.description}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="pt-3 border-t border-cyan-950 flex justify-end relative z-10">
+                    <div className="pt-4 border-t border-cyan-950 flex justify-end relative z-10">
                       {mat.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
                         <Link
                           href="/dashboard/account"
-                          className="w-full text-center py-2 px-3 rounded-lg text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-md uppercase tracking-wider"
+                          className="w-full text-center py-2.5 px-4 rounded-xl text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-md uppercase tracking-wider"
                         >
-                          🔒 Subscribe to Access
+                          ⭐ Gold Member Access Required
                         </Link>
                       ) : (
                         <a
-                        href={mat.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-95"
-                      >
-                        <span>{mat.type === "LINK" ? "Open Link" : "View / Download"}</span>
-                        {mat.type === "LINK" ? <ExternalLink className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
-                      </a>
+                          href={mat.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)] active:scale-95"
+                        >
+                          <span>{mat.type === "LINK" ? "Open Interactive Model" : "View / Download"}</span>
+                          {mat.type === "LINK" ? <ExternalLink className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
+                        </a>
                       )}
                     </div>
                   </div>
@@ -459,68 +720,22 @@ export default function StudentDashboard() {
             </div>
           )}
         </section>
-        
-        {/* Top Summary Cards */}
-        {testsTaken > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
-              <div className="p-2.5 sm:p-3 bg-blue-900/30 rounded-lg text-blue-400 shrink-0"><BookOpen className="w-5 h-5 sm:w-6 sm:h-6" /></div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Tests Taken</p>
-                <p className="text-lg sm:text-2xl font-bold text-white leading-tight">{testsTaken}</p>
-              </div>
-            </div>
-            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
-              <div className="p-2.5 sm:p-3 bg-green-900/30 rounded-lg text-green-400 shrink-0"><TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" /></div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Average Score</p>
-                <p className="text-base sm:text-2xl font-bold text-white leading-tight">{avgScore}%</p>
-              </div>
-            </div>
-            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
-              <div className="p-2.5 sm:p-3 bg-purple-900/30 rounded-lg text-purple-400 shrink-0"><Trophy className="w-5 h-5 sm:w-6 sm:h-6" /></div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Best Score</p>
-                <p className="text-base sm:text-2xl font-bold text-white leading-tight">{bestScore}%</p>
-              </div>
-            </div>
-            <div className="bg-[#161616]/60 border border-[#333333] p-3.5 sm:p-6 rounded-xl flex items-center gap-2.5 sm:gap-4 backdrop-blur-sm">
-              <div className="p-2.5 sm:p-3 bg-amber-900/30 rounded-lg text-amber-400 shrink-0"><Target className="w-5 h-5 sm:w-6 sm:h-6" /></div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-[#a6a6a6] truncate">Avg. Accuracy</p>
-                <p className="text-base sm:text-2xl font-bold text-white leading-tight">{avgAccuracy}%</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-gradient-to-r from-[#0a1b2a]/90 via-[#0d2336]/90 to-[#081522]/90 border border-cyan-500/30 p-8 sm:p-10 rounded-2xl text-center backdrop-blur-xl shadow-[0_10px_35px_rgba(0,153,255,0.15)] space-y-4 relative overflow-hidden">
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none"></div>
-            
-            <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.25)]">
-              <Medal className="w-7 h-7 text-cyan-300 animate-pulse" />
-            </div>
-            
-            <div className="space-y-1.5 max-w-lg mx-auto">
-              <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide">Start Your Performance Journey</h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                You haven't completed any tests yet. Take your first test from <strong className="text-cyan-300 font-semibold">Available Tests</strong> to unlock real-time accuracy, score graphs, and leaderboard insights!
-              </p>
-            </div>
-          </div>
-        )}
 
-        {/* Top 2 Performers of Last Exam (Excluding Admin) */}
+        {/* ========================================================= */}
+        {/* 6. CONTENT ROW 3: HALL OF FAME / TOP PERFORMERS          */}
+        {/* ========================================================= */}
         {lastExamTopStudents && lastExamTopStudents.length > 0 && (
-          <div className="bg-gradient-to-r from-[#0d2a3e]/90 via-[#0a1e2b]/90 to-[#122838]/90 border border-[#0099ff]/30 p-5 rounded-xl backdrop-blur-md shadow-xl space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#0099ff]/20 pb-3">
-              <div className="flex items-center gap-2.5">
-                <Trophy className="w-5 h-5 text-amber-400 animate-pulse shrink-0" />
-                <span className="text-sm font-bold text-white uppercase tracking-wider">
-                  Top Performers — {lastExamTitle || "Last Exam"}
-                </span>
+          <section id="leaderboard" className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-amber-400 animate-pulse" />
+                  <span>Top Performers — {lastExamTitle || "Recent Benchmark Test"}</span>
+                </h2>
+                <p className="text-xs text-slate-400">Honour roll ranked by aggregate score, speed and accuracy</p>
               </div>
-              <span className="text-xs text-[#7dd3fc] bg-[#0099ff]/10 px-3 py-1 rounded-full border border-[#0099ff]/30 font-medium">
-                Ranked by Score, Accuracy & Speed
+              <span className="text-xs bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full border border-amber-500/30 font-bold">
+                Hall of Fame
               </span>
             </div>
 
@@ -528,18 +743,18 @@ export default function StudentDashboard() {
               {lastExamTopStudents.map((st: any) => (
                 <div
                   key={st.rank}
-                  className={`p-4 rounded-xl border flex items-center justify-between gap-4 transition-all ${
+                  className={`p-5 rounded-2xl border flex items-center justify-between gap-4 transition-all shadow-xl ${
                     st.rank === 1
-                      ? "bg-gradient-to-r from-amber-950/40 via-[#1e190e]/60 to-[#2a210d]/50 border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.15)]"
-                      : "bg-gradient-to-r from-slate-900/60 via-[#16202c]/60 to-[#0e1620]/50 border-slate-400/40 shadow-md"
+                      ? "bg-gradient-to-r from-[#241a0c] via-[#140e06] to-[#0c0803] border-amber-500/50 shadow-amber-950/20"
+                      : "bg-gradient-to-r from-[#141b24] via-[#0b1016] to-[#070a0e] border-slate-400/40"
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-base shrink-0 border ${
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 border shadow-md ${
                         st.rank === 1
-                          ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 shadow-[0_0_10px_#f59e0b]"
-                          : "bg-gradient-to-br from-slate-300 to-slate-500 text-black border-slate-200"
+                          ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300"
+                          : "bg-gradient-to-br from-slate-200 to-slate-400 text-black border-slate-100"
                       }`}
                     >
                       #{st.rank}
@@ -548,526 +763,174 @@ export default function StudentDashboard() {
                       <div className="font-bold text-white text-base truncate flex items-center gap-2">
                         <span>{st.name}</span>
                         {st.rank === 1 && (
-                          <span className="text-[11px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/40 font-semibold shrink-0">
-                            👑 1st Rank
+                          <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold uppercase">
+                            🥇 1st Rank
                           </span>
                         )}
                         {st.rank === 2 && (
-                          <span className="text-[11px] bg-slate-400/20 text-slate-300 px-2 py-0.5 rounded border border-slate-400/40 font-semibold shrink-0">
+                          <span className="text-[10px] bg-slate-400/20 text-slate-300 px-2 py-0.5 rounded font-bold uppercase">
                             🥈 2nd Rank
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-[#a6a6a6] mt-0.5 flex items-center gap-2">
-                        <span>Avg Accuracy: <strong className="text-[#00e5ff] font-bold">{st.accuracy}%</strong></span>
+                      <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                        <span>Accuracy: <strong className="text-cyan-300 font-bold">{st.accuracy}%</strong></span>
                       </div>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <div className="text-xl font-extrabold text-white">{st.score} <span className="text-xs font-normal text-[#a6a6a6]">pts</span></div>
-                    <div className="text-xs font-bold text-blue-400">{st.percentage != null ? `${Number(st.percentage).toFixed(1)}%` : '-'}</div>
+                    <div className="text-2xl font-black text-white">{st.score} <span className="text-xs font-normal text-slate-400">pts</span></div>
+                    <div className="text-xs font-bold text-cyan-400">{st.percentage != null ? `${Number(st.percentage).toFixed(1)}%` : '-'}</div>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        )}
-
-        {/* Categorized Tests Sections */}
-        {(() => {
-          const formatDateTime = (dateInput: Date | string | null | undefined) => {
-            if (!dateInput) return "";
-            const dateObj = dateInput instanceof Date ? dateInput : new Date(dateInput);
-            if (isNaN(dateObj.getTime())) return "";
-            const pad = (n: number) => n.toString().padStart(2, '0');
-            const day = pad(dateObj.getDate());
-            const month = pad(dateObj.getMonth() + 1);
-            const year = dateObj.getFullYear();
-            let hours = dateObj.getHours();
-            const minutes = pad(dateObj.getMinutes());
-            const seconds = pad(dateObj.getSeconds());
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            return `${day}/${month}/${year} ${pad(hours)}:${minutes}:${seconds} ${ampm}`;
-          };
-
-          const currentAvailableTests: any[] = [];
-          const upcomingTests: any[] = [];
-          const expiredTests: any[] = [];
-
-          availableTests.forEach((test: any) => {
-            const lockDate = test.lockAt ? new Date(test.lockAt) : null;
-            const unlockDate = test.unlockAt ? new Date(test.unlockAt) : null;
-
-            // 1. LIVE / PUBLISHED: Selected as live by admin -> Available Tests category
-            if (test.status === "LIVE" || test.status === "PUBLISHED") {
-              currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS" });
-            } 
-            // 2. EXPIRED / CLOSED / LOCKED: Selected as expired -> Expired Tests category (unless student has individual access override)
-            else if (test.status === "EXPIRED" || test.status === "CLOSED" || test.status === "LOCKED") {
-              if (test.hasIndividualAccess) {
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
-              } else {
-                expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
-              }
-            } 
-            // 3. SCHEDULE_EXPIRED: Under Available Tests until lockDate arrives -> after lockDate arrives, put in Expired Tests category
-            else if (test.status === "SCHEDULE_EXPIRED") {
-              if (!lockDate || now < lockDate) {
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
-              } else if (test.hasIndividualAccess) {
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED" });
-              } else {
-                expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
-              }
-            } 
-            // 4. UPCOMING: In Upcoming category until re-locked AND post-lock holding period expires -> then Available Tests category
-            else if (test.status === "UPCOMING") {
-              const holdMinutes = test.postLockHoldMinutes ?? 0;
-              const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
-
-              if (!lockDate || (autoLiveDate && now < autoLiveDate)) {
-                // Before re-lock or during post-lock holding period -> stays in Upcoming category
-                upcomingTests.push({ 
-                  ...test, 
-                  category: unlockDate && now < unlockDate ? "UPCOMING" : (lockDate && now >= lockDate ? "HOLDING" : "UPCOMING_LIVE"), 
-                  lockState: unlockDate && now < unlockDate ? "BEFORE_UNLOCK" : (lockDate && now >= lockDate ? "POST_LOCK_HOLDING" : "SCHEDULED_OPEN"), 
-                  unlockDate, 
-                  lockDate, 
-                  autoLiveDate 
-                });
-              } else {
-                // After re-lock AND post-lock holding period expired -> put into Available Tests category
-                currentAvailableTests.push({ ...test, category: "LIVE", lockState: "AUTO_RELEASED_LIVE", unlockDate, lockDate, autoLiveDate });
-              }
-            }
-            // 5. DRAFT or any unlisted status -> Excluded (Not visible to students)
-          });
-
-          const renderTestCard = (test: any) => {
-            const hasAttempted = allAttempts.some((a: any) => a.testId === test.id && a.status === 'SUBMITTED');
-            const activeAttempt = allAttempts.find((a: any) => a.testId === test.id && a.status === 'IN_PROGRESS');
-
-            const isUpcomingStage = test.lockState === "BEFORE_UNLOCK";
-            const isLiveStage = test.lockState === "SCHEDULED_OPEN" || test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE" || test.lockState === "INDIVIDUAL_ACCESS_GRANTED";
-            const isHoldingStage = test.lockState === "POST_LOCK_HOLDING";
-            const isLockedStage = test.lockState === "AFTER_LOCK" || test.lockState === "EXPIRED_STATUS";
-
-            return (
-              <div key={test.id} className={`bg-[#1a1a1a] border rounded-xl overflow-hidden flex flex-col transition duration-300 shadow-lg relative ${isLiveStage ? 'border-[#0099ff]/60 hover:border-[#0099ff] shadow-[0_0_15px_rgba(0,153,255,0.15)]' : isUpcomingStage ? 'border-amber-500/40 hover:border-amber-500' : isHoldingStage ? 'border-orange-500/50 hover:border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.15)]' : 'border-[#333333] hover:border-[#4d4d4d]'}`}>
-                <div className="p-5 flex-1">
-                  <div className="flex justify-between items-start gap-2 mb-3">
-                    <h3 className="text-base sm:text-lg font-bold text-white break-words leading-snug flex-1 min-w-0">{test.title}</h3>
-                    {isLiveStage && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-green-950/80 text-green-400 border border-green-700/60 shrink-0 whitespace-nowrap">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
-                        {test.lockState === "AUTO_RELEASED_LIVE" ? "LIVE TEST" : "LIVE NOW"}
-                      </span>
-                    )}
-                    {isUpcomingStage && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60 shrink-0 whitespace-nowrap animate-pulse">
-                        🔒 UPCOMING
-                      </span>
-                    )}
-                    {isHoldingStage && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-950/80 text-orange-400 border border-orange-700/60 shrink-0 whitespace-nowrap">
-                        ⌛ CONCLUDED
-                      </span>
-                    )}
-                    {isLockedStage && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-950/80 text-red-400 border border-red-800/60 shrink-0 whitespace-nowrap">
-                        ⌛ EXPIRED
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                    <div className="flex items-center text-[#a6a6a6]">
-                      <span className="font-semibold text-white mr-2">{test.totalQuestions}</span> Qs
-                    </div>
-                    <div className="flex items-center text-[#a6a6a6]">
-                      <Clock className="w-4 h-4 mr-1.5 opacity-70" />
-                      <span className="font-semibold text-white mr-1">{test.durationMinutes}</span> min
-                    </div>
-                    <div className="flex items-center text-[#a6a6a6]">
-                      <span className="font-semibold text-white mr-1">{test.totalQuestions * test.marksPerQuestion}</span> Marks
-                    </div>
-                    {test.negativeMarking && (
-                      <div className="flex items-center text-red-400">
-                        -{test.negativeMarks} per wrong
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Status Banner */}
-                  <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333] overflow-hidden">
-                    {isUpcomingStage && test.unlockDate && (
-                      <div className="text-amber-300 font-medium truncate">
-                        <span>🔒 Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
-                      </div>
-                    )}
-                    {isLiveStage && test.lockState === "SCHEDULED_OPEN" && test.lockDate && (
-                      <div className="text-green-400 font-medium truncate">
-                        <span>🔥 Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
-                      </div>
-                    )}
-                    {isLiveStage && (test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE") && (
-                      <div className="flex items-center text-green-400 font-medium truncate">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2 shrink-0"></span>
-                        <span>🟢 Auto-Released Live Test</span>
-                      </div>
-                    )}
-                    {isHoldingStage && test.autoLiveDate && (
-                      <div className="text-orange-300 font-medium text-[11px] leading-tight">
-                        <div>⌛ Concluded at {formatDateTime(test.lockDate)}</div>
-                        <div className="text-green-400 font-mono mt-0.5">Auto-lives: {formatDateTime(test.autoLiveDate)}</div>
-                      </div>
-                    )}
-                    {isLockedStage && (
-                      <div className="text-red-400 font-medium truncate">
-                        <span>⚠️ Contact Admin for access</span>
-                      </div>
-                    )}
-                    {activeAttempt && (
-                      <div className="mt-1 flex items-center text-yellow-400 font-semibold">
-                        <span>▶ Active attempt in progress</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-[#111111] border-t border-[#333333]">
-                  {isUpcomingStage ? (
-                    <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow">
-                      🎯 Best of Luck!
-                    </button>
-                  ) : activeAttempt ? (
-                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-[0_0_15px_rgba(202,138,4,0.3)] animate-pulse">
-                      Continue Test
-                    </Link>
-                  ) : isHoldingStage ? (
-                    test.userRequestStatus === "PENDING" ? (
-                      <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 cursor-not-allowed">
-                        ⏳ Request Pending Admin Review
-                      </button>
-                    ) : (
-                      <button
-                        onClick={async () => {
-                          try {
-                            const res = await fetch("/api/student/request-access", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ testId: test.id })
-                            });
-                            const data = await res.json();
-                            if (res.ok) {
-                              alert("Your request to live this test has been sent to the Admin!");
-                              window.location.reload();
-                            } else {
-                              alert(data.error || "Failed to submit request.");
-                            }
-                          } catch (err) {
-                            alert("Something went wrong requesting access.");
-                          }
-                        }}
-                        className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 transition shadow-[0_0_15px_rgba(249,115,22,0.3)] flex items-center justify-center gap-1.5"
-                      >
-                        📩 Request Admin to Live Test
-                      </button>
-                    )
-                  ) : isLockedStage ? (
-                    test.userRequestStatus === "PENDING" ? (
-                      <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-amber-300 bg-amber-950/60 border border-amber-800/80 cursor-not-allowed">
-                        ⏳ Request Pending Admin Review
-                      </button>
-                    ) : test.userRequestStatus === "APPROVED" || test.hasIndividualAccess ? (
-                      <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                        {activeAttempt ? 'Continue Test (Access Granted)' : hasAttempted ? 'Take Again (Access Granted)' : 'Start Test (Access Granted)'}
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={async () => {
-                          try {
-                            const res = await fetch("/api/student/request-access", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ testId: test.id })
-                            });
-                            const data = await res.json();
-                            if (res.ok) {
-                              alert("Your request to live this test has been sent to the Admin!");
-                              window.location.reload();
-                            } else {
-                              alert(data.error || "Failed to submit request");
-                            }
-                          } catch (e) {
-                            alert("Error sending request");
-                          }
-                        }}
-                        className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.25)] flex items-center justify-center gap-1.5"
-                      >
-                        📩 Request Admin to Live Test
-                      </button>
-                    )
-                  ) : activeAttempt ? (
-                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-[0_0_15px_rgba(202,138,4,0.3)]">
-                      Continue Test
-                    </Link>
-                  ) : hasAttempted ? (
-                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-[#262626] border border-[#404040] hover:bg-[#333333] transition">
-                      Take Again / View
-                    </Link>
-                  ) : (
-                    <Link href={`/exam/start/${test.id}`} className="block w-full text-center py-2.5 px-4 rounded-md text-sm font-semibold text-white bg-[#0099ff] hover:bg-[#007acc] transition shadow-[0_0_15px_rgba(0,153,255,0.3)]">
-                      Start Test
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          };
-
-          return (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* 1. Folder 1: Upcoming Tests */}
-              <div className="bg-[#121212]/90 border border-amber-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.08)] hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-1">
-                <Link
-                  href="/dashboard/category/upcoming"
-                  className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-[#1a1610]/90 to-[#120e0a]/90 hover:from-[#2a2218] hover:to-[#1a140e] transition-colors text-left cursor-pointer group space-y-5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="p-3 rounded-xl bg-amber-950/90 border border-amber-700/60 shadow group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
-                      <PiechemLogo size="sm" showText={false} />
-                    </div>
-                    <span className="text-xs bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 font-mono font-bold shrink-0 shadow">
-                      {upcomingTests.length} Scheduled
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5 flex-1">
-                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-between group-hover:text-amber-300 transition-colors">
-                      <span>Upcoming / Scheduled</span>
-                      <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform shrink-0" />
-                    </h2>
-                    <p className="text-xs text-amber-200/70 leading-relaxed">Click to view all scheduled upcoming tests →</p>
-                  </div>
-                </Link>
-              </div>
-
-              {/* 2. Folder 2: Available Tests */}
-              <div className="bg-[#121212]/90 border border-green-500/40 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(34,197,94,0.08)] hover:border-green-400 transition-all duration-300 transform hover:-translate-y-1">
-                <Link
-                  href="/dashboard/category/available"
-                  className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-[#0f1f17]/90 to-[#0a1610]/90 hover:from-[#162e22] hover:to-[#0f2118] transition-colors text-left cursor-pointer group space-y-5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="p-3 rounded-xl bg-green-950/90 border border-green-700/60 shadow group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
-                      <PiechemLogo size="sm" showText={false} />
-                    </div>
-                    <span className="text-xs bg-green-950 text-green-400 px-3 py-1 rounded-full border border-green-700 font-mono font-bold shrink-0 shadow">
-                      {currentAvailableTests.length} Live
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5 flex-1">
-                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-between group-hover:text-green-300 transition-colors">
-                      <span className="flex items-center gap-2">
-                        Available Tests
-                        <span className="relative flex h-2.5 w-2.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                        </span>
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-green-400 group-hover:translate-x-1 transition-transform shrink-0" />
-                    </h2>
-                    <p className="text-xs text-green-200/70 leading-relaxed">Click to view all tests ready to attempt →</p>
-                  </div>
-                </Link>
-              </div>
-
-              {/* 3. Folder 3: Expired Tests */}
-              <div className="bg-[#121212]/90 border border-red-900/50 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(239,68,68,0.05)] hover:border-red-600 transition-all duration-300 transform hover:-translate-y-1">
-                <Link
-                  href="/dashboard/category/expired"
-                  className="w-full h-full flex flex-col justify-between p-6 bg-gradient-to-b from-[#1f1012]/90 to-[#140b0c]/90 hover:from-[#2c1719] hover:to-[#1e1011] transition-colors text-left cursor-pointer group space-y-5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="p-3 rounded-xl bg-red-950/90 border border-red-800/60 shadow group-hover:scale-110 transition-transform flex items-center justify-center shrink-0">
-                      <PiechemLogo size="sm" showText={false} />
-                    </div>
-                    <span className="text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full border border-red-800 font-mono font-bold shrink-0 shadow">
-                      {expiredTests.length} Expired
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5 flex-1">
-                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide flex items-center justify-between group-hover:text-red-300 transition-colors">
-                      <span>Expired Tests</span>
-                      <ChevronRight className="w-5 h-5 text-red-400 group-hover:translate-x-1 transition-transform shrink-0" />
-                    </h2>
-                    <p className="text-xs text-red-200/70 leading-relaxed">Click to view all past concluded tests →</p>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Performance Overview (Only if tests taken) */}
-        {testsTaken > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <section className="lg:col-span-2 bg-[#161616]/60 border border-[#333333] rounded-xl p-6 backdrop-blur-sm">
-              <h2 className="text-xl font-bold mb-6 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-[#0099ff]" />
-                Performance Overview
-              </h2>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={graphData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333333" vertical={false} />
-                    <XAxis dataKey="attempt" stroke="#a6a6a6" tick={{fill: '#a6a6a6', fontSize: 12}} />
-                    <YAxis stroke="#a6a6a6" tick={{fill: '#a6a6a6', fontSize: 12}} domain={[0, 100]} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1a1a1a', borderColor: '#333333', borderRadius: '8px', color: '#fff' }}
-                      itemStyle={{ color: '#0099ff' }}
-                    />
-                    <Line type="monotone" dataKey="percentage" name="Percentage (%)" stroke="#0099ff" strokeWidth={3} dot={{r: 4, fill: '#0099ff'}} activeDot={{r: 6}} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </section>
-
-            {/* Recent Performance Cards */}
-            <section className="bg-[#161616]/60 border border-[#333333] rounded-xl p-5 sm:p-6 backdrop-blur-sm flex flex-col">
-              <h2 className="text-lg sm:text-xl font-bold mb-4">Recent Performance</h2>
-              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {recentAttempts.map((attempt: any) => (
-                  <Link key={attempt.id} href={`/exam/result/${attempt.id}`} className="block bg-[#1a1a1a] border border-[#333333] p-3.5 sm:p-4 rounded-lg hover:border-[#4d4d4d] transition group">
-                    <p className="font-semibold text-xs sm:text-sm text-white mb-2 break-words line-clamp-2 leading-snug group-hover:text-[#0099ff] transition-colors">{attempt.test.title}</p>
-                    <div className="flex justify-between items-center text-xs sm:text-sm pt-1 border-t border-[#262626]">
-                      <span className="text-[#a6a6a6]">{new Date(attempt.submittedAt).toLocaleDateString()}</span>
-                      <span className={`font-bold ${(attempt.percentage ?? 0) >= 80 ? 'text-green-400' : (attempt.percentage ?? 0) >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
-                        {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          </div>
-        )}
-
-        {/* Result Tracker Table */}
-        {testsTaken > 0 && (
-          <section className="bg-[#161616]/60 border border-[#333333] rounded-xl overflow-hidden backdrop-blur-sm">
-            <div className="p-4 sm:p-6 border-b border-[#333333] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
-              <h2 className="text-lg sm:text-xl font-bold">Result Tracker</h2>
-              <span className="text-xs sm:text-sm text-[#a6a6a6]">Showing last {last25Attempts.length} tests</span>
-            </div>
-
-            {/* Dedicated Mobile Card View (md:hidden) */}
-            <div className="md:hidden p-4 space-y-3">
-              {last25Attempts.map((attempt: any) => (
-                <div key={attempt.id} className="bg-[#1a1a1a] border border-[#333333] p-4 rounded-lg space-y-3">
-                  <div className="text-sm font-semibold text-white break-words line-clamp-2 leading-snug">
-                    {attempt.test.title}
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-[#a6a6a6] pt-1 border-t border-[#262626]">
-                    <div>
-                      <span>Date: </span>
-                      <span className="text-white font-medium">{new Date(attempt.submittedAt).toLocaleDateString()}</span>
-                    </div>
-                    <div>
-                      <span>Score: </span>
-                      <span className="text-white font-bold text-sm">{attempt.score}</span>
-                      <span className={`ml-1.5 px-2 py-0.5 rounded-full font-bold text-[11px] ${
-                        (attempt.percentage ?? 0) >= 80 ? 'bg-green-900/40 text-green-300 border border-green-700/50' : 
-                        (attempt.percentage ?? 0) >= 60 ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50' : 
-                        'bg-red-900/40 text-red-300 border border-red-700/50'
-                      }`}>
-                        {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center text-xs pt-1">
-                    <div className="font-mono text-[#a6a6a6]">
-                      <span className="text-green-400 font-bold">{attempt.correctCount}</span> C / <span className="text-red-400 font-bold">{attempt.incorrectCount}</span> I / <span className="text-[#a6a6a6] font-bold">{attempt.unansweredCount}</span> U
-                    </div>
-                    <Link href={`/exam/result/${attempt.id}`} className="inline-flex items-center text-xs font-semibold text-[#0099ff] bg-[#0099ff]/10 hover:bg-[#0099ff]/20 px-3 py-1.5 rounded-md border border-[#0099ff]/30 transition-colors">
-                      View Result <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop Table View (hidden md:block) */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-[#333333]">
-                <thead className="bg-[#1a1a1a]">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Test</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Score</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">%</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">C / I / U</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-[#a6a6a6] uppercase tracking-wider">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#333333] bg-[#161616]/40">
-                  {last25Attempts.map((attempt: any) => (
-                    <tr key={attempt.id} className="hover:bg-[#262626]/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-white">{attempt.test.title}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#a6a6a6]">
-                        {new Date(attempt.submittedAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
-                        {attempt.score}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span className={`px-2.5 py-0.5 rounded-full font-medium ${
-                          (attempt.percentage ?? 0) >= 80 ? 'bg-green-900/30 text-green-400 border border-green-800' : 
-                          (attempt.percentage ?? 0) >= 60 ? 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' : 
-                          'bg-red-900/30 text-red-400 border border-red-800'
-                        }`}>
-                          {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <span className="text-green-400">{attempt.correctCount}</span>
-                        <span className="text-[#666666] mx-1">/</span>
-                        <span className="text-red-400">{attempt.incorrectCount}</span>
-                        <span className="text-[#666666] mx-1">/</span>
-                        <span className="text-[#a6a6a6]">{attempt.unansweredCount}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link href={`/exam/result/${attempt.id}`} className="inline-flex items-center text-[#0099ff] hover:text-[#33adff] transition-colors">
-                          View <ChevronRight className="w-4 h-4 ml-1" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </section>
         )}
-      </main>
 
-      {/* Mobile-Only Bottom Logout Footer Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#121212]/95 backdrop-blur-lg border-t border-[#333333] px-4 py-2.5 flex justify-center items-center shadow-[0_-4px_20px_rgba(0,0,0,0.6)]">
-        <button
-          onClick={handleLogout}
-          className="w-full max-w-xs flex items-center justify-center text-sm font-semibold text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 py-2 px-4 rounded-lg transition-all shadow-md active:scale-95"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Logout from Account
-        </button>
-      </div>
+        {/* ========================================================= */}
+        {/* 7. CONTENT ROW 4: PERFORMANCE JOURNEY & RESULT TRACKER    */}
+        {/* ========================================================= */}
+        <section id="performance" className="space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-cyan-400" />
+                <span>Your Performance Journey</span>
+              </h2>
+              <p className="text-xs text-slate-400">Historical attempt records, accuracy trajectory and result analysis</p>
+            </div>
+          </div>
+
+          {testsTaken === 0 ? (
+            /* Empty State Banner (Image 1) */
+            <div className="bg-gradient-to-r from-[#061524] via-[#040e18] to-[#02070c] border border-cyan-500/30 p-8 sm:p-12 rounded-3xl text-center shadow-xl space-y-4 relative overflow-hidden">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(0,195,255,0.25)]">
+                <Medal className="w-8 h-8 text-cyan-300 animate-pulse" />
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white">Start Your Performance Journey</h3>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
+                You haven't completed any tests yet. Take your first exam from <strong className="text-cyan-300">Available Tests</strong> to unlock real-time accuracy, score graphs, and leaderboard insights!
+              </p>
+              <a
+                href="#tests"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm transition shadow-lg shadow-cyan-950/50"
+              >
+                <span>View Available Tests</span>
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
+          ) : (
+            /* Active Analytics & Graph View */
+            <div className="space-y-6">
+              
+              {/* 4 Summary Stat Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-900/30 rounded-xl text-blue-400"><BookOpen className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-xs text-slate-400">Tests Taken</p>
+                    <p className="text-xl sm:text-2xl font-black text-white">{testsTaken}</p>
+                  </div>
+                </div>
+                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                  <div className="p-2.5 bg-green-900/30 rounded-xl text-green-400"><TrendingUp className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-xs text-slate-400">Average Score</p>
+                    <p className="text-xl sm:text-2xl font-black text-white">{avgScore}%</p>
+                  </div>
+                </div>
+                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                  <div className="p-2.5 bg-purple-900/30 rounded-xl text-purple-400"><Trophy className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-xs text-slate-400">Best Score</p>
+                    <p className="text-xl sm:text-2xl font-black text-white">{bestScore}%</p>
+                  </div>
+                </div>
+                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                  <div className="p-2.5 bg-amber-900/30 rounded-xl text-amber-400"><Target className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-xs text-slate-400">Avg. Accuracy</p>
+                    <p className="text-xl sm:text-2xl font-black text-white">{avgAccuracy}%</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance Line Chart */}
+              <div className="bg-[#061421]/90 border border-cyan-500/25 rounded-2xl p-6 shadow-xl">
+                <h3 className="text-base sm:text-lg font-bold text-white mb-4">Score Trajectory Across Tests</h3>
+                <div className="h-[260px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={graphData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                      <XAxis dataKey="attempt" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                      <YAxis stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 12 }} domain={[0, 100]} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#02070c', borderColor: '#0284c7', borderRadius: '12px', color: '#fff' }}
+                        itemStyle={{ color: '#00e5ff' }}
+                      />
+                      <Line type="monotone" dataKey="percentage" name="Percentage (%)" stroke="#00e5ff" strokeWidth={3} dot={{ r: 4, fill: '#00e5ff' }} activeDot={{ r: 6 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Results Table */}
+              <div className="bg-[#061421]/90 border border-cyan-500/25 rounded-2xl overflow-hidden shadow-xl">
+                <div className="p-4 sm:p-5 border-b border-cyan-500/20 flex justify-between items-center">
+                  <h3 className="text-base sm:text-lg font-bold text-white">Recent Test Records</h3>
+                  <span className="text-xs text-slate-400">Last {last25Attempts.length} tests</span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-800">
+                    <thead className="bg-[#030910]">
+                      <tr>
+                        <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">Test Title</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">Date</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">Score</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">Percentage</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">C / I / U</th>
+                        <th className="px-5 py-3 text-right text-xs font-bold text-slate-400 uppercase">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 bg-[#040e17]/50 text-xs sm:text-sm">
+                      {last25Attempts.map((attempt: any) => (
+                        <tr key={attempt.id} className="hover:bg-cyan-950/20 transition">
+                          <td className="px-5 py-3.5 font-semibold text-white whitespace-nowrap">{attempt.test.title}</td>
+                          <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">{new Date(attempt.submittedAt).toLocaleDateString()}</td>
+                          <td className="px-5 py-3.5 font-bold text-white whitespace-nowrap">{attempt.score}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <span className={`px-2.5 py-0.5 rounded-full font-bold text-xs ${
+                              (attempt.percentage ?? 0) >= 80 ? 'bg-green-950 text-green-300 border border-green-800' :
+                              (attempt.percentage ?? 0) >= 60 ? 'bg-yellow-950 text-yellow-300 border border-yellow-800' :
+                              'bg-red-950 text-red-300 border border-red-800'
+                            }`}>
+                              {attempt.percentage != null ? `${Number(attempt.percentage).toFixed(1)}%` : '-'}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3.5 font-mono whitespace-nowrap">
+                            <span className="text-green-400 font-bold">{attempt.correctCount}</span> / <span className="text-red-400 font-bold">{attempt.incorrectCount}</span> / <span className="text-slate-400 font-bold">{attempt.unansweredCount}</span>
+                          </td>
+                          <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                            <Link href={`/exam/result/${attempt.id}`} className="text-cyan-400 hover:text-cyan-300 font-bold inline-flex items-center gap-1">
+                              <span>View</span>
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          )}
+        </section>
+
+      </main>
     </div>
   );
 }
