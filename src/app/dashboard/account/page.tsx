@@ -1644,7 +1644,7 @@ export default function StudentAccountPage() {
                       </div>
                       <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-400 font-medium">Chemistry Exam Tests</span>
-                        <span className="font-semibold text-slate-300">2 Practice Tests</span>
+                        <span className="font-semibold text-slate-300">Selected tests are free.</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-400 font-medium">Answer Explanations</span>
@@ -1714,7 +1714,7 @@ export default function StudentAccountPage() {
                       <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-300 font-medium">Chemistry Exam Tests</span>
                         <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Unlimited (50+ Tests)
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Unlimited
                         </span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
@@ -1738,7 +1738,7 @@ export default function StudentAccountPage() {
                       <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-300 font-medium">Supported Devices</span>
                         <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Mobile, Tablet, PC / Laptop
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Mobile, Tablet, PC / Laptop (Max 2 device)
                         </span>
                       </div>
                     </div>
