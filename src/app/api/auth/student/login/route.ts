@@ -1,3 +1,4 @@
+import { touchOrCreateStudentSession } from "@/lib/sessionService";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -51,6 +52,12 @@ export async function POST(req: Request) {
       where: { id: student.id },
       data: { lastLogin: new Date() }
     });
+
+    try {
+      await touchOrCreateStudentSession(student.id, req, cookieStore);
+    } catch (err) {
+      console.error("Device session registration error:", err);
+    }
 
     const isOnboarded = Boolean(student.board && student.academicLevel);
     return NextResponse.json({ success: true, isOnboarded });

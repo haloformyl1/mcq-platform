@@ -1,3 +1,4 @@
+import { touchOrCreateStudentSession, getActiveStudentSessions } from "@/lib/sessionService";
 ﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { recalculateStudentAttempts } from "@/lib/recalculate";
@@ -29,6 +30,11 @@ export async function GET(req: Request) {
     }
 
     const studentId = payload.id;
+    const { deviceId, isRevoked } = await touchOrCreateStudentSession(studentId, req, cookieStore);
+    if (isRevoked) {
+      cookieStore.delete('session');
+      return NextResponse.json({ error: "Session has been revoked" }, { status: 401 });
+    }
     cookieStore.set('session', session, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

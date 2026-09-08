@@ -7,7 +7,7 @@ import {
   Copy, Check, X, User, Mail, Phone, ShieldCheck, 
   ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
   Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
-  ChevronDown, Layers, Laptop, Shield, CheckCircle
+  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor
 } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -66,6 +66,14 @@ export default function StudentAccountPage() {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Netflix-style Manage Access and Devices States
+  const [devicesList, setDevicesList] = useState<any[]>([]);
+  const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
+  const [expandedDeviceIds, setExpandedDeviceIds] = useState<Record<string, boolean>>({});
+  const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
+  const [revokingAll, setRevokingAll] = useState(false);
+  const [deviceActionMsg, setDeviceActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Password Change Form States
   const [oldPassword, setOldPassword] = useState("");
@@ -159,6 +167,12 @@ export default function StudentAccountPage() {
       })
       .then((resData) => {
         setData(resData);
+        if (resData.devices) {
+          setDevicesList(resData.devices);
+        }
+        if (resData.currentDeviceId) {
+          setCurrentDeviceId(resData.currentDeviceId);
+        }
         if (resData.student) {
           setName(resData.student.name || "");
           setPhone(resData.student.phone || "");
@@ -176,6 +190,79 @@ export default function StudentAccountPage() {
         router.push("/login");
       });
   }, [router]);
+  const fetchDevices = async () => {
+    try {
+      const res = await fetch("/api/student/devices");
+      if (res.ok) {
+        const d = await res.json();
+        if (d.devices) setDevicesList(d.devices);
+        if (d.currentDeviceId) setCurrentDeviceId(d.currentDeviceId);
+      }
+    } catch (e) {
+      // silent
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "devices") {
+      fetchDevices();
+      const interval = setInterval(fetchDevices, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab]);
+
+  const toggleDeviceExpand = (id: string) => {
+    setExpandedDeviceIds(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleSignOutDevice = async (id: string) => {
+    setRevokingDeviceId(id);
+    setDeviceActionMsg(null);
+    try {
+      const res = await fetch("/api/student/devices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "signout_device", targetId: id }),
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Failed to sign out device");
+      if (resData.signedOutCurrent) {
+        router.push("/login");
+        return;
+      }
+      if (resData.devices) {
+        setDevicesList(resData.devices);
+      } else {
+        setDevicesList(prev => prev.filter(d => d.id !== id && d.deviceId !== id));
+      }
+      setDeviceActionMsg({ type: "success", text: "Signed out of device successfully." });
+    } catch (err: any) {
+      setDeviceActionMsg({ type: "error", text: err.message || "Failed to sign out device." });
+    } finally {
+      setRevokingDeviceId(null);
+    }
+  };
+
+  const handleSignOutAllDevices = async () => {
+    if (!confirm("Are you sure you want to sign out of all devices? You will need to sign in again.")) return;
+    setRevokingAll(true);
+    setDeviceActionMsg(null);
+    try {
+      const res = await fetch("/api/student/devices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "signout_all" }),
+      });
+      if (res.ok) {
+        router.push("/login");
+      }
+    } catch (err) {
+      setDeviceActionMsg({ type: "error", text: "Failed to sign out of all devices." });
+    } finally {
+      setRevokingAll(false);
+    }
+  };
+
   const handleSendUpgradeRequest = async () => {
     const trimmedUpi = studentUpiId.trim();
     if (!trimmedUpi) {
@@ -514,10 +601,23 @@ export default function StudentAccountPage() {
             {/* Header Titles */}
             <div>
               <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-                Account
+                {activeTab === "devices" ? "Manage Access and Devices" : "Account"}
               </h1>
               <p className="text-sm font-medium text-slate-400 mt-1">
-                Membership details
+                {activeTab === "devices" ? (
+                  <>
+                    These signed-in devices have recently been active on this account. You can sign out any unfamiliar devices or{" "}
+                    <button
+                      onClick={() => setActiveTab("security")}
+                      className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
+                    >
+                      change your password
+                    </button>{" "}
+                    for added security.
+                  </>
+                ) : (
+                  "Membership details"
+                )}
               </p>
             </div>
 
@@ -1202,66 +1302,205 @@ export default function StudentAccountPage() {
             {activeTab === "devices" && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
-                  
-                  <div className="border-b border-cyan-500/15 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <h2 className="text-xl font-bold text-white">Access & Devices</h2>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Review active browsers and security devices connected to your student profile.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={handleLogout}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 text-red-400 text-xs font-bold transition self-start sm:self-auto cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign out of all sessions</span>
+                {/* Global Status Notification */}
+                {deviceActionMsg && (
+                  <div
+                    className={`p-4 rounded-xl text-xs font-medium border flex items-center justify-between gap-3 ${
+                      deviceActionMsg.type === "success"
+                        ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300"
+                        : "bg-red-950/80 border-red-500/40 text-red-300"
+                    }`}
+                  >
+                    <span>{deviceActionMsg.text}</span>
+                    <button onClick={() => setDeviceActionMsg(null)} className="cursor-pointer text-slate-400 hover:text-white">
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
+                )}
 
-                  {/* Active Device Card */}
-                  <div className="p-5 rounded-xl border border-cyan-500/20 bg-slate-950/80 flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3.5">
-                      <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/30 shadow-sm text-cyan-400 shrink-0">
-                        <Laptop className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-white">Current Active Web Browser</h4>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-500/40">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active Now
-                          </span>
+                {/* Sign out of all devices header card */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 p-4 sm:p-5 rounded-2xl border border-cyan-500/25 shadow-md">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 shadow-sm">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Signed-in Devices ({devicesList.length || 1})</h3>
+                      <p className="text-xs text-slate-400">
+                        Active web browsers and device sessions authenticated with {student.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleSignOutAllDevices}
+                    disabled={revokingAll}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-red-400 hover:text-red-300 text-xs font-bold transition self-start sm:self-auto cursor-pointer disabled:opacity-50 shadow-sm"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>{revokingAll ? "Signing out..." : "Sign out of all devices"}</span>
+                  </button>
+                </div>
+
+                {/* Device Cards List (Netflix inspired) */}
+                <div className="space-y-3.5">
+                  {devicesList.length === 0 ? (
+                    <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/20 p-6 text-center text-slate-400 text-xs">
+                      <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin mx-auto mb-2" />
+                      Loading signed-in devices...
+                    </div>
+                  ) : (
+                    devicesList.map((dev: any, idx: number) => {
+                      const devKey = dev.id || dev.deviceId || String(idx);
+                      const isExpanded = !!expandedDeviceIds[devKey];
+                      const isCurrent = Boolean(dev.isCurrent || (idx === 0 && devicesList.length === 1));
+
+                      return (
+                        <div
+                          key={devKey}
+                          className={`rounded-2xl border transition-all duration-200 overflow-hidden bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 ${
+                            isCurrent
+                              ? "border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.1)]"
+                              : "border-cyan-500/20 hover:border-cyan-500/40"
+                          }`}
+                        >
+                          {/* Card Header Row */}
+                          <div
+                            onClick={() => toggleDeviceExpand(devKey)}
+                            className="p-5 sm:p-6 flex items-start justify-between gap-4 cursor-pointer select-none"
+                          >
+                            <div className="flex items-start gap-4">
+                              {/* Device Icon */}
+                              <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/30 text-slate-300 shrink-0 mt-0.5 shadow-sm">
+                                {dev.deviceType === "mobile" ? (
+                                  <Smartphone className="w-5 h-5 text-cyan-400" />
+                                ) : dev.deviceType === "tablet" ? (
+                                  <Tablet className="w-5 h-5 text-cyan-400" />
+                                ) : (
+                                  <Laptop className="w-5 h-5 text-cyan-400" />
+                                )}
+                              </div>
+
+                              <div className="space-y-1">
+                                {/* CURRENT DEVICE Badge */}
+                                {isCurrent && (
+                                  <div className="mb-1.5">
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 shadow-sm">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                                      CURRENT DEVICE
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Device Name (Netflix style) */}
+                                <h4 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                                  {dev.deviceName || "PC Chrome - Web browser"}
+                                </h4>
+
+                                {/* Activity Line with Clock */}
+                                <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 font-medium pt-0.5">
+                                  <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                  <span>{dev.lastActiveFormatted || formatDateTime24(dev.lastActive || new Date())}</span>
+                                  {(dev.isActiveNow || isCurrent) && (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 ml-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active now
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Expand / Collapse Chevron */}
+                            <button
+                              type="button"
+                              aria-label="Toggle device details"
+                              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-cyan-950/40 transition shrink-0"
+                            >
+                              <ChevronDown
+                                className={`w-5 h-5 transition-transform duration-200 ${
+                                  isExpanded ? "rotate-180 text-cyan-400" : ""
+                                }`}
+                              />
+                            </button>
+                          </div>
+
+                          {/* Accordion Expanded Body */}
+                          {isExpanded && (
+                            <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-cyan-500/15 space-y-4 animate-in fade-in duration-150">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-xs">
+                                <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/20">
+                                  <span className="text-slate-500 block font-medium">Account Profile</span>
+                                  <span className="text-slate-200 font-mono font-semibold truncate block mt-0.5">
+                                    {student.email}
+                                  </span>
+                                </div>
+
+                                <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/20">
+                                  <span className="text-slate-500 block font-medium">Approximate IP / Network</span>
+                                  <span className="text-slate-200 font-mono font-semibold block mt-0.5">
+                                    {dev.ipAddress || "India"}
+                                  </span>
+                                </div>
+
+                                <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/20">
+                                  <span className="text-slate-500 block font-medium">Session Registered</span>
+                                  <span className="text-slate-200 font-mono font-semibold block mt-0.5">
+                                    {dev.createdAtFormatted || dev.lastActiveFormatted || "-"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between pt-1">
+                                <span className="text-[11px] text-slate-500">
+                                  Device ID: <span className="font-mono">{dev.deviceId ? dev.deviceId.slice(0, 18) + "..." : "dev_current"}</span>
+                                </span>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (isCurrent) {
+                                      handleLogout();
+                                    } else {
+                                      handleSignOutDevice(dev.id || dev.deviceId);
+                                    }
+                                  }}
+                                  disabled={revokingDeviceId === (dev.id || dev.deviceId)}
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 text-red-400 hover:text-red-300 text-xs font-bold transition cursor-pointer disabled:opacity-50"
+                                >
+                                  <LogOut className="w-3.5 h-3.5" />
+                                  <span>
+                                    {revokingDeviceId === (dev.id || dev.deviceId)
+                                      ? "Signing out..."
+                                      : isCurrent
+                                      ? "Sign out of this device"
+                                      : "Sign out"}
+                                  </span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <p className="text-xs text-slate-400 mt-1 font-mono">
-                          Account: {student.email}
-                        </p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          Last session refresh: {formatDateTime24(new Date())}
-                        </p>
-                      </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Exam Integrity & Security Posture Card */}
+                <div className="p-5 sm:p-6 rounded-2xl border border-cyan-500/20 bg-slate-950/80 space-y-3 mt-6">
+                  <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-cyan-400" />
+                    Exam Integrity & Security Posture
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
+                      <span>Anti-Cheat Proctoring:</span>
+                      <span className="font-bold text-emerald-400">VERIFIED ACTIVE</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
+                      <span>Completed Attempts:</span>
+                      <span className="font-mono font-bold text-white">{completedAttempts.length} Submitted</span>
                     </div>
                   </div>
-
-                  {/* Proctoring & Integrity Details */}
-                  <div className="p-5 rounded-xl border border-cyan-500/20 bg-slate-950/80 space-y-3">
-                    <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-cyan-400" />
-                      Exam Integrity & Security Posture
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
-                        <span>Anti-Cheat Proctoring:</span>
-                        <span className="font-bold text-emerald-400">VERIFIED ACTIVE</span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
-                        <span>Completed Attempts:</span>
-                        <span className="font-mono font-bold text-white">{completedAttempts.length} Submitted</span>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
 
               </div>

@@ -33,6 +33,30 @@ model Student {
   accessRequests TestAccessRequest[]
   upgradeRequests SubscriptionUpgradeRequest[]
   proctoringWarnings ProctoringWarningLog[]
+  sessions           StudentSession[]
+}
+
+model StudentSession {
+  id               String   @id @default(uuid())
+  studentId        String
+  student          Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  deviceId         String
+  sessionTokenHash String?
+  deviceType       String   @default("desktop")
+  deviceName       String   @default("Web Browser")
+  browser          String   @default("Chrome")
+  os               String   @default("PC")
+  ipAddress        String?
+  city             String?
+  country          String?
+  userAgent        String?
+  lastActive       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  isRevoked        Boolean  @default(false)
+
+  @@unique([studentId, deviceId])
+  @@index([studentId])
+  @@index([lastActive])
 }
 
 model AdminUser {
