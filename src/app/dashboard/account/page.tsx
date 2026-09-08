@@ -13,6 +13,8 @@ import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
+import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
+import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 
 function formatDateTime24(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return "-";
@@ -721,6 +723,7 @@ export default function StudentAccountPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans selection:bg-cyan-500 selection:text-black pb-24">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={student} />
+      <GoldUpgradeCelebrationModal student={student} />
 
       {/* 1. TOP NAVBAR (ELECTRIC BLACKISH-BLUE THEME) */}
       <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
@@ -747,6 +750,17 @@ export default function StudentAccountPage() {
 
           {/* Right: Netflix-Style Profile Dropdown Trigger */}
           <div className="relative flex items-center gap-3 shrink-0">
+            {/* Option 3: Golden Status Pill */}
+            {isGold && (
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)]">
+                <span className="text-sm">⭐</span>
+                <span>GOLD MEMBER</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
+            )}
+
+            {/* Option 4: Notification Center Dropdown */}
+            <NotificationCenterDropdown student={student} upgradeReq={upgradeReq} />
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               className="flex items-center gap-1.5 p-1 rounded-xl hover:bg-white/5 transition cursor-pointer group"

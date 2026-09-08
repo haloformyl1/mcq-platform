@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import { autoExpireSubscriptions } from "@/lib/subscription";
+import { sendSubscriptionUpgradeEmail } from "@/lib/email";
 
 export const dynamic = 'force-dynamic';
 
@@ -144,7 +145,8 @@ export async function PATCH(req: Request) {
     }
 
     const upgradeReq = await prisma.subscriptionUpgradeRequest.findUnique({
-      where: { id: requestId }
+      where: { id: requestId },
+      include: { student: true }
     });
 
     if (!upgradeReq) {
@@ -175,6 +177,17 @@ export async function PATCH(req: Request) {
           expiresAt: expiresAt
         }
       });
+
+      // Option 1: Send official activation email to student (non-blocking)
+      if (upgradeReq.student?.email) {
+        sendSubscriptionUpgradeEmail({
+          email: upgradeReq.student.email,
+          name: upgradeReq.student.name,
+          amount: upgradeReq.amount || 199,
+          expiresAt: expiresAt,
+          activeSince: activeSince,
+        }).catch(err => console.error("[Subscription Upgrade] Email error:", err));
+      }
 
       return NextResponse.json({ 
         message: "Subscription upgraded to PAID successfully for 30 days!", 
@@ -250,6 +263,17 @@ export async function POST(req: Request) {
         }
       });
 
+      // Option 1: Send official activation email to student
+      if (matchingReq.student?.email) {
+        sendSubscriptionUpgradeEmail({
+          email: matchingReq.student.email,
+          name: matchingReq.student.name,
+          amount: matchingReq.amount || 199,
+          expiresAt: expiresAt,
+          activeSince: activeSince,
+        }).catch(err => console.error("[Subscription Upgrade] Email error:", err));
+      }
+
       return NextResponse.json({
         success: true,
         message: `Verified! Student ${matchingReq.student.name || matchingReq.student.email} granted 30-Day Premium Pass.`
@@ -261,7 +285,8 @@ export async function POST(req: Request) {
       const cleanList = batchUtrList.map(u => String(u).trim()).filter(Boolean);
 
       const pendingReqs = await prisma.subscriptionUpgradeRequest.findMany({
-        where: { status: "PENDING" }
+        where: { status: "PENDING" },
+        include: { student: true }
       });
 
       let approvedCount = 0;
@@ -288,6 +313,17 @@ export async function POST(req: Request) {
               expiresAt: expiresAt
             }
           });
+
+          // Option 1: Send official activation email to student
+          if (req.student?.email) {
+            sendSubscriptionUpgradeEmail({
+              email: req.student.email,
+              name: req.student.name,
+              amount: req.amount || 199,
+              expiresAt: expiresAt,
+              activeSince: activeSince,
+            }).catch(err => console.error("[Subscription Upgrade] Email error:", err));
+          }
 
           approvedCount++;
         }

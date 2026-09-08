@@ -14,6 +14,8 @@ import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
+import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
+import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -101,6 +103,7 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex flex-col items-center justify-center p-4">
         <AdminPreviewBanner />
         <SubscriptionExpiredModal student={data?.student} />
+      <GoldUpgradeCelebrationModal student={data?.student} />
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-xl font-bold mb-4">Unable to load dashboard</h2>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#262626] rounded-md hover:bg-[#333333]">Retry</button>
@@ -321,6 +324,22 @@ export default function StudentDashboard() {
             {/* Right Group: Curriculum Switcher + Account Profile + Logout */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
+              {/* Option 3: Golden Status Pill */}
+              {student.subscriptionStatus === "PAID" && (
+                <Link
+                  href="/dashboard/account"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-105 transition-all"
+                  title="Gold Membership Active - 30-Day Pass"
+                >
+                  <span className="text-sm">⭐</span>
+                  <span>GOLD MEMBER</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                </Link>
+              )}
+
+              {/* Option 4: Notification Center Dropdown */}
+              <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
+              
               {/* Sleek Curriculum Selector Pill */}
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#061421]/90 border border-cyan-500/30 text-xs shadow-inner">
                 <BookOpen className="w-3.5 h-3.5 text-cyan-400 hidden sm:block shrink-0" />
@@ -527,6 +546,13 @@ export default function StudentDashboard() {
                   <ShieldCheck className="w-3 h-3" />
                   AI Proctored
                 </span>
+
+                {student.subscriptionStatus === "PAID" && (
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500/30 to-yellow-500/20 text-amber-300 border border-amber-500/50 flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.25)]">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    Gold Pass Active • Unlimited Attempts
+                  </span>
+                )}
               </div>
 
               {/* Big Stylized Title (Image 2 Netflix billboard title) */}
