@@ -515,6 +515,25 @@ export default function StudentAccountPage() {
     ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : "Never (Lifetime Pass)";
 
+  const isLifetime = isGold && !student.subscriptionExpiresAt;
+  const is30Day = isGold && !!student.subscriptionExpiresAt;
+
+  const rawPayerUpi = (upgradeReq?.utrNumber && upgradeReq.utrNumber.includes("@"))
+    ? upgradeReq.utrNumber
+    : (paymentSettings?.upiId || "arg9830@axl");
+
+  const displayUpiId = (() => {
+    if (rawPayerUpi.includes("@")) {
+      const [user, domain] = rawPayerUpi.split("@");
+      return `${user.slice(0, 1)}•••@${domain}`;
+    }
+    return rawPayerUpi;
+  })();
+
+  const isPhonePe = rawPayerUpi.toLowerCase().endsWith("@ybl") || 
+                    rawPayerUpi.toLowerCase().endsWith("@ibl") || 
+                    rawPayerUpi.toLowerCase().endsWith("@axl");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans selection:bg-cyan-500 selection:text-black pb-24">
       <AdminPreviewBanner />
@@ -712,40 +731,39 @@ export default function StudentAccountPage() {
                       {isGold ? "Premium plan" : "Basic Student Plan"}
                     </h2>
                     <p className="text-xs sm:text-sm font-semibold text-cyan-400">
-                      {isGold 
-                        ? (student.subscriptionExpiresAt ? "Active 30-Day Gold Membership" : "Lifetime Unlimited Pass")
-                        : "Free Tier / Practice Account"}
+                      {!isGold
+                        ? "Free Tier"
+                        : is30Day
+                        ? "30-Day Premium Access"
+                        : "Lifetime Premium Access"}
                     </p>
                   </div>
 
-                  {/* Payment / Renewal Info */}
-                  <div className="pt-3 text-sm text-slate-300 font-medium space-y-2">
-                    <p>
-                      {isGold ? (
-                        <>
-                          <span className="text-slate-400">First payment / Next renewal: </span>
-                          <span className="font-bold text-amber-300 font-mono">{nextPaymentFormatted}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-slate-400">Status: </span>
-                          <span className="font-bold text-cyan-300">Upgrade anytime for unlimited test series & proctored analytics</span>
-                        </>
-                      )}
-                    </p>
+                  {/* Payment / Renewal Info - Only for 30-Day Premium Access */}
+                  {is30Day && (
+                    <div className="pt-2 text-sm text-slate-300 font-medium space-y-2">
+                      <p>
+                        <span className="text-slate-400">Next renewal: </span>
+                        <span className="font-bold text-amber-300 font-mono">{nextPaymentFormatted}</span>
+                      </p>
 
-                    {/* Payment Handle Pill (UPI / Card) */}
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#061421] border border-cyan-500/40 text-xs font-mono font-medium text-slate-200">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        <span className="font-bold text-cyan-400">UPI</span>
-                        <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
+                      {/* Netflix-style UPI handle without payee name */}
+                      <div className="flex items-center gap-2 pt-0.5">
+                        {isPhonePe ? (
+                          <div className="w-5 h-5 rounded bg-[#5f259f] flex items-center justify-center text-white text-[11px] font-bold shadow-sm select-none shrink-0">
+                            पे
+                          </div>
+                        ) : (
+                          <div className="px-1.5 py-0.5 rounded bg-[#061421] border border-cyan-500/30 text-[10px] font-bold text-cyan-400 font-mono shrink-0">
+                            UPI
+                          </div>
+                        )}
+                        <span className="text-xs sm:text-sm font-medium text-slate-200 font-mono">
+                          {displayUpiId}
+                        </span>
                       </div>
-                      <span className="text-xs text-slate-400 font-mono">
-                        Payee: {paymentSettings?.payeeName || "Arghyadeep Roy"} (₹{paymentSettings?.monthlyFee || 199}/mo)
-                      </span>
                     </div>
-                  </div>
+                  )}
 
                   {/* Divider & Manage Membership Link Row */}
                   <div className="pt-5 mt-5 border-t border-cyan-500/15 flex items-center justify-between">
