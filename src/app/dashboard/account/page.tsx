@@ -57,9 +57,11 @@ export default function StudentAccountPage() {
 
   // Upgrade Request State
   const [upgradeReq, setUpgradeReq] = useState<any>(null);
-  const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 });
+  const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
+  const [studentUpiId, setStudentUpiId] = useState("");
+  const [paymentStep, setPaymentStep] = useState<"input" | "waiting">("input");
   const [utrNumber, setUtrNumber] = useState("");
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
@@ -138,8 +140,13 @@ export default function StudentAccountPage() {
       });
   }, [router]);
   const handleSendUpgradeRequest = async () => {
-    if (!utrNumber.trim()) {
-      setUpgradeMsg({ type: "error", text: "Please enter your 12-digit UTR / Payment Reference Number." });
+    const trimmedUpi = studentUpiId.trim();
+    if (!trimmedUpi) {
+      setUpgradeMsg({ type: "error", text: "Please enter the UPI ID from which you will initiate the payment." });
+      return;
+    }
+    if (!trimmedUpi.includes("@") || trimmedUpi.startsWith("@") || trimmedUpi.endsWith("@")) {
+      setUpgradeMsg({ type: "error", text: "Please enter a valid UPI ID format (e.g. username@okhdfcbank or 9830507435@upi)." });
       return;
     }
     setRequestingUpgrade(true);
@@ -149,18 +156,22 @@ export default function StudentAccountPage() {
       const res = await fetch("/api/student/upgrade-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ utrNumber: utrNumber.trim(), amount: paymentSettings?.monthlyFee || 99.0 })
+        body: JSON.stringify({ 
+          studentUpiId: trimmedUpi, 
+          amount: paymentSettings?.monthlyFee || 199.0 
+        })
       });
       const resData = await res.json();
 
       if (res.ok) {
-        setUpgradeMsg({ type: "success", text: resData.message });
+        setUpgradeMsg({ type: "success", text: resData.message || "Payment request sent successfully!" });
         setUpgradeReq(resData.request);
+        setPaymentStep("waiting");
       } else {
-        setUpgradeMsg({ type: "error", text: resData.error || "Failed to send request." });
+        setUpgradeMsg({ type: "error", text: resData.error || "Failed to initiate payment request." });
       }
     } catch (err) {
-      setUpgradeMsg({ type: "error", text: "Network error sending upgrade request." });
+      setUpgradeMsg({ type: "error", text: "Network error initiating payment request." });
     } finally {
       setRequestingUpgrade(false);
     }
@@ -608,7 +619,7 @@ export default function StudentAccountPage() {
                         <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
                       </div>
                       <span className="text-xs text-slate-400 font-mono">
-                        Payee: {paymentSettings?.payeeName || "Arghyadeep Roy"} (₹{paymentSettings?.monthlyFee || 99}/mo)
+                        Payee: {paymentSettings?.payeeName || "Arghyadeep Roy"} (₹{paymentSettings?.monthlyFee || 199}/mo)
                       </span>
                     </div>
                   </div>
@@ -816,7 +827,7 @@ export default function StudentAccountPage() {
                     <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <span className="text-slate-400 block">Monthly Rate</span>
                       <span className="text-lg font-black text-emerald-400 font-mono mt-0.5 block">
-                        ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-slate-400">/ 30 Days</span>
+                        ₹{paymentSettings?.monthlyFee || 199} <span className="text-xs font-normal text-slate-400">/ 30 Days</span>
                       </span>
                     </div>
 
@@ -1333,8 +1344,8 @@ export default function StudentAccountPage() {
       </main>
       {/* 3. INSTANT UPI QR CODE MODAL (ELECTRIC BLACKISH BLUE THEME) */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.25)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="p-6 sm:p-7 border-b border-cyan-500/20 flex items-center justify-between bg-[#061421]/90">
@@ -1344,12 +1355,16 @@ export default function StudentAccountPage() {
                   <span>Instant UPI Activation</span>
                 </div>
                 <h3 className="text-xl font-black text-white tracking-tight">
-                  Scan QR to Pay with any UPI App
+                  Pay with UPI ID
                 </h3>
               </div>
 
               <button
-                onClick={() => setShowPaymentModal(false)}
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setPaymentStep("input");
+                  setUpgradeMsg(null);
+                }}
                 className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
                 title="Close"
               >
@@ -1358,106 +1373,181 @@ export default function StudentAccountPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              
-              {/* QR Code Column */}
-              <div className="flex flex-col items-center justify-center text-center space-y-4">
-                <div className="relative group">
-                  <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-500 via-blue-500 to-teal-400 opacity-30 blur-lg group-hover:opacity-60 transition duration-500" />
-                  <div className="relative p-4 sm:p-5 bg-white rounded-2xl shadow-2xl inline-block">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${paymentSettings?.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
-                      alt="UPI Payment QR Code"
-                      className="w-44 h-44 sm:w-48 sm:h-48 mx-auto object-contain"
-                    />
+            <div className="p-6 sm:p-7 space-y-5">
+
+              {/* Plan & Pricing Box */}
+              <div className="bg-slate-950/90 border border-cyan-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 uppercase tracking-wider mb-1">
+                      <Sparkles className="w-3 h-3 text-amber-400" /> Gold Membership
+                    </div>
+                    <h4 className="text-base font-black text-white">30 Days All-Access Pass</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      All 50+ Chemistry Exams, 3D Molecular Models, Full Solutions & Proctored Analytics
+                    </p>
                   </div>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-xs font-semibold text-slate-400 block">Monthly Subscription</span>
-                  <span className="text-2xl font-black text-emerald-400 font-mono">
-                    ₹{paymentSettings?.monthlyFee || 99} <span className="text-xs font-normal text-slate-400">/ 30 Days</span>
-                  </span>
-                </div>
-
-                {/* Copy UPI ID */}
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/90 border border-cyan-500/40 text-xs font-mono text-cyan-300">
-                  <span>{paymentSettings?.upiId || "9830507435@upi"}</span>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(paymentSettings?.upiId || "9830507435@upi");
-                      setCopiedUpi(true);
-                      setTimeout(() => setCopiedUpi(false), 2000);
-                    }}
-                    className="text-slate-400 hover:text-white cursor-pointer"
-                    title="Copy UPI ID"
-                  >
-                    {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
+                  <div className="text-right shrink-0">
+                    <span className="text-2xl font-black text-emerald-400 font-mono">
+                      ₹{paymentSettings?.monthlyFee || 199}
+                    </span>
+                    <span className="text-[11px] text-slate-400 block font-normal">/ 30 Days</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Step 2 Column: Enter UTR */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <h4 className="text-sm font-bold text-white">
-                    Step 2: Submit 12-Digit UTR
-                  </h4>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    After scanning and completing the transaction in GPay, PhonePe, Paytm, or BHIM, enter your 12-digit UTR reference number below.
-                  </p>
-                </div>
+              {/* State: INPUT STEP */}
+              {paymentStep === "input" && (
+                <div className="space-y-4">
+                  
+                  {/* Explicit Mandatory Requirement Instruction */}
+                  <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex items-start gap-3">
+                    <div className="p-1.5 rounded-xl bg-cyan-500/20 text-cyan-400 shrink-0 mt-0.5">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-xs font-bold text-cyan-200">
+                        Please enter the UPI ID using which you will initiate the payment.
+                      </p>
+                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                        A payment request of ₹{paymentSettings?.monthlyFee || 199} will be sent to this UPI ID on your UPI app (Google Pay, PhonePe, Paytm, or BHIM).
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-                    12-Digit UTR / Ref No:
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={utrNumber}
-                      onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9A-Za-z]/g, ""))}
-                      placeholder="e.g. 423456789012"
-                      maxLength={18}
-                      className="w-full bg-slate-950/90 text-white border border-cyan-500/40 focus:border-cyan-400 rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wider outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                    />
-                    {utrNumber.length >= 12 && (
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" /> Valid Format
-                      </span>
-                    )}
+                  {/* UPI ID Input Field */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                      <span>Your UPI ID (VPA):</span>
+                      <span className="text-[11px] font-normal text-slate-400 font-mono">e.g. mobile@upi or name@oksbi</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={studentUpiId}
+                        onChange={(e) => {
+                          setStudentUpiId(e.target.value.trim().toLowerCase());
+                          if (upgradeMsg) setUpgradeMsg(null);
+                        }}
+                        placeholder="Enter your UPI ID (e.g. 9830507435@upi)"
+                        className="w-full bg-slate-950/90 text-white border border-cyan-500/40 focus:border-cyan-400 rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wide outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                      />
+                      {studentUpiId.includes("@") && studentUpiId.split("@")[1]?.length > 1 && (
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4" /> Valid Format
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Quick Handle Completion Pills */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      <span className="text-[11px] text-slate-500 font-medium">Quick handle:</span>
+                      {["@oksbi", "@okaxis", "@okhdfcbank", "@paytm", "@ybl", "@upi"].map((handle) => (
+                        <button
+                          key={handle}
+                          type="button"
+                          onClick={() => {
+                            const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
+                            setStudentUpiId((base || "") + handle);
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 text-[11px] font-mono hover:bg-cyan-900/60 hover:border-cyan-400 transition cursor-pointer"
+                        >
+                          {handle}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {upgradeMsg && (
+                    <div className={"p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border " + (
+                      upgradeMsg.type === "success"
+                        ? "bg-green-950/80 border-green-600/60 text-green-300"
+                        : "bg-red-950/80 border-red-600/60 text-red-300"
+                    )}>
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{upgradeMsg.text}</span>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleSendUpgradeRequest}
+                    disabled={requestingUpgrade || !studentUpiId.trim()}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition hover:brightness-110 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {requestingUpgrade ? "Sending Payment Request..." : ("SEND PAYMENT REQUEST (₹" + (paymentSettings?.monthlyFee || 199) + ")")}
+                  </button>
+
+                  <div className="text-[11px] text-slate-400 text-center space-y-1 pt-1">
+                    <p>
+                      0% Convenience Fees • Verified UPI Merchant • Instant Gold Pass Activation
+                    </p>
                   </div>
                 </div>
+              )}
 
-                {upgradeMsg && (
-                  <div className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border ${
-                    upgradeMsg.type === "success"
-                      ? "bg-green-950/80 border-green-600/60 text-green-300"
-                      : "bg-red-950/80 border-red-600/60 text-red-300"
-                  }`}>
-                    <span>{upgradeMsg.text}</span>
+              {/* State: WAITING / SENT STEP */}
+              {paymentStep === "waiting" && (
+                <div className="space-y-5 text-center py-2 animate-in fade-in duration-300">
+                  
+                  {/* Radar / Pulsing animation */}
+                  <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+                    <span className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping duration-1000" />
+                    <span className="absolute inset-2 rounded-full bg-cyan-500/30 animate-pulse" />
+                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.6)]">
+                      <Sparkles className="w-7 h-7 text-slate-950" />
+                    </div>
                   </div>
-                )}
 
-                <button
-                  onClick={async () => {
-                    await handleSendUpgradeRequest();
-                    if (utrNumber.trim()) {
-                      setTimeout(() => setShowPaymentModal(false), 2000);
-                    }
-                  }}
-                  disabled={requestingUpgrade || !utrNumber.trim()}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {requestingUpgrade ? "Verifying Transaction..." : "SUBMIT PAYMENT FOR ACTIVATION"}
-                </button>
+                  <div className="space-y-1.5">
+                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Payment Request Initiated</span>
+                    </div>
+                    <h4 className="text-lg font-black text-white">
+                      Request Sent to <span className="text-cyan-400 font-mono">{studentUpiId}</span>
+                    </h4>
+                    <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+                      Please open <strong>Google Pay, PhonePe, Paytm, or BHIM</strong> on your mobile device. You will find a payment notification/request of <strong>₹{paymentSettings?.monthlyFee || 199}</strong>. Enter your UPI PIN to approve.
+                    </p>
+                  </div>
 
-                <div className="pt-2 text-[11px] text-slate-400 text-center">
-                  <span>Assistance / Issues? Call Arghyadeep Roy: </span>
-                  <a href="tel:9830507435" className="font-mono font-bold text-cyan-400 hover:underline">
-                    9830507435
-                  </a>
+                  {/* Direct One-Click Pay Link for Mobile Students */}
+                  <div className="pt-2 space-y-2.5">
+                    <a
+                      href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=PIECHEM%20Gold%20Pass"}
+                      className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>Open UPI App on This Device (₹{paymentSettings?.monthlyFee || 199})</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setPaymentStep("input")}
+                      className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
+                    >
+                      Wrong UPI ID? Click here to enter a different UPI ID
+                    </button>
+                  </div>
+
+                  {/* Live Status indicator */}
+                  <div className="p-3 bg-slate-950/80 border border-cyan-500/20 rounded-xl flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">Status:</span>
+                    <span className="text-amber-300 font-bold flex items-center gap-1.5 font-mono">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" /> Awaiting Payment Approval
+                    </span>
+                  </div>
+
                 </div>
+              )}
+
+              {/* Support Contact */}
+              <div className="pt-2 text-[11px] text-slate-400 text-center border-t border-cyan-500/15">
+                <span>Assistance or query? Contact Arghyadeep Roy: </span>
+                <a href="tel:9830507435" className="font-mono font-bold text-cyan-400 hover:underline">
+                  9830507435
+                </a>
               </div>
 
             </div>

@@ -14,24 +14,18 @@ export async function POST(req: Request) {
     }
 
     const studentId = payload.id as string;
+    const body = await req.json().catch(() => ({}));
+    const { utrNumber, studentUpiId, amount } = body;
+    const cleanUpi = studentUpiId ? String(studentUpiId).trim() : null;
+    const cleanUtr = utrNumber ? String(utrNumber).trim() : null;
+    const identifier = cleanUpi || cleanUtr;
 
-    // Check if there is already a PENDING request
-    const existingPending = await prisma.subscriptionUpgradeRequest.findFirst({
-      where: { studentId, status: "PENDING" }
-    });
-
-    if (existingPending) {
-      return NextResponse.json({ 
-        message: "Your subscription upgrade request is already pending admin review.",
-        request: existingPending 
-      });
+    if (!identifier) {
+      return NextResponse.json({ error: "Please enter a valid UPI ID." }, { status: 400 });
     }
 
-    const { utrNumber, amount } = await req.json().catch(() => ({}));
-    const cleanUtr = utrNumber ? String(utrNumber).trim() : null;
-
-    if (cleanUtr) {
-      // Anti-Fraud check: Prevent re-using already approved UTR
+    // Anti-Fraud check: Prevent re-using already approved UTR (only for 12-digit numeric bank UTR)
+    if (cleanUtr && /^\d{12}$/.test(cleanUtr)) {
       const existingApproved = await prisma.subscriptionUpgradeRequest.findFirst({
         where: {
           utrNumber: { equals: cleanUtr, mode: "insensitive" },
@@ -41,22 +35,45 @@ export async function POST(req: Request) {
 
       if (existingApproved) {
         return NextResponse.json({
-          error: `This UTR Ref Number (${cleanUtr}) has already been used and approved for another subscription. Fraudulent re-use is blocked.`
+          error: "This UTR Ref Number (" + cleanUtr + ") has already been used and approved for another subscription. Fraudulent re-use is blocked."
         }, { status: 400 });
       }
+    }
+
+    const finalAmount = parseFloat(amount) || 199.0;
+
+    // Check if there is already a PENDING request - update it if so, to allow student to adjust/retry
+    const existingPending = await prisma.subscriptionUpgradeRequest.findFirst({
+      where: { studentId, status: "PENDING" }
+    });
+
+    if (existingPending) {
+      const updated = await prisma.subscriptionUpgradeRequest.update({
+        where: { id: existingPending.id },
+        data: {
+          utrNumber: identifier,
+          note: cleanUpi ? "Payer UPI ID: " + cleanUpi : existingPending.note,
+          amount: finalAmount
+        }
+      });
+      return NextResponse.json({
+        message: "Payment request updated successfully!",
+        request: updated
+      });
     }
 
     const newRequest = await prisma.subscriptionUpgradeRequest.create({
       data: {
         studentId,
-        utrNumber: cleanUtr,
-        amount: parseFloat(amount) || 99.0,
+        utrNumber: identifier,
+        note: cleanUpi ? "Payer UPI ID: " + cleanUpi : null,
+        amount: finalAmount,
         status: "PENDING"
       }
     });
 
     return NextResponse.json({
-      message: "Upgrade request sent to admin successfully!",
+      message: "Payment request initiated successfully!",
       request: newRequest
     });
   } catch (error) {
@@ -85,7 +102,7 @@ export async function GET(req: Request) {
     let paymentSettings = await prisma.paymentSetting.findUnique({ where: { id: "default" } });
     if (!paymentSettings) {
       paymentSettings = await prisma.paymentSetting.create({
-        data: { id: "default", upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 }
+        data: { id: "default", upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 }
       });
     }
 
