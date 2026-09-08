@@ -8,7 +8,7 @@ import {
   BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, 
   LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, 
   Download, ExternalLink, FolderOpen, Clock, User, Play, Info, Sparkles, 
-  Flame, ShieldCheck, CheckCircle2, Award, Bell, Phone
+  Flame, ShieldCheck, CheckCircle2, Award, Bell, Phone, X, Check
 } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -26,6 +26,7 @@ export default function StudentDashboard() {
   const router = useRouter();
   const [updatingCurriculum, setUpdatingCurriculum] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "tests" | "materials" | "leaderboard" | "performance">("overview");
+  const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -326,11 +327,9 @@ export default function StudentDashboard() {
               </nav>
             </div>
 
-            {/* Right Group: Curriculum Switcher + Account Profile + Logout */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              
-
-
+            {/* Right Group: Curriculum Switcher + Account Profile */}
+            {/* Desktop Right Group (UNTOUCHED: Exactly as before) */}
+            <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0">
               {/* Option 4: Notification Center Dropdown */}
               <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
               
@@ -404,10 +403,206 @@ export default function StudentDashboard() {
                 </div>
                 <span className="hidden sm:inline">{studentName.split(' ')[0]}</span>
               </Link>
+            </div>
 
+            {/* Mobile Right Group: Netflix Image 2 Style Curriculum Button + Bell + Avatar (Zero Clipping) */}
+            <div className="flex md:hidden items-center gap-1.5 shrink-0">
+              {/* Option 4: Notification Center Dropdown */}
+              <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
 
+              {/* Netflix Image 2 Style Curriculum Trigger Button */}
+              <button
+                type="button"
+                onClick={() => setMobileCurriculumOpen(prev => !prev)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-black/85 hover:bg-black border border-white/25 active:border-cyan-400 text-white font-bold text-xs shadow-md transition active:scale-95 shrink-0"
+                aria-label="Select Curriculum"
+              >
+                <span className="text-cyan-300 font-extrabold text-[11px] tracking-tight">
+                  {student.board || 'CBSE'}
+                </span>
+                <span className="text-slate-500 text-[10px]">•</span>
+                <span className="text-teal-300 font-extrabold text-[11px] tracking-tight">
+                  {student.board === 'WBCHSE' ? (student.academicLevel || 'SEM-I') : `Cl ${student.academicLevel || '11'}`}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 ${mobileCurriculumOpen ? 'rotate-180 text-cyan-400' : ''}`} />
+              </button>
+
+              {/* Mobile Profile Avatar */}
+              <Link 
+                href="/dashboard/account"
+                className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-tr from-cyan-950 to-blue-900 border border-cyan-500/50 flex items-center justify-center shrink-0 shadow-sm active:scale-95 hover:border-cyan-400 transition"
+                title="My Account"
+              >
+                <img
+                  src={student.avatarUrl || "/avatars/atom.jpg"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  onError={(e: any) => { e.target.style.display = 'none'; }}
+                />
+                <User className="w-4 h-4 text-cyan-300" />
+              </Link>
             </div>
           </div>
+
+          {/* Netflix Image 2 Window Overlay (Mobile Browser Only) */}
+          {mobileCurriculumOpen && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200"
+                onClick={() => setMobileCurriculumOpen(false)}
+              />
+
+              {/* Netflix Menu Window */}
+              <div className="absolute top-full left-2 right-2 mt-1.5 z-50 bg-[#040a14]/98 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden md:hidden animate-in fade-in zoom-in-95 duration-150">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-black tracking-wider uppercase text-white">
+                      Curriculum & Browse
+                    </span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setMobileCurriculumOpen(false)}
+                    className="text-slate-400 hover:text-white p-1 rounded-md transition"
+                    aria-label="Close menu"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Columns Grid (Netflix Image 2 3-Column Layout) */}
+                <div className="p-3.5 grid grid-cols-3 gap-2.5 text-xs max-h-[65vh] overflow-y-auto">
+                  
+                  {/* Column 1: WBCHSE Semesters */}
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400 pb-1 border-b border-cyan-500/20 mb-1.5">
+                      WBCHSE
+                    </div>
+                    {[
+                      { level: 'SEM-I', label: 'SEM-I' },
+                      { level: 'SEM-II', label: 'SEM-II' },
+                      { level: 'SEM-III', label: 'SEM-III' },
+                      { level: 'SEM-IV', label: 'SEM-IV' }
+                    ].map((item) => {
+                      const isSelected = student.board === 'WBCHSE' && (student.academicLevel || 'SEM-I') === item.level;
+                      return (
+                        <button
+                          key={item.level}
+                          type="button"
+                          disabled={updatingCurriculum}
+                          onClick={async () => {
+                            setMobileCurriculumOpen(false);
+                            if (!isSelected) {
+                              await handleCurriculumChange('WBCHSE', item.level);
+                            }
+                          }}
+                          className={`w-full text-left px-2 py-1.5 rounded text-[11px] font-bold transition flex items-center justify-between ${
+                            isSelected 
+                              ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 shadow-sm' 
+                              : 'text-slate-300 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <span>{item.label}</span>
+                          {isSelected && <Check className="w-3 h-3 text-cyan-400 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Column 2: CBSE & ICSE */}
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-teal-400 pb-1 border-b border-teal-500/20 mb-1.5">
+                      CBSE / ICSE
+                    </div>
+                    {[
+                      { board: 'CBSE', level: '11', label: 'CBSE 11' },
+                      { board: 'CBSE', level: '12', label: 'CBSE 12' },
+                      { board: 'ICSE', level: '11', label: 'ICSE 11' },
+                      { board: 'ICSE', level: '12', label: 'ICSE 12' }
+                    ].map((item) => {
+                      const isSelected = student.board === item.board && (student.academicLevel || '11') === item.level;
+                      return (
+                        <button
+                          key={`${item.board}-${item.level}`}
+                          type="button"
+                          disabled={updatingCurriculum}
+                          onClick={async () => {
+                            setMobileCurriculumOpen(false);
+                            if (!isSelected) {
+                              await handleCurriculumChange(item.board, item.level);
+                            }
+                          }}
+                          className={`w-full text-left px-2 py-1.5 rounded text-[11px] font-bold transition flex items-center justify-between ${
+                            isSelected 
+                              ? 'bg-teal-500/25 text-teal-300 border border-teal-500/40 shadow-sm' 
+                              : 'text-slate-300 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <span className="truncate">{item.label}</span>
+                          {isSelected && <Check className="w-3 h-3 text-teal-400 shrink-0 ml-0.5" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Column 3: Navigation Sections */}
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 pb-1 border-b border-white/10 mb-1.5">
+                      Sections
+                    </div>
+                    {[
+                      { id: 'overview', label: 'Overview' },
+                      { id: 'tests', label: 'Tests' },
+                      { id: 'materials', label: '3D Notes' },
+                      { id: 'leaderboard', label: 'Ranks' },
+                      { id: 'performance', label: 'Tracker' }
+                    ].map((item) => {
+                      const isSelected = activeTab === item.id;
+                      return (
+                        <a
+                          key={item.id}
+                          href={`#${item.id}`}
+                          onClick={() => {
+                            setActiveTab(item.id as any);
+                            setMobileCurriculumOpen(false);
+                          }}
+                          className={`w-full block text-left px-2 py-1.5 rounded text-[11px] font-medium transition ${
+                            isSelected 
+                              ? 'bg-white/20 text-white font-bold border border-white/30 shadow-sm' 
+                              : 'text-slate-300 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <span>{item.label}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+
+                </div>
+
+                {/* Footer */}
+                <div className="px-4 py-2.5 bg-black/60 border-t border-white/10 flex items-center justify-between text-[10px]">
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Curriculum: <strong className="text-cyan-300">{student.board} • {student.academicLevel}</strong></span>
+                  </div>
+                  <Link 
+                    href="/dashboard/account"
+                    onClick={() => setMobileCurriculumOpen(false)}
+                    className="text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1"
+                  >
+                    <span>My Profile</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </Link>
+                </div>
+
+              </div>
+            </>
+          )}
 
           {/* Mobile / Tablet Dedicated Navigation Rail (Zero Scrollbar) */}
           <div className="lg:hidden w-full pt-2 mt-2 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-2 px-1 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
