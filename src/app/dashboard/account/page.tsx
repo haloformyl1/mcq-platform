@@ -1,13 +1,13 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   Copy, Check, X, User, Mail, Phone, ShieldCheck, 
   ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
   Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
-  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag
+  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag, History
 } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -54,8 +54,83 @@ export default function StudentAccountPage() {
     "overview", "membership", "security", "devices", "profiles", "change-plan"
   ];
 
+  const lastBaseTabRef = useRef<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan">("overview");
+
+  type ModalType = "pay" | "promo" | "billing-history" | "plan-status" | "payment-done";
+
+  const closeAllModals = () => {
+    setShowPaymentModal(false);
+    setShowPromoModal(false);
+    setShowHistoryModal(false);
+    setShowHighestPlanModal(false);
+    setShowPaymentDoneDialog(false);
+    setPaymentStep("input");
+    setUpgradeMsg(null);
+  };
+
+  const openModal = (modalName: ModalType) => {
+    if (typeof window !== "undefined") {
+      const targetHash = `#${modalName}`;
+      if (window.location.hash !== targetHash) {
+        window.history.pushState({ modal: modalName, fromTab: activeTab }, "", `${window.location.pathname}${targetHash}`);
+      }
+    }
+    if (modalName === "pay") {
+      setShowPaymentModal(true);
+      setShowPromoModal(false);
+      setShowHistoryModal(false);
+      setShowHighestPlanModal(false);
+      setShowPaymentDoneDialog(false);
+      fetchUpgradeRequest();
+    } else if (modalName === "promo") {
+      setShowPromoModal(true);
+      setShowPaymentModal(false);
+      setShowHistoryModal(false);
+      setShowHighestPlanModal(false);
+      setShowPaymentDoneDialog(false);
+    } else if (modalName === "billing-history") {
+      setShowHistoryModal(true);
+      setShowPaymentModal(false);
+      setShowPromoModal(false);
+      setShowHighestPlanModal(false);
+      setShowPaymentDoneDialog(false);
+    } else if (modalName === "plan-status") {
+      setShowHighestPlanModal(true);
+      setShowPaymentModal(false);
+      setShowPromoModal(false);
+      setShowHistoryModal(false);
+      setShowPaymentDoneDialog(false);
+    } else if (modalName === "payment-done") {
+      setShowPaymentDoneDialog(true);
+    }
+  };
+
+  const handleCloseModal = (fallbackTab?: "overview" | "membership" | "security" | "devices" | "profiles" | "change-plan") => {
+    if (typeof window !== "undefined") {
+      const currentHash = window.location.hash.replace(/^#/, "").toLowerCase();
+      const modalHashes = ["pay", "renew", "promo", "redeem-promo", "billing-history", "history", "plan-status", "highest-plan", "payment-done"];
+      if (modalHashes.includes(currentHash)) {
+        if (window.history.length > 1) {
+          window.history.back();
+          setTimeout(() => {
+            const checkHash = window.location.hash.replace(/^#/, "").toLowerCase();
+            if (modalHashes.includes(checkHash)) {
+              closeAllModals();
+              navigateToTab(fallbackTab || lastBaseTabRef.current || "overview", true);
+            }
+          }, 150);
+          return;
+        }
+      }
+    }
+    closeAllModals();
+    navigateToTab(fallbackTab || lastBaseTabRef.current || "overview", true);
+  };
+
   const navigateToTab = (tab: "overview" | "membership" | "security" | "devices" | "profiles" | "change-plan", replace = false) => {
     setActiveTab(tab);
+    lastBaseTabRef.current = tab;
+    closeAllModals();
     if (typeof window !== "undefined") {
       const targetHash = tab === "overview" ? "" : `#${tab}`;
       const targetUrl = targetHash ? `${window.location.pathname}${targetHash}` : window.location.pathname;
@@ -174,16 +249,68 @@ export default function StudentAccountPage() {
       if (typeof window === "undefined") return;
       const rawHash = window.location.hash.replace(/^#/, "").toLowerCase();
 
-      if (rawHash === "renew") {
+      if (rawHash === "pay" || rawHash === "renew") {
         setShowPaymentModal(true);
-        setActiveTab("membership");
+        setShowPromoModal(false);
+        setShowHistoryModal(false);
+        setShowHighestPlanModal(false);
+        setShowPaymentDoneDialog(false);
+        if (rawHash === "renew") {
+          setActiveTab("membership");
+          lastBaseTabRef.current = "membership";
+        }
         return;
       }
 
+      if (rawHash === "payment-done") {
+        setShowPaymentDoneDialog(true);
+        setShowPromoModal(false);
+        setShowHistoryModal(false);
+        setShowHighestPlanModal(false);
+        return;
+      }
+
+      if (rawHash === "promo" || rawHash === "redeem-promo") {
+        setShowPromoModal(true);
+        setShowPaymentModal(false);
+        setShowHistoryModal(false);
+        setShowHighestPlanModal(false);
+        setShowPaymentDoneDialog(false);
+        return;
+      }
+
+      if (rawHash === "billing-history" || rawHash === "history") {
+        setShowHistoryModal(true);
+        setShowPaymentModal(false);
+        setShowPromoModal(false);
+        setShowHighestPlanModal(false);
+        setShowPaymentDoneDialog(false);
+        return;
+      }
+
+      if (rawHash === "plan-status" || rawHash === "highest-plan") {
+        setShowHighestPlanModal(true);
+        setShowPaymentModal(false);
+        setShowPromoModal(false);
+        setShowHistoryModal(false);
+        setShowPaymentDoneDialog(false);
+        return;
+      }
+
+      // Base tab navigation: Close all modals and show active tab
+      setShowPaymentModal(false);
+      setShowPromoModal(false);
+      setShowHistoryModal(false);
+      setShowHighestPlanModal(false);
+      setShowPaymentDoneDialog(false);
+      setPaymentStep("input");
+
       if (validTabs.includes(rawHash as any)) {
         setActiveTab(rawHash as any);
+        lastBaseTabRef.current = rawHash as any;
       } else {
         setActiveTab("overview");
+        lastBaseTabRef.current = "overview";
       }
     };
 
@@ -536,7 +663,7 @@ export default function StudentAccountPage() {
 
   const handleChangePlanClick = () => {
     if (isAtHighestPlan) {
-      setShowHighestPlanModal(true);
+      openModal("plan-status");
     } else {
       navigateToTab("change-plan");
     }
@@ -1032,7 +1159,7 @@ export default function StudentAccountPage() {
                       onClick={() => {
                         setPromoMsg(null);
                         setPromoCodeInput("");
-                        setShowPromoModal(true);
+                        openModal("promo");
                       }}
                       className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
                     >
@@ -1044,7 +1171,7 @@ export default function StudentAccountPage() {
 
                     {/* View Payment History Link */}
                     <button
-                      onClick={() => setShowHistoryModal(true)}
+                      onClick={() => openModal("billing-history")}
                       className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
                     >
                       <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
@@ -1781,8 +1908,7 @@ export default function StudentAccountPage() {
                       {!isGold ? (
                         <button
                           onClick={() => {
-                            setShowPaymentModal(true);
-                            fetchUpgradeRequest();
+                            openModal("pay");
                           }}
                           className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
                         >
@@ -1812,7 +1938,7 @@ export default function StudentAccountPage() {
                       onClick={() => {
                         setPromoMsg(null);
                         setPromoCodeInput("");
-                        setShowPromoModal(true);
+                        openModal("promo");
                       }}
                       className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
                     >
@@ -1838,9 +1964,7 @@ export default function StudentAccountPage() {
                   if (paymentStep === "waiting" || paymentStep === "notice") {
                     setPaymentStep("input");
                   } else {
-                    setShowPaymentModal(false);
-                    setPaymentStep("input");
-                    setUpgradeMsg(null);
+                    handleCloseModal("change-plan");
                   }
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/20 text-white text-xs font-bold transition cursor-pointer"
@@ -1862,9 +1986,7 @@ export default function StudentAccountPage() {
             <button
               type="button"
               onClick={() => {
-                setShowPaymentModal(false);
-                setPaymentStep("input");
-                setUpgradeMsg(null);
+                handleCloseModal("change-plan");
               }}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/20 text-white text-xs font-bold transition cursor-pointer"
               title="Close Full Screen"
@@ -2222,7 +2344,7 @@ export default function StudentAccountPage() {
                       type="button"
                       onClick={() => {
                         setPaymentDoneAcknowledged(true);
-                        setShowPaymentDoneDialog(true);
+                        openModal("payment-done");
                       }}
                       className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:shadow-[0_0_35px_rgba(225,29,72,0.6)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
                     >
@@ -2247,7 +2369,7 @@ export default function StudentAccountPage() {
                     </p>
                     <button
                       type="button"
-                      onClick={() => setShowPaymentDoneDialog(true)}
+                      onClick={() => openModal("payment-done")}
                       className="text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold cursor-pointer block pt-1"
                     >
                       View confirmation notice
@@ -2314,18 +2436,25 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-[60] bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
           
           <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-rose-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                Payment Submission Acknowledgment
-              </h2>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => openModal("pay")}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Payment</span>
+              </button>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Payment Submission Acknowledgment
+                </h2>
+              </div>
             </div>
             <button
               type="button"
-              onClick={() => {
-                setShowPaymentDoneDialog(false);
-                setShowPaymentModal(false);
-              }}
+              onClick={() => handleCloseModal("change-plan")}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
             >
               <X className="w-4 h-4" />
@@ -2387,10 +2516,7 @@ export default function StudentAccountPage() {
             <div className="w-full pt-3 space-y-3">
               <button
                 type="button"
-                onClick={() => {
-                  setShowPaymentDoneDialog(false);
-                  setShowPaymentModal(false);
-                }}
+                onClick={() => handleCloseModal("change-plan")}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
               >
                 GOT IT, CLOSE
@@ -2398,7 +2524,7 @@ export default function StudentAccountPage() {
 
               <button
                 type="button"
-                onClick={() => setShowPaymentDoneDialog(false)}
+                onClick={() => openModal("pay")}
                 className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
               >
                 Keep payment screen open
@@ -2414,15 +2540,25 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
           
           <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-cyan-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-2.5">
-              <Tag className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                Redeem Gift or Promo Code
-              </h2>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleCloseModal()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+              <div className="flex items-center gap-2.5">
+                <Tag className="w-5 h-5 text-cyan-400" />
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Redeem Gift or Promo Code
+                </h2>
+              </div>
             </div>
             <button
               type="button"
-              onClick={() => setShowPromoModal(false)}
+              onClick={() => handleCloseModal()}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
             >
               <X className="w-4 h-4" />
@@ -2581,15 +2717,25 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
           
           <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-amber-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                Plan Details & Enrollment Status
-              </h2>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleCloseModal()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Plan Details & Enrollment Status
+                </h2>
+              </div>
             </div>
             <button
               type="button"
-              onClick={() => setShowHighestPlanModal(false)}
+              onClick={() => handleCloseModal()}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
             >
               <X className="w-4 h-4" />
@@ -2639,7 +2785,7 @@ export default function StudentAccountPage() {
             <div className="w-full space-y-3 pt-2">
               <button
                 type="button"
-                onClick={() => setShowHighestPlanModal(false)}
+                onClick={() => handleCloseModal()}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer transition"
               >
                 GOT IT, THANK YOU!
@@ -2649,9 +2795,7 @@ export default function StudentAccountPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setShowHighestPlanModal(false);
-                    setShowPaymentModal(true);
-                    fetchUpgradeRequest();
+                    openModal("pay");
                   }}
                   className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer block mx-auto"
                 >
