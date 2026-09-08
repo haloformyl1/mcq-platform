@@ -327,6 +327,23 @@ export default function StudentAccountPage() {
     };
   }, []);
 
+  // Prevent background body scroll when any full-screen modal/window is open (eliminates double scrollbars)
+  useEffect(() => {
+    const isModalOpen = showPaymentModal || showPromoModal || showHistoryModal || showHighestPlanModal || showPaymentDoneDialog;
+    if (typeof document !== "undefined") {
+      if (isModalOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+    }
+    return () => {
+      if (typeof document !== "undefined") {
+        document.body.style.overflow = "";
+      }
+    };
+  }, [showPaymentModal, showPromoModal, showHistoryModal, showHighestPlanModal, showPaymentDoneDialog]);
+
   // Auto-polling when payment modal is open in "waiting" step to detect approval in real-time
   useEffect(() => {
     if (!showPaymentModal || paymentStep !== "waiting") return;
@@ -1953,47 +1970,40 @@ export default function StudentAccountPage() {
       </main>
       {/* 3. INSTANT UPI QR CODE MODAL (NETFLIX PREMIUM CRIMSON/INDIGO THEME) */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
-          {/* Full Screen Header Banner */}
-          <header className="sticky top-0 z-30 w-full bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white px-4 sm:px-8 py-4 flex items-center justify-between shadow-xl">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  if (paymentStep === "waiting" || paymentStep === "notice") {
-                    setPaymentStep("input");
-                  } else {
-                    handleCloseModal("change-plan");
-                  }
-                }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/20 text-white text-xs font-bold transition cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/40 border border-white/20 text-amber-300 text-[11px] font-black uppercase tracking-wider">
-                  <Sparkles className="w-3 h-3 text-amber-300" />
-                  <span>Instant UPI</span>
-                </span>
-                <h2 className="text-base sm:text-xl font-black text-white tracking-tight">
-                  Pay with UPI
-                </h2>
+          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+              
+              {/* Left: Brand Identity & Designer Attribution */}
+              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60"> </span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                handleCloseModal("change-plan");
-              }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/20 text-white text-xs font-bold transition cursor-pointer"
-              title="Close Full Screen"
-            >
-              <X className="w-4 h-4" />
-              <span>Close</span>
-            </button>
+              {/* Right: Instant UPI Badge */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-950/80 via-[#1e1028] to-indigo-950/80 border border-rose-500/30 text-rose-300 text-xs font-black uppercase tracking-wider shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Pay with UPI</span>
+                </span>
+              </div>
+
+            </div>
           </header>
 
           {/* Full Screen Main Content */}
@@ -2433,33 +2443,40 @@ export default function StudentAccountPage() {
 
       {/* 3.1 PAYMENT DONE CONFIRMATION DIALOG */}
       {showPaymentDoneDialog && (
-        <div className="fixed inset-0 z-[60] bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[60] bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
-          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-rose-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => openModal("pay")}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to Payment</span>
-              </button>
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  Payment Submission Acknowledgment
-                </h2>
+          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+              
+              {/* Left: Brand Identity & Designer Attribution */}
+              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60"> </span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
+
+              {/* Right: Payment Recorded Status */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-black uppercase tracking-wider shadow-sm">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Payment Recorded</span>
+                </span>
+              </div>
+
             </div>
-            <button
-              type="button"
-              onClick={() => handleCloseModal("change-plan")}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-              <span>Close</span>
-            </button>
           </header>
 
           <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col items-center justify-center text-center space-y-6 my-auto">
@@ -2537,33 +2554,40 @@ export default function StudentAccountPage() {
 
       {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
       {showPromoModal && (
-        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
-          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-cyan-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => handleCloseModal()}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-              <div className="flex items-center gap-2.5">
-                <Tag className="w-5 h-5 text-cyan-400" />
-                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  Redeem Gift or Promo Code
-                </h2>
+          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+              
+              {/* Left: Brand Identity & Designer Attribution */}
+              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60"> </span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
+
+              {/* Right: Promo Voucher Badge */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-black uppercase tracking-wider shadow-sm">
+                  <Tag className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Promo Voucher</span>
+                </span>
+              </div>
+
             </div>
-            <button
-              type="button"
-              onClick={() => handleCloseModal()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-              <span>Close</span>
-            </button>
           </header>
 
           <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col justify-center space-y-6 my-auto">
@@ -2629,28 +2653,40 @@ export default function StudentAccountPage() {
 
       {/* 6. PAYMENT HISTORY MODAL (NETFLIX STYLE) */}
       {showHistoryModal && (
-        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
-          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-cyan-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-2.5">
-              <Receipt className="w-5 h-5 text-cyan-400" />
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  Billing & Payment History
-                </h2>
-                <p className="text-xs text-slate-400 hidden sm:block">
-                  Verified receipts, invoices, and membership activation records
-                </p>
+          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+              
+              {/* Left: Brand Identity & Designer Attribution */}
+              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60"> </span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
+
+              {/* Right: Payment History Badge */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-black uppercase tracking-wider shadow-sm">
+                  <Receipt className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Payment History</span>
+                </span>
+              </div>
+
             </div>
-            <button
-              type="button"
-              onClick={() => setShowHistoryModal(false)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-              <span>Close</span>
-            </button>
           </header>
 
           <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-6">
@@ -2714,33 +2750,40 @@ export default function StudentAccountPage() {
 
       {/* 4. HIGHEST ENROLLED PLAN MODAL */}
       {showHighestPlanModal && (
-        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
-          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-amber-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => handleCloseModal()}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
-              </button>
-              <div className="flex items-center gap-2.5">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  Plan Details & Enrollment Status
-                </h2>
+          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+              
+              {/* Left: Brand Identity & Designer Attribution */}
+              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60"> </span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
+
+              {/* Right: Top Tier Badge */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Top Tier Enrolled</span>
+                </span>
+              </div>
+
             </div>
-            <button
-              type="button"
-              onClick={() => handleCloseModal()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-              <span>Close</span>
-            </button>
           </header>
 
           <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col items-center justify-center text-center space-y-6 my-auto">
