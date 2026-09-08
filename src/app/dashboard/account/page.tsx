@@ -31,13 +31,13 @@ function formatDateTime24(dateInput: string | Date | null | undefined): string {
 export default function StudentAccountPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "membership" | "security" | "devices" | "profiles">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan">("overview");
 
-  const validTabs: Array<"overview" | "membership" | "security" | "devices" | "profiles"> = [
-    "overview", "membership", "security", "devices", "profiles"
+  const validTabs: Array<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan"> = [
+    "overview", "membership", "security", "devices", "profiles", "change-plan"
   ];
 
-  const navigateToTab = (tab: "overview" | "membership" | "security" | "devices" | "profiles", replace = false) => {
+  const navigateToTab = (tab: "overview" | "membership" | "security" | "devices" | "profiles" | "change-plan", replace = false) => {
     setActiveTab(tab);
     if (typeof window !== "undefined") {
       const targetHash = tab === "overview" ? "" : `#${tab}`;
@@ -505,8 +505,7 @@ export default function StudentAccountPage() {
     if (isAtHighestPlan) {
       setShowHighestPlanModal(true);
     } else {
-      setShowPaymentModal(true);
-      fetchUpgradeRequest();
+      navigateToTab("change-plan");
     }
   };
 
@@ -686,7 +685,9 @@ export default function StudentAccountPage() {
         {/* Header Titles */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            {activeTab === "devices"
+            {activeTab === "change-plan"
+              ? "Change plan"
+              : activeTab === "devices"
               ? "Manage Access and Devices"
               : activeTab === "security"
               ? "Security & Password"
@@ -697,7 +698,9 @@ export default function StudentAccountPage() {
               : "Account"}
           </h1>
           <p className="text-sm font-medium text-slate-400 mt-1">
-            {activeTab === "devices" ? (
+            {activeTab === "change-plan" ? (
+              "Choose the plan that's right for you. Upgrade anytime to unlock all chemistry exams and features."
+            ) : activeTab === "devices" ? (
               <>
                 These signed-in devices have recently been active on this account. You can sign out any unfamiliar devices or{" "}
                 <button
@@ -806,8 +809,8 @@ export default function StudentAccountPage() {
                           </span>
                           <span className="text-xs text-slate-400 font-normal">
                             {isAtHighestPlan 
-                              ? "You are at the highest enrolled plan (Gold Membership)"
-                              : "Upgrade to Gold Pass or renew current active membership"}
+                              ? "You are currently enrolled in the highest possible plan on PieChem"
+                              : "Explore available plans and upgrade to Premium Pass"}
                           </span>
                         </div>
                       </div>
@@ -1608,6 +1611,186 @@ export default function StudentAccountPage() {
               </div>
             )}
 
+
+            {/* VIEW F: CHANGE PLAN TAB (NETFLIX-INSPIRED) */}
+            {activeTab === "change-plan" && (
+              <div className="space-y-8 animate-in fade-in duration-200">
+                
+                {/* Plan Comparison Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
+                  
+                  {/* Card 1: Basic Student Plan */}
+                  <div className="rounded-2xl border border-slate-800/90 bg-[#07111c]/90 shadow-lg flex flex-col justify-between overflow-hidden relative transition hover:border-slate-700">
+                    
+                    {/* Card Head */}
+                    <div className="p-6 bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 border-b border-slate-800 relative">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Free Tier</span>
+                        {!isGold && (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold shadow-sm">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Current plan
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-2xl font-black text-white tracking-tight">Basic</h3>
+                      <p className="text-xs text-slate-400 mt-1">Foundational practice tier for chemistry students</p>
+                    </div>
+
+                    {/* Features Comparison Rows */}
+                    <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-slate-800/80">
+                      <div className="flex justify-between items-center pt-1">
+                        <span className="text-slate-400 font-medium">Monthly price</span>
+                        <span className="font-bold text-white font-mono text-base">₹0</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-400 font-medium">Chemistry Exam Tests</span>
+                        <span className="font-semibold text-slate-300">2 Practice Tests</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-400 font-medium">Answer Explanations</span>
+                        <span className="font-semibold text-slate-300">Standard Answer Key</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-400 font-medium">Study Materials</span>
+                        <span className="font-semibold text-slate-300">Selected Free Chapters</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-400 font-medium">Ranking & Analytics</span>
+                        <span className="font-semibold text-slate-300">Basic Score Summary</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-400 font-medium">Supported Devices</span>
+                        <span className="font-semibold text-slate-300">1 Active Device</span>
+                      </div>
+                    </div>
+
+                    {/* Card CTA */}
+                    <div className="p-6 pt-0 mt-auto">
+                      {!isGold ? (
+                        <div className="w-full py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-500 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2">
+                          <Check className="w-4 h-4 text-cyan-400" />
+                          <span>Enrolled (Current Plan)</span>
+                        </div>
+                      ) : (
+                        <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-500 text-xs font-semibold text-center select-none">
+                          Standard Free Tier
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card 2: Premium Plan (Netflix-Inspired Crimson/Indigo Gradient) */}
+                  <div className="rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
+                    
+                    {/* Card Head (Vibrant Gradient Banner) */}
+                    <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
+                          RECOMMENDED
+                        </span>
+                        {isGold ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-black text-amber-300 bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-400/30">
+                            <Sparkles className="w-3.5 h-3.5" /> Current plan
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs font-black text-amber-300">
+                            <Sparkles className="w-3.5 h-3.5" /> 30-Day Pass
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-2xl font-black text-white tracking-tight">Premium</h3>
+                      <p className="text-xs text-white/80 mt-1">Full access to 50+ exams, 3D models & proctored rankings</p>
+                    </div>
+
+                    {/* Features Comparison Rows */}
+                    <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-cyan-500/15">
+                      <div className="flex justify-between items-center pt-1">
+                        <span className="text-slate-300 font-medium">Monthly price</span>
+                        <div className="text-right">
+                          <span className="text-xl font-black text-amber-300 font-mono">₹{paymentSettings?.monthlyFee || 199}</span>
+                          <span className="text-xs text-slate-400 block">/ 30 days</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">Chemistry Exam Tests</span>
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Unlimited (50+ Tests)
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">Answer Explanations</span>
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Full Solutions & 3D Models
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">Study Materials</span>
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Complete Digital Library
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">Ranking & Analytics</span>
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Proctored National Percentile
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">Supported Devices</span>
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Mobile, Tablet, PC / Laptop
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card CTA Button */}
+                    <div className="p-6 pt-0 mt-auto">
+                      {!isGold ? (
+                        <button
+                          onClick={() => {
+                            setShowPaymentModal(true);
+                            fetchUpgradeRequest();
+                          }}
+                          className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <span>Upgrade to Premium</span>
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <div className="w-full py-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-400" />
+                          <span>Enrolled ({isComplimentary ? "Complimentary" : "Active Pass"})</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Footer Assurance Banner */}
+                <div className="text-center pt-2 space-y-2 text-xs text-slate-400 max-w-2xl mx-auto">
+                  <p className="flex items-center justify-center gap-1.5 font-medium">
+                    <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+                    Instant activation upon PhonePe, Google Pay, or Paytm UPI verification.
+                  </p>
+                  <p>
+                    Have a promo voucher?{" "}
+                    <button
+                      onClick={() => {
+                        setPromoMsg(null);
+                        setPromoCodeInput("");
+                        setShowPromoModal(true);
+                      }}
+                      className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
+                    >
+                      Redeem gift or promo code
+                    </button>
+                  </p>
+                </div>
+
+              </div>
+            )}
+
       </main>
       {/* 3. INSTANT UPI QR CODE MODAL (ELECTRIC BLACKISH BLUE THEME) */}
       {showPaymentModal && (
@@ -2143,10 +2326,10 @@ export default function StudentAccountPage() {
             {/* Heading & Exact Requested Message */}
             <div className="space-y-2">
               <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Highest Plan Enrolled
+                Highest Plan Active
               </h3>
-              <p className="text-sm text-slate-300 leading-relaxed font-medium">
-                You are at the highest enrolled plan currently and no more upgrade option available. Thank you!!
+              <p className="text-base text-slate-200 leading-relaxed font-semibold">
+                You are currently enrolled in the highest possible plan on PieChem.
               </p>
             </div>
 
@@ -2159,7 +2342,7 @@ export default function StudentAccountPage() {
                 </span>
               </div>
               <p className="text-sm font-bold text-white flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400" /> Gold Membership (Premium)
+                <Sparkles className="w-4 h-4 text-amber-400" /> {isComplimentary ? "Complimentary Premium Access" : "Gold Membership (Premium)"}
               </p>
               <p className="text-xs text-slate-400 leading-relaxed">
                 You already have full access to all 50+ exams, 3D molecular models, full solutions, and proctored analytics.
