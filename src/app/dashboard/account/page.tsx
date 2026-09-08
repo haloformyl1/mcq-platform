@@ -119,6 +119,8 @@ export default function StudentAccountPage() {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [paymentDoneAcknowledged, setPaymentDoneAcknowledged] = useState(false);
+  const [showPaymentDoneDialog, setShowPaymentDoneDialog] = useState(false);
 
   // Netflix-style Manage Access and Devices States
   const [devicesList, setDevicesList] = useState<any[]>([]);
@@ -2194,6 +2196,43 @@ export default function StudentAccountPage() {
                     </span>
                   </div>
 
+                  {/* Student Action: PAYMENT DONE */}
+                  {!paymentDoneAcknowledged ? (
+                    <div className="space-y-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentDoneAcknowledged(true);
+                          setShowPaymentDoneDialog(true);
+                        }}
+                        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:shadow-[0_0_35px_rgba(225,29,72,0.6)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span>PAYMENT DONE</span>
+                      </button>
+                      <p className="text-[11px] text-slate-400 text-center">
+                        Tap above once you have transferred the amount in your UPI app.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-slate-950/80 to-teal-950/60 border border-emerald-500/40 space-y-2 animate-in fade-in duration-300">
+                      <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Payment Submission Logged</span>
+                      </div>
+                      <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                        We will notify you once your plan has been upgraded, or you may check your account after 24 hours. Thank you.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowPaymentDoneDialog(true)}
+                        className="text-[11px] text-cyan-400 hover:text-cyan-300 underline font-semibold cursor-pointer block"
+                      >
+                        View confirmation notice
+                      </button>
+                    </div>
+                  )}
+
                 </div>
               )}
 
@@ -2249,7 +2288,82 @@ export default function StudentAccountPage() {
         </div>
       )}
 
-      {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
+      {/* 3.1 PAYMENT DONE CONFIRMATION DIALOG */}
+      {showPaymentDoneDialog && (
+        <div className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="relative w-full max-w-md bg-gradient-to-b from-[#0e1c2e] via-[#081320] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(225,29,72,0.3)] border-2 border-rose-500/50 p-6 sm:p-7 text-center space-y-5 animate-in zoom-in-95 duration-200 my-auto">
+            
+            <button
+              onClick={() => setShowPaymentDoneDialog(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Glowing Icon */}
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border border-emerald-400/40 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+              <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+            </div>
+
+            {/* Status Pill */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span>PAYMENT RECORDED</span>
+            </div>
+
+            {/* Official Message (Grammatically Flawless) */}
+            <div className="space-y-2">
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Payment Submission Received
+              </h3>
+              <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-semibold">
+                We will notify you once your plan has been upgraded, or you may check your account after 24 hours. Thank you.
+              </p>
+            </div>
+
+            {/* Details Box */}
+            <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-4 text-left space-y-2 text-xs">
+              <div className="flex justify-between items-center text-slate-400">
+                <span>Registered Payer UPI:</span>
+                <span className="font-mono font-bold text-white">{studentUpiId || rawPayerUpi}</span>
+              </div>
+              <div className="flex justify-between items-center text-slate-400">
+                <span>Verification Status:</span>
+                <span className="font-bold text-amber-300 font-mono">Awaiting Confirmation</span>
+              </div>
+              <div className="flex justify-between items-center text-slate-400">
+                <span>Review Period:</span>
+                <span className="font-bold text-slate-200">Up to 24 Hours</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 space-y-2">
+              <button
+                onClick={() => {
+                  setShowPaymentDoneDialog(false);
+                  setShowPaymentModal(false);
+                }}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
+              >
+                GOT IT, CLOSE
+              </button>
+
+              <button
+                onClick={() => setShowPaymentDoneDialog(false)}
+                className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
+              >
+                Keep payment screen open
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+
+            {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
       {showPromoModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
           <div className="relative w-full max-w-md bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200 p-6 sm:p-7 space-y-5">
