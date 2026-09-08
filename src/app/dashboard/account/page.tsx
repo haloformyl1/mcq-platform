@@ -1345,7 +1345,7 @@ export default function StudentAccountPage() {
       {/* 3. INSTANT UPI QR CODE MODAL (ELECTRIC BLACKISH BLUE THEME) */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-lg bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="p-6 sm:p-7 border-b border-cyan-500/20 flex items-center justify-between bg-[#061421]/90">
@@ -1355,7 +1355,7 @@ export default function StudentAccountPage() {
                   <span>Instant UPI Activation</span>
                 </div>
                 <h3 className="text-xl font-black text-white tracking-tight">
-                  Pay with UPI ID
+                  Pay with UPI
                 </h3>
               </div>
 
@@ -1411,7 +1411,7 @@ export default function StudentAccountPage() {
                         Please enter the UPI ID using which you will initiate the payment.
                       </p>
                       <p className="text-[11px] text-slate-400 leading-relaxed">
-                        A payment request of ₹{paymentSettings?.monthlyFee || 199} will be sent to this UPI ID on your UPI app (Google Pay, PhonePe, Paytm, or BHIM).
+                        Once entered, you can complete the payment directly via Mobile App or by scanning the Dynamic UPI QR Code (with fixed amount ₹{paymentSettings?.monthlyFee || 199}) on PC / Laptop.
                       </p>
                     </div>
                   </div>
@@ -1475,67 +1475,145 @@ export default function StudentAccountPage() {
                     disabled={requestingUpgrade || !studentUpiId.trim()}
                     className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition hover:brightness-110 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    {requestingUpgrade ? "Sending Payment Request..." : ("SEND PAYMENT REQUEST (₹" + (paymentSettings?.monthlyFee || 199) + ")")}
+                    {requestingUpgrade ? "Initiating Payment..." : ("PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")")}
                   </button>
 
                   <div className="text-[11px] text-slate-400 text-center space-y-1 pt-1">
                     <p>
-                      0% Convenience Fees • Verified UPI Merchant • Instant Gold Pass Activation
+                      0% Processing Fees • Official Admin UPI • Instant Gold Pass Activation
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* State: WAITING / SENT STEP */}
+              {/* State: WAITING / PAYMENT OPTIONS STEP */}
               {paymentStep === "waiting" && (
-                <div className="space-y-5 text-center py-2 animate-in fade-in duration-300">
+                <div className="space-y-5 py-1 animate-in fade-in duration-300">
                   
-                  {/* Radar / Pulsing animation */}
-                  <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                    <span className="absolute inset-0 rounded-full bg-cyan-500/20 animate-ping duration-1000" />
-                    <span className="absolute inset-2 rounded-full bg-cyan-500/30 animate-pulse" />
-                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.6)]">
-                      <Sparkles className="w-7 h-7 text-slate-950" />
+                  {/* Status Banner */}
+                  <div className="p-4 rounded-2xl bg-cyan-950/50 border border-cyan-500/30 flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider block">
+                        Registered Payer UPI ID:
+                      </span>
+                      <span className="text-sm font-bold text-white font-mono flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        {studentUpiId}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[11px] text-slate-400 block font-medium">Locked Amount:</span>
+                      <span className="text-lg font-black text-emerald-400 font-mono">
+                        ₹{paymentSettings?.monthlyFee || 199}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>Payment Request Initiated</span>
+                  {/* Two Payment Options: Mobile vs PC/Laptop */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+                    
+                    {/* OPTION 1: MOBILE APP DIRECT */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-cyan-500/30 flex flex-col justify-between space-y-4">
+                      <div className="space-y-1.5">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-950/80 border border-blue-500/40 text-blue-300 text-[11px] font-bold">
+                          <MonitorSmartphone className="w-3.5 h-3.5 text-blue-400" />
+                          <span>Mobile Device</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-white">
+                          Pay Directly via UPI App
+                        </h4>
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          If you are on your smartphone, tap below to launch Google Pay, PhonePe, or Paytm with the fixed amount <strong>₹{paymentSettings?.monthlyFee || 199}</strong> pre-filled.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 pt-2">
+                        <a
+                          href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student"))}
+                          className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer text-center"
+                        >
+                          <Sparkles className="w-4 h-4 shrink-0" />
+                          <span>Pay ₹{paymentSettings?.monthlyFee || 199} via UPI App</span>
+                        </a>
+
+                        <div className="text-[11px] text-slate-400 text-center font-mono">
+                          Supports GPay, PhonePe, Paytm, BHIM
+                        </div>
+                      </div>
                     </div>
-                    <h4 className="text-lg font-black text-white">
-                      Request Sent to <span className="text-cyan-400 font-mono">{studentUpiId}</span>
-                    </h4>
-                    <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
-                      Please open <strong>Google Pay, PhonePe, Paytm, or BHIM</strong> on your mobile device. You will find a payment notification/request of <strong>₹{paymentSettings?.monthlyFee || 199}</strong>. Enter your UPI PIN to approve.
-                    </p>
+
+                    {/* OPTION 2: PC / LAPTOP (DYNAMIC QR WITH FIXED AMOUNT) */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-cyan-500/30 text-center flex flex-col justify-between space-y-3">
+                      <div className="space-y-1">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[11px] font-bold">
+                          <Laptop className="w-3.5 h-3.5 text-amber-400" />
+                          <span>PC / Laptop</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-white">
+                          Scan Dynamic UPI QR
+                        </h4>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          Scan with any phone UPI app. The amount is locked to <strong>₹{paymentSettings?.monthlyFee || 199}</strong>.
+                        </p>
+                      </div>
+
+                      {/* QR Code Container with Fixed Amount */}
+                      <div className="relative group inline-block mx-auto">
+                        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 via-amber-400 to-teal-400 opacity-25 blur group-hover:opacity-40 transition" />
+                        <div className="relative p-2.5 bg-white rounded-xl shadow-lg">
+                          <img
+                            src={"https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student")))}
+                            alt="Dynamic UPI Payment QR with Fixed Amount"
+                            className="w-36 h-36 mx-auto object-contain"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Fixed Amount Badge */}
+                      <div className="inline-flex items-center justify-center gap-1 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold font-mono">
+                        <span>🔒 Fixed: ₹{paymentSettings?.monthlyFee || 199}</span>
+                      </div>
+                    </div>
+
                   </div>
 
-                  {/* Direct One-Click Pay Link for Mobile Students */}
-                  <div className="pt-2 space-y-2.5">
-                    <a
-                      href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=PIECHEM%20Gold%20Pass"}
-                      className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      <span>Open UPI App on This Device (₹{paymentSettings?.monthlyFee || 199})</span>
-                    </a>
+                  {/* Payee Info & Copy UPI */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 border border-cyan-500/20 rounded-xl text-xs">
+                    <div className="text-left">
+                      <span className="text-slate-400 block text-[11px]">Receiving UPI ID (Admin):</span>
+                      <span className="text-white font-mono font-bold text-xs">{paymentSettings?.upiId || "9830507435@upi"}</span>
+                      <span className="text-slate-400 text-[11px] ml-2">({paymentSettings?.payeeName || "Arghyadeep Roy"})</span>
+                    </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setPaymentStep("input")}
-                      className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
-                    >
-                      Wrong UPI ID? Click here to enter a different UPI ID
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(paymentSettings?.upiId || "9830507435@upi");
+                          setCopiedUpi(true);
+                          setTimeout(() => setCopiedUpi(false), 2000);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-cyan-950 border border-cyan-700/60 text-cyan-300 text-xs font-mono hover:bg-cyan-900 transition flex items-center gap-1 cursor-pointer"
+                      >
+                        {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedUpi ? "Copied!" : "Copy UPI"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentStep("input")}
+                        className="text-xs text-slate-400 hover:text-cyan-300 underline cursor-pointer"
+                      >
+                        Edit Payer UPI
+                      </button>
+                    </div>
                   </div>
 
                   {/* Live Status indicator */}
                   <div className="p-3 bg-slate-950/80 border border-cyan-500/20 rounded-xl flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium">Status:</span>
+                    <span className="text-slate-400 font-medium">Payment Verification:</span>
                     <span className="text-amber-300 font-bold flex items-center gap-1.5 font-mono">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" /> Awaiting Payment Approval
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" /> Awaiting Confirmation
                     </span>
                   </div>
 

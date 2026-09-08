@@ -8,7 +8,7 @@ export async function GET() {
     let settings = await prisma.paymentSetting.findUnique({ where: { id: "default" } });
     if (!settings) {
       settings = await prisma.paymentSetting.create({
-        data: { id: "default", upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 }
+        data: { id: "default", upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 }
       });
     }
     return NextResponse.json({ settings });
@@ -56,14 +56,14 @@ export async function POST(req: Request) {
       update: {
         upiId: upiId || "9830507435@upi",
         payeeName: payeeName || "Arghyadeep Roy",
-        monthlyFee: parseFloat(monthlyFee) || 99.0,
+        monthlyFee: parseFloat(monthlyFee) || 199.0,
         qrImageUrl: qrImageUrl || "", paytmMid: paytmMid || "", paytmMerchantKey: paytmMerchantKey || "", paytmWebsite: paytmWebsite || "DEFAULT", paytmMode: paytmMode || "TEST"
       },
       create: {
         id: "default",
         upiId: upiId || "9830507435@upi",
         payeeName: payeeName || "Arghyadeep Roy",
-        monthlyFee: parseFloat(monthlyFee) || 99.0,
+        monthlyFee: parseFloat(monthlyFee) || 199.0,
         qrImageUrl: qrImageUrl || "", paytmMid: paytmMid || "", paytmMerchantKey: paytmMerchantKey || "", paytmWebsite: paytmWebsite || "DEFAULT", paytmMode: paytmMode || "TEST"
       }
     });

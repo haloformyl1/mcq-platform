@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const [showProctoringModal, setShowProctoringModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentForm, setPaymentForm] = useState({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 99.0 });
+  const [paymentForm, setPaymentForm] = useState({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 });
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSaving, setPaymentSaving] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState("");
@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setPaymentForm({
           upiId: data.settings.upiId || "9830507435@upi",
           payeeName: data.settings.payeeName || "Arghyadeep Roy",
-          monthlyFee: data.settings.monthlyFee || 99.0
+          monthlyFee: data.settings.monthlyFee || 199.0
         });
       }
       const subRes = await fetch("/api/admin/subscriptions");
@@ -530,7 +530,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {/* Instant Regenerated QR Code Preview */}
                     <div className="bg-white p-3 rounded-xl text-center shadow-md">
                       <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${paymentForm.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentForm.payeeName || 'Arghyadeep Roy')}&am=${paymentForm.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${paymentForm.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentForm.payeeName || 'Arghyadeep Roy')}&am=${paymentForm.monthlyFee || 199}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
                         alt="Instant Generated QR"
                         className="w-32 h-32 mx-auto"
                       />

@@ -46,13 +46,13 @@ export default function AdminPaymentsPage() {
   const [paymentSettings, setPaymentSettings] = useState<any>({
     upiId: "9830507435@upi",
     payeeName: "Arghyadeep Roy",
-    monthlyFee: 99.0
+    monthlyFee: 199.0
   });
 
   const [paymentForm, setPaymentForm] = useState({
     upiId: "9830507435@upi",
     payeeName: "Arghyadeep Roy",
-    monthlyFee: 99.0
+    monthlyFee: 199.0
   });
 
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export default function AdminPaymentsPage() {
         setPaymentForm({
           upiId: data.paymentSettings.upiId || "9830507435@upi",
           payeeName: data.paymentSettings.payeeName || "Arghyadeep Roy",
-          monthlyFee: data.paymentSettings.monthlyFee || 99.0
+          monthlyFee: data.paymentSettings.monthlyFee || 199.0
         });
       }
     } catch (err: any) {
@@ -318,7 +318,7 @@ export default function AdminPaymentsPage() {
             <span>Monthly Plan Fee</span>
             <Sparkles className="w-4 h-4 text-cyan-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white font-mono">₹{paymentSettings.monthlyFee || 99}</div>
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">₹{paymentSettings.monthlyFee || 199}</div>
           <div className="text-[11px] text-cyan-200/70">Current Live Fee Rate</div>
         </div>
 
@@ -691,7 +691,7 @@ export default function AdminPaymentsPage() {
           {/* Live QR Code Preview */}
           <div className="bg-white p-4 rounded-2xl text-center shadow-2xl flex flex-col items-center justify-center space-y-2">
             <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=${paymentForm.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentForm.payeeName || 'Arghyadeep Roy')}&am=${paymentForm.monthlyFee || 99}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=${paymentForm.upiId || '9830507435@upi'}&pn=${encodeURIComponent(paymentForm.payeeName || 'Arghyadeep Roy')}&am=${paymentForm.monthlyFee || 199}&cu=INR&tn=PIECHEM%20Monthly%20Subscription`)}`}
               alt="Instant Generated QR"
               className="w-40 h-40 mx-auto"
             />
