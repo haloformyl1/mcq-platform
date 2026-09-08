@@ -1827,530 +1827,563 @@ export default function StudentAccountPage() {
       </main>
       {/* 3. INSTANT UPI QR CODE MODAL (NETFLIX PREMIUM CRIMSON/INDIGO THEME) */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0e1c2e] via-[#081320] to-[#03080e] text-white rounded-3xl shadow-[0_0_65px_rgba(225,29,72,0.25)] border-2 border-rose-500/50 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
-            
-            {/* Modal Header (Image 1 Vibrant Gradient Banner) */}
-            <div className="p-6 sm:p-7 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative flex items-center justify-between">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-white text-[11px] font-black uppercase tracking-widest mb-1.5 shadow">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Instant UPI Activation</span>
-                </div>
-                <h3 className="text-2xl font-black text-white tracking-tight">
-                  Pay with UPI
-                </h3>
-              </div>
-
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+          
+          {/* Full Screen Header Banner */}
+          <header className="sticky top-0 z-30 w-full bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white px-4 sm:px-8 py-4 flex items-center justify-between shadow-xl">
+            <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={() => {
-                  setShowPaymentModal(false);
-                  setPaymentStep("input");
-                  setUpgradeMsg(null);
+                  if (paymentStep === "waiting" || paymentStep === "notice") {
+                    setPaymentStep("input");
+                  } else {
+                    setShowPaymentModal(false);
+                    setPaymentStep("input");
+                    setUpgradeMsg(null);
+                  }
                 }}
-                className="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer"
-                title="Close"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/20 text-white text-xs font-bold transition cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
               </button>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/40 border border-white/20 text-amber-300 text-[11px] font-black uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <span>Instant UPI</span>
+                </span>
+                <h2 className="text-base sm:text-xl font-black text-white tracking-tight">
+                  Pay with UPI
+                </h2>
+              </div>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-6 sm:p-7 space-y-5">
+            <button
+              type="button"
+              onClick={() => {
+                setShowPaymentModal(false);
+                setPaymentStep("input");
+                setUpgradeMsg(null);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/20 text-white text-xs font-bold transition cursor-pointer"
+              title="Close Full Screen"
+            >
+              <X className="w-4 h-4" />
+              <span>Close</span>
+            </button>
+          </header>
 
-              {/* Plan & Pricing Box */}
-              <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none" />
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 uppercase tracking-wider mb-1">
-                      <Sparkles className="w-3 h-3 text-amber-400" /> Gold Membership
-                    </div>
-                    <h4 className="text-base font-black text-white">30 Days All-Access Pass</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      All 50+ Chemistry Exams, 3D Molecular Models, Full Solutions & Proctored Analytics
-                    </p>
+          {/* Full Screen Main Content */}
+          <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6">
+            
+            {/* Plan & Pricing Box */}
+            <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-5 sm:p-6 relative overflow-hidden shadow-lg">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 uppercase tracking-wider mb-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" /> Gold Membership
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-2xl font-black text-amber-300 font-mono">
-                      ₹{paymentSettings?.monthlyFee || 199}
-                    </span>
-                    <span className="text-[11px] text-slate-400 block font-normal">/ 30 Days</span>
-                  </div>
+                  <h3 className="text-lg sm:text-xl font-black text-white">30 Days All-Access Pass</h3>
+                  <p className="text-xs text-slate-400 mt-1 max-w-xl">
+                    Full access to all 50+ Chemistry Exams, 3D Molecular Models, Full Solutions & Proctored Analytics
+                  </p>
+                </div>
+                <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                  <span className="text-3xl font-black text-amber-300 font-mono">
+                    ₹{paymentSettings?.monthlyFee || 199}
+                  </span>
+                  <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
                 </div>
               </div>
+            </div>
 
-              {/* State: INPUT STEP */}
-              {paymentStep === "input" && (
-                <div className="space-y-4">
-                  
-                  {/* Explicit Mandatory Requirement Instruction */}
-                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-rose-950/40 border border-rose-500/30 flex items-start gap-3">
-                    <div className="p-1.5 rounded-xl bg-rose-500/20 text-rose-400 shrink-0 mt-0.5">
-                      <Sparkles className="w-4 h-4 text-rose-400" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <p className="text-xs font-bold text-rose-200">
-                        Please enter the UPI ID using which you will initiate the payment.
-                      </p>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        Once entered, you can complete the payment directly via Mobile App or by scanning the Dynamic UPI QR Code (with fixed amount ₹{paymentSettings?.monthlyFee || 199}) on PC / Laptop.
-                      </p>
-                    </div>
+            {/* State: INPUT STEP */}
+            {paymentStep === "input" && (
+              <div className="space-y-5 bg-[#0a1524]/70 p-5 sm:p-7 rounded-3xl border border-rose-500/30 shadow-xl">
+                
+                {/* Instruction */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-rose-950/40 border border-rose-500/30 flex items-start gap-3">
+                  <div className="p-1.5 rounded-xl bg-rose-500/20 text-rose-400 shrink-0 mt-0.5">
+                    <Sparkles className="w-4 h-4 text-rose-400" />
                   </div>
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-bold text-rose-200">
+                      Please enter the UPI ID using which you will initiate the payment.
+                    </p>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Once entered, you can complete the payment directly via Mobile App or by scanning the Dynamic UPI QR Code (with fixed amount ₹{paymentSettings?.monthlyFee || 199}) on PC / Laptop.
+                    </p>
+                  </div>
+                </div>
 
-                  {/* UPI ID Input Field */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-                      <span>Your UPI ID (VPA):</span>
-                      <span className="text-[11px] font-normal text-slate-400 font-mono">e.g. mobile@upi or name@oksbi</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={studentUpiId}
-                        onChange={(e) => {
-                          setStudentUpiId(e.target.value.trim().toLowerCase());
-                          if (upgradeMsg) setUpgradeMsg(null);
-                        }}
-                        placeholder="Enter your UPI ID (e.g. 9830507435@upi)"
-                        className={"w-full bg-slate-950/90 text-white rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wide outline-none transition border " + (
-                          studentUpiId.trim()
-                            ? isValidUpiId(studentUpiId)
-                              ? "border-emerald-500/60 focus:border-emerald-400 focus:shadow-[0_0_25px_rgba(16,185,129,0.3)]"
-                              : "border-rose-500/60 focus:border-rose-400 focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
-                            : "border-rose-500/40 focus:border-rose-400 focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
-                        )}
-                      />
-                      {studentUpiId.trim().length > 0 && (
-                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
-                          {isValidUpiId(studentUpiId) ? (
-                            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1 font-mono">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                              <span className="hidden sm:inline">Valid UPI</span>
-                            </span>
-                          ) : (
-                            <span className="text-xs font-semibold text-rose-400 flex items-center gap-1 font-mono">
-                              <AlertCircle className="w-4 h-4 text-rose-400" />
-                              <span className="hidden sm:inline text-[11px]">Strict format required</span>
-                            </span>
-                          )}
-                        </div>
+                {/* UPI ID Input Field */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>Your UPI ID (VPA):</span>
+                    <span className="text-xs font-normal text-slate-400 font-mono">e.g. mobile@upi or name@oksbi</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={studentUpiId}
+                      onChange={(e) => {
+                        setStudentUpiId(e.target.value.trim().toLowerCase());
+                        if (upgradeMsg) setUpgradeMsg(null);
+                      }}
+                      placeholder="Enter your UPI ID (e.g. 9830507435@upi)"
+                      className={"w-full bg-slate-950/90 text-white rounded-2xl px-5 py-4 text-sm font-mono tracking-wide outline-none transition border " + (
+                        studentUpiId.trim()
+                          ? isValidUpiId(studentUpiId)
+                            ? "border-emerald-500/60 focus:border-emerald-400 focus:shadow-[0_0_25px_rgba(16,185,129,0.3)]"
+                            : "border-rose-500/60 focus:border-rose-400 focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
+                          : "border-rose-500/40 focus:border-rose-400 focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
                       )}
-                    </div>
-
-                    {/* Quick Handle Completion Pills - Expanded Collection */}
-                    <div className="space-y-1.5 pt-1">
-                      <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
-                        <span>Quick handles (tap to append):</span>
-                        <span className="text-[10px] text-slate-500 font-mono">18 available</span>
+                    />
+                    {studentUpiId.trim().length > 0 && (
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
+                        {isValidUpiId(studentUpiId) ? (
+                          <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <span>Valid UPI Format</span>
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-rose-400 flex items-center gap-1 font-mono">
+                            <AlertCircle className="w-4 h-4 text-rose-400" />
+                            <span className="text-xs">Strict format required</span>
+                          </span>
+                        )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto py-1 pr-1 custom-scrollbar">
-                        {POPULAR_UPI_HANDLES.map((handle) => (
-                          <button
-                            key={handle}
-                            type="button"
-                            onClick={() => {
-                              const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
-                              setStudentUpiId((base || "") + handle);
-                              if (upgradeMsg) setUpgradeMsg(null);
-                            }}
-                            className="px-2.5 py-1 rounded-lg bg-rose-950/40 border border-rose-800/50 text-rose-300 text-[11px] font-mono hover:bg-rose-900/60 hover:border-rose-400 hover:text-white transition cursor-pointer"
-                          >
-                            {handle}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    )}
                   </div>
 
-                  {upgradeMsg && (
-                    <div className={"p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border " + (
-                      upgradeMsg.type === "success"
-                        ? "bg-green-950/80 border-green-600/60 text-green-300"
-                        : "bg-red-950/80 border-red-600/60 text-red-300"
-                    )}>
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{upgradeMsg.text}</span>
+                  {/* Quick Handle Completion Pills */}
+                  <div className="space-y-1.5 pt-2">
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                      <span>Quick handles (tap to append):</span>
+                      <span className="text-[11px] text-slate-500 font-mono">18 available</span>
                     </div>
-                  )}
+                    <div className="flex flex-wrap items-center gap-2 py-1">
+                      {POPULAR_UPI_HANDLES.map((handle) => (
+                        <button
+                          key={handle}
+                          type="button"
+                          onClick={() => {
+                            const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
+                            setStudentUpiId((base || "") + handle);
+                            if (upgradeMsg) setUpgradeMsg(null);
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-300 text-xs font-mono hover:bg-rose-900/60 hover:border-rose-400 hover:text-white transition cursor-pointer"
+                        >
+                          {handle}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
+                {upgradeMsg && (
+                  <div className={"p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border " + (
+                    upgradeMsg.type === "success"
+                      ? "bg-green-950/80 border-green-600/60 text-green-300"
+                      : "bg-red-950/80 border-red-600/60 text-red-300"
+                  )}>
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{upgradeMsg.text}</span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleProceedClick}
+                  disabled={requestingUpgrade || !studentUpiId.trim() || !isValidUpiId(studentUpiId)}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>{"PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")"}</span>
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                <p className="text-xs text-slate-400 text-center pt-1">
+                  0% Processing Fees • Official Admin UPI • Instant Gold Pass Activation
+                </p>
+              </div>
+            )}
+
+            {/* State: NOTICE STEP */}
+            {paymentStep === "notice" && (
+              <div className="space-y-6 bg-[#0a1524]/70 p-6 sm:p-8 rounded-3xl border border-rose-500/30 shadow-xl animate-in fade-in duration-300">
+                
+                {/* Warning / Timeline Notice Card */}
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-950/40 via-rose-950/30 to-[#0a1726] border-2 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.15)] space-y-3">
+                  <div className="flex items-center gap-2.5 text-amber-300">
+                    <Clock className="w-6 h-6 text-amber-400 shrink-0 animate-pulse" />
+                    <h4 className="text-base font-black uppercase tracking-wider">
+                      Important Verification Notice
+                    </h4>
+                  </div>
+
+                  <p className="text-base sm:text-lg text-slate-100 font-semibold leading-relaxed">
+                    After completing your payment, please allow up to 24 hours for transaction confirmation and premium access grant by our administration.
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pt-2 border-t border-amber-500/20">
+                    Our team manually validates each payment against your registered UPI ID to ensure account integrity and exam security. Your dashboard access will unlock automatically as soon as verification is approved.
+                  </p>
+                </div>
+
+                {/* Payment Details Recap */}
+                <div className="p-5 rounded-2xl bg-slate-950/90 border border-rose-500/30 space-y-3 text-sm">
+                  <div className="flex justify-between items-center text-slate-400">
+                    <span>Registered Payer UPI ID:</span>
+                    <span className="font-mono font-bold text-white text-base">{studentUpiId}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-400">
+                    <span>Payable Amount:</span>
+                    <span className="font-mono font-bold text-amber-300 text-base">₹{paymentSettings?.monthlyFee || 199}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-400">
+                    <span>Subscription Tier:</span>
+                    <span className="font-bold text-slate-200">Gold Membership (30-Day Pass)</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="space-y-3 pt-2">
                   <button
-                    onClick={handleProceedClick}
-                    disabled={requestingUpgrade || !studentUpiId.trim() || !isValidUpiId(studentUpiId)}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                    type="button"
+                    onClick={handleSendUpgradeRequest}
+                    disabled={requestingUpgrade}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span>{"PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")"}</span>
+                    <span>{requestingUpgrade ? "Initiating Payment..." : "I Understand, Proceed to Pay"}</span>
                     <ChevronRight className="w-5 h-5" />
                   </button>
 
-                  <div className="text-[11px] text-slate-400 text-center space-y-1 pt-1">
-                    <p>
-                      0% Processing Fees • Official Admin UPI • Instant Gold Pass Activation
-                    </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPaymentStep("input");
+                      setUpgradeMsg(null);
+                    }}
+                    className="w-full py-3 rounded-xl text-xs text-slate-400 hover:text-white transition cursor-pointer text-center flex items-center justify-center gap-1.5"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Change UPI ID</span>
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+            {/* State: WAITING / PAYMENT OPTIONS STEP */}
+            {paymentStep === "waiting" && (
+              <div className="space-y-6 bg-[#0a1524]/70 p-6 sm:p-8 rounded-3xl border border-rose-500/30 shadow-xl animate-in fade-in duration-300">
+                
+                {/* 24-Hour Confirmation Timeline Banner */}
+                <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-center gap-3 text-xs sm:text-sm text-amber-200 shadow-md">
+                  <Clock className="w-5 h-5 text-amber-400 shrink-0" />
+                  <span>
+                    <strong>Verification Timeline:</strong> After completing payment via UPI, please allow up to 24 hours for administrative confirmation and access grant.
+                  </span>
+                </div>
+
+                {/* Status Banner */}
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-indigo-950/50 to-rose-950/50 border border-rose-500/30 flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="text-xs font-bold text-rose-400 uppercase tracking-wider block">
+                      Registered Payer UPI ID:
+                    </span>
+                    <span className="text-base font-bold text-white font-mono flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                      {studentUpiId}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs text-slate-400 block font-medium">Locked Amount:</span>
+                    <span className="text-xl font-black text-amber-300 font-mono">
+                      ₹{paymentSettings?.monthlyFee || 199}
+                    </span>
                   </div>
                 </div>
-              )}
 
-              {/* State: NOTICE STEP (Before landing to Image 2) */}
-              {paymentStep === "notice" && (
-                <div className="space-y-5 py-2 animate-in fade-in duration-300">
+                {/* Two Payment Options: Mobile vs PC/Laptop */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
                   
-                  {/* Warning / Timeline Notice Card */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-950/40 via-rose-950/30 to-[#0a1726] border-2 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.15)] space-y-3">
-                    <div className="flex items-center gap-2.5 text-amber-300">
-                      <Clock className="w-5 h-5 text-amber-400 shrink-0 animate-pulse" />
-                      <h4 className="text-sm sm:text-base font-black uppercase tracking-wider">
-                        Important Verification Notice
+                  {/* OPTION 1: MOBILE APP DIRECT */}
+                  <div className="p-5 sm:p-6 rounded-2xl bg-slate-950/90 border border-rose-500/30 flex flex-col justify-between space-y-5">
+                    <div className="space-y-2">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs font-bold">
+                        <MonitorSmartphone className="w-4 h-4 text-rose-400" />
+                        <span>Mobile Device</span>
+                      </div>
+                      <h4 className="text-base font-bold text-white">
+                        Pay Directly via UPI App
                       </h4>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        If you are on your smartphone, tap below to launch Google Pay, PhonePe, or Paytm with the fixed amount <strong>₹{paymentSettings?.monthlyFee || 199}</strong> pre-filled.
+                      </p>
                     </div>
 
-                    <p className="text-sm sm:text-base text-slate-100 font-semibold leading-relaxed">
-                      After completing your payment, please allow up to 24 hours for transaction confirmation and premium access grant by our administration.
-                    </p>
+                    <div className="space-y-2.5 pt-2">
+                      <a
+                        href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student"))}
+                        className="inline-flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer text-center"
+                      >
+                        <Sparkles className="w-4 h-4 shrink-0 text-amber-300" />
+                        <span>Pay ₹{paymentSettings?.monthlyFee || 199} via UPI App</span>
+                      </a>
 
-                    <p className="text-xs text-slate-300 leading-relaxed pt-1 border-t border-amber-500/20">
-                      Our team manually validates each payment against your registered UPI ID to ensure account integrity and exam security. Your dashboard access will unlock automatically as soon as verification is approved.
-                    </p>
-                  </div>
-
-                  {/* Payment Details Recap */}
-                  <div className="p-4 rounded-2xl bg-slate-950/90 border border-rose-500/30 space-y-2.5 text-xs">
-                    <div className="flex justify-between items-center text-slate-400">
-                      <span>Registered Payer UPI ID:</span>
-                      <span className="font-mono font-bold text-white text-sm">{studentUpiId}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-400">
-                      <span>Payable Amount:</span>
-                      <span className="font-mono font-bold text-amber-300 text-sm">₹{paymentSettings?.monthlyFee || 199}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-400">
-                      <span>Subscription Tier:</span>
-                      <span className="font-bold text-slate-200">Gold Membership (30-Day Pass)</span>
+                      <div className="text-xs text-slate-400 text-center font-mono">
+                        Supports GPay, PhonePe, Paytm, BHIM
+                      </div>
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="space-y-2.5 pt-1">
+                  {/* OPTION 2: PC / LAPTOP (DYNAMIC QR WITH FIXED AMOUNT) */}
+                  <div className="p-5 sm:p-6 rounded-2xl bg-slate-950/90 border border-rose-500/30 text-center flex flex-col justify-between space-y-4">
+                    <div className="space-y-1.5">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-bold">
+                        <Laptop className="w-4 h-4 text-amber-400" />
+                        <span>PC / Laptop</span>
+                      </div>
+                      <h4 className="text-base font-bold text-white">
+                        Scan Dynamic UPI QR
+                      </h4>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        Scan with any phone UPI app. The amount is locked to <strong>₹{paymentSettings?.monthlyFee || 199}</strong>.
+                      </p>
+                    </div>
+
+                    {/* QR Code Container with Fixed Amount */}
+                    <div className="relative group inline-block mx-auto">
+                      <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 opacity-35 blur group-hover:opacity-60 transition" />
+                      <div className="relative p-3 bg-white rounded-xl shadow-2xl">
+                        <img
+                          src={"https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student")))}
+                          alt="Dynamic UPI Payment QR with Fixed Amount"
+                          className="w-40 h-40 mx-auto object-contain"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Fixed Amount Badge */}
+                    <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300 text-xs font-bold font-mono">
+                      <span>🔒 Fixed Amount: ₹{paymentSettings?.monthlyFee || 199}</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Payee Info & Copy UPI */}
+                <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-slate-950/90 border border-rose-500/20 rounded-2xl text-xs">
+                  <div className="text-left">
+                    <span className="text-slate-400 block text-xs">Receiving UPI ID (Admin):</span>
+                    <span className="text-white font-mono font-bold text-sm">{paymentSettings?.upiId || "9830507435@upi"}</span>
+                    <span className="text-slate-400 text-xs ml-2">({paymentSettings?.payeeName || "Arghyadeep Roy"})</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
                     <button
-                      onClick={handleSendUpgradeRequest}
-                      disabled={requestingUpgrade}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(paymentSettings?.upiId || "9830507435@upi");
+                        setCopiedUpi(true);
+                        setTimeout(() => setCopiedUpi(false), 2000);
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl bg-rose-950 border border-rose-700/60 text-rose-300 text-xs font-mono hover:bg-rose-900 transition flex items-center gap-1.5 cursor-pointer"
                     >
-                      <span>{requestingUpgrade ? "Initiating Payment..." : "I Understand, Proceed to Pay"}</span>
-                      <ChevronRight className="w-5 h-5" />
+                      {copiedUpi ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                      <span>{copiedUpi ? "Copied!" : "Copy UPI"}</span>
                     </button>
 
                     <button
                       type="button"
-                      onClick={() => {
-                        setPaymentStep("input");
-                        setUpgradeMsg(null);
-                      }}
-                      className="w-full py-2.5 rounded-xl text-xs text-slate-400 hover:text-white transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      onClick={() => setPaymentStep("input")}
+                      className="text-xs text-slate-400 hover:text-rose-300 underline cursor-pointer"
                     >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>Change UPI ID</span>
+                      Edit Payer UPI
                     </button>
                   </div>
-
                 </div>
-              )}
 
-              {/* State: WAITING / PAYMENT OPTIONS STEP */}
-              {paymentStep === "waiting" && (
-                <div className="space-y-5 py-1 animate-in fade-in duration-300">
-                  
-                  {/* 24-Hour Confirmation Timeline Banner */}
-                  <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 flex items-center gap-2.5 text-xs text-amber-200">
-                    <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>
-                      <strong>Verification Timeline:</strong> After completing payment via UPI, please allow up to 24 hours for administrative confirmation and access grant.
-                    </span>
-                  </div>
-                  
-                  {/* Status Banner */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/50 to-rose-950/50 border border-rose-500/30 flex items-center justify-between gap-3">
-                    <div className="space-y-0.5">
-                      <span className="text-[11px] font-bold text-rose-400 uppercase tracking-wider block">
-                        Registered Payer UPI ID:
-                      </span>
-                      <span className="text-sm font-bold text-white font-mono flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        {studentUpiId}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[11px] text-slate-400 block font-medium">Locked Amount:</span>
-                      <span className="text-lg font-black text-amber-300 font-mono">
-                        ₹{paymentSettings?.monthlyFee || 199}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Two Payment Options: Mobile vs PC/Laptop */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-                    
-                    {/* OPTION 1: MOBILE APP DIRECT */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-rose-500/30 flex flex-col justify-between space-y-4">
-                      <div className="space-y-1.5">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[11px] font-bold">
-                          <MonitorSmartphone className="w-3.5 h-3.5 text-rose-400" />
-                          <span>Mobile Device</span>
-                        </div>
-                        <h4 className="text-sm font-bold text-white">
-                          Pay Directly via UPI App
-                        </h4>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          If you are on your smartphone, tap below to launch Google Pay, PhonePe, or Paytm with the fixed amount <strong>₹{paymentSettings?.monthlyFee || 199}</strong> pre-filled.
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 pt-2">
-                        <a
-                          href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student"))}
-                          className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer text-center"
-                        >
-                          <Sparkles className="w-4 h-4 shrink-0 text-amber-300" />
-                          <span>Pay ₹{paymentSettings?.monthlyFee || 199} via UPI App</span>
-                        </a>
-
-                        <div className="text-[11px] text-slate-400 text-center font-mono">
-                          Supports GPay, PhonePe, Paytm, BHIM
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* OPTION 2: PC / LAPTOP (DYNAMIC QR WITH FIXED AMOUNT) */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-rose-500/30 text-center flex flex-col justify-between space-y-3">
-                      <div className="space-y-1">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[11px] font-bold">
-                          <Laptop className="w-3.5 h-3.5 text-amber-400" />
-                          <span>PC / Laptop</span>
-                        </div>
-                        <h4 className="text-sm font-bold text-white">
-                          Scan Dynamic UPI QR
-                        </h4>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">
-                          Scan with any phone UPI app. The amount is locked to <strong>₹{paymentSettings?.monthlyFee || 199}</strong>.
-                        </p>
-                      </div>
-
-                      {/* QR Code Container with Fixed Amount */}
-                      <div className="relative group inline-block mx-auto">
-                        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 opacity-30 blur group-hover:opacity-50 transition" />
-                        <div className="relative p-2.5 bg-white rounded-xl shadow-lg">
-                          <img
-                            src={"https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student")))}
-                            alt="Dynamic UPI Payment QR with Fixed Amount"
-                            className="w-36 h-36 mx-auto object-contain"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Fixed Amount Badge */}
-                      <div className="inline-flex items-center justify-center gap-1 px-3 py-1 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300 text-[11px] font-bold font-mono">
-                        <span>🔒 Fixed: ₹{paymentSettings?.monthlyFee || 199}</span>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Payee Info & Copy UPI */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 border border-rose-500/20 rounded-xl text-xs">
-                    <div className="text-left">
-                      <span className="text-slate-400 block text-[11px]">Receiving UPI ID (Admin):</span>
-                      <span className="text-white font-mono font-bold text-xs">{paymentSettings?.upiId || "9830507435@upi"}</span>
-                      <span className="text-slate-400 text-[11px] ml-2">({paymentSettings?.payeeName || "Arghyadeep Roy"})</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(paymentSettings?.upiId || "9830507435@upi");
-                          setCopiedUpi(true);
-                          setTimeout(() => setCopiedUpi(false), 2000);
-                        }}
-                        className="px-2.5 py-1 rounded-lg bg-rose-950 border border-rose-700/60 text-rose-300 text-xs font-mono hover:bg-rose-900 transition flex items-center gap-1 cursor-pointer"
-                      >
-                        {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copiedUpi ? "Copied!" : "Copy UPI"}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentStep("input")}
-                        className="text-xs text-slate-400 hover:text-rose-300 underline cursor-pointer"
-                      >
-                        Edit Payer UPI
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Live Status indicator */}
-                  <div className="p-3 bg-slate-950/80 border border-rose-500/20 rounded-xl flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium">Payment Verification:</span>
-                    <span className="text-amber-300 font-bold flex items-center gap-1.5 font-mono">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-rose-400" /> Awaiting Confirmation
-                    </span>
-                  </div>
-
-                  {/* Student Action: PAYMENT DONE */}
-                  {!paymentDoneAcknowledged ? (
-                    <div className="space-y-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentDoneAcknowledged(true);
-                          setShowPaymentDoneDialog(true);
-                        }}
-                        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:shadow-[0_0_35px_rgba(225,29,72,0.6)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>PAYMENT DONE</span>
-                      </button>
-                      <p className="text-[11px] text-slate-400 text-center">
-                        Tap above once you have transferred the amount in your UPI app.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-slate-950/80 to-teal-950/60 border border-emerald-500/40 space-y-2 animate-in fade-in duration-300">
-                      <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Payment Submission Logged</span>
-                      </div>
-                      <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                        We will notify you once your plan has been upgraded, or you may check your account after 24 hours. Thank you.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setShowPaymentDoneDialog(true)}
-                        className="text-[11px] text-cyan-400 hover:text-cyan-300 underline font-semibold cursor-pointer block"
-                      >
-                        View confirmation notice
-                      </button>
-                    </div>
-                  )}
-
+                {/* Live Status indicator */}
+                <div className="p-4 bg-slate-950/80 border border-rose-500/20 rounded-2xl flex items-center justify-between text-xs sm:text-sm">
+                  <span className="text-slate-400 font-medium">Payment Verification:</span>
+                  <span className="text-amber-300 font-bold flex items-center gap-2 font-mono">
+                    <RefreshCw className="w-4 h-4 animate-spin text-rose-400" /> Awaiting Confirmation
+                  </span>
                 </div>
-              )}
 
-              {/* State: SUCCESS / CONFIRMED STEP */}
-              {paymentStep === "success" && (
-                <div className="space-y-5 text-center py-4 animate-in zoom-in-95 duration-300">
-                  <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                    <span className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping duration-1000" />
-                    <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.5)]">
-                      <CheckCircle2 className="w-9 h-9 text-slate-950 stroke-[2.5]" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-500/50 text-emerald-300 text-xs font-bold">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Payment Verified & Approved!</span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-black text-white">
-                      Welcome to Gold Membership!
-                    </h3>
-                    <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
-                      Your ₹{paymentSettings?.monthlyFee || 199} payment has been confirmed by Admin. All 50+ Chemistry Exams, full solutions, and proctored analytics are now fully unlocked for 30 days.
+                {/* Student Action: PAYMENT DONE */}
+                {!paymentDoneAcknowledged ? (
+                  <div className="space-y-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPaymentDoneAcknowledged(true);
+                        setShowPaymentDoneDialog(true);
+                      }}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:shadow-[0_0_35px_rgba(225,29,72,0.6)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>PAYMENT DONE</span>
+                    </button>
+                    <p className="text-xs text-slate-400 text-center">
+                      Tap above once you have transferred the amount in your UPI app.
                     </p>
                   </div>
-
-                  <div className="pt-2">
+                ) : (
+                  <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-slate-950/80 to-teal-950/60 border border-emerald-500/40 space-y-2 animate-in fade-in duration-300">
+                    <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>Payment Submission Logged</span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                      We will notify you once your plan has been upgraded, or you may check your account after 24 hours. Thank you.
+                    </p>
                     <button
-                      onClick={() => {
-                        setShowPaymentModal(false);
-                        setPaymentStep("input");
-                        window.location.reload();
-                      }}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:brightness-110 active:scale-98 transition cursor-pointer"
+                      type="button"
+                      onClick={() => setShowPaymentDoneDialog(true)}
+                      className="text-xs text-cyan-400 hover:text-cyan-300 underline font-semibold cursor-pointer block pt-1"
                     >
-                      CONTINUE TO DASHBOARD
+                      View confirmation notice
                     </button>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Support Contact */}
-              <div className="pt-2 text-[11px] text-slate-400 text-center border-t border-rose-500/20">
-                <span>Assistance or query? Contact Arghyadeep Roy: </span>
-                <a href="tel:9830507435" className="font-mono font-bold text-rose-400 hover:underline">
-                  9830507435
-                </a>
               </div>
+            )}
 
+            {/* State: SUCCESS / CONFIRMED STEP */}
+            {paymentStep === "success" && (
+              <div className="space-y-6 text-center py-8 bg-[#0a1524]/70 p-8 rounded-3xl border border-emerald-500/40 shadow-xl animate-in zoom-in-95 duration-300">
+                <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+                  <span className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping duration-1000" />
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-[0_0_35px_rgba(16,185,129,0.5)]">
+                    <CheckCircle2 className="w-10 h-10 text-slate-950 stroke-[2.5]" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-500/50 text-emerald-300 text-xs font-bold">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Payment Verified & Approved!</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white">
+                    Welcome to Gold Membership!
+                  </h3>
+                  <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+                    Your ₹{paymentSettings?.monthlyFee || 199} payment has been confirmed by Admin. All 50+ Chemistry Exams, full solutions, and proctored analytics are now fully unlocked for 30 days.
+                  </p>
+                </div>
+
+                <div className="pt-4 max-w-sm mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setPaymentStep("input");
+                      window.location.reload();
+                    }}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:brightness-110 active:scale-98 transition cursor-pointer"
+                  >
+                    CONTINUE TO DASHBOARD
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Support Contact */}
+            <div className="pt-4 text-xs text-slate-400 text-center border-t border-rose-500/20">
+              <span>Assistance or query? Contact Arghyadeep Roy: </span>
+              <a href="tel:9830507435" className="font-mono font-bold text-rose-400 hover:underline">
+                9830507435
+              </a>
             </div>
 
-          </div>
+          </main>
         </div>
       )}
 
       {/* 3.1 PAYMENT DONE CONFIRMATION DIALOG */}
       {showPaymentDoneDialog && (
-        <div className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="relative w-full max-w-md bg-gradient-to-b from-[#0e1c2e] via-[#081320] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(225,29,72,0.3)] border-2 border-rose-500/50 p-6 sm:p-7 text-center space-y-5 animate-in zoom-in-95 duration-200 my-auto">
-            
+        <div className="fixed inset-0 z-[60] bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+          
+          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-rose-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                Payment Submission Acknowledgment
+              </h2>
+            </div>
             <button
-              onClick={() => setShowPaymentDoneDialog(false)}
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
-              title="Close"
+              type="button"
+              onClick={() => {
+                setShowPaymentDoneDialog(false);
+                setShowPaymentModal(false);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
+              <span>Close</span>
             </button>
+          </header>
 
+          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col items-center justify-center text-center space-y-6 my-auto">
+            
             {/* Glowing Icon */}
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border border-emerald-400/40 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border-2 border-emerald-400/40 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.35)]">
+              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
             </div>
 
             {/* Status Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-sm">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               <span>PAYMENT RECORDED</span>
             </div>
 
-            {/* Official Message (Grammatically Flawless) */}
+            {/* Official Message */}
             <div className="space-y-2">
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 Payment Submission Received
               </h3>
-              <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-semibold">
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed font-semibold">
                 We will notify you once your plan has been upgraded, or you may check your account after 24 hours. Thank you.
               </p>
             </div>
 
             {/* Details Box */}
-            <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-4 text-left space-y-2 text-xs">
+            <div className="w-full bg-slate-950/90 border border-rose-500/30 rounded-2xl p-5 text-left space-y-3 text-xs sm:text-sm shadow-xl">
               <div className="flex justify-between items-center text-slate-400">
                 <span>Registered Payer UPI:</span>
-                <span className="font-mono font-bold text-white">{studentUpiId || rawPayerUpi}</span>
+                <span className="font-mono font-bold text-white text-sm">{studentUpiId || rawPayerUpi}</span>
               </div>
               <div className="flex justify-between items-center text-slate-400">
                 <span>Verification Status:</span>
                 <span className="font-bold text-amber-300 font-mono">Awaiting Confirmation</span>
               </div>
               <div className="flex justify-between items-center text-slate-400">
-                <span>Review Period:</span>
+                <span>Review Window:</span>
                 <span className="font-bold text-slate-200">Up to 24 Hours</span>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="pt-2 space-y-2">
+            <div className="w-full pt-3 space-y-3">
               <button
+                type="button"
                 onClick={() => {
                   setShowPaymentDoneDialog(false);
                   setShowPaymentModal(false);
                 }}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
               >
                 GOT IT, CLOSE
               </button>
 
               <button
+                type="button"
                 onClick={() => setShowPaymentDoneDialog(false)}
                 className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
               >
@@ -2358,259 +2391,262 @@ export default function StudentAccountPage() {
               </button>
             </div>
 
-          </div>
+          </main>
         </div>
       )}
 
-
-            {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
+      {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
       {showPromoModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-md bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200 p-6 sm:p-7 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400">
-                  <Tag className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">Redeem Promo Code</h3>
-                  <p className="text-xs text-slate-400">Enter your gift card or discount promo code</p>
-                </div>
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+          
+          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-cyan-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <Tag className="w-5 h-5 text-cyan-400" />
+              <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                Redeem Gift or Promo Code
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowPromoModal(false)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+              <span>Close</span>
+            </button>
+          </header>
+
+          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col justify-center space-y-6 my-auto">
+            
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.25)]">
+                <Tag className="w-8 h-8" />
               </div>
-              <button
-                onClick={() => setShowPromoModal(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-cyan-950/50 transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <h3 className="text-2xl font-black text-white tracking-tight">
+                Apply Voucher or Promo Code
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-400">
+                Enter your voucher or discount code provided by administration.
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Code / Voucher
-              </label>
-              <input
-                type="text"
-                value={promoCodeInput}
-                onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                placeholder="e.g. CHEMGOLD, PIECHEM2026"
-                className="w-full bg-slate-950 border border-cyan-500/40 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase tracking-wider outline-none focus:border-cyan-400 transition"
-              />
-            </div>
+            <div className="bg-[#0a1524]/80 p-6 rounded-3xl border border-cyan-500/30 space-y-4 shadow-xl">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  Voucher / Promo Code:
+                </label>
+                <input
+                  type="text"
+                  value={promoCodeInput}
+                  onChange={(e) => {
+                    setPromoCodeInput(e.target.value.toUpperCase());
+                    if (promoMsg) setPromoMsg(null);
+                  }}
+                  placeholder="e.g. PIECHEM2026 or GOLD30"
+                  className="w-full bg-slate-950/90 text-white rounded-2xl px-5 py-4 text-base font-mono tracking-widest outline-none transition border border-cyan-500/40 focus:border-cyan-400 focus:shadow-[0_0_25px_rgba(6,182,212,0.3)] uppercase"
+                />
+              </div>
 
-            {promoMsg && (
-              <div
-                className={`p-3 rounded-xl text-xs font-medium border flex items-center gap-2 ${
+              {promoMsg && (
+                <div className={"p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 border " + (
                   promoMsg.type === "success"
-                    ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300"
-                    : "bg-amber-950/80 border-amber-500/40 text-amber-300"
-                }`}
-              >
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{promoMsg.text}</span>
-              </div>
-            )}
+                    ? "bg-green-950/80 border-green-600/60 text-green-300"
+                    : "bg-red-950/80 border-red-600/60 text-red-300"
+                )}>
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{promoMsg.text}</span>
+                </div>
+              )}
 
-            <div className="flex items-center gap-3 pt-1">
               <button
+                type="button"
                 onClick={() => {
                   if (!promoCodeInput.trim()) {
-                    setPromoMsg({ type: "error", text: "Please enter a valid promo code." });
+                    setPromoMsg({ type: "error", text: "Please enter a voucher or promo code." });
                     return;
                   }
-                  setPromoMsg({
-                    type: "success",
-                    text: "Promo code valid! Discount will be automatically applied at checkout."
-                  });
+                  setPromoMsg({ type: "error", text: "Invalid or expired promo code. Please check with administrator." });
                 }}
-                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md hover:brightness-110 cursor-pointer"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer"
               >
-                Apply Code
-              </button>
-              <button
-                onClick={() => setShowPromoModal(false)}
-                className="px-4 py-3 rounded-xl border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-900 transition cursor-pointer"
-              >
-                Close
+                APPLY CODE
               </button>
             </div>
-          </div>
+
+          </main>
         </div>
       )}
 
       {/* 6. PAYMENT HISTORY MODAL (NETFLIX STYLE) */}
       {showHistoryModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200 p-6 sm:p-7 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400">
-                  <Receipt className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">Billing & Payment History</h3>
-                  <p className="text-xs text-slate-400">Past transactions, subscription passes, and membership invoices</p>
-                </div>
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+          
+          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-cyan-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <Receipt className="w-5 h-5 text-cyan-400" />
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Billing & Payment History
+                </h2>
+                <p className="text-xs text-slate-400 hidden sm:block">
+                  Verified receipts, invoices, and membership activation records
+                </p>
               </div>
-              <button
-                onClick={() => setShowHistoryModal(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-cyan-950/50 transition cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowHistoryModal(false)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+              <span>Close</span>
+            </button>
+          </header>
+
+          <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-6">
+            
+            <div className="bg-[#0a1524]/80 rounded-3xl border border-cyan-500/30 overflow-hidden shadow-2xl p-4 sm:p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs sm:text-sm">
+                  <thead>
+                    <tr className="border-b border-cyan-500/20 text-slate-400 text-xs uppercase tracking-wider">
+                      <th className="pb-3 px-3">Date</th>
+                      <th className="pb-3 px-3">Description</th>
+                      <th className="pb-3 px-3">Payer UPI ID</th>
+                      <th className="pb-3 px-3">Amount</th>
+                      <th className="pb-3 px-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/80">
+                    {allUpgradeReqs && allUpgradeReqs.length > 0 ? (
+                      allUpgradeReqs.map((req: any) => (
+                        <tr key={req.id} className="hover:bg-cyan-950/20 transition">
+                          <td className="py-4 px-3 text-slate-300 font-mono text-xs">
+                            {formatDateTime24(req.createdAt)}
+                          </td>
+                          <td className="py-4 px-3 text-white font-medium">
+                            30-Day Gold Pass
+                          </td>
+                          <td className="py-4 px-3 text-slate-400 font-mono text-xs">
+                            {req.utrNumber || "-"}
+                          </td>
+                          <td className="py-4 px-3 text-amber-300 font-bold font-mono">
+                            ₹{req.amount || paymentSettings?.monthlyFee || 199}
+                          </td>
+                          <td className="py-4 px-3">
+                            <span className={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold " + (
+                              req.status === "APPROVED"
+                                ? "bg-emerald-950 text-emerald-300 border border-emerald-500/40"
+                                : req.status === "PENDING"
+                                ? "bg-amber-950 text-amber-300 border border-amber-500/40"
+                                : "bg-red-950 text-red-300 border border-red-500/40"
+                            )}>
+                              {req.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-slate-500">
+                          No previous payment records found on file.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            {/* Transactions List */}
-            <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
-              {allUpgradeReqs && allUpgradeReqs.length > 0 ? (
-                allUpgradeReqs.map((req: any, i: number) => (
-                  <div
-                    key={req.id || i}
-                    className="p-4 rounded-xl bg-[#061421] border border-cyan-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-white">
-                          Gold Membership Pass (30 Days)
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                            req.status === "APPROVED"
-                              ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-400"
-                              : req.status === "REJECTED"
-                              ? "bg-red-950/80 border-red-500/40 text-red-400"
-                              : "bg-amber-950/80 border-amber-500/40 text-amber-300"
-                          }`}
-                        >
-                          {req.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-400 font-mono">
-                        {new Date(req.createdAt).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric"
-                        })}   Method: UPI ({req.utrNumber || displayUpiId})
-                      </p>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <span className="text-base font-black text-emerald-400 font-mono block">
-                        ₹{req.amount || paymentSettings?.monthlyFee || 199}
-                      </span>
-                      <span className="text-[10px] text-slate-500 block">Official Receipt</span>
-                    </div>
-                  </div>
-                ))
-              ) : isGold ? (
-                <div className="p-4 rounded-xl bg-[#061421] border border-cyan-500/20 flex items-center justify-between gap-3">
-                  <div className="space-y-0.5">
-                    <span className="text-sm font-bold text-white">
-                      Active Gold Membership Subscription
-                    </span>
-                    <p className="text-xs text-slate-400 font-mono">
-                      Started: {memberSinceFormatted}   Payment: UPI ({displayUpiId})
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-base font-black text-emerald-400 font-mono block">
-                      ₹{paymentSettings?.monthlyFee || 199}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
-                      <Check className="w-3 h-3" /> Paid & Active
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-6 text-center text-slate-400 text-xs bg-[#061421] rounded-xl border border-cyan-500/20">
-                  No billing or payment history recorded for this account.
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={() => setShowHistoryModal(false)}
-                className="px-5 py-2.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition cursor-pointer"
-              >
-                Done
-              </button>
-            </div>
-          </div>
+          </main>
         </div>
       )}
 
       {/* 4. HIGHEST ENROLLED PLAN MODAL */}
       {showHighestPlanModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="relative w-full max-w-md bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 p-6 sm:p-8 text-center space-y-5 animate-in zoom-in-95 duration-200 my-auto">
-            
+        <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto flex flex-col animate-in fade-in duration-200">
+          
+          <header className="sticky top-0 z-30 w-full bg-[#07111c]/95 backdrop-blur-md border-b border-amber-500/30 px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                Plan Details & Enrollment Status
+              </h2>
+            </div>
             <button
+              type="button"
               onClick={() => setShowHighestPlanModal(false)}
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
-              title="Close"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
+              <span>Close</span>
             </button>
+          </header>
 
+          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col items-center justify-center text-center space-y-6 my-auto">
+            
             {/* Glowing Trophy / Badge Icon */}
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500/20 via-yellow-400/20 to-cyan-400/20 border border-amber-400/40 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)]">
-              <Sparkles className="w-8 h-8 text-amber-400" />
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-amber-500/20 via-yellow-400/20 to-cyan-400/20 border-2 border-amber-400/40 flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.35)]">
+              <Sparkles className="w-10 h-10 text-amber-400" />
             </div>
 
             {/* Top Tier Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-bold shadow-sm">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-bold shadow-sm">
               <span>★ TOP TIER ENROLLED</span>
             </div>
 
             {/* Heading & Exact Requested Message */}
             <div className="space-y-2">
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 Highest Plan Active
               </h3>
-              <p className="text-base text-slate-200 leading-relaxed font-semibold">
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed font-semibold">
                 You are currently enrolled in the highest possible plan on PieChem.
               </p>
             </div>
 
             {/* Current Plan Card */}
-            <div className="bg-slate-950/80 border border-cyan-500/30 rounded-2xl p-4 text-left space-y-2">
+            <div className="w-full bg-slate-950/80 border border-cyan-500/30 rounded-3xl p-5 text-left space-y-2.5 shadow-xl">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-400 font-medium">Active Membership</span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Active
                 </span>
               </div>
-              <p className="text-sm font-bold text-white flex items-center gap-1.5">
+              <p className="text-base font-bold text-white flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400" /> {isComplimentary ? "Complimentary Premium Access" : "Gold Membership (Premium)"}
               </p>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 You already have full access to all 50+ exams, 3D molecular models, full solutions, and proctored analytics.
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-2.5 pt-1">
+            <div className="w-full space-y-3 pt-2">
               <button
+                type="button"
                 onClick={() => setShowHighestPlanModal(false)}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer transition"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer transition"
               >
                 GOT IT, THANK YOU!
               </button>
 
-              <button
-                onClick={() => {
-                  setShowHighestPlanModal(false);
-                  setShowPaymentModal(true);
-                  fetchUpgradeRequest();
-                }}
-                className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer"
-              >
-                Need to renew or extend your 30-day pass instead?
-              </button>
+              {is30Day && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHighestPlanModal(false);
+                    setShowPaymentModal(true);
+                    fetchUpgradeRequest();
+                  }}
+                  className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer block mx-auto"
+                >
+                  Need to renew or extend your 30-day pass instead?
+                </button>
+              )}
             </div>
 
-          </div>
+          </main>
         </div>
       )}
 
