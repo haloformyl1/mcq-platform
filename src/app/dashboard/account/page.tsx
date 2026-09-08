@@ -1796,60 +1796,62 @@ export default function StudentAccountPage() {
                 {/* Plan Comparison Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
                   
-                  {/* Card 1: Basic Student Plan */}
-                  <div className="rounded-2xl border border-slate-800/90 bg-[#07111c]/90 shadow-lg flex flex-col justify-between overflow-hidden relative transition hover:border-slate-700">
+                  {/* Card 1: Basic Student Plan (Netflix-Inspired Standard Blue/Purple Gradient) */}
+                  <div className="rounded-2xl border-2 border-indigo-500/40 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(99,102,241,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400 hover:shadow-[0_0_60px_rgba(99,102,241,0.28)]">
                     
-                    {/* Card Head */}
-                    <div className="p-6 bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 border-b border-slate-800 relative">
+                    {/* Card Head (Netflix Standard Vibrant Blue/Purple Gradient Banner) */}
+                    <div className="p-6 bg-gradient-to-r from-[#203a94] via-[#4338ca] to-[#723abb] text-white relative">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Free Tier</span>
+                        <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
+                          FREE TIER
+                        </span>
                         {!isGold && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold shadow-sm">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Current plan
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-cyan-300 text-xs font-black shadow-sm">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Current plan
                           </span>
                         )}
                       </div>
                       <h3 className="text-2xl font-black text-white tracking-tight">Basic</h3>
-                      <p className="text-xs text-slate-400 mt-1">Foundational practice tier for chemistry students</p>
+                      <p className="text-xs text-white/80 mt-1">Foundational practice tier for chemistry students</p>
                     </div>
 
                     {/* Features Comparison Rows */}
-                    <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-slate-800/80">
+                    <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-indigo-500/15">
                       <div className="flex justify-between items-center pt-1">
-                        <span className="text-slate-400 font-medium">Monthly price</span>
+                        <span className="text-slate-300 font-medium">Monthly price</span>
                         <span className="font-bold text-white font-mono text-base">₹0</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-400 font-medium">Chemistry Exam Tests</span>
-                        <span className="font-semibold text-slate-300">Selected tests are free.</span>
+                        <span className="text-slate-300 font-medium">Chemistry Exam Tests</span>
+                        <span className="font-semibold text-slate-200">Selected tests are free.</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-400 font-medium">Answer Explanations</span>
-                        <span className="font-semibold text-slate-300">Standard Answer Key</span>
+                        <span className="text-slate-300 font-medium">Answer Explanations</span>
+                        <span className="font-semibold text-slate-200">Standard Answer Key</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-400 font-medium">Study Materials</span>
-                        <span className="font-semibold text-slate-300">Selected Free Chapters</span>
+                        <span className="text-slate-300 font-medium">Study Materials</span>
+                        <span className="font-semibold text-slate-200">Selected Free Chapters</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-400 font-medium">Ranking & Analytics</span>
-                        <span className="font-semibold text-slate-300">Basic Score Summary</span>
+                        <span className="text-slate-300 font-medium">Ranking & Analytics</span>
+                        <span className="font-semibold text-slate-200">Basic Score Summary</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-400 font-medium">Supported Devices</span>
-                        <span className="font-semibold text-slate-300">1 Active Device</span>
+                        <span className="text-slate-300 font-medium">Supported Devices</span>
+                        <span className="font-semibold text-slate-200">1 Active Device</span>
                       </div>
                     </div>
 
                     {/* Card CTA */}
                     <div className="p-6 pt-0 mt-auto">
                       {!isGold ? (
-                        <div className="w-full py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-500 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2">
+                        <div className="w-full py-4 rounded-xl bg-gradient-to-r from-[#203a94]/40 via-[#4338ca]/30 to-[#723abb]/40 border border-indigo-500/40 text-indigo-200 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.2)]">
                           <Check className="w-4 h-4 text-cyan-400" />
                           <span>Enrolled (Current Plan)</span>
                         </div>
                       ) : (
-                        <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-500 text-xs font-semibold text-center select-none">
+                        <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs font-semibold text-center select-none">
                           Standard Free Tier
                         </div>
                       )}
