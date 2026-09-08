@@ -107,7 +107,6 @@ export default function StudentAccountPage() {
   const [deviceActionMsg, setDeviceActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Password Change Form States
-  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordOtp, setPasswordOtp] = useState("");
@@ -451,7 +450,6 @@ export default function StudentAccountPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          currentPassword: oldPassword,
           otp: passwordOtp,
           newPassword
         })
@@ -460,7 +458,6 @@ export default function StudentAccountPage() {
 
       if (res.ok) {
         setPassMsg({ type: "success", text: "Password updated successfully!" });
-        setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
         setPasswordOtp("");
@@ -1062,36 +1059,19 @@ export default function StudentAccountPage() {
 
                   {/* Password Form */}
                   <form onSubmit={handlePasswordChange} className="space-y-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      
-                      {/* OTP Input */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
-                          <span>Verification OTP *</span>
-                          <span className="text-[11px] text-slate-500 font-normal">6 digits</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={passwordOtp}
-                          onChange={(e) => setPasswordOtp(e.target.value)}
-                          placeholder="Enter 6-digit OTP"
-                          className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white font-mono tracking-wider outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                        />
-                      </div>
-
-                      {/* Current Password */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Current Password (Optional)
-                        </label>
-                        <input
-                          type="password"
-                          value={oldPassword}
-                          onChange={(e) => setOldPassword(e.target.value)}
-                          placeholder="Enter current password if set"
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
-                        />
-                      </div>
+                    {/* OTP Input */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
+                        <span>Verification OTP *</span>
+                        <span className="text-[11px] text-slate-500 font-normal">6 digits</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={passwordOtp}
+                        onChange={(e) => setPasswordOtp(e.target.value)}
+                        placeholder="Enter 6-digit OTP"
+                        className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white font-mono tracking-wider outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                      />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
