@@ -519,9 +519,10 @@ export default function StudentAccountPage() {
 
   const nextPaymentFormatted = student.subscriptionExpiresAt
     ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-    : "Never (Lifetime Pass)";
+    : "Never (Complimentary Pass)";
 
-  const isLifetime = isGold && !student.subscriptionExpiresAt;
+  const isComplimentary = student.subscriptionStatus === "COMPLIMENTARY" || (isGold && !student.subscriptionExpiresAt);
+  const isLifetime = isComplimentary;
   const is30Day = isGold && !!student.subscriptionExpiresAt;
 
   const rawPayerUpi = (upgradeReq?.utrNumber && upgradeReq.utrNumber.includes("@"))
@@ -741,7 +742,7 @@ export default function StudentAccountPage() {
                         ? "Free Tier"
                         : is30Day
                         ? "30-Day Premium Access"
-                        : "Lifetime Premium Access"}
+                        : "Complimentary"}
                     </p>
                   </div>
 
@@ -932,7 +933,7 @@ export default function StudentAccountPage() {
                         ? "Free Tier"
                         : is30Day
                         ? "30-Day Premium Access"
-                        : "Lifetime Premium Access"}
+                        : "Complimentary"}
                     </p>
                     <p className="text-xs sm:text-sm text-slate-400 pt-1 leading-relaxed">
                       {isGold
@@ -968,7 +969,7 @@ export default function StudentAccountPage() {
                         {is30Day ? "Next renewal" : isLifetime ? "Membership" : "Payment status"}
                       </h4>
                       <p className="text-sm text-slate-300 font-mono font-medium">
-                        {is30Day ? nextPaymentFormatted : isLifetime ? "Lifetime Unlimited Pass" : "No payment method on file"}
+                        {is30Day ? nextPaymentFormatted : isComplimentary ? "Complimentary Pass" : "No payment method on file"}
                       </p>
 
                       {is30Day && (
