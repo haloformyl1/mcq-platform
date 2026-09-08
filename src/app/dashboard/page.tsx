@@ -53,6 +53,11 @@ export default function StudentDashboard() {
           return;
         }
         setData(data);
+        if (typeof window !== "undefined") {
+          const isGold = data.student?.subscriptionStatus === "PAID" || data.student?.subscriptionStatus === "COMPLIMENTARY";
+          localStorage.setItem("piechem_is_gold", isGold ? "true" : "false");
+          window.dispatchEvent(new Event("piechem_gold_status_changed"));
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -244,7 +249,7 @@ export default function StudentDashboard() {
               
               {/* Horizontal Logo + Designer Badge Side-by-Side (Image 1 style) */}
               <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
-                <PiechemLogo size="md" href="/dashboard" />
+                <PiechemLogo size="md" href="/dashboard" isGoldMember={student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY"} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -324,21 +329,7 @@ export default function StudentDashboard() {
             {/* Right Group: Curriculum Switcher + Account Profile + Logout */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
-              {/* Option 3: Golden Status Pill */}
-              {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.dispatchEvent(new CustomEvent("piechem:show-celebration"));
-                  }}
-                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-105 transition-all cursor-pointer"
-                  title="Gold Membership Active - Click to view validity & perks"
-                >
-                  <span className="text-sm">⭐</span>
-                  <span>GOLD MEMBER</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                </button>
-              )}
+
 
               {/* Option 4: Notification Center Dropdown */}
               <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />

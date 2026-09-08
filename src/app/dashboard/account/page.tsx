@@ -731,7 +731,7 @@ export default function StudentAccountPage() {
           
           {/* Left: Brand Identity & Designer Attribution */}
           <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-            <PiechemLogo size="md" theme="dark" href="/dashboard" />
+            <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
             
             <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
               <span className="text-slate-400">Designed by</span>
@@ -750,21 +750,7 @@ export default function StudentAccountPage() {
 
           {/* Right: Netflix-Style Profile Dropdown Trigger */}
           <div className="relative flex items-center gap-3 shrink-0">
-            {/* Option 3: Golden Status Pill */}
-            {isGold && (
-              <button
-                type="button"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent("piechem:show-celebration"));
-                }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-105 transition-all cursor-pointer"
-                title="Gold Membership Active - Click to view validity & perks"
-              >
-                <span className="text-sm">⭐</span>
-                <span>GOLD MEMBER</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              </button>
-            )}
+
 
             {/* Option 4: Notification Center Dropdown */}
             <NotificationCenterDropdown student={student} upgradeReq={upgradeReq} />
@@ -2001,7 +1987,7 @@ export default function StudentAccountPage() {
               
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -2469,7 +2455,7 @@ export default function StudentAccountPage() {
               
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -2580,7 +2566,7 @@ export default function StudentAccountPage() {
               
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -2679,7 +2665,7 @@ export default function StudentAccountPage() {
               
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -2776,7 +2762,7 @@ export default function StudentAccountPage() {
               
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" />
+                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
