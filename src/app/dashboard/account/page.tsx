@@ -32,6 +32,37 @@ export default function StudentAccountPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "membership" | "security" | "devices" | "profiles">("overview");
+
+  const validTabs: Array<"overview" | "membership" | "security" | "devices" | "profiles"> = [
+    "overview", "membership", "security", "devices", "profiles"
+  ];
+
+  const navigateToTab = (tab: "overview" | "membership" | "security" | "devices" | "profiles", replace = false) => {
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const targetHash = tab === "overview" ? "" : `#${tab}`;
+      const targetUrl = targetHash ? `${window.location.pathname}${targetHash}` : window.location.pathname;
+      if (window.location.hash !== targetHash) {
+        if (replace) {
+          window.history.replaceState({ tab }, "", targetUrl);
+        } else {
+          window.history.pushState({ tab }, "", targetUrl);
+        }
+      }
+    }
+  };
+
+  const handleBackNavigation = () => {
+    if (typeof window !== "undefined") {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        navigateToTab("overview");
+      }
+    } else {
+      setActiveTab("overview");
+    }
+  };
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   // Unisex Avatar Options
@@ -115,11 +146,34 @@ export default function StudentAccountPage() {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash === "#renew") {
-      setShowPaymentModal(true);
-      setActiveTab("membership");
-    }
+    const handleUrlChange = () => {
+      if (typeof window === "undefined") return;
+      const rawHash = window.location.hash.replace(/^#/, "").toLowerCase();
+
+      if (rawHash === "renew") {
+        setShowPaymentModal(true);
+        setActiveTab("membership");
+        return;
+      }
+
+      if (validTabs.includes(rawHash as any)) {
+        setActiveTab(rawHash as any);
+      } else {
+        setActiveTab("overview");
+      }
+    };
+
+    handleUrlChange();
+
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("hashchange", handleUrlChange);
+
     fetchUpgradeRequest();
+
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("hashchange", handleUrlChange);
+    };
   }, []);
 
   // Auto-polling when payment modal is open in "waiting" step to detect approval in real-time
@@ -540,7 +594,7 @@ export default function StudentAccountPage() {
                   <button
                     onClick={() => {
                       setProfileDropdownOpen(false);
-                      setActiveTab("profiles");
+                      navigateToTab("profiles");
                     }}
                     className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition text-left cursor-pointer"
                   >
@@ -550,7 +604,7 @@ export default function StudentAccountPage() {
                   <button
                     onClick={() => {
                       setProfileDropdownOpen(false);
-                      setActiveTab("security");
+                      navigateToTab("security");
                     }}
                     className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition text-left cursor-pointer"
                   >
@@ -578,48 +632,70 @@ export default function StudentAccountPage() {
         
         {/* Top Navigation Row */}
         <div className="flex items-center justify-between">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-400 hover:text-cyan-300 transition group"
-          >
-            <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Dashboard</span>
-          </Link>
-
-          {activeTab !== "overview" && (
-            <button
-              onClick={() => setActiveTab("overview")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 hover:text-white text-xs font-bold transition cursor-pointer"
+          {activeTab === "overview" ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-400 hover:text-cyan-300 transition group"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Dashboard</span>
+            </Link>
+          ) : (
+            <button
+              onClick={handleBackNavigation}
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-cyan-400 hover:text-cyan-300 transition group cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4 text-cyan-400 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Overview</span>
             </button>
           )}
+
+          {activeTab !== "overview" && (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/60 hover:bg-cyan-950/80 border border-slate-800 hover:border-cyan-500/30 text-slate-400 hover:text-cyan-300 text-xs font-bold transition cursor-pointer"
+            >
+              <span>Exit to Dashboard</span>
+            </Link>
+          )}
         </div>
 
-            
-            {/* Header Titles */}
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-                {activeTab === "devices" ? "Manage Access and Devices" : "Account"}
-              </h1>
-              <p className="text-sm font-medium text-slate-400 mt-1">
-                {activeTab === "devices" ? (
-                  <>
-                    These signed-in devices have recently been active on this account. You can sign out any unfamiliar devices or{" "}
-                    <button
-                      onClick={() => setActiveTab("security")}
-                      className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
-                    >
-                      change your password
-                    </button>{" "}
-                    for added security.
-                  </>
-                ) : (
-                  "Membership details"
-                )}
-              </p>
-            </div>
+        {/* Header Titles */}
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            {activeTab === "devices"
+              ? "Manage Access and Devices"
+              : activeTab === "security"
+              ? "Security & Password"
+              : activeTab === "profiles"
+              ? "Student Profile & Curriculum"
+              : activeTab === "membership"
+              ? "Plan & Membership Details"
+              : "Account"}
+          </h1>
+          <p className="text-sm font-medium text-slate-400 mt-1">
+            {activeTab === "devices" ? (
+              <>
+                These signed-in devices have recently been active on this account. You can sign out any unfamiliar devices or{" "}
+                <button
+                  onClick={() => navigateToTab("security")}
+                  className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
+                >
+                  change your password
+                </button>{" "}
+                for added security.
+              </>
+            ) : activeTab === "security" ? (
+              "Update your account credentials to protect your proctored exam history."
+            ) : activeTab === "profiles" ? (
+              "Customize your display avatar, personal details, and academic board."
+            ) : activeTab === "membership" ? (
+              "Review subscription tier, renewal dates, and available exam pass benefits."
+            ) : (
+              "Membership details"
+            )}
+          </p>
+        </div>
 
             {/* VIEW A: OVERVIEW TAB */}
             {activeTab === "overview" && (
@@ -723,7 +799,7 @@ export default function StudentAccountPage() {
 
                     {/* Manage Access and Devices */}
                     <button
-                      onClick={() => setActiveTab("devices")}
+                      onClick={() => navigateToTab("devices")}
                       className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
@@ -744,7 +820,7 @@ export default function StudentAccountPage() {
 
                     {/* Edit Student Profile & Curriculum */}
                     <button
-                      onClick={() => setActiveTab("profiles")}
+                      onClick={() => navigateToTab("profiles")}
                       className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
@@ -765,7 +841,7 @@ export default function StudentAccountPage() {
 
                     {/* Update Password & Security */}
                     <button
-                      onClick={() => setActiveTab("security")}
+                      onClick={() => navigateToTab("security")}
                       className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
                     >
                       <div className="flex items-center gap-3.5">
@@ -811,7 +887,7 @@ export default function StudentAccountPage() {
                   </div>
 
                   <button
-                    onClick={() => setActiveTab("profiles")}
+                    onClick={() => navigateToTab("profiles")}
                     className="px-4 py-2 rounded-xl border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:bg-cyan-950/60 hover:text-white transition cursor-pointer shrink-0"
                   >
                     Edit Profile
