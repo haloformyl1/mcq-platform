@@ -677,16 +677,9 @@ export default function StudentAccountPage() {
     router.push("/");
   };
 
-  if (loading || !data) return <PiFiringLoader fullScreen={true} />;
-
-  const { student, allAttempts = [] } = data;
-  const completedAttempts = allAttempts.filter((a: any) => a.status === "SUBMITTED");
-  const isComplimentary = student.subscriptionStatus === "COMPLIMENTARY" || (!student.subscriptionExpiresAt && student.subscriptionStatus === "PAID");
-  const isPaidActive = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
-  const isGold = isComplimentary || isPaidActive;
-
-  // Reactively synchronize localStorage to active subscription state
+  // Reactively synchronize localStorage to active subscription state (must be before early return)
   useEffect(() => {
+    const student = data?.student;
     if (!student) return;
     const isComp = student.subscriptionStatus === "COMPLIMENTARY";
     const isPaid = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
@@ -711,7 +704,15 @@ export default function StudentAccountPage() {
         window.dispatchEvent(new Event("piechem_gold_status_changed"));
       } catch {}
     }
-  }, [student, now]);
+  }, [data?.student, now]);
+
+  if (loading || !data) return <PiFiringLoader fullScreen={true} />;
+
+  const { student, allAttempts = [] } = data;
+  const completedAttempts = allAttempts.filter((a: any) => a.status === "SUBMITTED");
+  const isComplimentary = student.subscriptionStatus === "COMPLIMENTARY" || (!student.subscriptionExpiresAt && student.subscriptionStatus === "PAID");
+  const isPaidActive = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
+  const isGold = isComplimentary || isPaidActive;
 
   // Check if student is currently at the highest plan available
   // Currently, 1 paid plan exists: Gold Membership
