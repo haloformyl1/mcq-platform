@@ -261,7 +261,7 @@ export default function AdminPaymentsPage() {
               <span>Payment & Subscription Hub</span>
             </h1>
             <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Manage student UPI payments, UTR verification, 30-day billing cycles, and live QR settings
+              Manage student UPI payments, verify payer UPI ID, 30-day billing cycles, and live QR settings
             </p>
           </div>
         </div>
@@ -299,7 +299,7 @@ export default function AdminPaymentsPage() {
             <Clock className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-black text-white font-mono">{pendingRequests.length}</div>
-          <div className="text-[11px] text-amber-200/70">Awaiting Admin UTR Approval</div>
+          <div className="text-[11px] text-amber-200/70">Awaiting Admin Approval</div>
         </div>
 
         {/* Metric 2 */}
@@ -349,7 +349,7 @@ export default function AdminPaymentsPage() {
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-slate-400">Review student UPI submissions, match UTR reference numbers, and grant 30-Day Pass</p>
+              <p className="text-xs text-slate-400">Review student UPI submissions, check student payer UPI ID, and grant 30-Day Pass</p>
             </div>
           </div>
         </div>
@@ -390,10 +390,10 @@ export default function AdminPaymentsPage() {
                     <div className="bg-slate-950/90 p-3.5 rounded-xl border border-amber-500/40 space-y-2 font-mono text-xs">
                       <div className="flex justify-between items-center text-slate-300">
                         <span>Amount Paid:</span>
-                        <span className="font-extrabold text-green-400 text-sm">₹{req.amount || 99}</span>
+                        <span className="font-extrabold text-green-400 text-sm">₹{req.amount || paymentSettings?.monthlyFee || 199}</span>
                       </div>
                       <div className="flex justify-between items-center text-slate-300 pt-1 border-t border-slate-800">
-                        <span>Payment UTR / Ref:</span>
+                        <span className="text-amber-300 font-bold">Student Payer UPI ID:</span>
                         <div className="flex items-center gap-1.5">
                           <span className="font-black text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800 tracking-wider">
                             {req.utrNumber || "NOT PROVIDED"}
@@ -407,7 +407,7 @@ export default function AdminPaymentsPage() {
                                 setTimeout(() => setCopiedUtr(null), 2000);
                               }}
                               className="p-1 text-slate-400 hover:text-white transition"
-                              title="Copy UTR Ref Number"
+                              title="Copy Student Payer UPI ID"
                             >
                               {copiedUtr === req.utrNumber ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                             </button>
@@ -491,7 +491,7 @@ export default function AdminPaymentsPage() {
               <thead className="text-[11px] text-slate-400 uppercase tracking-wider bg-slate-950/80 border-b border-slate-800 font-bold">
                 <tr>
                   <th className="px-4 py-3.5">Student Details</th>
-                  <th className="px-4 py-3.5">UTR Reference</th>
+                  <th className="px-4 py-3.5 text-cyan-300">Payer UPI ID</th>
                   <th className="px-4 py-3.5 text-emerald-400">Active Since (DD/MM/YYYY HH:MM:SS)</th>
                   <th className="px-4 py-3.5 text-amber-400">Next Payment / Expiry Date (DD/MM/YYYY HH:MM:SS)</th>
                   <th className="px-4 py-3.5">Time Remaining</th>
@@ -601,78 +601,6 @@ export default function AdminPaymentsPage() {
             </table>
           </div>
         )}
-      </section>
-
-      {/* SECTION 3: AUTOMATED UTR VERIFICATION TOOLS (0% GATEWAY FEE) */}
-      <section className="bg-[#12161f]/90 border border-cyan-500/40 p-6 sm:p-7 rounded-3xl shadow-xl space-y-5">
-        <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4">
-          <div className="p-2.5 bg-cyan-950/90 rounded-xl border border-cyan-500/40 text-cyan-300">
-            <ShieldAlert className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-lg font-black text-white tracking-wide">Automated UTR Verification Tools (0% Gateway Fee)</h2>
-            <p className="text-xs text-slate-400">Instantly match single UTR numbers or paste complete UPI bank statement CSVs for batch auto-approvals</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Tool 1: Instant Single UTR Lookup */}
-          <div className="bg-[#161d28] p-5 rounded-2xl border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Search className="w-4 h-4" /> 1-Click Instant UTR Lookup
-              </span>
-              <span className="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded border border-cyan-800 font-bold">Fast</span>
-            </div>
-            <p className="text-xs text-slate-400">Paste student's 12-digit UTR/RRN number from your GPay/PhonePe history to immediately verify and grant 30 days access.</p>
-
-            <form onSubmit={handleSingleUtrVerify} className="flex gap-2">
-              <input
-                type="text"
-                value={singleUtrInput}
-                onChange={(e) => setSingleUtrInput(e.target.value.replace(/[^0-9A-Za-z]/g, ''))}
-                placeholder="Paste 12-digit UTR (e.g. 467289946557)"
-                className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono placeholder-slate-600 focus:outline-none focus:border-cyan-400"
-              />
-              <button
-                type="submit"
-                disabled={singleUtrLoading}
-                className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md disabled:opacity-50 shrink-0"
-              >
-                {singleUtrLoading ? "Verifying..." : "Verify & Grant"}
-              </button>
-            </form>
-          </div>
-
-          {/* Tool 2: Bulk Statement Batch Importer */}
-          <div className="bg-[#161d28] p-5 rounded-2xl border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                <FileSpreadsheet className="w-4 h-4" /> Bulk Statement UTR Auto-Approve
-              </span>
-              <span className="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800 font-bold">Batch</span>
-            </div>
-            <p className="text-xs text-slate-400">Copy transaction lines or CSV export from PhonePe/GPay statement. Auto-extracts all 12-digit UTRs and activates matching students.</p>
-
-            <div className="flex gap-2">
-              <textarea
-                rows={2}
-                value={bulkUtrText}
-                onChange={(e) => setBulkUtrText(e.target.value)}
-                placeholder="Paste transaction lines or statement text containing 12-digit UTRs..."
-                className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono placeholder-slate-600 focus:outline-none focus:border-emerald-400"
-              />
-              <button
-                type="button"
-                onClick={handleBulkUtrVerify}
-                disabled={bulkUtrLoading}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md disabled:opacity-50 shrink-0"
-              >
-                {bulkUtrLoading ? "Matching..." : "Batch Verify"}
-              </button>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* SECTION 4: LIVE UPI VPA & DYNAMIC QR CODE CONFIGURATION */}

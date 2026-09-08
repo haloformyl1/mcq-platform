@@ -61,7 +61,7 @@ export default function StudentAccountPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
   const [studentUpiId, setStudentUpiId] = useState("");
-  const [paymentStep, setPaymentStep] = useState<"input" | "waiting">("input");
+  const [paymentStep, setPaymentStep] = useState<"input" | "waiting" | "success">("input");
   const [utrNumber, setUtrNumber] = useState("");
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
@@ -113,6 +113,43 @@ export default function StudentAccountPage() {
     }
     fetchUpgradeRequest();
   }, []);
+
+  // Auto-polling when payment modal is open in "waiting" step to detect approval in real-time
+  useEffect(() => {
+    if (!showPaymentModal || paymentStep !== "waiting") return;
+
+    const interval = setInterval(async () => {
+      try {
+        const [dashRes, upgRes] = await Promise.all([
+          fetch("/api/student/dashboard"),
+          fetch("/api/student/upgrade-request")
+        ]);
+
+        if (dashRes.ok) {
+          const dashData = await dashRes.json();
+          if (dashData?.student?.subscriptionStatus === "PAID" || dashData?.student?.subscriptionStatus === "COMPLIMENTARY") {
+            setData(dashData);
+            setPaymentStep("success");
+            return;
+          }
+        }
+
+        if (upgRes.ok) {
+          const upgData = await upgRes.json();
+          if (upgData?.request) {
+            setUpgradeReq(upgData.request);
+            if (upgData.request.status === "APPROVED") {
+              setPaymentStep("success");
+            }
+          }
+        }
+      } catch (err) {
+        // silent
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [showPaymentModal, paymentStep]);
 
   useEffect(() => {
     fetch("/api/student/dashboard")
@@ -1617,6 +1654,44 @@ export default function StudentAccountPage() {
                     </span>
                   </div>
 
+                </div>
+              )}
+
+              {/* State: SUCCESS / CONFIRMED STEP */}
+              {paymentStep === "success" && (
+                <div className="space-y-5 text-center py-4 animate-in zoom-in-95 duration-300">
+                  <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+                    <span className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping duration-1000" />
+                    <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                      <CheckCircle2 className="w-9 h-9 text-slate-950 stroke-[2.5]" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-500/50 text-emerald-300 text-xs font-bold">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Payment Verified & Approved!</span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-black text-white">
+                      Welcome to Gold Membership!
+                    </h3>
+                    <p className="text-xs text-slate-300 max-w-sm mx-auto leading-relaxed">
+                      Your ₹{paymentSettings?.monthlyFee || 199} payment has been confirmed by Admin. All 50+ Chemistry Exams, full solutions, and proctored analytics are now fully unlocked for 30 days.
+                    </p>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={() => {
+                        setShowPaymentModal(false);
+                        setPaymentStep("input");
+                        window.location.reload();
+                      }}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:brightness-110 active:scale-98 transition cursor-pointer"
+                    >
+                      CONTINUE TO DASHBOARD
+                    </button>
+                  </div>
                 </div>
               )}
 
