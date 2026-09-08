@@ -305,27 +305,25 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
       <header className="border-b border-cyan-500/20 bg-[#08131e]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
           <div className="flex justify-between items-center gap-2">
-            <div className="flex flex-col items-start gap-1 shrink-0">
-              <PiechemLogo size="md" href="/dashboard" />
-              
-              <div className="hidden sm:flex px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-[11px] text-slate-300 font-semibold tracking-wide items-center space-x-1.5 mt-0.5">
-                <span className="text-slate-400">Designed by</span>
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
-                  Arghyadeep Roy
-                </span>
-                <span className="text-cyan-500/60">•</span>
-                <a 
-                  href="tel:9830507435" 
-                  className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white hover:bg-cyan-600/80 border border-cyan-500/50 transition-all font-mono shadow-[0_0_10px_rgba(6,182,212,0.2)]"
-                  title="Call Arghyadeep Roy"
-                >
-                  <svg className="w-2.5 h-2.5 mr-0.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
-                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                  </svg>
-                  <span>9830507435</span>
-                </a>
+            <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+                <PiechemLogo size="md" href="/dashboard" />
+                
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                  <span className="text-slate-400">Designed by</span>
+                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+                  <span className="text-cyan-500/60 text-[9px] hidden xs:inline">•</span>
+                  <a 
+                    href="tel:9830507435" 
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    title="Call Arghyadeep Roy"
+                  >
+                    <svg className="w-2.5 h-2.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
+                      <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    </svg>
+                    <span>9830507435</span>
+                  </a>
+                </div>
               </div>
-            </div>
 
             <div className="flex items-center gap-2 shrink-0">
               <Link 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { KeyRound, Shield, X, Check, Lock } from "lucide-react";
+import { KeyRound, Shield, X, Check, Lock, Phone } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

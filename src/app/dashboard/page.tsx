@@ -233,20 +233,20 @@ export default function StudentDashboard() {
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
       <header className="sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3">
-          <div className="flex items-center justify-between gap-4">
+        <div className="w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+          <div className="flex items-center justify-between gap-3 sm:gap-4">
             
-            {/* Left Group: Brand Identity (Stacked Logo + Badge) & Netflix Nav Tabs */}
-            <div className="flex items-center gap-6 lg:gap-8 min-w-0">
+            {/* Left Group: Brand Identity & Designer Attribution at Far Left for Mobile & Desktop */}
+            <div className="flex items-center gap-3 sm:gap-5 min-w-0 shrink-0">
               
-              {/* Stacked Logo + Compact Designer Badge (Image 2 style) */}
-              <div className="flex flex-col items-start gap-1 shrink-0">
+              {/* Horizontal Logo + Designer Badge Side-by-Side (Image 1 style) */}
+              <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
                 <PiechemLogo size="md" href="/dashboard" />
                 
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[10px] font-medium shadow-sm">
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60 text-[9px]">•</span>
+                  <span className="text-cyan-500/60 text-[9px] hidden xs:inline">•</span>
                   <a 
                     href="tel:9830507435" 
                     className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
