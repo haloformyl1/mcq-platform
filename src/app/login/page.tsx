@@ -291,7 +291,7 @@ export default function StudentLogin() {
         <header className="relative z-20 w-full px-4 sm:px-8 py-5 sm:py-6 flex items-start justify-between gap-4">
           {/* Logo & Compact Designer Badge (Image 2 style) */}
           <div className="flex flex-col items-start gap-1.5 sm:gap-2">
-            <PiechemLogo size="md" />
+            <PiechemLogo size="md" isGoldMember={false} />
             <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full border border-cyan-500/30 bg-[#03111c]/90 backdrop-blur-md shadow-sm">
               <span className="text-[11px] sm:text-xs text-slate-400 font-medium whitespace-nowrap">
                 Designed by <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>

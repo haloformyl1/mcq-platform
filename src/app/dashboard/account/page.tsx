@@ -50,6 +50,12 @@ function isValidUpiId(upi: string): boolean {
 export default function StudentAccountPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
   const [activeTab, setActiveTab] = useState<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan">("overview");
 
   const validTabs: Array<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan"> = [
@@ -658,6 +664,14 @@ export default function StudentAccountPage() {
   };
 
   const handleLogout = async () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("piechem_is_gold");
+        localStorage.removeItem("piechem_gold_expires_at");
+        localStorage.removeItem("piechem_is_complimentary");
+        window.dispatchEvent(new Event("piechem_gold_status_changed"));
+      } catch {}
+    }
     document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/");
@@ -667,7 +681,37 @@ export default function StudentAccountPage() {
 
   const { student, allAttempts = [] } = data;
   const completedAttempts = allAttempts.filter((a: any) => a.status === "SUBMITTED");
-  const isGold = student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY";
+  const isComplimentary = student.subscriptionStatus === "COMPLIMENTARY" || (!student.subscriptionExpiresAt && student.subscriptionStatus === "PAID");
+  const isPaidActive = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
+  const isGold = isComplimentary || isPaidActive;
+
+  // Reactively synchronize localStorage to active subscription state
+  useEffect(() => {
+    if (!student) return;
+    const isComp = student.subscriptionStatus === "COMPLIMENTARY";
+    const isPaid = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
+    const isGoldStatus = isComp || isPaid;
+
+    if (typeof window !== "undefined") {
+      try {
+        if (isGoldStatus) {
+          localStorage.setItem("piechem_is_gold", "true");
+          if (isComp) {
+            localStorage.setItem("piechem_is_complimentary", "true");
+            localStorage.removeItem("piechem_gold_expires_at");
+          } else if (student.subscriptionExpiresAt) {
+            localStorage.setItem("piechem_gold_expires_at", new Date(student.subscriptionExpiresAt).toISOString());
+            localStorage.removeItem("piechem_is_complimentary");
+          }
+        } else {
+          localStorage.removeItem("piechem_is_gold");
+          localStorage.removeItem("piechem_gold_expires_at");
+          localStorage.removeItem("piechem_is_complimentary");
+        }
+        window.dispatchEvent(new Event("piechem_gold_status_changed"));
+      } catch {}
+    }
+  }, [student, now]);
 
   // Check if student is currently at the highest plan available
   // Currently, 1 paid plan exists: Gold Membership
@@ -699,7 +743,6 @@ export default function StudentAccountPage() {
     ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : "Never (Complimentary Pass)";
 
-  const isComplimentary = student.subscriptionStatus === "COMPLIMENTARY" || (isGold && !student.subscriptionExpiresAt);
   const isLifetime = isComplimentary;
   const is30Day = isGold && !!student.subscriptionExpiresAt;
 

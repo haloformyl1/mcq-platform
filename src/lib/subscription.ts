@@ -20,8 +20,20 @@ export async function autoExpireSubscriptions() {
   }
 }
 
-export function hasPremiumAccess(subscriptionStatus: string | null | undefined): boolean {
-  return subscriptionStatus === "PAID" || subscriptionStatus === "COMPLIMENTARY";
+export function hasPremiumAccess(
+  subscriptionStatus: string | null | undefined,
+  subscriptionExpiresAt?: string | Date | null
+): boolean {
+  if (!subscriptionStatus) return false;
+  const status = subscriptionStatus.trim().toUpperCase();
+  if (status === "COMPLIMENTARY") return true;
+  if (status === "PAID") {
+    if (!subscriptionExpiresAt) return true;
+    const expiry = new Date(subscriptionExpiresAt).getTime();
+    if (isNaN(expiry)) return true;
+    return expiry > Date.now();
+  }
+  return false;
 }
 
 export function formatDateTime24(dateInput: string | Date | null | undefined): string {

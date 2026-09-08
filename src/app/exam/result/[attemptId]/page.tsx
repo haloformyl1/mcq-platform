@@ -62,7 +62,10 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
         {/* Top Header & Logo */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#161616]/70 border border-[#333333] p-4 rounded-xl backdrop-blur-md">
           <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
-            <PiechemLogo size="sm" />
+            <PiechemLogo size="sm" isGoldMember={
+                result?.student?.subscriptionStatus === "COMPLIMENTARY" ||
+                (result?.student?.subscriptionStatus === "PAID" && (!result?.student?.subscriptionExpiresAt || new Date(result.student.subscriptionExpiresAt).getTime() > Date.now()))
+              } />
             <div className="min-w-0 flex-1">
               <div className="text-[10px] sm:text-xs font-semibold text-blue-400 uppercase tracking-widest truncate">Exam Scrutiny & Performance</div>
               <h1 className="text-base sm:text-lg font-bold text-white break-words line-clamp-2 leading-tight">{result.test.title}</h1>

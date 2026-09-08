@@ -144,6 +144,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const handleLogout = async () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("piechem_is_gold");
+        localStorage.removeItem("piechem_gold_expires_at");
+        localStorage.removeItem("piechem_is_complimentary");
+        window.dispatchEvent(new Event("piechem_gold_status_changed"));
+      } catch {}
+    }
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
   };
@@ -215,7 +223,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             
             {/* Left Brand & Title */}
             <div className="flex items-center space-x-3 shrink-0">
-              <PiechemLogo size="sm" />
+              <PiechemLogo size="sm" isGoldMember={false} />
               <span className="border-l border-slate-700/80 pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
                 Admin Panel
               </span>

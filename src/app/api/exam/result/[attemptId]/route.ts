@@ -27,7 +27,9 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
           select: {
             id: true,
             name: true,
-            email: true
+            email: true,
+            subscriptionStatus: true,
+            subscriptionExpiresAt: true
           }
         },
         test: {

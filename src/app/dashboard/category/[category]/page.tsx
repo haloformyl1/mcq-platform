@@ -59,6 +59,9 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
 
   const { student, availableTests = [], allAttempts = [] } = data;
   const studentName = student?.name || (student?.email ? student.email.split('@')[0] : 'Student');
+  const isComplimentary = student?.subscriptionStatus === "COMPLIMENTARY";
+  const isPaidActive = student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
+  const isGoldActive = isComplimentary || isPaidActive;
 
   const currentAvailableTests: any[] = [];
   const upcomingTests: any[] = [];
@@ -306,7 +309,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
           <div className="flex justify-between items-center gap-2">
             <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
-                <PiechemLogo size="md" href="/dashboard" />
+                <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} />
                 
                 <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -479,7 +482,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         <div className={`rounded-2xl border ${selectedHeaderBg} p-6 shadow-xl flex justify-between items-center`}>
           <div className="flex items-center gap-4">
             <div className="p-3 bg-black/40 rounded-xl border border-white/10 shrink-0">
-              <PiechemLogo size="md" showText={false} />
+              <PiechemLogo size="md" showText={false} isGoldMember={isGoldActive} />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{selectedTitle}</h1>

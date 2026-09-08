@@ -44,6 +44,18 @@ export default function AdminLogin() {
   const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
+    // Purge any stale student gold membership keys upon visiting the admin portal
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("piechem_is_gold");
+        localStorage.removeItem("piechem_gold_expires_at");
+        localStorage.removeItem("piechem_is_complimentary");
+        window.dispatchEvent(new Event("piechem_gold_status_changed"));
+      } catch {}
+    }
+  }, []);
+
+  useEffect(() => {
     if (cooldown <= 0) return;
     const timer = setInterval(() => {
       setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
@@ -197,7 +209,7 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black relative font-sans text-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* Header with PIECHEM logo */}
       <header className="absolute top-0 left-0 w-full p-6 sm:p-8 flex items-center">
-        <PiechemLogo size="lg" />
+        <PiechemLogo size="lg" isGoldMember={false} />
       </header>
 
       {/* Header Icon & Title */}

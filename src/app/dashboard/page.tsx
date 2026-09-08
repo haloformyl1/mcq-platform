@@ -54,11 +54,7 @@ export default function StudentDashboard() {
           return;
         }
         setData(data);
-        if (typeof window !== "undefined") {
-          const isGold = data.student?.subscriptionStatus === "PAID" || data.student?.subscriptionStatus === "COMPLIMENTARY";
-          localStorage.setItem("piechem_is_gold", isGold ? "true" : "false");
-          window.dispatchEvent(new Event("piechem_gold_status_changed"));
-        }
+
         setLoading(false);
       })
       .catch(() => {
@@ -95,7 +91,43 @@ export default function StudentDashboard() {
     }
   };
 
+  // Keep localStorage reactive to real-time subscription status & expiration
+  useEffect(() => {
+    if (!data?.student) return;
+    const isComp = data.student.subscriptionStatus === "COMPLIMENTARY";
+    const isPaid = data.student.subscriptionStatus === "PAID" && (!data.student.subscriptionExpiresAt || new Date(data.student.subscriptionExpiresAt).getTime() > now.getTime());
+    const isGold = isComp || isPaid;
+
+    if (typeof window !== "undefined") {
+      try {
+        if (isGold) {
+          localStorage.setItem("piechem_is_gold", "true");
+          if (isComp) {
+            localStorage.setItem("piechem_is_complimentary", "true");
+            localStorage.removeItem("piechem_gold_expires_at");
+          } else if (data.student.subscriptionExpiresAt) {
+            localStorage.setItem("piechem_gold_expires_at", new Date(data.student.subscriptionExpiresAt).toISOString());
+            localStorage.removeItem("piechem_is_complimentary");
+          }
+        } else {
+          localStorage.removeItem("piechem_is_gold");
+          localStorage.removeItem("piechem_gold_expires_at");
+          localStorage.removeItem("piechem_is_complimentary");
+        }
+        window.dispatchEvent(new Event("piechem_gold_status_changed"));
+      } catch {}
+    }
+  }, [data?.student, now]);
+
   const handleLogout = async () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("piechem_is_gold");
+        localStorage.removeItem("piechem_gold_expires_at");
+        localStorage.removeItem("piechem_is_complimentary");
+        window.dispatchEvent(new Event("piechem_gold_status_changed"));
+      } catch {}
+    }
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/");
   };
@@ -250,7 +282,10 @@ export default function StudentDashboard() {
               
               {/* Horizontal Logo + Designer Badge Side-by-Side (Image 1 style) */}
               <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
-                <PiechemLogo size="md" href="/dashboard" isGoldMember={student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY"} />
+                <PiechemLogo size="md" href="/dashboard" isGoldMember={
+                    student.subscriptionStatus === "COMPLIMENTARY" || 
+                    (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
+                  } />
                 
                 <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
@@ -839,7 +874,10 @@ export default function StudentDashboard() {
             >
               <div className="flex justify-between items-start">
                 <div className="p-3 rounded-xl bg-green-950 border border-green-600/50 shadow group-hover:scale-110 transition-transform">
-                  <PiechemLogo size="sm" showText={false} />
+                  <PiechemLogo size="sm" showText={false} isGoldMember={
+                      student.subscriptionStatus === "COMPLIMENTARY" || 
+                      (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
+                    } />
                 </div>
                 <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-green-500/20 text-green-300 border border-green-500/40 font-mono">
                   {currentAvailableTests.length} Live
