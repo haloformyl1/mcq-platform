@@ -22,8 +22,19 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
   const status = (student?.subscriptionStatus || "").trim().toUpperCase();
   const isGold = status === "PAID" || status === "COMPLIMENTARY";
 
+  // Calculate remaining days & whether this is an extension (e.g. 2 days left + 30 days = 32 days)
+  const now = new Date();
+  const expiryDate = student?.subscriptionExpiresAt ? new Date(student.subscriptionExpiresAt) : null;
+  const diffMs = expiryDate ? Math.max(0, expiryDate.getTime() - now.getTime()) : 0;
+  const totalDays = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+  
+  // If total days > 30, it indicates an additive extension on top of remaining days
+  const isExtended = totalDays > 30;
+
   const getStorageKey = useCallback(() => {
     if (!student) return null;
+    // Key is tied to the exact expiration timestamp. When extended (e.g. from 2 days to 32 days),
+    // this timestamp changes, automatically generating a fresh key so the modal shows for the extension!
     const expiryKey = student.subscriptionExpiresAt 
       ? new Date(student.subscriptionExpiresAt).getTime() 
       : "active";
@@ -64,8 +75,9 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
     // Small delay to ensure smooth entry after page mount
     const timer = setTimeout(() => {
       checkAndShow();
-    }, 250);
+    }, 200);
 
+    // Navigation triggers (browser back/forward, hash changes, tab focus, app navigation)
     const handlePopState = () => {
       checkAndShow();
     };
@@ -80,14 +92,28 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
       checkAndShow(true);
     };
 
+    const handleFocus = () => {
+      checkAndShow();
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        checkAndShow();
+      }
+    };
+
     window.addEventListener("popstate", handlePopState);
     window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("piechem:show-celebration", handleCustomShow);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("piechem:show-celebration", handleCustomShow);
     };
   }, [isGold, student, checkAndShow]);
@@ -117,10 +143,9 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
       type: "circle" | "rect" | "star";
     }> = [];
 
-    // 130 festive particles
-    for (let i = 0; i < 130; i++) {
+    for (let i = 0; i < 140; i++) {
       particles.push({
-        x: canvas.width * 0.5 + (Math.random() - 0.5) * 350,
+        x: canvas.width * 0.5 + (Math.random() - 0.5) * 360,
         y: canvas.height * 0.35 + (Math.random() - 0.5) * 150,
         size: Math.random() * 9 + 4,
         color: colors[Math.floor(Math.random() * colors.length)],
@@ -208,7 +233,6 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
         localStorage.setItem(key, "true");
       } catch (e) {}
     }
-    // Clean up hash if present
     if (typeof window !== "undefined" && window.location.hash.toLowerCase() === "#celebrate") {
       history.replaceState(null, "", window.location.pathname + window.location.search);
     }
@@ -271,17 +295,35 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
         </div>
 
         {/* Status Pill */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase mb-2">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase mb-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>Payment Verified & Approved</span>
+          <span>
+            {isExtended ? ("+30 Days Added • Total " + totalDays + " Days Active") : "Payment Verified & Approved"}
+          </span>
         </div>
 
         <h2 id="gold-upgrade-title" className="text-2xl md:text-3xl font-black text-white tracking-tight mb-2">
-          Welcome to <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">PIECHEM Gold!</span>
+          {isExtended ? (
+            <>
+              Gold Pass <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">Extended!</span>
+            </>
+          ) : (
+            <>
+              Welcome to <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">PIECHEM Gold!</span>
+            </>
+          )}
         </h2>
 
         <p className="text-sm text-slate-300 mb-5 leading-relaxed">
-          Congratulations <strong className="text-white">{student?.name || "Student"}</strong>! Administrator <strong className="text-amber-300">Arghyadeep Roy</strong> has approved your membership transaction. Your 30-Day All-Access Pass is now active.
+          {isExtended ? (
+            <>
+              Congratulations <strong className="text-white">{student?.name || "Student"}</strong>! Administrator <strong className="text-amber-300">Arghyadeep Roy</strong> has approved your transaction. <strong className="text-amber-300 font-bold">+30 Days</strong> have been added to your remaining validity, giving you <strong className="text-emerald-400 font-bold">{totalDays} days of total access</strong>!
+            </>
+          ) : (
+            <>
+              Congratulations <strong className="text-white">{student?.name || "Student"}</strong>! Administrator <strong className="text-amber-300">Arghyadeep Roy</strong> has approved your membership transaction. Your 30-Day All-Access Pass is now active.
+            </>
+          )}
         </p>
 
         {/* Validity Highlight Box */}
@@ -291,8 +333,15 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
               ⭐
             </div>
             <div>
-              <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Pass Validity Period</div>
-              <div className="text-xs sm:text-sm text-white font-bold">Valid until {validUntilStr}</div>
+              <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+                {isExtended ? "Updated Pass Validity" : "Pass Validity Period"}
+              </div>
+              <div className="text-xs sm:text-sm text-white font-bold">
+                Valid until {validUntilStr}
+              </div>
+              <div className="text-[10px] text-emerald-400 font-medium mt-0.5">
+                {totalDays} Days of Total Access Remaining
+              </div>
             </div>
           </div>
           <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">

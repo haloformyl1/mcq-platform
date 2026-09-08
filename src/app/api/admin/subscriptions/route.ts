@@ -154,9 +154,18 @@ export async function PATCH(req: Request) {
     }
 
     if (action === "APPROVE") {
-      const activeSince = new Date();
-      // Exact 30 days from approval
-      const expiresAt = new Date(activeSince.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+      // Additive Extension: If student already has active days left, add 30 days to existing expiry (e.g. 2 days left + 30 = 32 days total!)
+      const existingExpiresAt = upgradeReq.student?.subscriptionExpiresAt ? new Date(upgradeReq.student.subscriptionExpiresAt) : null;
+      const baseDate = (existingExpiresAt && existingExpiresAt.getTime() > now.getTime()) 
+        ? existingExpiresAt 
+        : now;
+      const expiresAt = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+      // Preserve original start date if already active, or set to now
+      const activeSince = (upgradeReq.student?.subscriptionStartedAt && upgradeReq.student?.subscriptionStatus === "PAID")
+        ? upgradeReq.student.subscriptionStartedAt
+        : now;
 
       // 1. Upgrade student subscription to PAID with exact Active Since and Expiry
       await prisma.student.update({
@@ -242,8 +251,17 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: `No pending upgrade request found with UTR Ref "${cleanUtr}".` }, { status: 404 });
       }
 
-      const activeSince = new Date();
-      const expiresAt = new Date(activeSince.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+      // Additive Extension: If student already has active days left, add 30 days to existing expiry
+      const existingExpiresAt = matchingReq.student?.subscriptionExpiresAt ? new Date(matchingReq.student.subscriptionExpiresAt) : null;
+      const baseDate = (existingExpiresAt && existingExpiresAt.getTime() > now.getTime()) 
+        ? existingExpiresAt 
+        : now;
+      const expiresAt = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+      const activeSince = (matchingReq.student?.subscriptionStartedAt && matchingReq.student?.subscriptionStatus === "PAID")
+        ? matchingReq.student.subscriptionStartedAt
+        : now;
 
       await prisma.student.update({
         where: { id: matchingReq.studentId },
@@ -293,8 +311,17 @@ export async function POST(req: Request) {
 
       for (const req of pendingReqs) {
         if (req.utrNumber && cleanList.some(u => u.toLowerCase() === req.utrNumber?.toLowerCase())) {
-          const activeSince = new Date();
-          const expiresAt = new Date(activeSince.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const now = new Date();
+          // Additive Extension: If student already has active days left, add 30 days to existing expiry
+          const existingExpiresAt = req.student?.subscriptionExpiresAt ? new Date(req.student.subscriptionExpiresAt) : null;
+          const baseDate = (existingExpiresAt && existingExpiresAt.getTime() > now.getTime()) 
+            ? existingExpiresAt 
+            : now;
+          const expiresAt = new Date(baseDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+          const activeSince = (req.student?.subscriptionStartedAt && req.student?.subscriptionStatus === "PAID")
+            ? req.student.subscriptionStartedAt
+            : now;
 
           await prisma.student.update({
             where: { id: req.studentId },
