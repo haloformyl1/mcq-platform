@@ -2272,36 +2272,31 @@ export default function StudentAccountPage() {
                     </div>
                   </div>
 
-                  {/* OPTION 2: PC / LAPTOP (DYNAMIC QR WITH FIXED AMOUNT) */}
+                  {/* OPTION 2: COMPUTER BROWSER (DYNAMIC QR) */}
                   <div className="p-5 sm:p-6 rounded-2xl bg-slate-950/90 border border-rose-500/30 text-center flex flex-col justify-between space-y-4">
                     <div className="space-y-1.5">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-bold">
-                        <Laptop className="w-4 h-4 text-amber-400" />
-                        <span>PC / Laptop</span>
+                        <Monitor className="w-4 h-4 text-amber-400" />
+                        <span>Computer Browser</span>
                       </div>
                       <h4 className="text-base font-bold text-white">
                         Scan Dynamic UPI QR
                       </h4>
                       <p className="text-xs text-slate-400 leading-relaxed">
-                        Scan with any phone UPI app. The amount is locked to <strong>₹{paymentSettings?.monthlyFee || 199}</strong>.
+                        Scan with any phone UPI app to complete your payment.
                       </p>
                     </div>
 
-                    {/* QR Code Container with Fixed Amount */}
+                    {/* QR Code Container */}
                     <div className="relative group inline-block mx-auto">
                       <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 opacity-35 blur group-hover:opacity-60 transition" />
                       <div className="relative p-3 bg-white rounded-xl shadow-2xl">
                         <img
                           src={"https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student")))}
-                          alt="Dynamic UPI Payment QR with Fixed Amount"
+                          alt="Dynamic UPI Payment QR"
                           className="w-40 h-40 mx-auto object-contain"
                         />
                       </div>
-                    </div>
-
-                    {/* Fixed Amount Badge */}
-                    <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300 text-xs font-bold font-mono">
-                      <span>🔒 Fixed Amount: ₹{paymentSettings?.monthlyFee || 199}</span>
                     </div>
                   </div>
 
