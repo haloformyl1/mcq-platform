@@ -483,120 +483,30 @@ export default function StudentAccountPage() {
           </div>
         </div>
       </header>
-      {/* 2. MAIN LAYOUT (TWO-COLUMN NETFLIX ACCOUNT SETTINGS PAGE) */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
-          {/* LEFT SIDEBAR NAVIGATION (Electric Blackish Blue Style) */}
-          <aside className="lg:col-span-3 space-y-6 shrink-0">
-            
-            {/* Back Link with Arrow */}
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-cyan-300 transition group"
+      {/* 2. MAIN LAYOUT (FULL SCREEN NETFLIX ACCOUNT SETTINGS PAGE) */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8">
+        
+        {/* Top Navigation Row */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-400 hover:text-cyan-300 transition group"
+          >
+            <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Dashboard</span>
+          </Link>
+
+          {activeTab !== "overview" && (
+            <button
+              onClick={() => setActiveTab("overview")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 hover:text-white text-xs font-bold transition cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
-              <span>Back to Dashboard</span>
-            </Link>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Overview</span>
+            </button>
+          )}
+        </div>
 
-            {/* Vertical Navigation Rail for Desktop */}
-            <nav className="hidden lg:flex flex-col space-y-1.5 pt-2">
-              <button
-                onClick={() => setActiveTab("overview")}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
-                  activeTab === "overview"
-                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <div className={`w-5 h-5 flex items-center justify-center ${activeTab === "overview" ? "text-cyan-300 font-bold" : "text-slate-400"}`}>
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                  </svg>
-                </div>
-                <span>Overview</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("membership")}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
-                  activeTab === "membership"
-                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <CreditCard className={`w-5 h-5 ${activeTab === "membership" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
-                <span>Membership</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("security")}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
-                  activeTab === "security"
-                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <ShieldCheck className={`w-5 h-5 ${activeTab === "security" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
-                <span>Security</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("devices")}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
-                  activeTab === "devices"
-                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <MonitorSmartphone className={`w-5 h-5 ${activeTab === "devices" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
-                <span>Devices</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("profiles")}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-left cursor-pointer ${
-                  activeTab === "profiles"
-                    ? "font-black text-cyan-300 bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <User className={`w-5 h-5 ${activeTab === "profiles" ? "text-cyan-300 stroke-[2.5]" : "text-slate-400"}`} />
-                <span>Profiles</span>
-              </button>
-            </nav>
-
-            {/* Horizontal Pill Tabs for Mobile / Tablet */}
-            <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 pt-1 -mx-4 px-4 border-b border-cyan-500/20">
-              {[
-                { id: "overview", label: "Overview", icon: Sparkles },
-                { id: "membership", label: "Membership", icon: CreditCard },
-                { id: "security", label: "Security", icon: ShieldCheck },
-                { id: "devices", label: "Devices", icon: MonitorSmartphone },
-                { id: "profiles", label: "Profiles", icon: User },
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isSelected = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-                      isSelected
-                        ? "bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                        : "bg-[#061421]/90 text-slate-400 hover:text-white border border-cyan-500/30"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </aside>
-
-          {/* RIGHT MAIN CONTENT AREA */}
-          <div className="lg:col-span-9 space-y-6 sm:space-y-8">
             
             {/* Header Titles */}
             <div>
@@ -706,29 +616,7 @@ export default function StudentAccountPage() {
                       <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
-                    {/* Manage Payment Method */}
-                    <button
-                      onClick={() => {
-                        setShowPaymentModal(true);
-                        fetchUpgradeRequest();
-                      }}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
-                          <CreditCard className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
-                            Manage payment method
-                          </span>
-                          <span className="text-xs text-slate-400 font-normal">
-                            Scan UPI QR code (GPay, PhonePe, Paytm) & submit UTR verification
-                          </span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
+                    
 
                     {/* Manage Access and Devices */}
                     <button
@@ -1376,8 +1264,6 @@ export default function StudentAccountPage() {
               </div>
             )}
 
-          </div>
-        </div>
       </main>
       {/* 3. INSTANT UPI QR CODE MODAL (ELECTRIC BLACKISH BLUE THEME) */}
       {showPaymentModal && (
