@@ -190,7 +190,7 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
       {/* Dropdown Panel */}
       {isOpen && (
         <div 
-          className="absolute right-0 mt-2.5 w-80 sm:w-96 rounded-2xl bg-[#091322]/95 backdrop-blur-xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 p-4 animate-in fade-in zoom-in-95 duration-200"
+          className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-16 sm:top-auto mt-2 sm:mt-2.5 sm:w-96 max-w-[calc(100vw-1.5rem)] rounded-2xl bg-[#091322]/98 sm:bg-[#091322]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-[100] p-4 animate-in fade-in zoom-in-95 duration-200"
           role="region"
           aria-label="Notifications"
         >

@@ -232,7 +232,7 @@ export default function StudentDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20">
+    <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20 overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={data?.student} />
       <GoldUpgradeCelebrationModal student={student || data?.student} />
@@ -251,7 +251,7 @@ export default function StudentDashboard() {
               <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
                 <PiechemLogo size="md" href="/dashboard" isGoldMember={student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY"} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] font-medium shadow-sm shrink-0">
+                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
                   <span className="text-cyan-500/60 text-[9px] hidden xs:inline">•</span>
@@ -410,7 +410,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Mobile / Tablet Dedicated Navigation Rail (Zero Scrollbar) */}
-          <div className="lg:hidden w-full pt-2.5 mt-2 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-1.5">
+          <div className="lg:hidden w-full pt-2 mt-2 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-2 px-1 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
             <a 
               href="#overview" 
               onClick={() => setActiveTab("overview")}
@@ -543,7 +543,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Big Stylized Title (Image 2 Netflix billboard title) */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-black text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] break-words">
                 {spotlightTest ? spotlightTest.title : "PIE CHEM EXAM SERIES 2026"}
               </h1>
 
@@ -556,15 +556,15 @@ export default function StudentDashboard() {
             </div>
 
             {/* Actions & Floating Tags Row (Netflix Style) */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-cyan-500/20">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-cyan-500/20 w-full">
               
               {/* Action CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                 {spotlightTest ? (
                   activeAttemptTest ? (
                     <Link
                       href={`/exam/start/${spotlightTest.id}`}
-                      className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
+                      className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 w-full sm:w-auto"
                     >
                       <Play className="w-5 h-5 fill-current text-black" />
                       <span>Resume Test</span>
@@ -590,7 +590,7 @@ export default function StudentDashboard() {
 
                 <a
                   href="#materials"
-                  className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95 w-full sm:w-auto"
                 >
                   <Info className="w-5 h-5 text-cyan-300" />
                   <span>3D Notes & Lab</span>

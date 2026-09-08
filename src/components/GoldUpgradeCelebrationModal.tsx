@@ -270,7 +270,7 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
         role="dialog"
         aria-modal="true"
         aria-labelledby="gold-upgrade-title"
-        className="relative z-20 w-full max-w-lg rounded-3xl bg-gradient-to-b from-[#0f1d32] via-[#091322] to-[#040812] border-2 border-amber-500/40 p-6 md:p-8 text-center shadow-[0_0_90px_rgba(245,158,11,0.35)] animate-in zoom-in-95 duration-300"
+        className="relative z-20 w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl bg-gradient-to-b from-[#0f1d32] via-[#091322] to-[#040812] border-2 border-amber-500/40 p-5 sm:p-8 text-center shadow-[0_0_90px_rgba(245,158,11,0.35)] animate-in zoom-in-95 duration-300"
       >
         <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl" />
 
