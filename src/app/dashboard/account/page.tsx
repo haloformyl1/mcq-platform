@@ -2242,6 +2242,9 @@ export default function StudentAccountPage() {
                     <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
                       We will notify you once your plan has been upgraded, or you may check your account after 24 hours. Thank you.
                     </p>
+                    <p className="text-xs text-amber-300/95 font-medium leading-relaxed">
+                      Please do not reattempt payment during this time. If you face any issues regarding this payment, please contact us at <a href="tel:9830507435" className="underline font-mono font-bold text-cyan-300">9830507435</a>.
+                    </p>
                     <button
                       type="button"
                       onClick={() => setShowPaymentDoneDialog(true)}
@@ -2367,6 +2370,17 @@ export default function StudentAccountPage() {
                 <span>Review Window:</span>
                 <span className="font-bold text-slate-200">Up to 24 Hours</span>
               </div>
+            </div>
+
+            {/* Reattempt Advisory Notice & Contact Box */}
+            <div className="w-full p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-left space-y-1.5 text-xs text-amber-200 shadow-md">
+              <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>Important Payment Notice:</span>
+              </div>
+              <p className="leading-relaxed text-slate-200">
+                Please do not reattempt payment during this time. If you face any problem related to this payment, please contact us at <a href="tel:9830507435" className="font-bold text-cyan-400 underline hover:text-cyan-300 font-mono">9830507435</a>.
+              </p>
             </div>
 
             {/* Action Buttons */}
