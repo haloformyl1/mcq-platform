@@ -28,6 +28,23 @@ function formatDateTime24(dateInput: string | Date | null | undefined): string {
   return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
 
+
+const POPULAR_UPI_HANDLES = [
+  "@oksbi", "@okhdfcbank", "@okaxis", "@okicici",
+  "@ybl", "@ibl", "@axl", "@paytm", "@upi",
+  "@sbi", "@icici", "@hdfcbank", "@axisbank",
+  "@kotak", "@indus", "@barodampay", "@federal", "@postbank"
+];
+
+function isValidUpiId(upi: string): boolean {
+  if (!upi || typeof upi !== "string") return false;
+  const clean = upi.trim().toLowerCase();
+  const upiRegex = /^[a-zA-Z0-9][a-zA-Z0-9._-]{1,48}[a-zA-Z0-9]@[a-zA-Z]{2,30}$/;
+  if (!upiRegex.test(clean)) return false;
+  if (clean.includes("..") || clean.includes("--") || clean.includes("__")) return false;
+  return true;
+}
+
 export default function StudentAccountPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -97,7 +114,7 @@ export default function StudentAccountPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
   const [studentUpiId, setStudentUpiId] = useState("");
-  const [paymentStep, setPaymentStep] = useState<"input" | "waiting" | "success">("input");
+  const [paymentStep, setPaymentStep] = useState<"input" | "notice" | "waiting" | "success">("input");
   const [utrNumber, setUtrNumber] = useState("");
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [requestingUpgrade, setRequestingUpgrade] = useState(false);
@@ -320,6 +337,20 @@ export default function StudentAccountPage() {
     } finally {
       setRevokingAll(false);
     }
+  };
+
+  
+  const handleProceedClick = () => {
+    const trimmedUpi = studentUpiId.trim().toLowerCase();
+    if (!isValidUpiId(trimmedUpi)) {
+      setUpgradeMsg({ 
+        type: "error", 
+        text: "Please enter a valid UPI ID (e.g. 9830507435@upi or name@oksbi). Only strictly valid UPI formats can proceed." 
+      });
+      return;
+    }
+    setUpgradeMsg(null);
+    setPaymentStep("notice");
   };
 
   const handleSendUpgradeRequest = async () => {
@@ -1881,31 +1912,53 @@ export default function StudentAccountPage() {
                           if (upgradeMsg) setUpgradeMsg(null);
                         }}
                         placeholder="Enter your UPI ID (e.g. 9830507435@upi)"
-                        className="w-full bg-slate-950/90 text-white border border-rose-500/40 focus:border-rose-400 rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wide outline-none transition focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
+                        className={"w-full bg-slate-950/90 text-white rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wide outline-none transition border " + (
+                          studentUpiId.trim()
+                            ? isValidUpiId(studentUpiId)
+                              ? "border-emerald-500/60 focus:border-emerald-400 focus:shadow-[0_0_25px_rgba(16,185,129,0.3)]"
+                              : "border-rose-500/60 focus:border-rose-400 focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
+                            : "border-rose-500/40 focus:border-rose-400 focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
+                        )}
                       />
-                      {studentUpiId.includes("@") && studentUpiId.split("@")[1]?.length > 1 && (
-                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
-                          <CheckCircle2 className="w-4 h-4" /> Valid Format
-                        </span>
+                      {studentUpiId.trim().length > 0 && (
+                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
+                          {isValidUpiId(studentUpiId) ? (
+                            <span className="text-xs font-bold text-emerald-400 flex items-center gap-1 font-mono">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              <span className="hidden sm:inline">Valid UPI</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs font-semibold text-rose-400 flex items-center gap-1 font-mono">
+                              <AlertCircle className="w-4 h-4 text-rose-400" />
+                              <span className="hidden sm:inline text-[11px]">Strict format required</span>
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
 
-                    {/* Quick Handle Completion Pills */}
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <span className="text-[11px] text-slate-500 font-medium">Quick handle:</span>
-                      {["@oksbi", "@okaxis", "@okhdfcbank", "@paytm", "@ybl", "@upi"].map((handle) => (
-                        <button
-                          key={handle}
-                          type="button"
-                          onClick={() => {
-                            const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
-                            setStudentUpiId((base || "") + handle);
-                          }}
-                          className="px-2 py-0.5 rounded-lg bg-rose-950/50 border border-rose-800/60 text-rose-300 text-[11px] font-mono hover:bg-rose-900/60 hover:border-rose-400 transition cursor-pointer"
-                        >
-                          {handle}
-                        </button>
-                      ))}
+                    {/* Quick Handle Completion Pills - Expanded Collection */}
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                        <span>Quick handles (tap to append):</span>
+                        <span className="text-[10px] text-slate-500 font-mono">18 available</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto py-1 pr-1 custom-scrollbar">
+                        {POPULAR_UPI_HANDLES.map((handle) => (
+                          <button
+                            key={handle}
+                            type="button"
+                            onClick={() => {
+                              const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
+                              setStudentUpiId((base || "") + handle);
+                              if (upgradeMsg) setUpgradeMsg(null);
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-rose-950/40 border border-rose-800/50 text-rose-300 text-[11px] font-mono hover:bg-rose-900/60 hover:border-rose-400 hover:text-white transition cursor-pointer"
+                          >
+                            {handle}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -1921,11 +1974,11 @@ export default function StudentAccountPage() {
                   )}
 
                   <button
-                    onClick={handleSendUpgradeRequest}
-                    disabled={requestingUpgrade || !studentUpiId.trim()}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                    onClick={handleProceedClick}
+                    disabled={requestingUpgrade || !studentUpiId.trim() || !isValidUpiId(studentUpiId)}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span>{requestingUpgrade ? "Initiating Payment..." : ("PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")")}</span>
+                    <span>{"PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")"}</span>
                     <ChevronRight className="w-5 h-5" />
                   </button>
 
@@ -1937,9 +1990,82 @@ export default function StudentAccountPage() {
                 </div>
               )}
 
+              {/* State: NOTICE STEP (Before landing to Image 2) */}
+              {paymentStep === "notice" && (
+                <div className="space-y-5 py-2 animate-in fade-in duration-300">
+                  
+                  {/* Warning / Timeline Notice Card */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-950/40 via-rose-950/30 to-[#0a1726] border-2 border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.15)] space-y-3">
+                    <div className="flex items-center gap-2.5 text-amber-300">
+                      <Clock className="w-5 h-5 text-amber-400 shrink-0 animate-pulse" />
+                      <h4 className="text-sm sm:text-base font-black uppercase tracking-wider">
+                        Important Verification Notice
+                      </h4>
+                    </div>
+
+                    <p className="text-sm sm:text-base text-slate-100 font-semibold leading-relaxed">
+                      After completing your payment, please allow up to 24 hours for transaction confirmation and premium access grant by our administration.
+                    </p>
+
+                    <p className="text-xs text-slate-300 leading-relaxed pt-1 border-t border-amber-500/20">
+                      Our team manually validates each payment against your registered UPI ID to ensure account integrity and exam security. Your dashboard access will unlock automatically as soon as verification is approved.
+                    </p>
+                  </div>
+
+                  {/* Payment Details Recap */}
+                  <div className="p-4 rounded-2xl bg-slate-950/90 border border-rose-500/30 space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Registered Payer UPI ID:</span>
+                      <span className="font-mono font-bold text-white text-sm">{studentUpiId}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Payable Amount:</span>
+                      <span className="font-mono font-bold text-amber-300 text-sm">₹{paymentSettings?.monthlyFee || 199}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-400">
+                      <span>Subscription Tier:</span>
+                      <span className="font-bold text-slate-200">Gold Membership (30-Day Pass)</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="space-y-2.5 pt-1">
+                    <button
+                      onClick={handleSendUpgradeRequest}
+                      disabled={requestingUpgrade}
+                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <span>{requestingUpgrade ? "Initiating Payment..." : "I Understand, Proceed to Pay"}</span>
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPaymentStep("input");
+                        setUpgradeMsg(null);
+                      }}
+                      className="w-full py-2.5 rounded-xl text-xs text-slate-400 hover:text-white transition cursor-pointer text-center flex items-center justify-center gap-1"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Change UPI ID</span>
+                    </button>
+                  </div>
+
+                </div>
+              )}
+
               {/* State: WAITING / PAYMENT OPTIONS STEP */}
               {paymentStep === "waiting" && (
                 <div className="space-y-5 py-1 animate-in fade-in duration-300">
+                  
+                  {/* 24-Hour Confirmation Timeline Banner */}
+                  <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 flex items-center gap-2.5 text-xs text-amber-200">
+                    <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>
+                      <strong>Verification Timeline:</strong> After completing payment via UPI, please allow up to 24 hours for administrative confirmation and access grant.
+                    </span>
+                  </div>
                   
                   {/* Status Banner */}
                   <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/50 to-rose-950/50 border border-rose-500/30 flex items-center justify-between gap-3">

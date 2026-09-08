@@ -24,6 +24,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Please enter a valid UPI ID." }, { status: 400 });
     }
 
+    if (cleanUpi) {
+      const upiRegex = /^[a-zA-Z0-9][a-zA-Z0-9._-]{1,48}[a-zA-Z0-9]@[a-zA-Z]{2,30}$/;
+      if (!upiRegex.test(cleanUpi) || cleanUpi.includes("..") || cleanUpi.includes("--") || cleanUpi.includes("__")) {
+        return NextResponse.json({ error: "Invalid UPI ID format. Only valid UPI VPAs (e.g. 9830507435@upi, name@oksbi) are accepted." }, { status: 400 });
+      }
+    }
+
     // Anti-Fraud check: Prevent re-using already approved UTR (only for 12-digit numeric bank UTR)
     if (cleanUtr && /^\d{12}$/.test(cleanUtr)) {
       const existingApproved = await prisma.subscriptionUpgradeRequest.findFirst({
