@@ -366,9 +366,12 @@ export default function StudentAccountPage() {
     }
   };
 
-  const memberSinceFormatted = student.createdAt
-    ? new Date(student.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
-    : "August 2026";
+  const memberSinceFormatted = (() => {
+    if (!student.createdAt) return "-";
+    const d = new Date(student.createdAt);
+    if (isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  })();
 
   const nextPaymentFormatted = student.subscriptionExpiresAt
     ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
