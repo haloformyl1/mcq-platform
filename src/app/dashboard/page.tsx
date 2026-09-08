@@ -103,7 +103,6 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex flex-col items-center justify-center p-4">
         <AdminPreviewBanner />
         <SubscriptionExpiredModal student={data?.student} />
-      <GoldUpgradeCelebrationModal student={data?.student} />
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h2 className="text-xl font-bold mb-4">Unable to load dashboard</h2>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-[#262626] rounded-md hover:bg-[#333333]">Retry</button>
@@ -231,6 +230,7 @@ export default function StudentDashboard() {
     <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={data?.student} />
+      <GoldUpgradeCelebrationModal student={student || data?.student} />
 
       {/* ========================================================= */}
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
@@ -325,16 +325,19 @@ export default function StudentDashboard() {
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
               {/* Option 3: Golden Status Pill */}
-              {student.subscriptionStatus === "PAID" && (
-                <Link
-                  href="/dashboard/account"
-                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-105 transition-all"
-                  title="Gold Membership Active - 30-Day Pass"
+              {(student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent("piechem:show-celebration"));
+                  }}
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-105 transition-all cursor-pointer"
+                  title="Gold Membership Active - Click to view validity & perks"
                 >
                   <span className="text-sm">⭐</span>
                   <span>GOLD MEMBER</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                </Link>
+                </button>
               )}
 
               {/* Option 4: Notification Center Dropdown */}

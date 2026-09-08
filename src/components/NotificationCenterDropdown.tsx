@@ -74,8 +74,8 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
       badge: "ACTIVE",
       badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
       time: approvedDateStr,
-      actionText: "Practice Exams →",
-      actionHref: "/dashboard",
+      actionText: "View Celebration 🎉",
+      actionHref: "#celebrate",
     });
   } else if (isPending) {
     notifications.push({
@@ -240,14 +240,27 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
 
                 <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/5">
                   <span>{notif.time}</span>
-                  {notif.actionText && notif.actionHref && (
-                    <Link
-                      href={notif.actionHref}
-                      onClick={() => setIsOpen(false)}
-                      className="font-bold text-amber-400 hover:text-amber-300 hover:underline"
-                    >
-                      {notif.actionText}
-                    </Link>
+                  {notif.actionText && (
+                    notif.type === "gold_activated" ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsOpen(false);
+                          window.dispatchEvent(new CustomEvent("piechem:show-celebration"));
+                        }}
+                        className="font-bold text-amber-400 hover:text-amber-300 hover:underline cursor-pointer"
+                      >
+                        {notif.actionText}
+                      </button>
+                    ) : (
+                      <Link
+                        href={notif.actionHref || "#"}
+                        onClick={() => setIsOpen(false)}
+                        className="font-bold text-amber-400 hover:text-amber-300 hover:underline"
+                      >
+                        {notif.actionText}
+                      </Link>
+                    )
                   )}
                 </div>
               </div>

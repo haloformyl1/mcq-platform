@@ -752,11 +752,18 @@ export default function StudentAccountPage() {
           <div className="relative flex items-center gap-3 shrink-0">
             {/* Option 3: Golden Status Pill */}
             {isGold && (
-              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)]">
+              <button
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent("piechem:show-celebration"));
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-black tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:scale-105 transition-all cursor-pointer"
+                title="Gold Membership Active - Click to view validity & perks"
+              >
                 <span className="text-sm">⭐</span>
                 <span>GOLD MEMBER</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              </div>
+              </button>
             )}
 
             {/* Option 4: Notification Center Dropdown */}
