@@ -247,7 +247,7 @@ export default function PiechemLogo({
               <span className="text-cyan-400/90 font-bold">EXAM PLATFORM</span>
               <span className="text-amber-400">•</span>
               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-cyan-500/20 border border-amber-500/40 text-amber-300 text-[8px] font-black tracking-wider shadow-sm">
-                <span>⭐</span> GOLD VIP
+                <span>⭐</span> GOLD
               </span>
             </div>
           ) : (
