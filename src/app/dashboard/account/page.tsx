@@ -989,19 +989,6 @@ export default function StudentAccountPage() {
                       )}
                     </div>
 
-                    {/* Manage Payment Method Link */}
-                    <button
-                      onClick={() => {
-                        setShowPaymentModal(true);
-                        fetchUpgradeRequest();
-                      }}
-                      className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
-                    >
-                      <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
-                        Manage payment method
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
 
                     {/* Redeem Gift or Promo Code Link */}
                     <button
