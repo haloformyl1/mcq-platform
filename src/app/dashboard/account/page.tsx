@@ -1792,19 +1792,19 @@ export default function StudentAccountPage() {
             )}
 
       </main>
-      {/* 3. INSTANT UPI QR CODE MODAL (ELECTRIC BLACKISH BLUE THEME) */}
+      {/* 3. INSTANT UPI QR CODE MODAL (NETFLIX PREMIUM CRIMSON/INDIGO THEME) */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0e1c2e] via-[#081320] to-[#03080e] text-white rounded-3xl shadow-[0_0_65px_rgba(225,29,72,0.25)] border-2 border-rose-500/50 overflow-hidden my-auto animate-in zoom-in-95 duration-200">
             
-            {/* Modal Header */}
-            <div className="p-6 sm:p-7 border-b border-cyan-500/20 flex items-center justify-between bg-[#061421]/90">
+            {/* Modal Header (Image 1 Vibrant Gradient Banner) */}
+            <div className="p-6 sm:p-7 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative flex items-center justify-between">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-bold mb-1 shadow">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-white text-[11px] font-black uppercase tracking-widest mb-1.5 shadow">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   <span>Instant UPI Activation</span>
                 </div>
-                <h3 className="text-xl font-black text-white tracking-tight">
+                <h3 className="text-2xl font-black text-white tracking-tight">
                   Pay with UPI
                 </h3>
               </div>
@@ -1815,7 +1815,7 @@ export default function StudentAccountPage() {
                   setPaymentStep("input");
                   setUpgradeMsg(null);
                 }}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                className="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -1826,8 +1826,8 @@ export default function StudentAccountPage() {
             <div className="p-6 sm:p-7 space-y-5">
 
               {/* Plan & Pricing Box */}
-              <div className="bg-slate-950/90 border border-cyan-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none" />
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 uppercase tracking-wider mb-1">
@@ -1839,7 +1839,7 @@ export default function StudentAccountPage() {
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-2xl font-black text-emerald-400 font-mono">
+                    <span className="text-2xl font-black text-amber-300 font-mono">
                       ₹{paymentSettings?.monthlyFee || 199}
                     </span>
                     <span className="text-[11px] text-slate-400 block font-normal">/ 30 Days</span>
@@ -1852,12 +1852,12 @@ export default function StudentAccountPage() {
                 <div className="space-y-4">
                   
                   {/* Explicit Mandatory Requirement Instruction */}
-                  <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex items-start gap-3">
-                    <div className="p-1.5 rounded-xl bg-cyan-500/20 text-cyan-400 shrink-0 mt-0.5">
-                      <Sparkles className="w-4 h-4" />
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-rose-950/40 border border-rose-500/30 flex items-start gap-3">
+                    <div className="p-1.5 rounded-xl bg-rose-500/20 text-rose-400 shrink-0 mt-0.5">
+                      <Sparkles className="w-4 h-4 text-rose-400" />
                     </div>
                     <div className="space-y-0.5">
-                      <p className="text-xs font-bold text-cyan-200">
+                      <p className="text-xs font-bold text-rose-200">
                         Please enter the UPI ID using which you will initiate the payment.
                       </p>
                       <p className="text-[11px] text-slate-400 leading-relaxed">
@@ -1881,7 +1881,7 @@ export default function StudentAccountPage() {
                           if (upgradeMsg) setUpgradeMsg(null);
                         }}
                         placeholder="Enter your UPI ID (e.g. 9830507435@upi)"
-                        className="w-full bg-slate-950/90 text-white border border-cyan-500/40 focus:border-cyan-400 rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wide outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                        className="w-full bg-slate-950/90 text-white border border-rose-500/40 focus:border-rose-400 rounded-2xl px-4 py-3.5 text-sm font-mono tracking-wide outline-none transition focus:shadow-[0_0_25px_rgba(225,29,72,0.3)]"
                       />
                       {studentUpiId.includes("@") && studentUpiId.split("@")[1]?.length > 1 && (
                         <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-400 flex items-center gap-1">
@@ -1901,7 +1901,7 @@ export default function StudentAccountPage() {
                             const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
                             setStudentUpiId((base || "") + handle);
                           }}
-                          className="px-2 py-0.5 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 text-[11px] font-mono hover:bg-cyan-900/60 hover:border-cyan-400 transition cursor-pointer"
+                          className="px-2 py-0.5 rounded-lg bg-rose-950/50 border border-rose-800/60 text-rose-300 text-[11px] font-mono hover:bg-rose-900/60 hover:border-rose-400 transition cursor-pointer"
                         >
                           {handle}
                         </button>
@@ -1923,9 +1923,10 @@ export default function StudentAccountPage() {
                   <button
                     onClick={handleSendUpgradeRequest}
                     disabled={requestingUpgrade || !studentUpiId.trim()}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_30px_rgba(6,182,212,0.4)] transition hover:brightness-110 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm uppercase tracking-wider shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
                   >
-                    {requestingUpgrade ? "Initiating Payment..." : ("PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")")}
+                    <span>{requestingUpgrade ? "Initiating Payment..." : ("PROCEED TO PAY (₹" + (paymentSettings?.monthlyFee || 199) + ")")}</span>
+                    <ChevronRight className="w-5 h-5" />
                   </button>
 
                   <div className="text-[11px] text-slate-400 text-center space-y-1 pt-1">
@@ -1941,9 +1942,9 @@ export default function StudentAccountPage() {
                 <div className="space-y-5 py-1 animate-in fade-in duration-300">
                   
                   {/* Status Banner */}
-                  <div className="p-4 rounded-2xl bg-cyan-950/50 border border-cyan-500/30 flex items-center justify-between gap-3">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/50 to-rose-950/50 border border-rose-500/30 flex items-center justify-between gap-3">
                     <div className="space-y-0.5">
-                      <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider block">
+                      <span className="text-[11px] font-bold text-rose-400 uppercase tracking-wider block">
                         Registered Payer UPI ID:
                       </span>
                       <span className="text-sm font-bold text-white font-mono flex items-center gap-1.5">
@@ -1953,7 +1954,7 @@ export default function StudentAccountPage() {
                     </div>
                     <div className="text-right">
                       <span className="text-[11px] text-slate-400 block font-medium">Locked Amount:</span>
-                      <span className="text-lg font-black text-emerald-400 font-mono">
+                      <span className="text-lg font-black text-amber-300 font-mono">
                         ₹{paymentSettings?.monthlyFee || 199}
                       </span>
                     </div>
@@ -1963,10 +1964,10 @@ export default function StudentAccountPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                     
                     {/* OPTION 1: MOBILE APP DIRECT */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-cyan-500/30 flex flex-col justify-between space-y-4">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-rose-500/30 flex flex-col justify-between space-y-4">
                       <div className="space-y-1.5">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-950/80 border border-blue-500/40 text-blue-300 text-[11px] font-bold">
-                          <MonitorSmartphone className="w-3.5 h-3.5 text-blue-400" />
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[11px] font-bold">
+                          <MonitorSmartphone className="w-3.5 h-3.5 text-rose-400" />
                           <span>Mobile Device</span>
                         </div>
                         <h4 className="text-sm font-bold text-white">
@@ -1980,9 +1981,9 @@ export default function StudentAccountPage() {
                       <div className="space-y-2 pt-2">
                         <a
                           href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student"))}
-                          className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer text-center"
+                          className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(225,29,72,0.4)] hover:brightness-110 active:scale-98 transition cursor-pointer text-center"
                         >
-                          <Sparkles className="w-4 h-4 shrink-0" />
+                          <Sparkles className="w-4 h-4 shrink-0 text-amber-300" />
                           <span>Pay ₹{paymentSettings?.monthlyFee || 199} via UPI App</span>
                         </a>
 
@@ -1993,7 +1994,7 @@ export default function StudentAccountPage() {
                     </div>
 
                     {/* OPTION 2: PC / LAPTOP (DYNAMIC QR WITH FIXED AMOUNT) */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-cyan-500/30 text-center flex flex-col justify-between space-y-3">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-rose-500/30 text-center flex flex-col justify-between space-y-3">
                       <div className="space-y-1">
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[11px] font-bold">
                           <Laptop className="w-3.5 h-3.5 text-amber-400" />
@@ -2009,7 +2010,7 @@ export default function StudentAccountPage() {
 
                       {/* QR Code Container with Fixed Amount */}
                       <div className="relative group inline-block mx-auto">
-                        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 via-amber-400 to-teal-400 opacity-25 blur group-hover:opacity-40 transition" />
+                        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 opacity-30 blur group-hover:opacity-50 transition" />
                         <div className="relative p-2.5 bg-white rounded-xl shadow-lg">
                           <img
                             src={"https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student")))}
@@ -2020,7 +2021,7 @@ export default function StudentAccountPage() {
                       </div>
 
                       {/* Fixed Amount Badge */}
-                      <div className="inline-flex items-center justify-center gap-1 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold font-mono">
+                      <div className="inline-flex items-center justify-center gap-1 px-3 py-1 rounded-full bg-amber-950 border border-amber-500/40 text-amber-300 text-[11px] font-bold font-mono">
                         <span>🔒 Fixed: ₹{paymentSettings?.monthlyFee || 199}</span>
                       </div>
                     </div>
@@ -2028,7 +2029,7 @@ export default function StudentAccountPage() {
                   </div>
 
                   {/* Payee Info & Copy UPI */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 border border-cyan-500/20 rounded-xl text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/90 border border-rose-500/20 rounded-xl text-xs">
                     <div className="text-left">
                       <span className="text-slate-400 block text-[11px]">Receiving UPI ID (Admin):</span>
                       <span className="text-white font-mono font-bold text-xs">{paymentSettings?.upiId || "9830507435@upi"}</span>
@@ -2043,7 +2044,7 @@ export default function StudentAccountPage() {
                           setCopiedUpi(true);
                           setTimeout(() => setCopiedUpi(false), 2000);
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-cyan-950 border border-cyan-700/60 text-cyan-300 text-xs font-mono hover:bg-cyan-900 transition flex items-center gap-1 cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg bg-rose-950 border border-rose-700/60 text-rose-300 text-xs font-mono hover:bg-rose-900 transition flex items-center gap-1 cursor-pointer"
                       >
                         {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copiedUpi ? "Copied!" : "Copy UPI"}</span>
@@ -2052,7 +2053,7 @@ export default function StudentAccountPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentStep("input")}
-                        className="text-xs text-slate-400 hover:text-cyan-300 underline cursor-pointer"
+                        className="text-xs text-slate-400 hover:text-rose-300 underline cursor-pointer"
                       >
                         Edit Payer UPI
                       </button>
@@ -2060,10 +2061,10 @@ export default function StudentAccountPage() {
                   </div>
 
                   {/* Live Status indicator */}
-                  <div className="p-3 bg-slate-950/80 border border-cyan-500/20 rounded-xl flex items-center justify-between text-xs">
+                  <div className="p-3 bg-slate-950/80 border border-rose-500/20 rounded-xl flex items-center justify-between text-xs">
                     <span className="text-slate-400 font-medium">Payment Verification:</span>
                     <span className="text-amber-300 font-bold flex items-center gap-1.5 font-mono">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" /> Awaiting Confirmation
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-rose-400" /> Awaiting Confirmation
                     </span>
                   </div>
 
@@ -2109,9 +2110,9 @@ export default function StudentAccountPage() {
               )}
 
               {/* Support Contact */}
-              <div className="pt-2 text-[11px] text-slate-400 text-center border-t border-cyan-500/15">
+              <div className="pt-2 text-[11px] text-slate-400 text-center border-t border-rose-500/20">
                 <span>Assistance or query? Contact Arghyadeep Roy: </span>
-                <a href="tel:9830507435" className="font-mono font-bold text-cyan-400 hover:underline">
+                <a href="tel:9830507435" className="font-mono font-bold text-rose-400 hover:underline">
                   9830507435
                 </a>
               </div>
@@ -2121,7 +2122,6 @@ export default function StudentAccountPage() {
           </div>
         </div>
       )}
-
 
       {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
       {showPromoModal && (
