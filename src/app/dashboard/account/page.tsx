@@ -7,7 +7,7 @@ import {
   Copy, Check, X, User, Mail, Phone, ShieldCheck, 
   ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
   Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
-  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor
+  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag
 } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -88,6 +88,11 @@ export default function StudentAccountPage() {
 
   // Upgrade Request State
   const [upgradeReq, setUpgradeReq] = useState<any>(null);
+  const [allUpgradeReqs, setAllUpgradeReqs] = useState<any[]>([]);
+  const [showPromoModal, setShowPromoModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [promoMsg, setPromoMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
@@ -139,6 +144,7 @@ export default function StudentAccountPage() {
       .then((res) => res.json())
       .then((d) => {
         if (d.request) setUpgradeReq(d.request);
+        if (d.allRequests) setAllUpgradeReqs(d.allRequests);
         if (d.paymentSettings) setPaymentSettings(d.paymentSettings);
       })
       .catch(() => {});
@@ -686,7 +692,7 @@ export default function StudentAccountPage() {
               : activeTab === "profiles"
               ? "Student Profile & Curriculum"
               : activeTab === "membership"
-              ? "Plan & Membership Details"
+              ? "Membership"
               : "Account"}
           </h1>
           <p className="text-sm font-medium text-slate-400 mt-1">
@@ -706,7 +712,7 @@ export default function StudentAccountPage() {
             ) : activeTab === "profiles" ? (
               "Customize your display avatar, personal details, and academic board."
             ) : activeTab === "membership" ? (
-              "Review subscription tier, renewal dates, and available exam pass benefits."
+              "Plan Details"
             ) : (
               "Membership details"
             )}
@@ -768,10 +774,7 @@ export default function StudentAccountPage() {
                   {/* Divider & Manage Membership Link Row */}
                   <div className="pt-5 mt-5 border-t border-cyan-500/15 flex items-center justify-between">
                     <button
-                      onClick={() => {
-                        setShowPaymentModal(true);
-                        fetchUpgradeRequest();
-                      }}
+                      onClick={() => navigateToTab("membership")}
                       className="w-full flex items-center justify-between text-sm font-bold text-white hover:text-cyan-300 transition group cursor-pointer text-left py-1"
                     >
                       <span>Manage membership</span>
@@ -912,87 +915,124 @@ export default function StudentAccountPage() {
               </div>
             )}
 
-            {/* VIEW B: MEMBERSHIP TAB */}
+            {/* VIEW B: MEMBERSHIP TAB (NETFLIX STYLE) */}
             {activeTab === "membership" && (
               <div className="space-y-6 animate-in fade-in duration-200">
                 
-                {/* Membership Overview Card */}
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-cyan-500/15 pb-5">
-                    <div>
-                      <span className="text-xs font-extrabold tracking-wider uppercase text-slate-400 block mb-1">
-                        Current Plan
-                      </span>
-                      <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                        {isGold ? "Gold Membership (Unlimited)" : "Free Student Tier"}
-                        {isGold && <Sparkles className="w-5 h-5 text-amber-400" />}
-                      </h2>
-                    </div>
+                {/* 1. Plan Details Card (Netflix Red/Purple Gradient Top Accent) */}
+                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl overflow-hidden">
+                  <div className="h-1.5 w-full bg-gradient-to-r from-[#221f52] via-[#e50914] to-[#e50914]" />
+                  
+                  <div className="p-6 sm:p-7 space-y-2">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                      {isGold ? "Premium plan" : "Basic Student Plan"}
+                    </h3>
+                    <p className="text-sm font-semibold text-cyan-400">
+                      {!isGold
+                        ? "Free Tier"
+                        : is30Day
+                        ? "30-Day Premium Access"
+                        : "Lifetime Premium Access"}
+                    </p>
+                    <p className="text-xs sm:text-sm text-slate-400 pt-1 leading-relaxed">
+                      {isGold
+                        ? "Full access to Chemistry exam test series, detailed answer explanations, and proctored ranking analytics."
+                        : "Standard access to chemistry practice tests with instant automated grading."}
+                    </p>
 
-                    <div>
-                      {isGold ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-950/80 text-amber-300 border border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                          <CheckCircle className="w-3.5 h-3.5 text-amber-400" /> Active Subscription
+                    <div className="border-t border-cyan-500/15 mt-5 pt-1">
+                      <button
+                        onClick={handleChangePlanClick}
+                        className="w-full py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
+                      >
+                        <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
+                          Change plan
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
-                          Free Account
-                        </span>
+                        <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Payment Info Section */}
+                <div className="space-y-3">
+                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                    Payment info
+                  </h3>
+
+                  <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl divide-y divide-cyan-500/15 overflow-hidden">
+                    
+                    {/* Next Renewal / Payment Handle Row */}
+                    <div className="p-6 sm:p-7 space-y-1.5">
+                      <h4 className="text-base sm:text-lg font-bold text-white">
+                        {is30Day ? "Next renewal" : isLifetime ? "Membership" : "Payment status"}
+                      </h4>
+                      <p className="text-sm text-slate-300 font-mono font-medium">
+                        {is30Day ? nextPaymentFormatted : isLifetime ? "Lifetime Unlimited Pass" : "No payment method on file"}
+                      </p>
+
+                      {is30Day && (
+                        <div className="flex items-center gap-2 pt-1.5">
+                          {isPhonePe ? (
+                            <div className="w-5 h-5 rounded bg-[#5f259f] flex items-center justify-center text-white text-[11px] font-bold shadow-sm select-none shrink-0">
+                              पे
+                            </div>
+                          ) : (
+                            <div className="px-1.5 py-0.5 rounded bg-[#061421] border border-cyan-500/30 text-[10px] font-bold text-cyan-400 font-mono shrink-0">
+                              UPI
+                            </div>
+                          )}
+                          <span className="text-xs sm:text-sm font-medium text-slate-200 font-mono">
+                            {displayUpiId}
+                          </span>
+                        </div>
                       )}
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                    <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <span className="text-slate-400 block">Monthly Rate</span>
-                      <span className="text-lg font-black text-emerald-400 font-mono mt-0.5 block">
-                        ₹{paymentSettings?.monthlyFee || 199} <span className="text-xs font-normal text-slate-400">/ 30 Days</span>
-                      </span>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <span className="text-slate-400 block">Payment Details</span>
-                      <span className="text-sm font-bold text-slate-200 truncate block mt-1 font-mono">
-                        {paymentSettings?.upiId || "9830507435@upi"}
-                      </span>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <span className="text-slate-400 block">Next Payment / Expiry</span>
-                      <span className="text-sm font-bold text-amber-300 font-mono mt-1 block">
-                        {nextPaymentFormatted}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Pending Upgrade Alert */}
-                  {upgradeReq?.status === "PENDING" && (
-                    <div className="p-4 rounded-xl bg-amber-950/70 border border-amber-500/50 text-amber-200 text-xs flex items-center gap-3 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                      <Clock className="w-5 h-5 text-amber-400 animate-spin shrink-0" />
-                      <div>
-                        <strong className="font-bold text-amber-300 block">Upgrade Verification Pending</strong>
-                        <p className="mt-0.5 text-amber-200/80">
-                          Your UTR submission (<span className="font-mono font-bold text-white">{upgradeReq.utrNumber}</span>) has been received and is being verified by Admin.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Button */}
-                  <div className="pt-2 flex flex-wrap items-center gap-3">
+                    {/* Manage Payment Method Link */}
                     <button
                       onClick={() => {
                         setShowPaymentModal(true);
                         fetchUpgradeRequest();
                       }}
-                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer"
+                      className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
                     >
-                      {isGold ? "Renew / Extend Gold Pass" : "Upgrade to Gold Membership (₹99)"}
+                      <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
+                        Manage payment method
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
                     </button>
+
+                    {/* Redeem Gift or Promo Code Link */}
+                    <button
+                      onClick={() => {
+                        setPromoMsg(null);
+                        setPromoCodeInput("");
+                        setShowPromoModal(true);
+                      }}
+                      className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
+                    >
+                      <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
+                        Redeem gift or promo code
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* View Payment History Link */}
+                    <button
+                      onClick={() => setShowHistoryModal(true)}
+                      className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
+                    >
+                      <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
+                        View payment history
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
                   </div>
                 </div>
 
-                {/* Plan Benefits Checklist */}
+                {/* What is included in Gold Membership Checklist */}
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-4">
                   <h3 className="text-base font-bold text-white">What is included in Gold Membership</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
@@ -1911,6 +1951,183 @@ export default function StudentAccountPage() {
         </div>
       )}
 
+
+      {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
+      {showPromoModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="relative w-full max-w-md bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200 p-6 sm:p-7 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400">
+                  <Tag className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Redeem Promo Code</h3>
+                  <p className="text-xs text-slate-400">Enter your gift card or discount promo code</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPromoModal(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-cyan-950/50 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Code / Voucher
+              </label>
+              <input
+                type="text"
+                value={promoCodeInput}
+                onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                placeholder="e.g. CHEMGOLD, PIECHEM2026"
+                className="w-full bg-slate-950 border border-cyan-500/40 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase tracking-wider outline-none focus:border-cyan-400 transition"
+              />
+            </div>
+
+            {promoMsg && (
+              <div
+                className={`p-3 rounded-xl text-xs font-medium border flex items-center gap-2 ${
+                  promoMsg.type === "success"
+                    ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300"
+                    : "bg-amber-950/80 border-amber-500/40 text-amber-300"
+                }`}
+              >
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{promoMsg.text}</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                onClick={() => {
+                  if (!promoCodeInput.trim()) {
+                    setPromoMsg({ type: "error", text: "Please enter a valid promo code." });
+                    return;
+                  }
+                  setPromoMsg({
+                    type: "success",
+                    text: "Promo code valid! Discount will be automatically applied at checkout."
+                  });
+                }}
+                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md hover:brightness-110 cursor-pointer"
+              >
+                Apply Code
+              </button>
+              <button
+                onClick={() => setShowPromoModal(false)}
+                className="px-4 py-3 rounded-xl border border-slate-700 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-900 transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. PAYMENT HISTORY MODAL (NETFLIX STYLE) */}
+      {showHistoryModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-[#03080e] text-white rounded-3xl shadow-[0_0_60px_rgba(6,182,212,0.3)] border border-cyan-500/40 overflow-hidden my-auto animate-in zoom-in-95 duration-200 p-6 sm:p-7 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400">
+                  <Receipt className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Billing & Payment History</h3>
+                  <p className="text-xs text-slate-400">Past transactions, subscription passes, and membership invoices</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowHistoryModal(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-cyan-950/50 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Transactions List */}
+            <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
+              {allUpgradeReqs && allUpgradeReqs.length > 0 ? (
+                allUpgradeReqs.map((req: any, i: number) => (
+                  <div
+                    key={req.id || i}
+                    className="p-4 rounded-xl bg-[#061421] border border-cyan-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-white">
+                          Gold Membership Pass (30 Days)
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            req.status === "APPROVED"
+                              ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-400"
+                              : req.status === "REJECTED"
+                              ? "bg-red-950/80 border-red-500/40 text-red-400"
+                              : "bg-amber-950/80 border-amber-500/40 text-amber-300"
+                          }`}
+                        >
+                          {req.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 font-mono">
+                        {new Date(req.createdAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric"
+                        })}   Method: UPI ({req.utrNumber || displayUpiId})
+                      </p>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-base font-black text-emerald-400 font-mono block">
+                        ₹{req.amount || paymentSettings?.monthlyFee || 199}
+                      </span>
+                      <span className="text-[10px] text-slate-500 block">Official Receipt</span>
+                    </div>
+                  </div>
+                ))
+              ) : isGold ? (
+                <div className="p-4 rounded-xl bg-[#061421] border border-cyan-500/20 flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <span className="text-sm font-bold text-white">
+                      Active Gold Membership Subscription
+                    </span>
+                    <p className="text-xs text-slate-400 font-mono">
+                      Started: {memberSinceFormatted}   Payment: UPI ({displayUpiId})
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-base font-black text-emerald-400 font-mono block">
+                      ₹{paymentSettings?.monthlyFee || 199}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+                      <Check className="w-3 h-3" /> Paid & Active
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6 text-center text-slate-400 text-xs bg-[#061421] rounded-xl border border-cyan-500/20">
+                  No billing or payment history recorded for this account.
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setShowHistoryModal(false)}
+                className="px-5 py-2.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4. HIGHEST ENROLLED PLAN MODAL */}
       {showHighestPlanModal && (
