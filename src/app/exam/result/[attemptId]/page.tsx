@@ -138,20 +138,20 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
         </div>
 
         {/* 4 Score Breakdown Cards Row */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#161616]/80 p-5 rounded-xl border border-[#333333] backdrop-blur-md text-center">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-[#161616]/80 p-3.5 sm:p-5 rounded-xl border border-[#333333] backdrop-blur-md text-center">
             <div className="text-xs font-medium text-[#a6a6a6] mb-1">Final Score</div>
             <div className="text-3xl font-extrabold text-white">{result.score != null ? result.score : '-'}</div>
             <div className="text-xs font-bold text-blue-400 mt-1">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : '-'}</div>
           </div>
 
-          <div className="bg-green-950/20 p-5 rounded-xl border border-green-900/50 backdrop-blur-md text-center">
+          <div className="bg-green-950/20 p-3.5 sm:p-5 rounded-xl border border-green-900/50 backdrop-blur-md text-center">
             <div className="text-xs font-medium text-green-400 mb-1">Correct Answers</div>
             <div className="text-3xl font-extrabold text-green-400">{correctCount}</div>
             <div className="text-xs text-green-500/80 mt-1">+{result.test?.marksPerQuestion || 1} mark each</div>
           </div>
 
-          <div className="bg-red-950/20 p-5 rounded-xl border border-red-900/50 backdrop-blur-md text-center">
+          <div className="bg-red-950/20 p-3.5 sm:p-5 rounded-xl border border-red-900/50 backdrop-blur-md text-center">
             <div className="text-xs font-medium text-red-400 mb-1">Wrong Answers</div>
             <div className="text-3xl font-extrabold text-red-400">{incorrectCount}</div>
             <div className="text-xs text-red-500/80 mt-1">
@@ -159,7 +159,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
             </div>
           </div>
 
-          <div className="bg-[#161616]/80 p-5 rounded-xl border border-[#333333] backdrop-blur-md text-center">
+          <div className="bg-[#161616]/80 p-3.5 sm:p-5 rounded-xl border border-[#333333] backdrop-blur-md text-center">
             <div className="text-xs font-medium text-[#a6a6a6] mb-1">Not Attempted</div>
             <div className="text-3xl font-extrabold text-[#a6a6a6]">{unansweredCount}</div>
             <div className="text-xs text-[#737373] mt-1">Unanswered</div>
@@ -175,12 +175,12 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 bg-[#1a1a1a] p-1 rounded-lg border border-[#333333] w-full sm:w-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 bg-[#1a1a1a] p-1 rounded-xl sm:rounded-lg border border-[#333333] w-full sm:w-auto">
             {(['All', 'Correct', 'Incorrect', 'Unanswered'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-center ${
+                className={`px-3 py-2 sm:py-1.5 text-xs font-bold rounded-lg sm:rounded-md transition-all text-center ${
                   filter === f 
                     ? 'bg-blue-600 text-white shadow-md' 
                     : 'text-[#a6a6a6] hover:text-white hover:bg-[#262626]'

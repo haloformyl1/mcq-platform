@@ -221,11 +221,11 @@ export default function AdminTests() {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 w-full md:w-auto">
             <select
               value={bulkStatus}
               onChange={e => setBulkStatus(e.target.value)}
-              className="bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+              className="bg-[#262626] border border-[#404040] text-white text-sm rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
             >
               <option value="">-- Change Selected Status To --</option>
               <option value="LIVE">LIVE</option>
@@ -389,7 +389,84 @@ export default function AdminTests() {
         )}
       </div>
 
-      <div className="bg-[#161616]/60 shadow rounded-lg overflow-hidden border border-[#333333] backdrop-blur-sm">
+      {/* Mobile Cards View */}
+      <div className="md:hidden space-y-3.5">
+        {tests.length === 0 && !error ? (
+          <div className="bg-[#161616]/60 p-6 text-center text-[#a6a6a6] rounded-xl border border-[#333333]">
+            No tests have been created yet.
+          </div>
+        ) : (
+          tests.map(test => {
+            const isChecked = selectedIds.includes(test.id);
+            const displayStatus = test.status === 'PUBLISHED' ? 'LIVE' : test.status === 'LOCKED' ? 'UPCOMING' : test.status;
+
+            return (
+              <div
+                key={test.id}
+                className={`bg-[#161616]/90 border ${
+                  isChecked ? 'border-blue-500 bg-blue-950/20' : 'border-[#333333]'
+                } p-4 rounded-xl space-y-3 shadow-lg transition-all`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => toggleSelectRow(test.id)}
+                      className="w-5 h-5 rounded bg-[#262626] border-[#404040] text-blue-600 focus:ring-blue-500 cursor-pointer mt-0.5 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-white text-base leading-snug break-words">{test.title}</h3>
+                      <p className="text-xs text-[#a6a6a6] mt-0.5">
+                        {test.durationMinutes} mins • {test.marksPerQuestion} marks/q • {test._count.questions}/{test.totalQuestions} Qs
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full shrink-0 ${
+                    displayStatus === 'LIVE' ? 'bg-green-900/40 text-green-300 border border-green-700/50' :
+                    displayStatus === 'UPCOMING' ? 'bg-amber-900/40 text-amber-300 border border-amber-700/50' :
+                    displayStatus === 'EXPIRED' ? 'bg-red-900/40 text-red-300 border border-red-700/50' :
+                    'bg-gray-800 text-gray-300 border border-gray-700'
+                  }`}>
+                    {displayStatus}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  {(!test.targetBoard || test.targetBoard === 'ALL') && (!test.targetAcademicLevel || test.targetAcademicLevel === 'ALL') ? (
+                    <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-cyan-950/60 text-cyan-300 border border-cyan-700/50">
+                      👥 All Students
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 text-[11px] font-bold rounded bg-amber-950/80 text-amber-300 border border-amber-600/60">
+                      🎯 {test.targetBoard !== 'ALL' ? test.targetBoard : 'All Boards'} • {test.targetAcademicLevel !== 'ALL' ? test.targetAcademicLevel : 'All Levels'}
+                    </span>
+                  )}
+                </div>
+
+                {displayStatus === 'UPCOMING' && (test.unlockAt || test.lockAt) && (
+                  <div className="text-[11px] text-[#8c8c8c] bg-[#1a1a1a] p-2 rounded-lg border border-[#333333] space-y-0.5 font-mono">
+                    {test.unlockAt && <div><span className="text-amber-400">Unlock:</span> {formatDateTimeDisplay(test.unlockAt)}</div>}
+                    {test.lockAt && <div><span className="text-orange-400">Re-Lock:</span> {formatDateTimeDisplay(test.lockAt)}</div>}
+                  </div>
+                )}
+
+                <div className="pt-2 border-t border-[#262626] flex justify-end">
+                  <Link
+                    href={`/admin/tests/${test.id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-950/40 border border-blue-800/60 px-3 py-1.5 rounded-lg transition"
+                  >
+                    Edit Test Settings & Questions →
+                  </Link>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-[#161616]/60 shadow rounded-lg overflow-x-auto border border-[#333333] backdrop-blur-sm">
         <table className="min-w-full divide-y divide-[#333333]">
           <thead className="bg-[#1a1a1a]/80">
             <tr>

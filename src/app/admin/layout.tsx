@@ -217,20 +217,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black flex flex-col font-sans text-white">
-            <nav className="bg-[#0b1724]/95 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40">
+            <nav className="bg-[#0b1724]/95 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          {/* Main Top Bar */}
           <div className="flex items-center justify-between h-16 gap-3">
             
             {/* Left Brand & Title */}
-            <div className="flex items-center space-x-3 shrink-0">
+            <div className="flex items-center space-x-2.5 sm:space-x-3 shrink-0">
               <PiechemLogo size="sm" isGoldMember={false} />
-              <span className="border-l border-slate-700/80 pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
+              <span className="border-l border-slate-700/80 pl-2 sm:pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
                 Admin Panel
               </span>
             </div>
 
-            {/* Middle Nav Links with horizontal scroll container */}
-            <div className="flex-1 flex items-center overflow-x-auto scrollbar-none py-1 mx-2">
+            {/* Desktop Nav Links (Hidden on Mobile) */}
+            <div className="hidden md:flex flex-1 items-center overflow-x-auto scrollbar-none py-1 mx-4">
               <div className="flex items-center space-x-1 whitespace-nowrap">
                 {navItems.map((item) => (
                   <Link
@@ -249,7 +250,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Right Action Tools Bar */}
-            <div className="flex items-center space-x-1.5 shrink-0">
+            <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
               <button
                 onClick={handleTestAsStudent}
                 className="bg-amber-600/90 hover:bg-amber-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-amber-500/40 shrink-0"
@@ -294,6 +295,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 Logout
               </button>
+            </div>
+          </div>
+
+          {/* Dedicated Mobile Nav Links Row (Horizontal Scroll) */}
+          <div className="md:hidden border-t border-slate-800/60 py-2 overflow-x-auto scrollbar-none">
+            <div className="flex items-center space-x-1.5 px-1 whitespace-nowrap">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition shrink-0 ${
+                    pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
+                      ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-sm"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
             </div>
           </div>
         </div>

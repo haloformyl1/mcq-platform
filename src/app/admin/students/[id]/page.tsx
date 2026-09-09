@@ -534,7 +534,31 @@ export default function AdminStudentDetails() {
           )}
         </div>
         <h2 className="text-lg font-semibold text-gray-200 mb-4">Recent Test History</h2>
-        <div className="overflow-x-auto">
+        {/* Mobile History Cards */}
+        <div className="md:hidden space-y-3">
+          {history.map((a) => (
+            <div key={a.id} className="bg-[#222] border border-[#333] p-4 rounded-xl space-y-2">
+              <div className="flex justify-between items-start gap-2">
+                <div className="font-bold text-gray-200 text-sm leading-snug break-words flex-1">{a.testName}</div>
+                <span className={`px-2 py-0.5 rounded text-xs shrink-0 ${a.status === "SUBMITTED" ? "bg-green-900/30 text-green-400" : "bg-blue-900/30 text-blue-400"}`}>
+                  {a.status}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 pt-1">
+                <div>Date: <span className="text-gray-200">{new Date(a.date).toLocaleDateString()}</span></div>
+                <div>Attempt #: <span className="text-gray-200">{a.attemptNumber}</span></div>
+                <div>Score: <span className="text-white font-bold">{a.score !== null ? a.score : "-"}</span></div>
+                <div>Percentage: <span className="text-cyan-300 font-bold">{a.percentage != null ? `${Number(a.percentage).toFixed(1)}%` : "-"}</span></div>
+              </div>
+            </div>
+          ))}
+          {history.length === 0 && (
+            <div className="text-center py-6 text-gray-400 bg-[#222] rounded-xl border border-[#333]">No test history.</div>
+          )}
+        </div>
+
+        {/* Desktop History Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-400">
             <thead className="text-xs text-gray-500 uppercase bg-[#222]">
               <tr>

@@ -129,8 +129,88 @@ export default function AdminStudents() {
         {loading ? (
           <PiFiringLoader fullScreen={false} />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-400">
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {students.map((student) => (
+                <div key={student.id} className="bg-[#222] border border-[#333] p-4 rounded-xl space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="font-bold text-gray-100 text-base break-words">{student.name || "Unnamed Student"}</div>
+                      <div className="text-xs text-gray-400 font-mono break-all">{student.email}</div>
+                      <div className="text-[11px] text-gray-500 font-mono mt-0.5">ID: {student.id.substring(0, 8)}...</div>
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded text-xs font-semibold shrink-0 ${student.status === "ACTIVE" ? "bg-green-900/30 text-green-400 border border-green-700/40" : "bg-red-900/30 text-red-400 border border-red-700/40"}`}>
+                      {student.status}
+                    </span>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#333] flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400">Subscription:</span>
+                      {student.hasActiveUpi ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-extrabold bg-blue-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/50">
+                          ⭐ GOLD (UPI)
+                        </span>
+                      ) : (
+                        <select
+                          value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : "FREE"}
+                          onChange={async (e) => {
+                            const newSub = e.target.value;
+                            try {
+                              const res = await fetch(`/api/admin/students/${student.id}/status`, {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ subscriptionStatus: newSub })
+                              });
+                              const resData = await res.json();
+                              if (res.ok) {
+                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, subscriptionStatus: newSub, subscriptionExpiresAt: null, hasActiveUpi: false } : s));
+                              } else {
+                                alert(resData.error || "Failed to update subscription");
+                              }
+                            } catch (err) {
+                              console.error("Failed to update subscription", err);
+                            }
+                          }}
+                          className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
+                            student.subscriptionStatus === "COMPLIMENTARY"
+                              ? "bg-blue-950 text-blue-300 border-blue-500/60"
+                              : "bg-slate-900 text-slate-400 border-slate-700"
+                          }`}
+                        >
+                          <option value="FREE">FREE</option>
+                          <option value="COMPLIMENTARY">COMPLIMENTARY</option>
+                        </select>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>Tests Attempted:</span>
+                      <span className="font-bold text-white font-mono">{student._count.attempts}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>Last Seen:</span>
+                      <span className="text-[#00e5ff] font-medium">{formatWhatsAppLastSeen(student.lastLogin)}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#333] flex justify-end">
+                    <Link href={`/admin/students/${student.id}`} className="text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-950/40 border border-blue-800/60 px-3 py-1.5 rounded-lg transition">
+                      Manage Student →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+              {students.length === 0 && (
+                <div className="text-center py-6 text-gray-400">No students found.</div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-400">
               <thead className="text-xs text-gray-500 uppercase bg-[#222]">
                 <tr>
                   <th className="px-4 py-3">Student ID</th>
@@ -219,6 +299,7 @@ export default function AdminStudents() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>

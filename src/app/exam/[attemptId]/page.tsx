@@ -358,7 +358,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             {timeLeft}
           </div>
         </div>
-        <div className="flex items-center space-x-3 w-full md:w-auto justify-end">
+        <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto justify-end">
           <button
             onClick={() => {
               const docEl = document.documentElement as any;
@@ -392,15 +392,15 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       </header>
 
       <div className="flex flex-1 overflow-hidden relative">
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8">
-          <div className="max-w-4xl mx-auto w-full bg-[#161616]/80 border border-[#404040] rounded-xl p-4 sm:p-8 shadow-2xl">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8">
+          <div className="max-w-4xl mx-auto w-full bg-[#161616]/80 border border-[#404040] rounded-xl p-4 sm:p-6 md:p-8 shadow-2xl">
             <div className="mb-6 flex justify-between items-start gap-4">
               <h2 className="text-xl font-medium text-[#a6a6a6] pt-1">
                 Question <span className="font-bold text-white text-2xl">{currentQ + 1}</span>
               </h2>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-medium mb-4 leading-relaxed">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-medium mb-4 leading-relaxed break-words overflow-x-auto">
               {currentQuestion.questionText}
             </h2>
 
@@ -416,7 +416,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               </div>
             )}
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {['A', 'B', 'C', 'D'].map((opt) => {
                 const optKey = `option${opt}` as keyof typeof currentQuestion;
                 const optText = currentQuestion[optKey];
@@ -426,7 +426,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   <div 
                     key={opt}
                     onClick={() => handleOptionSelect(currentQuestion.id, opt)}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-colors duration-150 touch-manipulation select-none active:scale-[0.99] ${
+                    className={`p-3.5 sm:p-4 border-2 rounded-xl cursor-pointer transition-colors duration-150 touch-manipulation select-none active:scale-[0.99] break-words text-sm sm:text-base ${
                       isSelected 
                         ? 'border-[#0099ff] bg-[#0099ff]/20' 
                         : 'border-[#404040] hover:border-white hover:bg-[#262626]'
@@ -438,58 +438,62 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               })}
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-12 pt-6 border-t border-[#404040] gap-4">
-              <div className="flex justify-between w-full sm:hidden order-2 gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-8 sm:mt-12 pt-6 border-t border-[#404040] gap-3 sm:gap-4">
+              {/* Mobile row: Previous / Next */}
+              <div className="flex justify-between w-full sm:hidden order-2 gap-2.5">
                 <button 
                   onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
                   disabled={currentQ === 0}
-                  className="flex-1 px-4 py-3 bg-[#262626] text-[#a6a6a6] font-medium rounded-md hover:bg-[#333333] hover:text-white disabled:opacity-50 transition"
+                  className="flex-1 py-3 px-4 bg-[#262626] text-[#a6a6a6] font-semibold text-sm rounded-xl hover:bg-[#333333] hover:text-white disabled:opacity-40 transition active:scale-[0.98]"
                 >
-                  Previous
+                  ← Previous
                 </button>
                 <button 
                   onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
                   disabled={currentQ === questions.length - 1}
-                  className="flex-1 px-4 py-3 bg-[#0099ff] text-white font-medium rounded-md hover:bg-[#007acc] disabled:opacity-50 transition"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm rounded-xl hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 transition shadow-md active:scale-[0.98]"
                 >
-                  Next
+                  Next →
                 </button>
               </div>
 
+              {/* Desktop Previous */}
               <button 
                 onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
                 disabled={currentQ === 0}
-                className="hidden sm:block order-1 px-6 py-2 bg-[#262626] text-[#a6a6a6] font-medium rounded-md hover:bg-[#333333] hover:text-white disabled:opacity-50 transition"
+                className="hidden sm:block order-1 px-6 py-2.5 bg-[#262626] text-[#a6a6a6] font-medium rounded-lg hover:bg-[#333333] hover:text-white disabled:opacity-40 transition"
               >
                 Previous
               </button>
               
-              <div className="order-1 sm:order-2 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              {/* Review & Clear controls */}
+              <div className="order-1 sm:order-2 flex flex-row items-center gap-2 w-full sm:w-auto">
                 <button 
                   onClick={() => setMarkedForReview(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
-                  className={`px-4 py-3 sm:py-2 font-medium rounded-md border-2 transition-colors duration-150 text-center ${
+                  className={`flex-1 sm:flex-none px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-lg border-2 transition-all text-center ${
                     markedForReview[currentQuestion.id] 
                       ? 'bg-purple-900/50 border-purple-500 text-purple-300 hover:bg-purple-800/50' 
                       : 'bg-transparent border-[#404040] text-purple-400 hover:bg-[#262626] hover:border-purple-400'
                   }`}
                 >
-                  {markedForReview[currentQuestion.id] ? "Marked for Review" : "Mark for Review"}
+                  {markedForReview[currentQuestion.id] ? "★ Marked for Review" : "☆ Mark for Review"}
                 </button>
 
                 {answers[currentQuestion.id] && (
                   <button 
                     onClick={() => handleClearAnswer(currentQuestion.id)}
-                    className="px-3 py-2 text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 rounded-md transition"
+                    className="px-3 py-2.5 text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 rounded-xl sm:rounded-lg transition shrink-0"
                   >
                     Clear Choice
                   </button>
                 )}
               </div>
 
+              {/* Desktop Next */}
               <button 
                 onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
                 disabled={currentQ === questions.length - 1}
-                className="hidden sm:block order-3 px-6 py-2 bg-[#0099ff] text-white font-medium rounded-md hover:bg-[#007acc] disabled:opacity-50 transition"
+                className="hidden sm:block order-3 px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 transition shadow"
               >
                 Next
               </button>

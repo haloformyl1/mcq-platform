@@ -263,16 +263,16 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold">Edit Test</h1>
-        <div className="flex items-center space-x-3">
-          <button onClick={recalculateScores} className="bg-amber-600/30 text-amber-300 border border-amber-500/40 px-3 py-2 text-sm rounded shadow hover:bg-amber-600/50 transition">Recalculate Scores</button>
-          <button onClick={deleteTest} className="text-red-400 hover:text-red-300 font-medium text-sm px-2">Delete Test</button>
-          <button onClick={saveSettings} className="bg-blue-600 text-white px-4 py-2 text-sm rounded shadow hover:bg-blue-700 font-medium">Save Settings</button>
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <button onClick={recalculateScores} className="flex-1 sm:flex-none bg-amber-600/30 text-amber-300 border border-amber-500/40 px-3 py-2 text-xs sm:text-sm rounded shadow hover:bg-amber-600/50 transition font-medium">Recalculate Scores</button>
+          <button onClick={deleteTest} className="flex-1 sm:flex-none text-red-400 hover:text-red-300 font-medium text-xs sm:text-sm px-3 py-2 rounded border border-red-900/40 hover:bg-red-950/30 transition text-center">Delete Test</button>
+          <button onClick={saveSettings} className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 text-xs sm:text-sm rounded shadow hover:bg-blue-700 font-bold transition">Save Settings</button>
         </div>
       </div>
 
-      <div className="bg-[#161616]/60 p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm grid grid-cols-2 gap-4">
+      <div className="bg-[#161616]/60 p-4 sm:p-6 rounded-lg shadow border border-[#333333] backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
           <label className="block text-sm font-medium text-amber-300 font-bold">Access Plan Tier</label>
           <select 
@@ -464,7 +464,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             Configure when this test will unlock for students, and when it will automatically re-lock (expire).
           </p>
 
-          <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#333333]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#333333]">
             <div>
               <label className="block text-sm font-medium text-[#a6a6a6]">Unlock Date & Time</label>
               <input type="datetime-local" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] [color-scheme:dark]" value={formatForInput(test.unlockAt)} onChange={e => {
@@ -528,17 +528,17 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         </div>
       )}
 
-      <div className="mt-8 flex justify-between items-center">
+      <div className="mt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h2 className="text-xl font-bold">Questions ({test.questions?.length || 0})</h2>
-        <div className="space-x-2">
-          <button onClick={downloadTemplate} className="bg-gray-200 text-gray-800 px-4 py-2 rounded shadow hover:bg-gray-300 font-medium text-sm">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button onClick={downloadTemplate} className="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-3 py-2 rounded shadow hover:bg-gray-300 font-medium text-xs sm:text-sm text-center">
             Download Template
           </button>
-          <label className={`bg-green-600 text-white px-4 py-2 rounded shadow cursor-pointer font-medium text-sm ${isImporting ? 'opacity-70' : 'hover:bg-green-700'}`}>
+          <label className={`flex-1 sm:flex-none bg-green-600 text-white px-3 py-2 rounded shadow cursor-pointer font-medium text-xs sm:text-sm text-center ${isImporting ? 'opacity-70' : 'hover:bg-green-700'}`}>
             {isImporting ? 'Importing...' : 'Import CSV'}
             <input type="file" accept=".csv" className="hidden" onChange={handleImport} disabled={isImporting} />
           </label>
-          <button onClick={addSampleQuestion} className="bg-gray-800 text-white px-4 py-2 rounded shadow hover:bg-gray-900 font-medium text-sm">Add Quick Question</button>
+          <button onClick={addSampleQuestion} className="w-full sm:w-auto bg-gray-800 text-white px-3.5 py-2 rounded shadow hover:bg-gray-900 font-medium text-xs sm:text-sm text-center">Add Quick Question</button>
         </div>
       </div>
 
@@ -555,13 +555,13 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
                   </div>
                 </div>
                 <textarea className="w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" rows={3} value={editingQuestion.questionText} onChange={e => setEditingQuestion({...editingQuestion, questionText: e.target.value})} placeholder="Question Text" />
-                <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                   <input className="bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={editingQuestion.optionA} onChange={e => setEditingQuestion({...editingQuestion, optionA: e.target.value})} placeholder="Option A" />
                   <input className="bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={editingQuestion.optionB} onChange={e => setEditingQuestion({...editingQuestion, optionB: e.target.value})} placeholder="Option B" />
                   <input className="bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={editingQuestion.optionC} onChange={e => setEditingQuestion({...editingQuestion, optionC: e.target.value})} placeholder="Option C" />
                   <input className="bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={editingQuestion.optionD} onChange={e => setEditingQuestion({...editingQuestion, optionD: e.target.value})} placeholder="Option D" />
                 </div>
-                <div className="flex gap-4 mt-2">
+                <div className="flex flex-col sm:flex-row gap-4 mt-2">
                   <div className="flex-1">
                     <label className="block text-xs font-medium text-[#a6a6a6] mb-1">Correct Answer</label>
                     <select className="w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={editingQuestion.correctAnswer} onChange={e => setEditingQuestion({...editingQuestion, correctAnswer: e.target.value})}>
@@ -579,9 +579,9 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
               </div>
             ) : (
               <>
-                <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-white whitespace-pre-wrap">Q{i + 1}. {q.questionText}</h3>
-                  <div className="flex items-center space-x-3 shrink-0 ml-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+                  <h3 className="font-bold text-white whitespace-pre-wrap flex-1 min-w-0">Q{i + 1}. {q.questionText}</h3>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button 
                       onClick={() => reevaluateQuestion(q.id, i + 1)} 
                       className="bg-amber-600/20 text-amber-300 hover:bg-amber-600/40 border border-amber-500/40 px-2.5 py-1 text-xs rounded transition-colors font-medium cursor-pointer"
@@ -593,7 +593,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
                     <button onClick={() => deleteQuestion(q.id)} className="text-red-500 hover:text-red-400 text-sm font-medium transition-colors">Delete</button>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 mt-4 text-sm text-[#cccccc]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 text-sm text-[#cccccc]">
                   <div className={`p-2 rounded ${q.correctAnswer === 'A' ? 'bg-green-900/30 border border-green-500/50 text-green-300 font-medium' : 'bg-[#262626]/50 border border-[#404040]'}`}>A. {q.optionA}</div>
                   <div className={`p-2 rounded ${q.correctAnswer === 'B' ? 'bg-green-900/30 border border-green-500/50 text-green-300 font-medium' : 'bg-[#262626]/50 border border-[#404040]'}`}>B. {q.optionB}</div>
                   <div className={`p-2 rounded ${q.correctAnswer === 'C' ? 'bg-green-900/30 border border-green-500/50 text-green-300 font-medium' : 'bg-[#262626]/50 border border-[#404040]'}`}>C. {q.optionC}</div>
