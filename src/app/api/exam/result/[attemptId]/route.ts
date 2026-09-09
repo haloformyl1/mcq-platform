@@ -41,6 +41,7 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
             negativeMarking: true,
             negativeMarks: true,
             durationMinutes: true,
+            maximumAttempts: true,
             questions: {
               orderBy: { orderIndex: 'asc' }
             }
@@ -104,7 +105,8 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
         marksPerQuestion: test.marksPerQuestion,
         negativeMarking: test.negativeMarking,
         negativeMarks: test.negativeMarks,
-        durationMinutes: test.durationMinutes
+        durationMinutes: test.durationMinutes,
+        maximumAttempts: test.maximumAttempts || 1
       },
       answers: allAnswers
     });

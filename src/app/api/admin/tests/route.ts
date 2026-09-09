@@ -47,6 +47,7 @@ export async function POST(req: Request) {
         marksPerQuestion: parseFloat(data.marksPerQuestion) || 1,
         negativeMarking: data.negativeMarking || false,
         negativeMarks: parseFloat(data.negativeMarks) || 0,
+        maximumAttempts: parseInt(data.maximumAttempts) || 1,
         randomizeQuestions: data.randomizeQuestions || false,
         randomizeOptions: data.randomizeOptions || false,
         targetBoard: data.targetBoard || "ALL",

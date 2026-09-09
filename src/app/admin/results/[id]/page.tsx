@@ -131,10 +131,11 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
     durationText = `${mins}m ${secs}s`;
   }
 
+  // An attempt is genuinely resumed ONLY if reopened by Admin or resumed with admin approval
   const isResumed = Boolean(
-    result.resumedAt ||
-    (result.timeSpentSeconds != null && result.timeSpentSeconds > 0) ||
-    (result.extraTimeMinutes != null && result.extraTimeMinutes > 0)
+    result.previousAnswersSnapshot != null ||
+    (result.extraTimeMinutes != null && result.extraTimeMinutes > 0) ||
+    result.answers?.some((a: any) => a.isChangedInResume || a.isFreshInResume)
   );
 
   const testDurationMinutes = result.test?.durationMinutes || 0;
@@ -236,15 +237,21 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
               <div className="text-xs font-medium text-white">
                 Initial: {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </div>
-              {result.resumedAt ? (
-                <div className="text-xs font-bold text-amber-400 mt-0.5">
-                  ⚡ Resumed: {new Date(result.resumedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              {isResumed ? (
+                result.resumedAt ? (
+                  <div className="text-xs font-bold text-amber-400 mt-0.5">
+                    ⚡ Resumed: {new Date(result.resumedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </div>
+                ) : result.status === "IN_PROGRESS" ? (
+                  <div className="text-xs font-semibold text-amber-400/80 mt-0.5">
+                    ⏳ Resumed: Awaiting student start
+                  </div>
+                ) : null
+              ) : (
+                <div className="text-xs text-[#737373] mt-0.5">
+                  Resumed: <span className="font-semibold text-slate-400">Do Not Apply</span>
                 </div>
-              ) : isResumed && result.status === "IN_PROGRESS" ? (
-                <div className="text-xs font-semibold text-amber-400/80 mt-0.5">
-                  ⏳ Resumed: Awaiting student start
-                </div>
-              ) : null}
+              )}
               <div className="text-xs text-[#737373] mt-0.5">
                 {submitTime ? `Submitted: ${submitTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : "Not submitted"}
               </div>
@@ -281,8 +288,8 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        {/* Resumed Session Details Banner (Shown if test was approved/reopened by Admin) */}
-        {isResumed && (
+        {/* Resumed Session Details Banner (Shown if test was approved/reopened by Admin, otherwise DO NOT APPLY) */}
+        {isResumed ? (
           <div className="mt-4 bg-gradient-to-r from-amber-950/40 via-[#1c1811] to-cyan-950/30 border border-amber-500/50 rounded-xl p-4 sm:p-5 shadow-lg space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
               <div className="flex items-center gap-3">
@@ -373,6 +380,62 @@ export default function AdminAttemptDetail({ params }: { params: Promise<{ id: s
                 <div className="text-[10px] text-[#888888] mt-0.5">
                   new questions answered in resume
                 </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 bg-[#141414]/80 border border-[#2d2d2d] rounded-xl p-4 sm:p-5 shadow space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-[#202020] text-slate-400 border border-white/10 shrink-0">
+                  <RotateCcw className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Resumed Test Session</span>
+                    <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700 font-mono font-bold">
+                      DO NOT APPLY
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1">
+                    Student did not resume their test ever (Attempt completed in original single session without admin reopen).
+                  </div>
+                </div>
+              </div>
+              <div className="px-3 py-1 rounded bg-[#1c1c1c] border border-[#333333] text-xs font-mono font-bold text-amber-300/90 self-start sm:self-center">
+                RESUME STATUS: DO NOT APPLY
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+              <div className="bg-black/30 border border-[#2d2d2d] p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#737373] uppercase font-semibold">Total Allowed in Resumed Test</div>
+                <div className="text-sm font-bold text-amber-300/80 font-mono mt-1">DO NOT APPLY</div>
+                <div className="text-[10px] text-[#555555] mt-0.5">Single session duration only</div>
+              </div>
+
+              <div className="bg-black/30 border border-[#2d2d2d] p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#737373] uppercase font-semibold">Previously Left Over Time</div>
+                <div className="text-sm font-bold text-amber-300/80 font-mono mt-1">DO NOT APPLY</div>
+                <div className="text-[10px] text-[#555555] mt-0.5">Attempt was never paused</div>
+              </div>
+
+              <div className="bg-black/30 border border-[#2d2d2d] p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#737373] uppercase font-semibold">Admin Grace Time Added</div>
+                <div className="text-sm font-bold text-amber-300/80 font-mono mt-1">DO NOT APPLY</div>
+                <div className="text-[10px] text-[#555555] mt-0.5">0 grace mins added</div>
+              </div>
+
+              <div className="bg-black/30 border border-[#2d2d2d] p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#737373] uppercase font-semibold">Answers Changed</div>
+                <div className="text-sm font-bold text-amber-300/80 font-mono mt-1">DO NOT APPLY</div>
+                <div className="text-[10px] text-[#555555] mt-0.5">No resume answer changes</div>
+              </div>
+
+              <div className="bg-black/30 border border-[#2d2d2d] p-3.5 rounded-lg">
+                <div className="text-[11px] text-[#737373] uppercase font-semibold">Freshly Attempted</div>
+                <div className="text-sm font-bold text-amber-300/80 font-mono mt-1">DO NOT APPLY</div>
+                <div className="text-[10px] text-[#555555] mt-0.5">Original session answers</div>
               </div>
             </div>
           </div>

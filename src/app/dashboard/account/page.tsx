@@ -1112,37 +1112,6 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
-                {/* 3. Summary Profile Spotlight */}
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-5">
-                  <div className="flex items-center gap-4 text-center sm:text-left">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-cyan-950 ring-2 ring-cyan-500/40 shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                      <img
-                        src={avatarUrl || "/avatars/atom.jpg"}
-                        alt="Avatar"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h4 className="text-base font-bold text-white">{name || "Student"}</h4>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">{email}</p>
-                      <div className="flex items-center gap-2 mt-2 justify-center sm:justify-start">
-                        <span className="text-xs font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-0.5 rounded-full border border-cyan-500/40">
-                          {board} ({board === "WBCHSE" ? academicLevel : `Class ${academicLevel}`})
-                        </span>
-                        <span className="text-xs text-slate-400 font-medium">
-                          • {completedAttempts.length} Tests Attempted
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => navigateToTab("profiles")}
-                    className="px-4 py-2 rounded-xl border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:bg-cyan-950/60 hover:text-white transition cursor-pointer shrink-0"
-                  >
-                    Edit Profile
-                  </button>
-                </div>
 
               </div>
             )}
@@ -2033,7 +2002,7 @@ export default function StudentAccountPage() {
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
                   <span className="text-cyan-500/60"> </span>
@@ -2501,7 +2470,7 @@ export default function StudentAccountPage() {
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
                   <span className="text-cyan-500/60"> </span>
@@ -2612,7 +2581,7 @@ export default function StudentAccountPage() {
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
                   <span className="text-cyan-500/60"> </span>
@@ -2711,7 +2680,7 @@ export default function StudentAccountPage() {
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
                   <span className="text-cyan-500/60"> </span>
@@ -2808,7 +2777,7 @@ export default function StudentAccountPage() {
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
                   <span className="text-cyan-500/60"> </span>

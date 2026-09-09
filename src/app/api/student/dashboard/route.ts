@@ -83,6 +83,7 @@ export async function GET(req: Request) {
         unlockAt: true,
         lockAt: true,
         postLockHoldMinutes: true,
+        maximumAttempts: true,
         targetBoard: true,
         targetAcademicLevel: true,
         isPremium: true

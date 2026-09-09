@@ -262,7 +262,7 @@ export async function POST(req: Request) {
           studentId: student.id,
           status: "IN_PROGRESS",
           attemptNumber: attemptsUsed + 1,
-          resumedAt: serverTime,
+          resumedAt: null,
           questionOrder,
           questionShufflings: Object.keys(questionShufflings).length > 0 ? questionShufflings : undefined,
         }

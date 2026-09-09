@@ -15,6 +15,7 @@ interface AttemptItem {
   timeSpentSeconds?: number | null;
   resumedAt?: string | Date | null;
   extraTimeMinutes?: number | null;
+  previousAnswersSnapshot?: any;
   answers?: Array<{
     isChangedInResume?: boolean | null;
     isFreshInResume?: boolean | null;
@@ -231,9 +232,9 @@ export default function AdminResults() {
 
                   {(() => {
                     const isResumed = Boolean(
-                      result.resumedAt ||
-                      (result.timeSpentSeconds != null && result.timeSpentSeconds > 0) ||
-                      (result.extraTimeMinutes != null && result.extraTimeMinutes > 0)
+                      result.previousAnswersSnapshot != null ||
+                      (result.extraTimeMinutes != null && result.extraTimeMinutes > 0) ||
+                      result.answers?.some((a: any) => a.isChangedInResume || a.isFreshInResume)
                     );
                     const durM = result.test?.durationMinutes || 0;
                     const leftSec = Math.max(0, durM * 60 - (result.timeSpentSeconds || 0));

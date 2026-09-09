@@ -68,6 +68,12 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
       });
     }
 
+    const isReopenedAttempt = Boolean(
+      (attempt.timeSpentSeconds && attempt.timeSpentSeconds > 0) ||
+      (attempt.extraTimeMinutes && attempt.extraTimeMinutes > 0) ||
+      attempt.previousAnswersSnapshot
+    );
+
     if (attempt.resumedAt) {
       const elapsedSinceResume = Math.max(0, Math.floor((now.getTime() - new Date(attempt.resumedAt).getTime()) / 1000));
       remainingSeconds = Math.max(5, remainingSeconds - elapsedSinceResume);
@@ -77,8 +83,8 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
           data: { previousAnswersSnapshot: snapshotToSave }
         });
       }
-    } else {
-      // First session entry after start/reopen
+    } else if (isReopenedAttempt) {
+      // First session entry AFTER admin reopen/resume: start resumed sub-session timer
       await prisma.testAttempt.update({
         where: { id: attempt.id },
         data: {
@@ -86,6 +92,10 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
           ...(snapshotToSave ? { previousAnswersSnapshot: snapshotToSave } : {})
         }
       });
+    } else {
+      // Normal first entry (not a resume): compute remaining time directly from startedAt
+      const elapsedSinceStart = Math.max(0, Math.floor((now.getTime() - new Date(attempt.startedAt).getTime()) / 1000));
+      remainingSeconds = Math.max(5, totalAllowedSeconds - elapsedSinceStart);
     }
 
     const endTime = new Date(now.getTime() + remainingSeconds * 1000);

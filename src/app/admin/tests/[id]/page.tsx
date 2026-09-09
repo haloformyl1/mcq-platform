@@ -324,10 +324,100 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
             <input type="number" step="0.25" disabled={!test.negativeMarking} className="block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 disabled:bg-[#1a1a1a] disabled:text-[#666666] focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.negativeMarks} onChange={e => setTest({...test, negativeMarks: parseFloat(e.target.value)})} />
           </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-[#a6a6a6]">Maximum Attempts Per Student</label>
-          <input type="number" min="1" step="1" className="mt-1 block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 focus:ring-[#3b82f6] focus:border-[#3b82f6]" value={test.maximumAttempts || 1} onChange={e => setTest({...test, maximumAttempts: parseInt(e.target.value)})} />
-          <p className="mt-1 text-xs text-[#888888]">Total number of attempts allowed per student, including the first attempt (e.g., 2 = initial attempt + 1 retake).</p>
+        <div className="bg-[#1a1a1a]/90 p-4 rounded-xl border border-cyan-500/40 space-y-3 md:col-span-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <label className="block text-sm font-bold text-white flex items-center gap-2">
+                <span>Student Attempt Policy / Maximum Allowed Attempts</span>
+                <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-mono font-bold ${
+                  (test.maximumAttempts || 1) === 1 
+                    ? "bg-amber-950/70 text-amber-300 border border-amber-500/50" 
+                    : "bg-cyan-950/70 text-cyan-300 border border-cyan-500/50"
+                }`}>
+                  {(test.maximumAttempts || 1) === 1 ? "1 Attempt Only (No Retakes)" : `${test.maximumAttempts} Attempts Allowed`}
+                </span>
+              </label>
+              <p className="text-xs text-[#a6a6a6] mt-0.5">
+                Control whether students can attempt this test only once, or whether they are allowed to retake it multiple times.
+              </p>
+            </div>
+
+            {/* Segmented Mode Selector */}
+            <div className="flex items-center gap-1 bg-[#111111] p-1 rounded-lg border border-[#333333] shrink-0">
+              <button
+                type="button"
+                onClick={() => setTest({ ...test, maximumAttempts: 1 })}
+                className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                  (test.maximumAttempts || 1) === 1
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-[#a6a6a6] hover:text-white hover:bg-[#222222]"
+                }`}
+              >
+                1 Attempt Only
+              </button>
+              <button
+                type="button"
+                onClick={() => setTest({ ...test, maximumAttempts: Math.max(2, test.maximumAttempts || 2) })}
+                className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                  (test.maximumAttempts || 1) > 1
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-[#a6a6a6] hover:text-white hover:bg-[#222222]"
+                }`}
+              >
+                Allow Retakes
+              </button>
+            </div>
+          </div>
+
+          {(test.maximumAttempts || 1) > 1 ? (
+            <div className="pt-2.5 border-t border-[#2d2d2d] space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-[#a6a6a6] font-medium">Quick Presets:</span>
+                {[
+                  { count: 2, label: "2 Attempts (1 Retake)" },
+                  { count: 3, label: "3 Attempts (2 Retakes)" },
+                  { count: 5, label: "5 Attempts" },
+                  { count: 10, label: "10 Attempts" },
+                  { count: 100, label: "Unlimited (100)" }
+                ].map(({ count, label }) => (
+                  <button
+                    key={count}
+                    type="button"
+                    onClick={() => setTest({ ...test, maximumAttempts: count })}
+                    className={`px-2.5 py-1 rounded-md text-xs font-mono font-semibold transition cursor-pointer border ${
+                      test.maximumAttempts === count
+                        ? "bg-cyan-950 text-cyan-300 border-cyan-500/70 shadow-sm"
+                        : "bg-[#262626] text-[#a6a6a6] border-[#404040] hover:text-white hover:border-[#666666]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+                <div className="w-full sm:w-52">
+                  <label className="block text-[11px] text-[#888888] font-medium mb-1">Exact Allowed Attempts</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    className="block w-full bg-[#262626] border border-[#404040] text-white rounded-md p-2 text-sm focus:ring-[#3b82f6] focus:border-[#3b82f6]"
+                    value={test.maximumAttempts || 1}
+                    onChange={e => setTest({ ...test, maximumAttempts: Math.max(1, parseInt(e.target.value) || 1) })}
+                  />
+                </div>
+                <div className="text-xs text-cyan-400/90 sm:pt-4">
+                  ✓ Students will be able to take this test up to <strong>{test.maximumAttempts || 1}</strong> times. Each attempt will be recorded and scored.
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs text-amber-300/80 pt-1 flex items-center gap-2">
+              <span>🔒</span>
+              <span><strong>Strict 1 Attempt Mode:</strong> Students can only take and submit this test once. After submission, no retakes will be allowed.</span>
+            </div>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-[#a6a6a6]">Shuffle Questions</label>

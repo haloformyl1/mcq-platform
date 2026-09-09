@@ -266,14 +266,39 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
               ⌛ Test Concluded
             </button>
           ) : submittedAttempt ? (
-            <div className="flex gap-2">
-              <Link 
-                href={`/exam/result/${submittedAttempt.id}`}
-                className="flex-1 text-center py-2.5 px-3 rounded-md text-xs sm:text-sm font-semibold text-[#a6a6a6] bg-[#222222] hover:bg-[#333333] hover:text-white border border-[#333333] transition"
-              >
-                Take Again / View
-              </Link>
-            </div>
+            (() => {
+              const maxAttempts = test.maximumAttempts || 1;
+              const attemptsUsed = submittedAttempt.attemptNumber || 1;
+              const canRetake = attemptsUsed < maxAttempts;
+
+              if (canRetake) {
+                return (
+                  <div className="flex gap-2">
+                    <Link 
+                      href={`/exam/start/${test.id}`}
+                      className="flex-1 text-center py-2.5 px-3 rounded-md text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 transition shadow"
+                    >
+                      Retake Test ({attemptsUsed}/{maxAttempts})
+                    </Link>
+                    <Link 
+                      href={`/exam/result/${submittedAttempt.id}`}
+                      className="text-center py-2.5 px-3 rounded-md text-xs sm:text-sm font-semibold text-[#a6a6a6] bg-[#222222] hover:bg-[#333333] hover:text-white border border-[#333333] transition whitespace-nowrap"
+                    >
+                      View Result
+                    </Link>
+                  </div>
+                );
+              }
+
+              return (
+                <Link 
+                  href={`/exam/result/${submittedAttempt.id}`}
+                  className="w-full block text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-semibold text-[#a6a6a6] bg-[#222222] hover:bg-[#333333] hover:text-white border border-[#333333] transition"
+                >
+                  View Scorecard {maxAttempts > 1 ? `(${attemptsUsed}/${maxAttempts} Attempts Used)` : "(Completed)"}
+                </Link>
+              );
+            })()
           ) : activeAttempt ? (
             <Link 
               href={`/exam/${activeAttempt.id}`}
@@ -306,21 +331,21 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
       <AdminPreviewBanner />
 
       <header className="border-b border-cyan-500/20 bg-[#08131e]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-        <div className="w-full py-3 px-4 sm:px-6 lg:px-8 space-y-2 sm:space-y-0">
-          <div className="flex justify-between items-center gap-2">
-            <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+        <div className="w-full py-2.5 sm:py-3 px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">
                 <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} />
                 
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[8.5px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
                   <span className="text-slate-400">Designed by</span>
                   <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60 text-[9px] hidden xs:inline">•</span>
+                  <span className="text-cyan-500/60 text-[9px] hidden sm:inline">•</span>
                   <a 
                     href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[8.5px] sm:text-[9px]"
                     title="Call Arghyadeep Roy"
                   >
-                    <svg className="w-2.5 h-2.5 text-cyan-400 fill-current" viewBox="0 0 24 24">
+                    <svg className="w-2.5 h-2.5 text-cyan-400 fill-current shrink-0" viewBox="0 0 24 24">
                       <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                     </svg>
                     <span>9830507435</span>
@@ -328,32 +353,15 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                 </div>
               </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center shrink-0">
               <Link 
                 href="/dashboard/account"
-                className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-3 sm:px-4 py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex items-center text-xs font-bold text-cyan-300 hover:text-white transition-all px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-cyan-950/70 hover:bg-cyan-600/80 border border-cyan-500/40 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)] active:scale-95 cursor-pointer whitespace-nowrap"
+                title="My Account"
               >
-                <User className="w-3.5 h-3.5 mr-1.5 text-cyan-400" />
-                <span>My Account</span>
+                <User className="w-3.5 h-3.5 sm:mr-1.5 text-cyan-400 shrink-0" />
+                <span className="hidden sm:inline">My Account</span>
               </Link>
-            </div>
-          </div>
-
-          {/* Student Contact Badge on Mobile */}
-          <div className="flex sm:hidden justify-between items-center w-full pt-1.5 border-t border-cyan-500/15">
-            <div className="px-2.5 py-1 rounded-full bg-slate-950/90 border border-cyan-500/30 text-[10px] text-slate-300 font-semibold tracking-wide flex items-center space-x-1.5 w-full justify-between">
-              <div className="flex items-center space-x-1">
-                <span className="text-slate-400">Designed by</span>
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                  Arghyadeep Roy
-                </span>
-              </div>
-              <a 
-                href="tel:9830507435" 
-                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono text-[10px]"
-              >
-                <span>📞 9830507435</span>
-              </a>
             </div>
           </div>
         </div>
@@ -361,10 +369,10 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
 
       <main className="w-full py-6 px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Top Action Row: Back Button + Announcement Ticker Banner */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           <Link 
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-cyan-950/40 border border-cyan-800/50 px-4 py-2.5 rounded-xl transition shadow shrink-0 h-full"
+            className="inline-flex items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/50 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl transition shadow shrink-0"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
@@ -447,13 +455,13 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             const badgeStyle = isUpcomingCategory ? "bg-amber-500 text-black" : "bg-cyan-500 text-black";
 
             return (
-              <div className={`flex-1 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2.5 px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
-                <div className="flex items-center gap-3 overflow-hidden w-full">
+              <div className={`flex-1 min-w-0 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2 px-3 sm:py-2.5 sm:px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
+                <div className="flex items-center gap-2 sm:gap-3 overflow-hidden w-full min-w-0">
                   <span className={`shrink-0 text-xs font-bold ${badgeStyle} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
                     <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
                     {badgeLabel}
                   </span>
-                  <div className="flex-1 overflow-hidden relative">
+                  <div className="flex-1 min-w-0 overflow-hidden relative">
                     <div 
                       className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
                       style={{ animationDuration: speedDuration }}
@@ -479,19 +487,21 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         </div>
 
         {/* Category Header Box */}
-        <div className={`rounded-2xl border ${selectedHeaderBg} p-6 shadow-xl flex justify-between items-center`}>
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-black/40 rounded-xl border border-white/10 shrink-0">
+        <div className={`rounded-2xl border ${selectedHeaderBg} p-4 sm:p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4`}>
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="p-2.5 sm:p-3 bg-black/40 rounded-xl border border-white/10 shrink-0">
               <PiechemLogo size="md" showText={false} isGoldMember={isGoldActive} />
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{selectedTitle}</h1>
-              <p className="text-sm text-slate-300 mt-1">Showing all tests under this category</p>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight break-words">{selectedTitle}</h1>
+              <p className="text-xs sm:text-sm text-slate-300 mt-0.5 sm:mt-1">Showing all tests under this category</p>
             </div>
           </div>
-          <span className={`text-xs px-4 py-1.5 rounded-full border font-mono font-bold ${selectedBadgeColor}`}>
-            {displayTests.length} Tests Total
-          </span>
+          <div className="self-start sm:self-center shrink-0">
+            <span className={`text-xs px-3.5 py-1.5 rounded-full border font-mono font-bold whitespace-nowrap inline-flex items-center gap-1.5 ${selectedBadgeColor}`}>
+              <span className="font-extrabold">{displayTests.length}</span> Tests Total
+            </span>
+          </div>
         </div>
 
         {/* Tests Grid */}
@@ -501,7 +511,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             <Link href="/dashboard" className="inline-block text-sm text-cyan-400 underline">Return to Dashboard</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {displayTests.map(test => renderTestCard(test))}
           </div>
         )}
