@@ -274,14 +274,14 @@ export default function StudentDashboard() {
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
       <header className="sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
-          <div className="flex items-center justify-between gap-3 sm:gap-4">
+        <div className="w-full px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-1.5 sm:gap-4">
             
             {/* Left Group: Brand Identity & Designer Attribution at Far Left for Mobile & Desktop */}
-            <div className="flex items-center gap-3 sm:gap-5 min-w-0 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-5 min-w-0">
               
               {/* Horizontal Logo + Designer Badge Side-by-Side (Image 1 style) */}
-              <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-3.5 shrink-0">
                 <PiechemLogo size="md" href="/dashboard" isGoldMember={
                     student.subscriptionStatus === "COMPLIMENTARY" || 
                     (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
@@ -440,32 +440,32 @@ export default function StudentDashboard() {
               </Link>
             </div>
 
-            {/* Mobile Right Group: Netflix Image 2 Style Curriculum Button + Bell + Avatar (Zero Clipping) */}
-            <div className="flex md:hidden items-center gap-1.5 shrink-0">
+            {/* Mobile Right Group: Notification Dropdown + Curriculum Trigger Button + Avatar */}
+            <div className="flex md:hidden items-center gap-1 sm:gap-1.5 shrink-0">
               {/* Option 4: Notification Center Dropdown */}
               <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
 
-              {/* Netflix Image 2 Style Curriculum Trigger Button */}
+              {/* Curriculum Trigger Button (Zero Truncation Guarantee) */}
               <button
                 type="button"
                 onClick={() => setMobileCurriculumOpen(prev => !prev)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-black/85 hover:bg-black border border-white/25 active:border-cyan-400 text-white font-bold text-xs shadow-md transition active:scale-95 shrink-0"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-black/85 hover:bg-black border border-white/25 active:border-cyan-400 text-white font-bold text-xs shadow-md transition active:scale-95 shrink-0 whitespace-nowrap"
                 aria-label="Select Curriculum"
               >
-                <span className="text-cyan-300 font-extrabold text-[11px] tracking-tight">
+                <span className="text-cyan-300 font-black text-[10px] sm:text-[11px] tracking-tight">
                   {student.board || 'CBSE'}
                 </span>
-                <span className="text-slate-500 text-[10px]">•</span>
-                <span className="text-teal-300 font-extrabold text-[11px] tracking-tight">
+                <span className="text-slate-500 text-[9px] sm:text-[10px]">•</span>
+                <span className="text-teal-300 font-black text-[10px] sm:text-[11px] tracking-tight">
                   {student.board === 'WBCHSE' ? (student.academicLevel || 'SEM-I') : `Cl ${student.academicLevel || '11'}`}
                 </span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 ${mobileCurriculumOpen ? 'rotate-180 text-cyan-400' : ''}`} />
+                <ChevronDown className={`w-3 h-3 text-slate-300 transition-transform duration-200 ${mobileCurriculumOpen ? 'rotate-180 text-cyan-400' : ''}`} />
               </button>
 
-              {/* Mobile Profile Avatar */}
+              {/* Mobile Profile Avatar (Always Fully Visible) */}
               <Link 
                 href="/dashboard/account"
-                className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-tr from-cyan-950 to-blue-900 border border-cyan-500/50 flex items-center justify-center shrink-0 shadow-sm active:scale-95 hover:border-cyan-400 transition"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-gradient-to-tr from-cyan-950 to-blue-900 border border-cyan-500/50 flex items-center justify-center shrink-0 shadow-sm active:scale-95 hover:border-cyan-400 transition"
                 title="My Account"
               >
                 <img
@@ -474,7 +474,7 @@ export default function StudentDashboard() {
                   className="w-full h-full object-cover"
                   onError={(e: any) => { e.target.style.display = 'none'; }}
                 />
-                <User className="w-4 h-4 text-cyan-300" />
+                <User className="w-3.5 h-3.5 text-cyan-300" />
               </Link>
             </div>
           </div>
@@ -640,11 +640,11 @@ export default function StudentDashboard() {
           )}
 
           {/* Mobile / Tablet Dedicated Navigation Rail (Zero Scrollbar) */}
-          <div className="lg:hidden w-full pt-2 mt-2 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-2 px-1 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
+          <div className="lg:hidden w-full pt-1.5 mt-1.5 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-1.5 px-0.5 pr-6 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
             <a 
               href="#overview" 
               onClick={() => setActiveTab("overview")}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
                 activeTab === "overview" 
                   ? "bg-white text-black shadow-sm" 
                   : "text-slate-300 hover:text-white hover:bg-white/10"
@@ -655,7 +655,7 @@ export default function StudentDashboard() {
             <a 
               href="#tests" 
               onClick={() => setActiveTab("tests")}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
                 activeTab === "tests" 
                   ? "bg-white text-black shadow-sm" 
                   : "text-slate-300 hover:text-white hover:bg-white/10"
@@ -666,7 +666,7 @@ export default function StudentDashboard() {
             <a 
               href="#materials" 
               onClick={() => setActiveTab("materials")}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
                 activeTab === "materials" 
                   ? "bg-white text-black shadow-sm" 
                   : "text-slate-300 hover:text-white hover:bg-white/10"
@@ -677,7 +677,7 @@ export default function StudentDashboard() {
             <a 
               href="#leaderboard" 
               onClick={() => setActiveTab("leaderboard")}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
                 activeTab === "leaderboard" 
                   ? "bg-white text-black shadow-sm" 
                   : "text-slate-300 hover:text-white hover:bg-white/10"
@@ -688,7 +688,7 @@ export default function StudentDashboard() {
             <a 
               href="#performance" 
               onClick={() => setActiveTab("performance")}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
                 activeTab === "performance" 
                   ? "bg-white text-black shadow-sm" 
                   : "text-slate-300 hover:text-white hover:bg-white/10"
@@ -701,7 +701,7 @@ export default function StudentDashboard() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 pt-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-10 pt-4 sm:pt-6">
 
         {/* ========================================================= */}
         {/* 2. UPCOMING TEST MARQUEE ALERT BANNER                    */}
@@ -727,108 +727,108 @@ export default function StudentDashboard() {
         {/* ========================================================= */}
         {/* 3. FEATURED SPOTLIGHT BILLBOARD (NETFLIX HERO - IMAGE 2) */}
         {/* ========================================================= */}
-        <section id="overview" className="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_20px_60px_rgba(0,180,255,0.15)]">
+        <section id="overview" className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_15px_40px_rgba(0,180,255,0.12)]">
           
           {/* Ambient Lighting & Abstract Chemistry Backdrop */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_75%_35%,rgba(0,195,255,0.18),transparent_65%)] pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#02070c] via-transparent to-transparent pointer-events-none" />
           
           {/* Faint Orbital Graphic Texture */}
-          <div className="absolute -right-10 -bottom-10 w-96 h-96 border border-cyan-500/10 rounded-full pointer-events-none blur-[1px]" />
-          <div className="absolute -right-20 -bottom-20 w-[500px] h-[500px] border border-cyan-500/5 rounded-full pointer-events-none" />
+          <div className="absolute -right-10 -bottom-10 w-64 sm:w-96 h-64 sm:h-96 border border-cyan-500/10 rounded-full pointer-events-none blur-[1px]" />
+          <div className="absolute -right-20 -bottom-20 w-80 sm:w-[500px] h-80 sm:h-[500px] border border-cyan-500/5 rounded-full pointer-events-none" />
 
           {/* Billboard Content */}
-          <div className="relative z-10 p-6 sm:p-10 lg:p-12 max-w-3xl flex flex-col justify-between min-h-[360px] sm:min-h-[420px]">
+          <div className="relative z-10 p-3.5 sm:p-8 lg:p-12 max-w-3xl flex flex-col justify-between min-h-0 sm:min-h-[380px]">
             
             <div>
               {/* Category / Meta Badges Row */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(0,195,255,0.4)] uppercase tracking-wider">
-                  <Flame className="w-3.5 h-3.5 fill-current" />
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2.5 sm:mb-4">
+                <span className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(0,195,255,0.4)] uppercase tracking-wider">
+                  <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
                   {spotlightTest ? (spotlightTest.lockState === "SCHEDULED_OPEN" ? "Live Now" : "Featured Mock") : "Master Series"}
                 </span>
                 
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-slate-200 border border-white/10">
+                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-white/10 backdrop-blur-md text-slate-200 border border-white/10">
                   {student.board || 'CBSE'} • {student.board === 'WBCHSE' ? student.academicLevel : `Class ${student.academicLevel}`}
                 </span>
 
                 {spotlightTest?.durationMinutes && (
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md text-cyan-300 border border-white/10 flex items-center gap-1">
+                  <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-white/10 backdrop-blur-md text-cyan-300 border border-white/10 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {spotlightTest.durationMinutes} Mins
                   </span>
                 )}
 
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   AI Proctored
                 </span>
 
                 {student.subscriptionStatus === "PAID" && (
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500/30 to-yellow-500/20 text-amber-300 border border-amber-500/50 flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.25)]">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-gradient-to-r from-amber-500/30 to-yellow-500/20 text-amber-300 border border-amber-500/50 flex items-center gap-1 shadow-[0_0_15px_rgba(245,158,11,0.25)]">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
                     Gold Pass Active • Unlimited Attempts
                   </span>
                 )}
               </div>
 
-              {/* Big Stylized Title (Image 2 Netflix billboard title) */}
-              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-black text-white tracking-tight uppercase leading-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] break-words">
+              {/* Big Stylized Title */}
+              <h1 className="text-xl sm:text-3xl lg:text-5xl font-black text-white tracking-tight uppercase leading-tight mb-2 sm:mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] break-words">
                 {spotlightTest ? spotlightTest.title : "PIE CHEM EXAM SERIES 2026"}
               </h1>
 
               {/* Description */}
-              <p className="text-sm sm:text-base text-slate-200/90 max-w-2xl leading-relaxed mb-8 drop-shadow">
+              <p className="text-xs sm:text-base text-slate-200/90 max-w-2xl leading-relaxed mb-3 sm:mb-8 drop-shadow line-clamp-2 sm:line-clamp-none">
                 {spotlightTest?.description 
                   ? spotlightTest.description 
                   : "Practice full-length timed chemistry mocks designed specifically for board exam perfection and competitive entrance benchmark rankings with instant AI evaluation."}
               </p>
             </div>
 
-            {/* Actions & Floating Tags Row (Netflix Style) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-cyan-500/20 w-full">
+            {/* Actions & Floating Tags Row */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-cyan-500/20 w-full">
               
-              {/* Action CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+              {/* Action CTA Buttons: Side-by-side row on mobile for fast access */}
+              <div className="flex flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 {spotlightTest ? (
                   activeAttemptTest ? (
                     <Link
                       href={`/exam/start/${spotlightTest.id}`}
-                      className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 w-full sm:w-auto"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 whitespace-nowrap"
                     >
-                      <Play className="w-5 h-5 fill-current text-black" />
+                      <Play className="w-4 h-4 fill-current text-black shrink-0" />
                       <span>Resume Test</span>
                     </Link>
                   ) : (
                     <Link
                       href={`/exam/start/${spotlightTest.id}`}
-                      className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 whitespace-nowrap"
                     >
-                      <Play className="w-5 h-5 fill-current text-black" />
+                      <Play className="w-4 h-4 fill-current text-black shrink-0" />
                       <span>Start Test</span>
                     </Link>
                   )
                 ) : (
                   <a
                     href="#tests"
-                    className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 whitespace-nowrap"
                   >
-                    <Play className="w-5 h-5 fill-current text-black" />
+                    <Play className="w-4 h-4 fill-current text-black shrink-0" />
                     <span>Explore Tests</span>
                   </a>
                 )}
 
                 <a
                   href="#materials"
-                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95 w-full sm:w-auto"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
                 >
-                  <Info className="w-5 h-5 text-cyan-300" />
+                  <Info className="w-4 h-4 text-cyan-300 shrink-0" />
                   <span>3D Notes & Lab</span>
                 </a>
               </div>
 
-              {/* Floating Bottom-Right Badges (Image 2 style: "Highly rewatched", "Emmy Nominee") */}
-              <div className="flex items-center gap-2.5">
+              {/* Floating Bottom-Right Badges */}
+              <div className="hidden sm:flex items-center gap-2.5">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-cyan-500/30 text-xs font-bold text-cyan-300 shadow">
                   <Flame className="w-3.5 h-3.5 fill-current text-cyan-400" />
                   <span>Most Attempted Mock</span>
@@ -920,7 +920,7 @@ export default function StudentDashboard() {
             {/* Expired Tests Card */}
             <Link
               href="/dashboard/category/expired"
-              className="bg-gradient-to-b from-[#240e11]/90 to-[#130708]/90 border border-red-500/40 hover:border-red-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[160px]"
+              className="bg-gradient-to-b from-[#240e11]/90 to-[#130708]/90 border border-red-500/40 hover:border-red-400 p-4 sm:p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[130px] sm:min-h-[160px]"
             >
               <div className="flex justify-between items-start">
                 <div className="p-3 rounded-xl bg-red-950 border border-red-600/50 shadow group-hover:scale-110 transition-transform">

@@ -93,10 +93,10 @@ export default function PiechemLogo({
   }, [isGoldMember]);
 
   const dimensions = {
-    sm: { icon: 28, text: "text-lg", gap: "gap-2" },
-    md: { icon: 38, text: "text-xl sm:text-2xl", gap: "gap-2.5 sm:gap-3" },
-    lg: { icon: 48, text: "text-2xl sm:text-3xl", gap: "gap-3.5" },
-    xl: { icon: 64, text: "text-4xl sm:text-5xl", gap: "gap-4" },
+    sm: { icon: 24, text: "text-sm sm:text-lg", gap: "gap-1.5 sm:gap-2" },
+    md: { icon: 28, text: "text-base sm:text-2xl", gap: "gap-2 sm:gap-3" },
+    lg: { icon: 40, text: "text-xl sm:text-3xl", gap: "gap-2.5 sm:gap-3.5" },
+    xl: { icon: 56, text: "text-3xl sm:text-5xl", gap: "gap-3.5 sm:gap-4" },
   };
 
   const current = dimensions[size] || dimensions.md;
@@ -287,21 +287,22 @@ export default function PiechemLogo({
           
           {/* Subtitle with VIP Gold Badge */}
           {isGold ? (
-            <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9.5px] tracking-[0.18em] font-extrabold uppercase mt-1">
-              <span className="text-cyan-400/90 font-bold">EXAM PLATFORM</span>
-              <span className="text-amber-400">•</span>
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-cyan-500/20 border border-amber-500/40 text-amber-300 text-[8px] font-black tracking-wider shadow-sm">
+            <div className="flex items-center gap-1 sm:gap-1.5 text-[7.5px] sm:text-[9.5px] tracking-[0.12em] sm:tracking-[0.18em] font-extrabold uppercase mt-0.5 sm:mt-1">
+              <span className="text-cyan-400/90 font-bold hidden sm:inline">EXAM PLATFORM</span>
+              <span className="text-amber-400 hidden sm:inline">•</span>
+              <span className="inline-flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-cyan-500/20 border border-amber-500/40 text-amber-300 text-[7px] sm:text-[8px] font-black tracking-wider shadow-sm">
                 <span>⭐</span> GOLD
               </span>
             </div>
           ) : (
             <div
               className={
-                "text-[9px] sm:text-[10px] tracking-[0.25em] font-semibold uppercase mt-1 " +
+                "text-[7.5px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.25em] font-semibold uppercase mt-0.5 sm:mt-1 " +
                 (theme === 'light' ? 'text-cyan-700 font-bold' : 'text-cyan-300/70')
               }
             >
-              Exam Platform
+              <span className="hidden sm:inline">Exam Platform</span>
+              <span className="sm:hidden">Exam</span>
             </div>
           )}
         </div>
