@@ -64,6 +64,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Test not available" }, { status: 400 });
     }
 
+    // Premium Test Verification: Free students cannot start Premium tests unless specifically overridden
+    if (test.isPremium && !isPaidSubscriber && !override) {
+      return NextResponse.json({
+        error: "This test is a Premium Resource and requires an active subscription or Gold membership to access.",
+        requiresSubscription: true
+      }, { status: 403 });
+    }
+
     const isScheduleExpiredActive = test.status === "SCHEDULE_EXPIRED" && (!test.lockAt || new Date() < new Date(test.lockAt));
 
     if (test.status !== "LIVE" && test.status !== "PUBLISHED" && test.status !== "UPCOMING" && test.status !== "LOCKED" && !isScheduleExpiredActive && !override) {
