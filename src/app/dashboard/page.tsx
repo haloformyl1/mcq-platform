@@ -975,19 +975,31 @@ export default function StudentDashboard() {
                     className="group bg-gradient-to-b from-[#0c1a27] to-[#061019] border border-cyan-500/25 hover:border-cyan-400/60 p-6 rounded-2xl flex flex-col justify-between gap-5 shadow-xl hover:shadow-[0_0_30px_rgba(0,195,255,0.2)] transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
                   >
                     <div className="space-y-3 relative z-10">
-                      <div className="flex items-center justify-between">
-                        <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 shadow ${
-                          isPdf
-                            ? "bg-red-950/90 text-red-300 border border-red-800/60"
-                            : isImage
-                            ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
-                            : "bg-cyan-950/90 text-cyan-300 border border-cyan-500/50"
-                        }`}>
-                          {isPdf && <FileText className="w-3.5 h-3.5" />}
-                          {isImage && <ImageIcon className="w-3.5 h-3.5" />}
-                          {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
-                          {mat.type === "LINK" ? "3D Interactive Lab" : mat.type}
-                        </span>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 shadow ${
+                            isPdf
+                              ? "bg-red-950/90 text-red-300 border border-red-800/60"
+                              : isImage
+                              ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
+                              : "bg-cyan-950/90 text-cyan-300 border border-cyan-500/50"
+                          }`}>
+                            {isPdf && <FileText className="w-3.5 h-3.5" />}
+                            {isImage && <ImageIcon className="w-3.5 h-3.5" />}
+                            {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
+                            {mat.type === "LINK" ? "3D Interactive Lab" : mat.type}
+                          </span>
+
+                          {mat.isPremium ? (
+                            <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wide bg-amber-950/90 text-amber-300 border border-amber-600/60 flex items-center gap-1 shadow">
+                              ⭐ Premium
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-emerald-950/90 text-emerald-300 border border-emerald-600/60 flex items-center gap-1 shadow">
+                              🔓 Free Access
+                            </span>
+                          )}
+                        </div>
                         {mat.fileSize && <span className="text-[11px] text-slate-400 font-mono">{mat.fileSize}</span>}
                       </div>
 

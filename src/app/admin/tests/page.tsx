@@ -15,6 +15,7 @@ export default function AdminTests() {
   // Bulk Target Audience states
   const [bulkTargetBoard, setBulkTargetBoard] = useState<string>("ALL");
   const [bulkTargetLevel, setBulkTargetLevel] = useState<string>("ALL");
+  const [bulkTier, setBulkTier] = useState<string>("");
   const [isApplying, setIsApplying] = useState<boolean>(false);
   const router = useRouter();
 
@@ -136,6 +137,44 @@ export default function AdminTests() {
     } catch (err) {
       setIsApplying(false);
       alert("An error occurred while updating tests.");
+    }
+  };
+
+  const applyBulkTier = async () => {
+    if (selectedIds.length === 0) {
+      alert("Please select at least one test to apply access plan tier.");
+      return;
+    }
+    if (!bulkTier) {
+      alert("Please choose FREE or PREMIUM tier.");
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      const isPremium = bulkTier === "PREMIUM";
+      const res = await fetch("/api/admin/tests/bulk-tier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          testIds: selectedIds,
+          isPremium,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Successfully updated ${data.count} test(s) to ${isPremium ? "⭐ PREMIUM (Subscription Required)" : "🔓 FREE (Available to All Students)"}!`);
+        setSelectedIds([]);
+        setBulkTier("");
+        fetchTests();
+      } else {
+        alert(data.error || "Failed to update access tier for selected tests.");
+      }
+    } catch {
+      alert("An unexpected error occurred while updating access tier.");
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -318,6 +357,40 @@ export default function AdminTests() {
           </div>
         </div>
 
+        {/* Dedicated Bulk Access Plan Tier Control Section (FREE vs PREMIUM) */}
+        <div className="pt-3 border-t border-amber-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-[#221808]/70 p-3 rounded-lg border border-amber-500/30">
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-bold uppercase tracking-wider bg-amber-950 text-amber-300 px-3 py-1 rounded-full border border-amber-700 flex items-center gap-1.5 shadow">
+              <span>⭐</span> Bulk Access Plan Tier
+            </span>
+            <span className="text-xs text-slate-300 hidden lg:inline">
+              Set FREE or PREMIUM tier for all selected tests at once
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            {/* Bulk Access Tier Select */}
+            <select
+              value={bulkTier}
+              onChange={e => setBulkTier(e.target.value)}
+              className="bg-[#1c1407] border border-amber-500/50 text-amber-300 text-xs font-bold rounded-md p-2 focus:ring-amber-500 focus:border-amber-500"
+            >
+              <option value="">-- Change Selected Access Tier To --</option>
+              <option value="FREE">🔓 FREE (Available to All Students)</option>
+              <option value="PREMIUM">⭐ PREMIUM (Gold / Subscription Required)</option>
+            </select>
+
+            {/* Apply Access Tier Button */}
+            <button
+              onClick={applyBulkTier}
+              disabled={isApplying || selectedIds.length === 0 || !bulkTier}
+              className="bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 px-4 py-2 rounded-md text-xs font-black uppercase tracking-wide shadow-[0_0_15px_rgba(245,158,11,0.3)] transition flex items-center space-x-1.5 cursor-pointer"
+            >
+              {isApplying ? "Updating..." : `Apply Access Tier (${selectedIds.length})`}
+            </button>
+          </div>
+        </div>
+
         {/* Schedule Inputs for Bulk SCHEDULED EXPIRY selection */}
         {bulkStatus === "SCHEDULE_EXPIRED" && (
           <div className="pt-3 border-t border-[#333333] bg-[#111111]/80 p-3 rounded-lg">
@@ -433,6 +506,15 @@ export default function AdminTests() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  {test.isPremium ? (
+                    <span className="px-2 py-0.5 text-[10px] font-extrabold rounded bg-amber-950/90 text-amber-300 border border-amber-500/60 shadow flex items-center gap-1">
+                      ⭐ PREMIUM
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-800 text-slate-300 border border-slate-600/60 flex items-center gap-1">
+                      🔓 FREE
+                    </span>
+                  )}
                   {(!test.targetBoard || test.targetBoard === 'ALL') && (!test.targetAcademicLevel || test.targetAcademicLevel === 'ALL') ? (
                     <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-cyan-950/60 text-cyan-300 border border-cyan-700/50">
                       👥 All Students
@@ -506,7 +588,18 @@ export default function AdminTests() {
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-white">{test.title}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-medium text-white">{test.title}</div>
+                      {test.isPremium ? (
+                        <span className="px-2 py-0.5 text-[10px] font-extrabold rounded bg-amber-950/90 text-amber-300 border border-amber-500/60 shadow flex items-center gap-1 shrink-0">
+                          ⭐ PREMIUM
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-800 text-slate-300 border border-slate-600/60 flex items-center gap-1 shrink-0">
+                          🔓 FREE
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-[#a6a6a6]">{test.durationMinutes} mins | {test.marksPerQuestion} marks/q</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
