@@ -68,18 +68,7 @@ export default function StudentLogin() {
       .catch(() => {});
   }, [router]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        router.push('/admin/login');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [router]);
-
-  useEffect(() => {
+    useEffect(() => {
     const savedEmail = localStorage.getItem("piechem_student_email");
     if (savedEmail) setEmail(savedEmail);
   }, []);
@@ -170,7 +159,9 @@ export default function StudentLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       
-      if (data.isOnboarded) {
+      if (data.isAdmin || data.redirectUrl) {
+        router.push(data.redirectUrl || "/admin");
+      } else if (data.isOnboarded) {
         router.push("/dashboard");
       } else {
         router.push("/onboarding");
@@ -307,15 +298,7 @@ export default function StudentLogin() {
             </div>
           </div>
 
-          {/* Top-Right: Admin Portal Link (Like Netflix 'Sign In') */}
-          <Link
-            href="/admin/login"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-950/40 hover:bg-cyan-900/60 hover:border-cyan-400 text-cyan-300 hover:text-white text-xs sm:text-sm font-semibold transition-all duration-200 shadow-sm shrink-0"
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Admin Portal</span>
-          </Link>
-        </header>
+                  </header>
 
         {/* --- Center Hero Content --- */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center my-auto pt-6 pb-12 w-full">
@@ -432,13 +415,15 @@ export default function StudentLogin() {
                       </div>
 
                       <div className="flex justify-between items-center text-xs mt-2">
-                        <button 
-                          type="button" 
-                          onClick={() => handleSendOTP(true)} 
-                          className="text-cyan-400 hover:text-cyan-300 hover:underline transition"
-                        >
-                          Forgot your password?
-                        </button>
+                        {email.trim().toLowerCase() !== "piechemotp@gmail.com" && (
+                          <button 
+                            type="button" 
+                            onClick={() => handleSendOTP(true)} 
+                            className="text-cyan-400 hover:text-cyan-300 hover:underline transition"
+                          >
+                            Forgot your password?
+                          </button>
+                        )}
                         <button type="button" onClick={() => setStep("EMAIL_ENTRY")} className="text-slate-400 hover:text-white transition">
                           Change Email
                         </button>
@@ -796,10 +781,6 @@ export default function StudentLogin() {
             (Arghyadeep Roy)
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/admin/login" className="hover:text-cyan-300 transition">
-              Admin Portal
-            </Link>
-            <span>•</span>
             <span>© 2026 PIE CHEM Platform</span>
           </div>
         </footer>

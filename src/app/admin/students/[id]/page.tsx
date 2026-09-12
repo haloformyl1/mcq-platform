@@ -83,7 +83,7 @@ export default function AdminStudentDetails() {
     try {
       const res = await fetch(`/api/admin/students/${id}`);
       if (res.status === 401) {
-        router.push("/admin/login");
+        router.push("/login");
         return;
       }
       if (res.ok) {

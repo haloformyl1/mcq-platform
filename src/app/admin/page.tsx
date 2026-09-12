@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     fetch("/api/admin/tests")
       .then(async res => {
         if (res.status === 401) {
-          router.push("/admin/login");
+          router.push("/login");
           return null;
         }
         const data = await res.json();

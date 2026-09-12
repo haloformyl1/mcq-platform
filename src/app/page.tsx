@@ -32,8 +32,8 @@ export default async function Home() {
   const adminSession = cookieStore.get('admin_session')?.value;
   if (adminSession) {
     const payload = await decrypt(adminSession);
-    if (payload && (payload.role === 'admin' || payload.username)) {
-      redirect('/admin/dashboard');
+    if (payload && payload.role === 'admin') {
+      redirect('/admin');
     }
   }
 

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -11,8 +11,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Dedicated Admin Email Check
+    if (normalizedEmail === "piechemotp@gmail.com") {
+      return NextResponse.json({ accountStatus: "ACTIVE", name: "Administrator", isAdmin: true });
+    }
+
     const student = await prisma.student.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       select: {
         id: true,
         name: true,

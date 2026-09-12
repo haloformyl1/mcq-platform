@@ -63,7 +63,7 @@ export default function AdminStudents() {
     try {
       const res = await fetch(`/api/admin/students?search=${encodeURIComponent(search)}&status=${statusFilter}`);
       if (res.status === 401) {
-        router.push("/admin/login");
+        router.push("/login");
         return;
       }
       const data = await res.json();
