@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { parseMaterialMetadata } from "@/lib/studyMaterialMetadata";
 
 export const dynamic = 'force-dynamic';
 
@@ -29,16 +30,15 @@ export async function GET() {
     });
 
     const sanitized = materials.map(m => {
-      if (m.isPremium && !isSubscribed) {
-        return {
-          ...m,
-          url: "#locked",
-          isLocked: true
-        };
-      }
+      const meta = parseMaterialMetadata(m.description, m.title, m.type);
+      const isLocked = m.isPremium && !isSubscribed;
       return {
         ...m,
-        isLocked: false
+        url: isLocked ? "#locked" : m.url,
+        isLocked,
+        category: meta.category,
+        discipline: meta.discipline,
+        description: meta.cleanDescription
       };
     });
 

@@ -1,14 +1,29 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { 
+  encodeMaterialMetadata, 
+  parseMaterialMetadata,
+  LIBRARY_CATEGORIES,
+  SUBJECT_DISCIPLINES
+} from "@/lib/studyMaterialMetadata";
 
 export async function GET() {
   try {
     const materials = await prisma.studyMaterial.findMany({
       orderBy: { createdAt: "desc" }
     });
-    return NextResponse.json(materials);
+    const parsed = materials.map(m => {
+      const meta = parseMaterialMetadata(m.description, m.title, m.type);
+      return {
+        ...m,
+        category: meta.category,
+        discipline: meta.discipline,
+        cleanDescription: meta.cleanDescription
+      };
+    });
+    return NextResponse.json(parsed);
   } catch (error) {
     console.error("Fetch study materials error:", error);
     return NextResponse.json({ error: "Failed to fetch study materials" }, { status: 500 });
@@ -19,11 +34,13 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const title = formData.get("title") as string;
-    const description = formData.get("description") as string || "";
+    const rawDescription = formData.get("description") as string || "";
     const type = formData.get("type") as string;
-    const isPremium = formData.get("isPremium") === "true"; // PDF, IMAGE, LINK
+    const isPremium = formData.get("isPremium") === "true";
     const url = formData.get("url") as string || "";
     const file = formData.get("file") as Blob | null;
+    const category = (formData.get("category") as string) || "Chapter wise PDF Notes";
+    const discipline = (formData.get("discipline") as string) || "GENERAL";
 
     if (!title || !type) {
       return NextResponse.json({ error: "Title and type are required" }, { status: 400 });
@@ -59,10 +76,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Please select a valid file or enter a link URL" }, { status: 400 });
     }
 
+    const encodedDescription = encodeMaterialMetadata(rawDescription, category, discipline);
+
     const material = await prisma.studyMaterial.create({
       data: {
         title,
-        description,
+        description: encodedDescription,
         type,
         url: finalUrl,
         fileSize: fileSizeFormatted,
@@ -70,7 +89,17 @@ export async function POST(req: Request) {
       }
     });
 
-    return NextResponse.json({ success: true, material });
+    const meta = parseMaterialMetadata(material.description, material.title, material.type);
+
+    return NextResponse.json({
+      success: true,
+      material: {
+        ...material,
+        category: meta.category,
+        discipline: meta.discipline,
+        cleanDescription: meta.cleanDescription
+      }
+    });
   } catch (error: any) {
     console.error("Create study material error:", error);
     const detailMsg = error?.message || (typeof error === 'string' ? error : "Failed to upload study material");
@@ -98,16 +127,53 @@ export async function DELETE(req: Request) {
   }
 }
 
-
 export async function PATCH(req: Request) {
   try {
-    const { id, isPremium } = await req.json();
+    const body = await req.json();
+    const { id, isPremium, category, discipline } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Material ID is required" }, { status: 400 });
+    }
+
+    const existing = await prisma.studyMaterial.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Material not found" }, { status: 404 });
+    }
+
+    const updateData: any = {};
+    if (typeof isPremium === "boolean") {
+      updateData.isPremium = isPremium;
+    }
+
+    if (category || discipline) {
+      const currentMeta = parseMaterialMetadata(existing.description, existing.title, existing.type);
+      const newCategory = category || currentMeta.category;
+      const newDiscipline = discipline || currentMeta.discipline;
+      updateData.description = encodeMaterialMetadata(currentMeta.cleanDescription, newCategory, newDiscipline);
+    }
+
     const updated = await prisma.studyMaterial.update({
       where: { id },
-      data: { isPremium: Boolean(isPremium) }
+      data: updateData
     });
-    return NextResponse.json({ success: true, material: updated });
+
+    const meta = parseMaterialMetadata(updated.description, updated.title, updated.type);
+
+    return NextResponse.json({
+      success: true,
+      material: {
+        ...updated,
+        category: meta.category,
+        discipline: meta.discipline,
+        cleanDescription: meta.cleanDescription
+      }
+    });
   } catch (error) {
+    console.error("Update study material error:", error);
     return NextResponse.json({ error: "Failed to update material" }, { status: 500 });
   }
 }

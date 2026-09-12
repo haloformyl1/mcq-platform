@@ -16,6 +16,7 @@ import PiFiringLoader from "@/components/PiFiringLoader";
 import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
 import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
 import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
+import ChemistryLibraryVault from "@/components/ChemistryLibraryVault";
 
 export default function StudentDashboard() {
   const [data, setData] = useState<any>(null);
@@ -517,7 +518,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Columns Grid (Netflix Image 2 3-Column Layout) */}
-                <div className="p-3.5 grid grid-cols-3 gap-2.5 text-xs max-h-[65vh] overflow-y-auto">
+                <div className="p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs max-h-[65vh] overflow-y-auto">
                   
                   {/* Column 1: WBCHSE Semesters */}
                   <div className="space-y-1">
@@ -970,102 +971,9 @@ export default function StudentDashboard() {
         </section>
 
         {/* ========================================================= */}
-        {/* 5. CONTENT ROW 2: STUDY MATERIALS & 3D CHEMISTRY LAB      */}
+        {/* 5. CONTENT ROW 2: CHEMISTRY DIGITAL LIBRARY & 3D VAULT    */}
         {/* ========================================================= */}
-        <section id="materials" className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>Interactive 3D Laboratory & Study Vault</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30 font-mono font-bold">
-                  {studyMaterials.length} Available
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">Manipulate molecular lattices, 3D crystal voids & download curated PDF guides</p>
-            </div>
-          </div>
-
-          {studyMaterials.length === 0 ? (
-            <div className="bg-[#071420]/80 border border-cyan-900/30 p-8 rounded-2xl text-center text-slate-400 space-y-2">
-              <BookOpen className="w-8 h-8 text-cyan-500/50 mx-auto" />
-              <p className="text-sm font-medium">No study materials published yet for this curriculum.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {studyMaterials.map((mat: any) => {
-                const isPdf = mat.type === "PDF";
-                const isImage = mat.type === "IMAGE";
-
-                return (
-                  <div 
-                    key={mat.id} 
-                    className="group bg-gradient-to-b from-[#0c1a27] to-[#061019] border border-cyan-500/25 hover:border-cyan-400/60 p-6 rounded-2xl flex flex-col justify-between gap-5 shadow-xl hover:shadow-[0_0_30px_rgba(0,195,255,0.2)] transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
-                  >
-                    <div className="space-y-3 relative z-10">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`px-3 py-1 rounded-md text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 shadow ${
-                            isPdf
-                              ? "bg-red-950/90 text-red-300 border border-red-800/60"
-                              : isImage
-                              ? "bg-purple-950/90 text-purple-300 border border-purple-800/60"
-                              : "bg-cyan-950/90 text-cyan-300 border border-cyan-500/50"
-                          }`}>
-                            {isPdf && <FileText className="w-3.5 h-3.5" />}
-                            {isImage && <ImageIcon className="w-3.5 h-3.5" />}
-                            {!isPdf && !isImage && <LinkIcon className="w-3.5 h-3.5" />}
-                            {mat.type === "LINK" ? "3D Interactive Lab" : mat.type}
-                          </span>
-
-                          {mat.isPremium ? (
-                            <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wide bg-amber-950/90 text-amber-300 border border-amber-600/60 flex items-center gap-1 shadow">
-                              ⭐ Premium
-                            </span>
-                          ) : (
-                            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-emerald-950/90 text-emerald-300 border border-emerald-600/60 flex items-center gap-1 shadow">
-                              🔓 Free Access
-                            </span>
-                          )}
-                        </div>
-                        {mat.fileSize && <span className="text-[11px] text-slate-400 font-mono">{mat.fileSize}</span>}
-                      </div>
-
-                      <h3 className="font-bold text-white text-base sm:text-lg group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug">
-                        {mat.title}
-                      </h3>
-                      {mat.description && (
-                        <p className="text-xs text-slate-300/80 line-clamp-3 leading-relaxed">
-                          {mat.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="pt-4 border-t border-cyan-950 flex justify-end relative z-10">
-                      {mat.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
-                        <Link
-                          href="/dashboard/account"
-                          className="w-full text-center py-2.5 px-4 rounded-xl text-xs font-black text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-md uppercase tracking-wider"
-                        >
-                          ⭐ Gold Member Access Required
-                        </Link>
-                      ) : (
-                        <a
-                          href={mat.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)] active:scale-95"
-                        >
-                          <span>{mat.type === "LINK" ? "Open Interactive Model" : "View / Download"}</span>
-                          {mat.type === "LINK" ? <ExternalLink className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
+        <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
 
         {/* ========================================================= */}
         {/* 6. CONTENT ROW 3: HALL OF FAME / TOP PERFORMERS          */}
