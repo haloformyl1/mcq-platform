@@ -1,23 +1,6 @@
 /**
- * Piechem Live AI Engine
- * 1. Direct Google Gemini 1.5/2.0 Flash integration (with optional Google Search Grounding)
- * 2. Autonomous Live Web Research Engine (searches scientific web sources for any chemistry doubt)
+ * Piechem AI Utilities (Admin Question Generator & Exam Review Diagnostics)
  */
-
-export interface AiResponse {
-  answer: string;
-  model: string;
-  isLive: boolean;
-  webSources?: string[];
-}
-
-const CHEMISTRY_SYSTEM_PROMPT = `You are "Pi-Chem AI", a world-class Chemistry Professor and Researcher for competitive exams (NEET, JEE Main & Advanced, WBJEE, and CBSE/ISC/WBCHSE boards).
-Always provide deep, scientifically rigorous, and pedagogically accurate answers.
-When a student asks a counter-question (e.g. "does SN1 really give a racemic mixture?"), explain both:
-1. The simplified textbook explanation (e.g. 50:50 planar carbocation attack).
-2. The real physical chemistry phenomenon (e.g. intimate ion pair shielding causing partial racemization with predominant inversion).
-3. The exact exam stance for NEET vs JEE Advanced.
-Structure answers cleanly with clear headings, bullet points, and chemical equations.`;
 
 /**
  * Execute a live web search for real-time scientific knowledge
@@ -126,105 +109,6 @@ async function callGemini(
   }
 }
 
-/**
- * Generate intelligent dynamic chemistry synthesis based on real-time web research
- */
-function synthesizeDynamicResearchAnswer(query: string, webSnippets: string[]): string {
-  const q = query.toLowerCase();
-
-  // Dynamic response tailored to specific counter-question: SN1 racemization
-  if (q.includes('sn1') && (q.includes('really') || q.includes('racemic') || q.includes('mixture') || q.includes('inversion'))) {
-    return [
-      "### 🔬 Scientific Answer: Does $S_N1$ Really Give a 100% Racemic Mixture?",
-      "",
-      "**Short Answer:** **NO!** In real laboratory conditions, an $S_N1$ reaction almost **never** produces an ideal 50:50 racemic mixture. Instead, it results in **partial racemization with a net excess of inversion** (typically 55%–70% inversion and 30%–45% retention).",
-      "",
-      "---",
-      "",
-      "#### 1. The Ideal Textbook Model vs The Physical Reality",
-      "- **The Simplified Model (NCERT / Elementary Chemistry)**:",
-      "  - The alkyl halide dissociates to form a planar, trigonal $sp^2$-hybridized carbocation.",
-      "  - The theory states the incoming nucleophile has an equal 50% chance to attack from the front face (retention) or rear face (inversion), theoretically producing an equimolar racemic mixture.",
-      "",
-      "- **The Physical Reality: The \"Intimate Ion Pair\" Phenomenon**:",
-      "  - When the leaving group ($X^-$) departs from $R-X$, it does not immediately vanish into bulk solution.",
-      "  - It forms an **intimate ion pair** $[R^+ \dots X^-]$ trapped within the same solvent cage.",
-      "  - The leaving group $X^-$ physically and electrostatically **shields the front face** of the carbocation.",
-      "  - Therefore, the incoming nucleophile ($Nu^-$) can attack the **unhindered backside** much more easily than the front side!",
-      "",
-      "---",
-      "",
-      "#### 2. Experimental Proof & Stereochemical Ratio",
-      "[R-X] -> [R+ ... X-] (Intimate Ion Pair) -> Inverted Product (>50%) + Retained Product (<50%)",
-      "- If the nucleophile attacks while the ion pair is still intact $\rightarrow$ **100% Inversion**.",
-      "- If the carbocation completely separates into a solvent-separated free ion before attack $\rightarrow$ **50:50 Racemization**.",
-      "- The net observed result is always an **intermediate state**: net optical rotation is not zero.",
-      "",
-      "---",
-      "",
-      "#### 3. Examination Stance (NEET vs JEE Advanced)",
-      "- 📌 **NEET & CBSE Boards**: Questions often ask for the simplified answer. Unless specified, mark 'Racemic mixture' or 'Loss of optical activity'.",
-      "- 🎯 **JEE Advanced**: Explicitly tests this nuance! Questions will specify 'partial racemization with predominant inversion due to shielding by the leaving group' as the correct option.",
-      "",
-      "---",
-      webSnippets.length > 0
-        ? `*(🌐 Grounded in live scientific literature: ${webSnippets.slice(0, 2).map(s => `"${s.slice(0, 80)}..."`).join(' • ')})*`
-        : ''
-    ].filter(Boolean).join('\n');
-  }
-
-  // Dynamic synthesis using the live web research snippets
-  const snippetBulletPoints = webSnippets.length > 0
-    ? webSnippets.map((s, idx) => `   - [Source ${idx + 1}]: ${s}`).join('\n')
-    : "   - Validating reaction kinetics, electron density, and thermodynamic equilibrium constraints.";
-
-  return [
-    `### 🔬 Pi-Chem Research: "${query}"`,
-    "",
-    "#### 1. Live Web Findings & Scientific Mechanism",
-    snippetBulletPoints,
-    "",
-    "#### 2. Theoretical Principles & Governing Rules",
-    "- **Thermodynamic vs Kinetic Factors**: Check whether the process is governed by activation energy barrier ($\Delta G^\ddagger$) or stability of final products ($\Delta G^\circ$).",
-    "- **Molecular Orbital / Steric Effects**: Consider front-side vs back-side attack, steric hindrance, and orbital overlap ($p$-orbital conjugate resonance).",
-    "- **Solvent & Temperature Influence**: Polar protic vs polar aprotic media drastically alter ion stability and nucleophile reactivity.",
-    "",
-    "#### 3. Key Takeaway for Competitive Exams",
-    "- Always verify whether the question is asking for the **idealized textbook rule** (e.g., standard NCERT definitions) or the **advanced physical reality** (e.g., JEE Advanced nuance questions).",
-    "",
-    "*(Tip: You can also connect your free Google Gemini API Key in ⚙️ Settings for live continuous LLM reasoning).* "
-  ].join('\n');
-}
-
-/**
- * Main AI Chat Tutor Handler
- */
-export async function askAiChemist(
-  prompt: string,
-  history: Array<{ role: string; content: string }> = [],
-  userApiKey?: string
-): Promise<AiResponse> {
-  // 1. Try Gemini API with live search grounding
-  const geminiResponse = await callGemini(prompt, CHEMISTRY_SYSTEM_PROMPT, userApiKey, true);
-  if (geminiResponse) {
-    return {
-      answer: geminiResponse,
-      model: 'Google Gemini 2.0 Flash (Live Web-Grounded)',
-      isLive: true
-    };
-  }
-
-  // 2. Autonomous Web Research: Query scientific sources live
-  const webSnippets = await fetchLiveWebResearch(prompt);
-  const synthesizedAnswer = synthesizeDynamicResearchAnswer(prompt, webSnippets);
-
-  return {
-    answer: synthesizedAnswer,
-    model: 'Piechem Autonomous Web Research Engine',
-    isLive: true,
-    webSources: webSnippets
-  };
-}
 
 /**
  * Question Error Explainer for Exam Review

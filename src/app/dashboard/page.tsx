@@ -2,7 +2,6 @@
 import DashboardAiWidget from "@/components/ai/DashboardAiWidget";
 import AiTutorDrawer from "@/components/ai/AiTutorDrawer";
 import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
-import AiChemistTutorModal from "@/components/AiChemistTutorModal";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -1257,8 +1256,6 @@ export default function StudentDashboard() {
           onClose={() => setIsAdaptiveQuizOpen(false)}
           targetTopic={adaptiveDrillTopic}
         />
-
-        <AiChemistTutorModal />
       </main>
     </div>
   );

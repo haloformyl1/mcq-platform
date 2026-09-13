@@ -512,7 +512,8 @@ export default function PiFiringLoader({ fullScreen = true }: { fullScreen?: boo
         ctx.fillStyle = "rgba(244, 63, 94, 0.35)";
         for (let i = 1; i <= 3; i++) {
           ctx.beginPath();
-          ctx.arc(xPos - i * 14 * scale, cy, (atomX_radius - i * 4) * scale, 0, Math.PI * 2);
+          const ringRadius = Math.max(0.5, (atomX_radius - i * 4) * scale);
+          ctx.arc(xPos - i * 14 * scale, cy, ringRadius, 0, Math.PI * 2);
           ctx.fill();
         }
       }
