@@ -85,10 +85,10 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                PIECHEM AI Study Assistant
+                PIECHEM Gemini AI
               </h3>
               <span className="inline-flex items-center rounded-full bg-cyan-950 px-2 py-0.5 text-[10px] font-semibold text-cyan-300 border border-cyan-500/40">
-                Neural Grounded
+                Gemini 3.6 Flash
               </span>
             </div>
             <p className="text-xs text-slate-400">
@@ -111,10 +111,10 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
           <button
             type="button"
             onClick={() => onOpenTutor?.('tutor')}
-            className="flex items-center gap-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-cyan-600/30 transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all active:scale-95 cursor-pointer"
           >
             <Brain className="h-3.5 w-3.5" />
-            <span>Ask AI Tutor</span>
+            <span>Ask Gemini AI</span>
           </button>
         </div>
       </div>

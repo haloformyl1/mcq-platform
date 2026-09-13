@@ -26,8 +26,19 @@ function detectEducationalIntent(prompt: string, history: AiChatMessage[]): {
 } {
   const p = prompt.trim().toLowerCase();
 
-  // 1. Conversational greetings & pleasantries
-  const greetingRegex = /^(hi|hello|hey|greetings|good morning|good afternoon|good evening|sup|yo|who are you|what can you do|what are you|what is your name|thanks|thank you|great|awesome|okay|ok)[!.]*$/i;
+  // 1. Farewell check
+  const farewellRegex = /^(goodbye|bye|good bye|see you|good night|farewell|take care)[!.]*$/i;
+  if (farewellRegex.test(p)) {
+    return {
+      intent: 'FAREWELL',
+      isEducational: true,
+      isGreeting: false,
+      isResearchQuery: false
+    };
+  }
+
+  // 1b. Conversational greetings & pleasantries
+  const greetingRegex = /^(hi|hello|hey|greetings|good morning|good afternoon|good evening|goodbye|bye|good bye|see you|good night|farewell|sup|yo|who are you|what can you do|what are you|what is your name|thanks|thank you|great|awesome|okay|ok)[!.]*$/i;
   if (greetingRegex.test(p) || p === 'hi there' || p === 'hello there' || p === 'help me') {
     return {
       intent: 'GREETING',
@@ -156,6 +167,13 @@ function detectEducationalIntent(prompt: string, history: AiChatMessage[]): {
  */
 function cleanTopicFromPrompt(prompt: string): string {
   const p = prompt.trim();
+  const lower = p.toLowerCase();
+  
+  // Guard: If it's a conversational greeting, farewell, or pleasantry, do not treat as an academic topic
+  const conversationalTokens = ['hi', 'hello', 'hey', 'goodbye', 'bye', 'good bye', 'see you', 'good night', 'thanks', 'thank you', 'ok', 'okay', 'great', 'awesome'];
+  if (conversationalTokens.includes(lower.replace(/[!.]/g, ''))) {
+    return 'Chemistry Concept';
+  }
   const cleaned = p
     .replace(/^(can you\s+)?(please\s+)?(explain|tell me about|what is|what are|define|describe|how does|why does|solve|help me with|teach me about|give me the solution for|discuss|elaborate on)\s+/i, '')
     .replace(/[?!.]+$/, '')
@@ -228,6 +246,24 @@ function resolveTopic(prompt: string, history: AiChatMessage[], context?: Studen
  * Generate Contextual Follow-Up Suggestions
  */
 function getSuggestedFollowUps(topic: string, isBengali: boolean, intent: string): string[] {
+  const isConversational = !topic || /^(good\s*bye|bye|hi|hello|thanks|chemistry\s+concept|general\s+academic)/i.test(topic);
+
+  if (isConversational || intent === 'GREETING') {
+    if (isBengali) {
+      return [
+        "কাইরালিটি (Chirality) ও অপটিক্যাল আইসোমারিজম কী?",
+        "আয়নীকরণ শক্তির পর্যায়বৃত্ত পরিবর্তন ব্যাখ্যা কর",
+        "ফার্মাকোলজিতে ফরম্যালিটি ও মোলারিটির পার্থক্য কী?",
+        "আমার সিলেবাস থেকে ৩টি অনুশীলন MCQ দিন"
+      ];
+    }
+    return [
+      "Explain Chirality & Optical Isomers with 3D concepts",
+      "Why does ionisation energy increase across a period?",
+      "Derive Snell's Law and refractive index in Physics",
+      "Quiz me with 3 challenging practice MCQs"
+    ];
+  }
   if (isBengali) {
     return [
       `${topic}-এর একটি সহজ উদাহরণ দিন`,
@@ -311,6 +347,24 @@ export async function askEducationalTutor(params: {
   const activeLanguage = analysis.detectedLanguage || language;
   const isBengali = activeLanguage === 'bn';
   const activeLevel = analysis.detectedLevel || level;
+
+  // FAREWELL: Warm, polite send-off
+  if (analysis.intent === 'FAREWELL') {
+    const farewell = isBengali
+      ? "বিদায়! আপনার পড়াশোনার জন্য শুভকামনা রইল। পদার্থবিদ্যা, রসায়ন বা গণিতের যেকোনো প্রয়োজনে আমি সবসময় এখানেই প্রস্তুত থাকব। ভালো থাকবেন!"
+      : "Goodbye! Wishing you all the best with your studies. Whenever you are ready to tackle Physics, Chemistry, Mathematics, or Biology again, I'll be right here to help. Have a great day!";
+    return {
+      answer: farewell,
+      model: "Google Gemini (gemini-3.6-flash)",
+      sources: [],
+      sourceCategory: 'GENERAL_ACADEMIC',
+      groundedInPiechem: false,
+      suggestedFollowUps: isBengali
+        ? ["কাইরালিটি কী?", "আয়নীকরণ শক্তি পর্যায়বৃত্ত পরিবর্তন", "নিউটনের গতিসূত্র", "রসায়ন অনুশীলন কুইজ"]
+        : ["What is chirality in chemistry?", "Why does ionisation energy increase across a period?", "Explain Newton's second law", "Quiz me on Chemistry with 3 MCQs"],
+      language: activeLanguage
+    };
+  }
 
   // CASUAL GREETING: Fast, warm, natural conversational reply (no academic reports)
   if (analysis.isGreeting) {

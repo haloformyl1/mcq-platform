@@ -1236,10 +1236,10 @@ export default function StudentDashboard() {
           <button
             type="button"
             onClick={() => handleOpenAiTutor("tutor")}
-            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 text-white shadow-2xl shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-cyan-400/40"
+            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-4 py-3 text-white shadow-2xl shadow-blue-500/30 hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20 backdrop-blur-xl"
           >
-            <Sparkles className="h-5 w-5 animate-spin-slow text-cyan-200" />
-            <span className="font-bold text-xs sm:text-sm tracking-tight pr-1">Ask AI Tutor</span>
+            <Sparkles className="h-5 w-5 animate-pulse text-cyan-200 group-hover:rotate-12 transition-transform" />
+            <span className="font-semibold text-xs sm:text-sm tracking-tight pr-1">Ask Gemini AI</span>
           </button>
         </div>
 
