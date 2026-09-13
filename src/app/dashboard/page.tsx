@@ -1,4 +1,7 @@
 "use client";
+import DashboardAiWidget from "@/components/ai/DashboardAiWidget";
+import AiTutorDrawer from "@/components/ai/AiTutorDrawer";
+import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
 import AiChemistTutorModal from "@/components/AiChemistTutorModal";
 
 import { useEffect, useState } from "react";
@@ -29,6 +32,24 @@ export default function StudentDashboard() {
   const [updatingCurriculum, setUpdatingCurriculum] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "tests" | "materials" | "leaderboard" | "performance">("overview");
   const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
+
+  // PIECHEM AI Integration States
+  const [isAiTutorOpen, setIsAiTutorOpen] = useState(false);
+  const [aiTutorMode, setAiTutorMode] = useState<any>("tutor");
+  const [aiTutorContext, setAiTutorContext] = useState<any>(undefined);
+  const [isAdaptiveQuizOpen, setIsAdaptiveQuizOpen] = useState(false);
+  const [adaptiveDrillTopic, setAdaptiveDrillTopic] = useState<string | undefined>(undefined);
+
+  const handleOpenAiTutor = (mode: string = "tutor", ctx?: any) => {
+    setAiTutorMode(mode);
+    if (ctx) setAiTutorContext(ctx);
+    setIsAiTutorOpen(true);
+  };
+
+  const handleOpenAdaptiveDrill = (topic?: string) => {
+    setAdaptiveDrillTopic(topic);
+    setIsAdaptiveQuizOpen(true);
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -734,6 +755,14 @@ export default function StudentDashboard() {
         )}
 
         {/* ========================================================= */}
+        {/* PIECHEM AI STUDENT DASHBOARD COPILOT                    */}
+        {/* ========================================================= */}
+        <DashboardAiWidget
+          onOpenTutor={handleOpenAiTutor}
+          onOpenAdaptiveQuiz={handleOpenAdaptiveDrill}
+        />
+
+        {/* ========================================================= */}
         {/* 3. FEATURED SPOTLIGHT BILLBOARD (NETFLIX HERO - IMAGE 2) */}
         {/* ========================================================= */}
         <section id="overview" className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_15px_40px_rgba(0,180,255,0.12)]">
@@ -1201,6 +1230,33 @@ export default function StudentDashboard() {
             </a>
           </p>
         </footer>
+
+        {/* AI Floating Summon Button for Mobile & Desktop */}
+        <div className="fixed bottom-5 right-5 z-40">
+          <button
+            type="button"
+            onClick={() => handleOpenAiTutor("tutor")}
+            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 text-white shadow-2xl shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-cyan-400/40"
+          >
+            <Sparkles className="h-5 w-5 animate-spin-slow text-cyan-200" />
+            <span className="font-bold text-xs sm:text-sm tracking-tight pr-1">Ask AI Tutor</span>
+          </button>
+        </div>
+
+        {/* AI Learning Drawer */}
+        <AiTutorDrawer
+          isOpen={isAiTutorOpen}
+          onClose={() => setIsAiTutorOpen(false)}
+          initialMode={aiTutorMode}
+          initialContext={aiTutorContext}
+        />
+
+        {/* AI Adaptive Drill Modal */}
+        <AdaptiveQuizModal
+          isOpen={isAdaptiveQuizOpen}
+          onClose={() => setIsAdaptiveQuizOpen(false)}
+          targetTopic={adaptiveDrillTopic}
+        />
 
         <AiChemistTutorModal />
       </main>

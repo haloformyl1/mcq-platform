@@ -1,5 +1,6 @@
 "use client";
 import AiQuestionExplainerModal from "@/components/AiQuestionExplainerModal";
+import PostExamAiAnalysisModal from "@/components/ai/PostExamAiAnalysisModal";
 import { Sparkles as SparklesIcon } from "lucide-react";
 
 import { useState, useEffect, use } from "react";
@@ -13,6 +14,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
   const resolvedParams = use(params);
   const [result, setResult] = useState<any>(null);
   const [explainingQuestion, setExplainingQuestion] = useState<any>(null);
+  const [showAiAnalysis, setShowAiAnalysis] = useState(false);
   const [filter, setFilter] = useState<'All' | 'Correct' | 'Incorrect' | 'Unanswered'>('All');
   const router = useRouter();
 
@@ -74,9 +76,19 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
               <h1 className="text-base sm:text-lg font-bold text-white break-words line-clamp-2 leading-tight">{result.test.title}</h1>
             </div>
           </div>
-          <Link href="/dashboard" className="w-full sm:w-auto text-center flex items-center justify-center gap-2 text-xs bg-[#222222] hover:bg-[#333333] text-white px-4 py-2.5 rounded-lg border border-[#404040] transition font-medium">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setShowAiAnalysis(true)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2.5 rounded-lg shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <SparklesIcon className="w-4 h-4 text-cyan-200 animate-pulse" />
+              <span>Analyze with PIECHEM AI</span>
+            </button>
+            <Link href="/dashboard" className="w-full sm:w-auto text-center flex items-center justify-center gap-2 text-xs bg-[#222222] hover:bg-[#333333] text-white px-4 py-2.5 rounded-lg border border-[#404040] transition font-medium">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-          </Link>
+            </Link>
+          </div>
         </div>
 
         {/* Overview Header & Timing Stats Grid */}
@@ -325,6 +337,25 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
             })
           )}
         </div>
+
+        {/* AI Explainer Modal */}
+        {explainingQuestion && (
+          <AiQuestionExplainerModal
+            isOpen={!!explainingQuestion}
+            onClose={() => setExplainingQuestion(null)}
+            question={explainingQuestion.question}
+            selectedAnswer={explainingQuestion.selectedAnswer}
+            correctAnswer={explainingQuestion.correctAnswer}
+          />
+        )}
+
+        {/* Post-Exam AI Deep Analysis Modal */}
+        <PostExamAiAnalysisModal
+          isOpen={showAiAnalysis}
+          onClose={() => setShowAiAnalysis(false)}
+          attemptId={resolvedParams.attemptId}
+          testTitle={result?.test?.title}
+        />
       </div>
     </div>
   );

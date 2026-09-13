@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Sparkles, AlertCircle, CheckCircle2, BookOpen, Lightbulb, Atom, Loader2 } from "lucide-react";
+import { 
+  X, Sparkles, AlertCircle, CheckCircle2, BookOpen, Lightbulb, 
+  Atom, Loader2, ArrowRight, RefreshCw, Languages, HelpCircle 
+} from "lucide-react";
 
 interface AiExplainerProps {
   isOpen: boolean;
@@ -28,10 +31,11 @@ export default function AiQuestionExplainerModal({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [diagnosis, setDiagnosis] = useState<any>(null);
+  const [hintLevel, setHintLevel] = useState<number>(1);
+  const [showFullSolution, setShowFullSolution] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'bn'>('en');
 
-  useEffect(() => {
-    if (!isOpen) return;
-
+  const fetchDoubtSolution = (level: number, full: boolean, lang: 'en' | 'bn') => {
     setLoading(true);
     setError(null);
 
@@ -42,7 +46,7 @@ export default function AiQuestionExplainerModal({
       D: question.optionD
     };
 
-    fetch("/api/ai/explain", {
+    fetch("/api/ai/doubt-solver", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -50,139 +54,267 @@ export default function AiQuestionExplainerModal({
         options: optionsMap,
         selectedAnswer,
         correctAnswer,
-        originalExplanation: question.explanation
+        originalExplanation: question.explanation,
+        hintLevel: level,
+        revealFullSolution: full,
+        language: lang
       })
     })
       .then(res => res.json())
       .then(data => {
         if (data.error) throw new Error(data.error);
-        setDiagnosis(data);
+        setDiagnosis(data.doubtSolution);
       })
       .catch(err => {
-        setError(err.message || "Failed to load AI explanation");
+        setError(err.message || "Failed to load AI pedagogical guidance.");
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setHintLevel(1);
+    setShowFullSolution(false);
+    fetchDoubtSolution(1, false, language);
   }, [isOpen, question, selectedAnswer, correctAnswer]);
+
+  const handleNextHint = () => {
+    const next = Math.min(hintLevel + 1, 3);
+    setHintLevel(next);
+    fetchDoubtSolution(next, false, language);
+  };
+
+  const handleRevealFull = () => {
+    setShowFullSolution(true);
+    fetchDoubtSolution(hintLevel, true, language);
+  };
+
+  const handleToggleLang = (lang: 'en' | 'bn') => {
+    setLanguage(lang);
+    fetchDoubtSolution(hintLevel, showFullSolution, lang);
+  };
 
   if (!isOpen) return null;
 
+  const isCorrect = selectedAnswer === correctAnswer;
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-[#07131f] border border-cyan-500/40 rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-7 shadow-2xl shadow-cyan-950/80 space-y-5 relative">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Header */}
-        <div className="flex items-center gap-3 border-b border-cyan-950 pb-4">
-          <div className="p-2.5 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25">
-            <Atom className="w-5 h-5 animate-spin-slow" />
-          </div>
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-950 text-cyan-400 border border-cyan-500/30">
-              <Sparkles className="w-3 h-3" />
-              <span>Pi-Chem AI Question Diagnostic</span>
+      <div className="relative w-full max-w-2xl bg-[#081a28] border border-cyan-500/40 rounded-2xl shadow-2xl shadow-cyan-950/80 overflow-hidden flex flex-col max-h-[90vh]">
+        
+        {/* Top Header */}
+        <div className="flex items-center justify-between border-b border-white/10 bg-[#091f30] p-4">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+              <Sparkles className="w-4 h-4" />
             </div>
-            <h3 className="text-lg sm:text-xl font-black text-white mt-1">
-              Why did I miss this question?
-            </h3>
+            <div>
+              <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                <span>PIECHEM AI Doubt Solver & Explainer</span>
+                <span className="text-[10px] bg-cyan-950 border border-cyan-500/40 text-cyan-300 px-2 py-0.5 rounded-full font-mono">
+                  Socratic Guide
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                Grounded academic reasoning &bull; Progressive hints
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Language Switch */}
+            <div className="flex items-center rounded-lg border border-white/10 bg-black/40 p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => handleToggleLang('en')}
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all ${
+                  language === 'en' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToggleLang('bn')}
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all ${
+                  language === 'bn' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                বাংলা
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="py-12 flex flex-col items-center justify-center gap-3 text-center">
-            <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
-            <p className="text-xs text-slate-400 font-mono">
-              Pi-Chem AI is analyzing the chemical reaction mechanisms and distractor trap...
-            </p>
-          </div>
-        )}
+        {/* Question Review Strip */}
+        <div className="bg-black/40 border-b border-white/10 p-4 space-y-2">
+          <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-relaxed break-words">
+            {question.questionText}
+          </p>
 
-        {/* Error State */}
-        {error && (
-          <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+          <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
+            <span className={`font-mono px-2 py-0.5 rounded border ${
+              isCorrect 
+                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
+                : 'bg-red-950/60 border-red-500/40 text-red-300'
+            }`}>
+              Your Pick: <strong>{selectedAnswer}</strong>
+            </span>
 
-        {/* Content */}
-        {!loading && diagnosis && (
-          <div className="space-y-4 text-xs sm:text-sm">
-            {/* Answer Comparison Pill */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <div className="p-3 rounded-xl bg-red-950/30 border border-red-800/40 flex items-center justify-between">
-                <span className="text-slate-400">Your Answer:</span>
-                <span className="font-extrabold text-red-400">Option {selectedAnswer}</span>
-              </div>
-              <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between">
-                <span className="text-slate-400">Verified Answer:</span>
-                <span className="font-extrabold text-emerald-400">Option {correctAnswer}</span>
-              </div>
-            </div>
-
-            {/* Misconception Trap */}
-            <div className="p-4 rounded-xl bg-[#030a12] border border-cyan-500/20 space-y-1.5">
-              <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span>The Distractor Trap (Why you picked Option {selectedAnswer})</span>
-              </div>
-              <p className="text-slate-300 leading-relaxed text-xs">
-                {diagnosis.misconceptionAnalysis}
-              </p>
-            </div>
-
-            {/* Step by step solution */}
-            <div className="p-4 rounded-xl bg-[#030a12] border border-cyan-500/20 space-y-2">
-              <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider">
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Step-by-Step Chemistry Derivation</span>
-              </div>
-              <p className="text-slate-200 leading-relaxed text-xs whitespace-pre-line font-sans">
-                {diagnosis.stepByStepSolution}
-              </p>
-            </div>
-
-            {/* Key Formula */}
-            {diagnosis.keyRuleOrFormula && (
-              <div className="p-3.5 rounded-xl bg-gradient-to-r from-cyan-950/60 to-blue-950/60 border border-cyan-500/30 space-y-1">
-                <span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider block">
-                  Core Formula / Rule to Memorize
-                </span>
-                <p className="text-xs font-mono text-cyan-100 whitespace-pre-line">
-                  {diagnosis.keyRuleOrFormula}
-                </p>
-              </div>
+            {showFullSolution && (
+              <span className="font-mono px-2 py-0.5 rounded border bg-emerald-950/60 border-emerald-500/40 text-emerald-300">
+                Correct Key: <strong>{correctAnswer}</strong>
+              </span>
             )}
+          </div>
+        </div>
 
-            {/* Memory Trick */}
-            {diagnosis.memoryTrick && (
-              <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/30 space-y-1">
-                <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs">
-                  <Lightbulb className="w-3.5 h-3.5" />
-                  <span>NEET / JEE Exam Trick</span>
+        {/* Main Body */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {loading ? (
+            <div className="py-12 flex flex-col items-center justify-center space-y-3">
+              <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+              <p className="text-xs text-slate-400 font-medium">
+                {language === 'bn' ? "শিক্ষাগত ব্যাখ্যা প্রস্তুত করা হচ্ছে..." : "Formulating step-by-step educational analysis..."}
+              </p>
+            </div>
+          ) : error ? (
+            <div className="p-4 rounded-xl bg-red-950/30 border border-red-500/30 text-xs text-red-300 text-center">
+              {error}
+            </div>
+          ) : diagnosis ? (
+            <div className="space-y-4">
+              
+              {/* Progressive Hint Box */}
+              {!showFullSolution && (
+                <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Lightbulb className="w-4 h-4 text-amber-400" />
+                      {language === 'bn' ? `ইঙ্গিত ধাপ ${hintLevel} / ৩` : `Progressive Hint Level ${hintLevel} / 3`}
+                    </span>
+                    <span className="text-[11px] text-amber-400/70">
+                      {hintLevel === 1 ? "Conceptual Clue" : hintLevel === 2 ? "Specific Guidance" : "Approach"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-amber-100 leading-relaxed font-medium">
+                    {diagnosis.content || diagnosis.hint || diagnosis.explanation}
+                  </p>
+
+                  <div className="pt-2 border-t border-amber-500/20 flex flex-wrap items-center justify-between gap-2">
+                    {hintLevel < 3 ? (
+                      <button
+                        type="button"
+                        onClick={handleNextHint}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-white bg-amber-950/80 border border-amber-500/40 hover:bg-amber-900 px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                      >
+                        <span>{language === 'bn' ? "পরবর্তী ইঙ্গিত" : "Need Next Hint"}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <span className="text-xs text-amber-400/80 italic">All hints unlocked!</span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleRevealFull}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-300 hover:text-white bg-cyan-950/80 border border-cyan-500/40 hover:bg-cyan-900 px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>{language === 'bn' ? "সম্পূর্ণ সমাধান দেখুন" : "Reveal Full Solution"}</span>
+                    </button>
+                  </div>
                 </div>
-                <p className="text-xs text-amber-200/90 leading-relaxed">
-                  {diagnosis.memoryTrick}
-                </p>
-              </div>
-            )}
+              )}
 
-            <div className="pt-2">
-              <button
-                onClick={onClose}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 transition"
-              >
-                Close Diagnostic
-              </button>
+              {/* Full Detailed Solution */}
+              {showFullSolution && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  {/* Why Choice was Incorrect */}
+                  {!isCorrect && diagnosis.whyIncorrect && (
+                    <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3.5 space-y-1">
+                      <div className="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {language === 'bn' ? "আপনার উত্তরটি কেন ভুল ছিল" : "Why Your Answer Was Incorrect"}
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                        {diagnosis.whyIncorrect}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Core Scientific Concept */}
+                  {diagnosis.correctConcept && (
+                    <div className="rounded-xl border border-cyan-500/30 bg-[#091f30] p-3.5 space-y-1">
+                      <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Atom className="w-3.5 h-3.5" />
+                        {language === 'bn' ? "মূল রসায়ন ধারণা" : "Core Academic Concept"}
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                        {diagnosis.correctConcept}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Step-by-Step Reasoning */}
+                  {diagnosis.explanation && (
+                    <div className="rounded-xl border border-white/10 bg-black/40 p-4 space-y-2">
+                      <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        {language === 'bn' ? "ধাপে ধাপে বিশ্লেষণ ও সঠিক উত্তর" : "Step-by-Step Explanation"}
+                      </div>
+                      <div className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
+                        {diagnosis.content || diagnosis.explanation}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Common Mistake Trap */}
+                  {diagnosis.commonMistake && (
+                    <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-3 text-xs text-amber-200">
+                      <strong className="text-amber-300 font-bold block mb-1">
+                        {language === 'bn' ? "সাধারণ ভুল ফাঁদ:" : "Common Exam Mistake Trap:"}
+                      </strong>
+                      {diagnosis.commonMistake}
+                    </div>
+                  )}
+
+                  {/* Similar Example / Exercise */}
+                  {diagnosis.similarExample && (
+                    <div className="rounded-xl border border-white/5 bg-white/5 p-3 text-xs text-slate-300">
+                      <strong className="text-cyan-300 font-bold block mb-1">
+                        {language === 'bn' ? "অনুরূপ উদাহরণ:" : "Similar Academic Application:"}
+                      </strong>
+                      {diagnosis.similarExample}
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
-          </div>
-        )}
+          ) : null}
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="border-t border-white/10 bg-[#091f30] p-4 flex items-center justify-between text-xs text-slate-400">
+          <span>PIECHEM Socratic Tutor Core</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all cursor-pointer"
+          >
+            Got It
+          </button>
+        </div>
+
       </div>
     </div>
   );
