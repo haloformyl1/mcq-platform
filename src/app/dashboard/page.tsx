@@ -1,6 +1,5 @@
 "use client";
 import DashboardAiWidget from "@/components/ai/DashboardAiWidget";
-import AiTutorDrawer from "@/components/ai/AiTutorDrawer";
 import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
 
 import { useEffect, useState } from "react";
@@ -34,16 +33,23 @@ export default function StudentDashboard() {
   const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
 
   // PIECHEM AI Integration States
-  const [isAiTutorOpen, setIsAiTutorOpen] = useState(false);
-  const [aiTutorMode, setAiTutorMode] = useState<any>("tutor");
-  const [aiTutorContext, setAiTutorContext] = useState<any>(undefined);
   const [isAdaptiveQuizOpen, setIsAdaptiveQuizOpen] = useState(false);
   const [adaptiveDrillTopic, setAdaptiveDrillTopic] = useState<string | undefined>(undefined);
 
+  // Prefetch full-screen AI workspace for instant client-side transition
+  useEffect(() => {
+    router.prefetch("/dashboard/ai");
+  }, [router]);
+
   const handleOpenAiTutor = (mode: string = "tutor", ctx?: any) => {
-    setAiTutorMode(mode);
-    if (ctx) setAiTutorContext(ctx);
-    setIsAiTutorOpen(true);
+    const params = new URLSearchParams();
+    if (mode && mode !== "tutor") params.set("mode", mode);
+    if (ctx?.subject) params.set("subject", ctx.subject);
+    if (ctx?.className) params.set("className", ctx.className);
+    if (ctx?.chapter) params.set("chapter", ctx.chapter);
+    if (ctx?.topic) params.set("topic", ctx.topic);
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+    router.push(`/dashboard/ai${queryString}`);
   };
 
   const handleOpenAdaptiveDrill = (topic?: string) => {
@@ -1243,13 +1249,7 @@ export default function StudentDashboard() {
           </button>
         </div>
 
-        {/* AI Learning Drawer */}
-        <AiTutorDrawer
-          isOpen={isAiTutorOpen}
-          onClose={() => setIsAiTutorOpen(false)}
-          initialMode={aiTutorMode}
-          initialContext={aiTutorContext}
-        />
+
 
         {/* AI Adaptive Drill Modal */}
         <AdaptiveQuizModal
