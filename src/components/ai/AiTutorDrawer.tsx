@@ -14,7 +14,9 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   groundedInPiechem?: boolean;
-  sourceCategory?: 'PIECHEM_MATERIAL' | 'STUDENT_DATA' | 'GENERAL_ACADEMIC';
+  sourceCategory?: 'PIECHEM_MATERIAL' | 'STUDENT_DATA' | 'GENERAL_ACADEMIC' | 'WEB_RESEARCH' | 'PIECHEM_AND_WEB';
+  searchGroundingUsed?: boolean;
+  webSources?: Array<{ title: string; url: string; snippet?: string }>;
   citations?: string[];
   suggestedFollowUps?: string[];
   activeTopic?: string;
@@ -159,6 +161,8 @@ export default function AiTutorDrawer({
         groundedInPiechem: data.groundedInPiechem,
         sourceCategory: data.sourceCategory || (data.groundedInPiechem ? 'PIECHEM_MATERIAL' : 'GENERAL_ACADEMIC'),
         citations: data.sources || [],
+        webSources: data.webSources || [],
+        searchGroundingUsed: data.searchGroundingUsed,
         suggestedFollowUps: data.suggestedFollowUps || [],
         activeTopic: data.activeTopic,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -344,10 +348,52 @@ export default function AiTutorDrawer({
                     <FormattedAiMessage content={m.content} />
                   )}
 
-                  {/* Real Citations */}
-                  {!isUser && m.citations && m.citations.length > 0 && (
-                    <div className="mt-3 pt-2 border-t border-white/10 text-[11px] text-slate-400">
-                      <span className="font-semibold text-cyan-300">Source:</span> {m.citations.join(' • ')}
+                  {/* Real Sources & Citations */}
+                  {!isUser && (
+                    <div className="mt-2.5 pt-2 border-t border-white/10 flex flex-col gap-1 text-[11px] text-slate-400">
+                      {/* Attribution Badges */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {m.sourceCategory === 'PIECHEM_AND_WEB' ? (
+                          <span className="inline-flex items-center gap-1 rounded bg-cyan-950/70 px-2 py-0.5 text-cyan-300 border border-cyan-700/50">
+                            <BookOpen className="w-3 h-3" /> PIECHEM + Web sources
+                          </span>
+                        ) : m.sourceCategory === 'WEB_RESEARCH' || m.searchGroundingUsed || (m.webSources && m.webSources.length > 0) ? (
+                          <span className="inline-flex items-center gap-1 rounded bg-blue-950/70 px-2 py-0.5 text-blue-300 border border-blue-700/50">
+                            <Globe className="w-3 h-3" /> Web sources
+                          </span>
+                        ) : m.sourceCategory === 'PIECHEM_MATERIAL' || m.groundedInPiechem ? (
+                          <span className="inline-flex items-center gap-1 rounded bg-cyan-950/70 px-2 py-0.5 text-cyan-300 border border-cyan-700/50">
+                            <BookOpen className="w-3 h-3" /> PIECHEM Study Material
+                          </span>
+                        ) : m.sourceCategory === 'STUDENT_DATA' ? (
+                          <span className="inline-flex items-center gap-1 rounded bg-amber-950/70 px-2 py-0.5 text-amber-300 border border-amber-700/50">
+                            <Activity className="w-3 h-3" /> Verified Student Telemetry
+                          </span>
+                        ) : null}
+
+                        {m.citations && m.citations.length > 0 && !m.webSources?.length && (
+                          <span className="text-slate-400">{m.citations.join(' • ')}</span>
+                        )}
+                      </div>
+
+                      {/* Web Sources Links */}
+                      {m.webSources && m.webSources.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                          <span className="font-semibold text-slate-300">Sources:</span>
+                          {m.webSources.map((ws, i) => (
+                            <a
+                              key={i}
+                              href={ws.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-cyan-400 hover:text-cyan-200 underline truncate max-w-[220px]"
+                              title={ws.title || ws.url}
+                            >
+                              • {ws.title || ws.url}
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 

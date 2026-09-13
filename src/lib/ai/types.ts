@@ -6,7 +6,19 @@
 export type AiMode = 'TUTOR' | 'PRACTICE' | 'EXAM' | 'DOUBT' | 'REVISION' | 'STUDY_PLAN';
 export type AcademicLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 export type Language = 'en' | 'bn';
-export type SourceCategory = 'PIECHEM_MATERIAL' | 'STUDENT_DATA' | 'GENERAL_ACADEMIC';
+
+export type SourceCategory = 
+  | 'PIECHEM_MATERIAL' 
+  | 'STUDENT_DATA' 
+  | 'GENERAL_ACADEMIC' 
+  | 'WEB_RESEARCH' 
+  | 'PIECHEM_AND_WEB';
+
+export interface WebCitation {
+  title: string;
+  url: string;
+  snippet?: string;
+}
 
 export type QuestionDifficulty = 'Easy' | 'Moderate' | 'Difficult' | 'HOTS';
 export type QuestionType = 'MCQ' | 'True/False' | 'Assertion-Reason' | 'Numerical' | 'Conceptual';
@@ -16,7 +28,7 @@ export interface StudentContext {
   name?: string;
   board?: string; // e.g., WBCHSE, CBSE, ISC, ALL
   academicLevel?: string; // e.g., SEM-I, SEM-II, Class 11, Class 12
-  subject?: string; // Chemistry (extensible to Physics, Maths, Biology)
+  subject?: string; // Chemistry, Physics, Mathematics, Biology
   chapter?: string;
   topic?: string;
   activePage?: string;
@@ -140,6 +152,8 @@ export interface AiChatMessage {
   context?: StudentContext;
   model?: string;
   sources?: string[];
+  webSources?: WebCitation[];
+  searchGroundingUsed?: boolean;
   sourceCategory?: SourceCategory;
   groundedInPiechem?: boolean;
   intent?: string;
@@ -150,6 +164,8 @@ export interface TutorResponse {
   answer: string;
   model: string;
   sources: string[];
+  webSources?: WebCitation[];
+  searchGroundingUsed?: boolean;
   sourceCategory: SourceCategory;
   groundedInPiechem: boolean;
   suggestedFollowUps: string[];
