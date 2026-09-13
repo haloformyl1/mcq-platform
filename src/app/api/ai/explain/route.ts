@@ -4,7 +4,8 @@ import { explainQuestionError } from "@/lib/aiClient";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { questionText, options, selectedAnswer, correctAnswer, originalExplanation } = body;
+    const { questionText, options, selectedAnswer, correctAnswer, originalExplanation, apiKey } = body;
+    const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
 
     if (!questionText || !options || !selectedAnswer || !correctAnswer) {
       return NextResponse.json(
@@ -18,7 +19,8 @@ export async function POST(req: NextRequest) {
       options,
       selectedAnswer,
       correctAnswer,
-      originalExplanation
+      originalExplanation,
+      userApiKey
     });
 
     return NextResponse.json(result);

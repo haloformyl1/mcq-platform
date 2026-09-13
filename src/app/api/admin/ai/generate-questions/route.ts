@@ -4,7 +4,8 @@ import { generateAiMcqs } from "@/lib/aiClient";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { topic, count, difficulty, targetExam } = body;
+    const { topic, count, difficulty, targetExam, apiKey } = body;
+    const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
 
     if (!topic || typeof topic !== 'string' || !topic.trim()) {
       return NextResponse.json(
@@ -17,7 +18,8 @@ export async function POST(req: NextRequest) {
       topic: topic.trim(),
       count: parseInt(count, 10) || 3,
       difficulty: difficulty || "Medium",
-      targetExam: targetExam || "NEET / JEE Mains"
+      targetExam: targetExam || "NEET / JEE Mains",
+      userApiKey
     });
 
     return NextResponse.json({ success: true, questions });
