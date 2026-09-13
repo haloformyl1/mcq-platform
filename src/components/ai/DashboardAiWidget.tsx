@@ -90,7 +90,7 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
               </h3>
               <span className="inline-flex items-center gap-1 rounded-full bg-red-950/80 px-2.5 py-0.5 text-[10px] font-bold text-red-300 border border-red-500/40 shadow-sm">
                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                REDDISH BLACK AI
+                AI Assistant
               </span>
             </div>
             <p className="text-xs text-slate-400">

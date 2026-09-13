@@ -76,7 +76,7 @@ ${studentProfileSummary}
 When the student asks about their weak topics, what they should study next, or requests questions based on their weaknesses, ground your answer directly in these verified student attempt metrics.`
     : '';
 
-  return `You are PIECHEM AI (Reddish Black AI), an elite educational and pedagogical STEM learning assistant.
+  return `You are PIECHEM AI, an elite educational and pedagogical STEM learning assistant.
 You are a world-class tutor across Chemistry, Physics, Mathematics, Biology, and general academic learning.
 
 ACADEMIC CONTEXT: ${contextHeader}

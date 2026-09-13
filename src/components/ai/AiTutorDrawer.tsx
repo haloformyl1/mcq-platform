@@ -4,12 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import FormattedAiMessage from "./FormattedAiMessage";
 import PiechemAiLogo from "./PiechemAiLogo";
 import { 
-  X, Send, User, Trash2, ArrowRight, 
-  Atom, CheckCircle2, BookOpen, Brain, 
-  Languages, GraduationCap, Copy, Check, RefreshCw, 
+  X, Send, User, ArrowRight, 
+  Atom, CheckCircle2, BookOpen, 
+  Languages, GraduationCap, Copy, Check, 
   Lightbulb, Globe, Activity, Volume2, VolumeX,
   ThumbsUp, ThumbsDown, RotateCcw,
-  Sparkles, Compass, Microscope, Calculator, ChevronDown
+  Sparkles, Compass, Calculator, ChevronDown
 } from "lucide-react";
 
 interface Message {
@@ -45,28 +45,28 @@ interface AiTutorDrawerProps {
 const PROMPT_STARTERS = [
   {
     icon: Atom,
-    color: "from-red-600/20 to-rose-900/10 border-red-500/30 text-rose-300",
+    color: "from-red-600/20 to-rose-950/20 border-red-500/30 text-rose-300",
     subject: "Chemistry",
     title: "Chirality & Stereochemistry",
     prompt: "Explain chirality, asymmetric carbon, and enantiomers with 3D intuition and exam examples."
   },
   {
     icon: Compass,
-    color: "from-rose-600/20 to-purple-900/10 border-rose-500/30 text-rose-300",
+    color: "from-rose-600/20 to-purple-950/20 border-rose-500/30 text-rose-300",
     subject: "Physics",
     title: "Electromagnetic Induction",
     prompt: "Explain Faraday's Law & Lenz's Law with step-by-step physical intuition."
   },
   {
     icon: Calculator,
-    color: "from-emerald-600/20 to-teal-900/10 border-emerald-500/30 text-emerald-300",
+    color: "from-emerald-600/20 to-teal-950/20 border-emerald-500/30 text-emerald-300",
     subject: "Mathematics",
     title: "Integration by Parts",
     prompt: "Derive the Integration by Parts formula with a clear step-by-step worked example."
   },
   {
     icon: CheckCircle2,
-    color: "from-amber-600/20 to-orange-900/10 border-amber-500/30 text-amber-300",
+    color: "from-amber-600/20 to-orange-950/20 border-amber-500/30 text-amber-300",
     subject: "Exam Practice",
     title: "Adaptive 3-MCQ Drill",
     prompt: "Quiz me on my syllabus with 3 challenging practice MCQs with options A-D."
@@ -129,7 +129,7 @@ export default function AiTutorDrawer({
 
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Synchronize initial context
@@ -139,13 +139,27 @@ export default function AiTutorDrawer({
     }
   }, [initialContext]);
 
-  // Scroll to bottom on updates
+  // Lock body scroll when full-screen AI modal is active
   useEffect(() => {
     if (isOpen) {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      setTimeout(() => inputRef.current?.focus(), 150);
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => inputRef.current?.focus(), 200);
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
-  }, [isOpen, messages, loading]);
+  }, [isOpen]);
+
+  // Scroll to bottom only when new messages are added or loading
+  useEffect(() => {
+    if (isOpen && messages.length > 0 && chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages, loading, isOpen]);
 
   // Clean up speech synthesis when drawer unmounts or closes
   useEffect(() => {
@@ -154,6 +168,17 @@ export default function AiTutorDrawer({
       setSpeakingId(null);
     }
   }, [isOpen]);
+
+  // Listen for Escape key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleSendMessage = async (textToSend?: string) => {
     const questionText = (textToSend || input).trim();
@@ -203,7 +228,6 @@ export default function AiTutorDrawer({
       }
 
       if (data.suggestedFollowUps && data.suggestedFollowUps.length > 0) {
-        // Filter out conversational anomalies like "GOOD BYE"
         const cleanFollowUps = data.suggestedFollowUps.filter(
           (s: string) => !/good\s*bye|exceptions in/i.test(s)
         );
@@ -258,7 +282,6 @@ export default function AiTutorDrawer({
     }
 
     window.speechSynthesis.cancel();
-    // Clean markdown and LaTeX symbols for clean speech
     const cleanSpeech = text
       .replace(/\$\$[\s\S]*?\$\$/g, " [mathematical formula] ")
       .replace(/\$[^$]+\$/g, " formula ")
@@ -300,14 +323,14 @@ export default function AiTutorDrawer({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#070203] text-slate-100 overflow-hidden animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 w-screen h-screen flex flex-col bg-[#070203] text-slate-100 overflow-hidden select-text animate-in fade-in duration-200">
       {/* Ambient Reddish-Black Nebula Glows */}
-      <div className="pointer-events-none absolute -top-40 -right-40 w-[34rem] h-[34rem] rounded-full bg-gradient-to-br from-red-600/15 via-rose-950/10 to-transparent blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -left-40 w-[34rem] h-[34rem] rounded-full bg-gradient-to-tr from-red-950/20 via-black to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 -right-40 w-[36rem] h-[36rem] rounded-full bg-gradient-to-br from-red-600/15 via-rose-950/10 to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -left-40 w-[36rem] h-[36rem] rounded-full bg-gradient-to-tr from-red-950/20 via-black to-transparent blur-3xl" />
 
-      {/* Reddish-Black Sleek Top Header (Spans 100% Full Screen) */}
-      <div className="relative z-10 flex items-center justify-between border-b border-red-950/80 px-4 sm:px-6 py-3.5 bg-[#0e0305]/95 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
+      {/* Top Header - Fixed & Pinned at the Very Top */}
+      <header className="relative z-30 shrink-0 h-16 border-b border-red-950/80 px-4 sm:px-8 flex items-center justify-between bg-[#0b0304]/95 backdrop-blur-xl">
+        <div className="flex items-center gap-3.5">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-red-950/60 border border-red-500/40 shadow-inner">
             <PiechemAiLogo size="sm" />
           </div>
@@ -320,10 +343,9 @@ export default function AiTutorDrawer({
                   AI
                 </span>
               </h2>
-              <div className="flex items-center gap-1.5 rounded-full bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 text-[10px] text-red-300 font-bold uppercase shadow-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                <span className="tracking-wider">REDDISH BLACK AI</span>
-              </div>
+              <span className="rounded-full bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 text-[10px] text-red-300 font-bold uppercase shadow-sm">
+                AI Tutor
+              </span>
             </div>
             <p className="text-[11px] text-slate-400">
               {language === 'bn' ? "শিক্ষামূলক এআই সহকারী" : "Conversational STEM Learning Assistant"}
@@ -332,7 +354,7 @@ export default function AiTutorDrawer({
         </div>
 
         {/* Right Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {/* Language Toggle */}
           <div className="flex items-center rounded-lg bg-white/[0.04] border border-red-950/60 p-0.5 text-xs font-medium">
             <button
@@ -373,7 +395,7 @@ export default function AiTutorDrawer({
             </button>
 
             {showLevelMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-40 rounded-xl bg-[#140507] border border-red-900/50 shadow-2xl p-1 z-30 animate-in fade-in slide-in-from-top-1">
+              <div className="absolute right-0 top-full mt-1.5 w-40 rounded-xl bg-[#140507] border border-red-900/50 shadow-2xl p-1 z-40 animate-in fade-in slide-in-from-top-1">
                 {(['beginner', 'intermediate', 'advanced'] as const).map(lvl => (
                   <button
                     key={lvl}
@@ -394,32 +416,30 @@ export default function AiTutorDrawer({
             )}
           </div>
 
-          {/* Prominent Full Screen Close Button */}
+          {/* Prominent Full-Screen Exit / Close Button */}
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-1.5 rounded-lg p-2 text-slate-400 hover:bg-red-950/50 hover:text-white border border-transparent hover:border-red-500/30 transition-colors cursor-pointer"
-            title="Back to Dashboard"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-red-950/70 border border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white transition-all cursor-pointer"
+            title="Exit Full Screen AI (Esc)"
           >
-            <X className="h-5 w-5" />
-            <span className="text-xs font-medium hidden sm:inline">Close</span>
+            <X className="h-4 w-4" />
+            <span className="text-xs font-semibold">Exit</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Main Full-Screen Workspace Body */}
-      <div className="relative flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
-        <div className="max-w-4xl lg:max-w-5xl mx-auto w-full space-y-5">
+      {/* Middle Scrollable Chat Area */}
+      <main 
+        ref={chatContainerRef} 
+        className="relative flex-1 min-h-0 overflow-y-auto px-4 sm:px-8 py-6 scroll-smooth z-10"
+      >
+        <div className="max-w-4xl lg:max-w-5xl mx-auto w-full flex flex-col space-y-5">
           {/* Welcome Hero / Empty State */}
           {messages.length === 0 && (
-            <div className="py-8 sm:py-12 text-center animate-in fade-in zoom-in-95 duration-300">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-tr from-red-600/25 via-rose-950/40 to-black/80 border border-red-500/40 shadow-2xl shadow-red-950/60 backdrop-blur-xl group hover:scale-105 transition-all">
+            <div className="py-6 sm:py-10 text-center animate-in fade-in duration-200">
+              <div className="mx-auto mb-3.5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-tr from-red-600/25 via-rose-950/40 to-black/80 border border-red-500/40 shadow-2xl shadow-red-950/60 backdrop-blur-xl group hover:scale-105 transition-all">
                 <PiechemAiLogo size="lg" animated />
-              </div>
-
-              <div className="mb-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-bold tracking-wider uppercase shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                <span>REDDISH BLACK AI</span>
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
@@ -432,7 +452,7 @@ export default function AiTutorDrawer({
               </p>
 
               {/* Quick Starter Cards */}
-              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
                 {PROMPT_STARTERS.map((card, idx) => {
                   const Icon = card.icon;
                   return (
@@ -440,7 +460,7 @@ export default function AiTutorDrawer({
                       key={idx}
                       type="button"
                       onClick={() => handleSendMessage(card.prompt)}
-                      className={`group relative p-4 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.02] transition-all duration-200 cursor-pointer shadow-sm text-left`}
+                      className={`group relative p-4 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">
@@ -499,7 +519,7 @@ export default function AiTutorDrawer({
                       ) : (
                         <div className="inline-flex items-center gap-1.5 rounded-full bg-red-950/60 px-2.5 py-0.5 font-bold text-red-300 border border-red-500/30 shadow-sm">
                           <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                          <span>PIECHEM AI (REDDISH BLACK AI)</span>
+                          <span>PIECHEM AI</span>
                         </div>
                       )}
 
@@ -614,7 +634,7 @@ export default function AiTutorDrawer({
                     </div>
                   )}
 
-                  {/* Fast Contextual Action Buttons */}
+                  {/* Contextual Follow-Up Buttons */}
                   {!isUser && (
                     <div className="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.04]">
                       <button
@@ -683,15 +703,14 @@ export default function AiTutorDrawer({
               </div>
             </div>
           )}
-
-          <div ref={chatEndRef} />
         </div>
-      </div>
+      </main>
 
-      {/* Pill Follow-Up Suggestions */}
-      {dynamicSuggestions.length > 0 && (
-        <div className="border-t border-red-950/80 bg-[#0a0203]/95 px-4 sm:px-6 py-2">
-          <div className="max-w-4xl lg:max-w-5xl mx-auto w-full">
+      {/* Bottom Pinned Action Area - Always Anchored at the Bottom */}
+      <footer className="relative z-30 shrink-0 border-t border-red-950/80 bg-[#090203]/95 px-4 sm:px-8 py-3 backdrop-blur-xl">
+        <div className="max-w-4xl lg:max-w-5xl mx-auto w-full space-y-2">
+          {/* Pill Follow-Up Suggestions */}
+          {dynamicSuggestions.length > 0 && (
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
               {dynamicSuggestions.map((prompt, idx) => (
                 <button
@@ -706,13 +725,9 @@ export default function AiTutorDrawer({
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* Floating Prompt Capsule */}
-      <div className="border-t border-red-950/80 bg-[#0a0203] p-4 sm:p-5">
-        <div className="max-w-4xl lg:max-w-5xl mx-auto w-full">
+          {/* Floating Prompt Capsule */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -733,7 +748,7 @@ export default function AiTutorDrawer({
               rows={1}
               placeholder={
                 language === 'bn'
-                  ? "রসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো একাডেমিক প্রশ্ন বা সংশয় জিজ্ঞাসা করুন..."
+                  ? "রসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো প্রশ্ন বা সংশয় জিজ্ঞাসা করুন..."
                   : "Ask anything in Chemistry, Physics, Math, or request a drill..."
               }
               className="w-full resize-none bg-transparent px-3 py-1 text-sm text-white placeholder-slate-500 focus:outline-none leading-relaxed"
@@ -770,12 +785,12 @@ export default function AiTutorDrawer({
             </div>
           </form>
 
-          {/* Minimalist Disclaimer */}
-          <p className="mt-2 text-center text-[10px] text-slate-500">
-            PIECHEM AI (REDDISH BLACK AI) • Verify critical formulas for board and competitive exams.
+          {/* Minimalist Clean Disclaimer */}
+          <p className="text-center text-[10px] text-slate-500">
+            PIECHEM AI • Verify critical formulas for board and competitive exams.
           </p>
         </div>
-      </div>
+      </footer>
 
     </div>
   );

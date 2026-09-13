@@ -155,7 +155,7 @@ export default function PiechemAiLogo({
             </span>
           </div>
           <span className="text-[8px] font-extrabold tracking-[0.2em] text-red-400/90 uppercase mt-0.5">
-            REDDISH BLACK AI
+            SMART TUTOR
           </span>
         </div>
       )}
