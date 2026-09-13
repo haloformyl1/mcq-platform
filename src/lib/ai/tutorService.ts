@@ -150,45 +150,78 @@ function detectEducationalIntent(prompt: string, history: AiChatMessage[]): {
 }
 
 /**
- * Topic Resolution:
- * Explicit student intent ALWAYS takes 100% precedence over page context.
- * Page context is only consulted if the student query is referential (pronouns).
+ * Extract clean subject/topic title from an explicit student question.
+ * E.g.: "What is chirality?" -> "Chirality"
+ * E.g.: "Explain Newton's second law." -> "Newton's Second Law"
  */
-function resolveTopic(prompt: string, history: AiChatMessage[], context?: StudentContext): string {
-  const p = prompt.toLowerCase();
+function cleanTopicFromPrompt(prompt: string): string {
+  const p = prompt.trim();
+  const cleaned = p
+    .replace(/^(can you\s+)?(please\s+)?(explain|tell me about|what is|what are|define|describe|how does|why does|solve|help me with|teach me about|give me the solution for|discuss|elaborate on)\s+/i, '')
+    .replace(/[?!.]+$/, '')
+    .trim();
 
-  // 1. Direct explicit topics mentioned in the student query
-  const physicsMatches = prompt.match(/(?:newton's second law|newton's laws|newton|kinematics|gravitation|electrodynamics|quantum computing|quantum physics|optics|thermodynamics|relativity|work energy power)/i);
-  if (physicsMatches) return physicsMatches[0];
+  if (cleaned.length > 1 && cleaned.length < 60) {
+    return cleaned.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+  return cleaned || prompt;
+}
 
-  const mathMatches = prompt.match(/(?:solve|equation|calculus|integration|differentiation|algebra|probability|trigonometry|matrix|matrices|vectors)/i);
-  if (mathMatches) return mathMatches[0];
+/**
+ * Topic Resolution Engine:
+ * Precedence:
+ * 1. Explicit current user message (ALWAYS ABSOLUTE PRIORITY)
+ * 2. Relevant recent conversation context (if referential)
+ * 3. Active page context (ONLY if query is referential, e.g. "Why does it increase?")
+ */
+function resolveTopic(prompt: string, history: AiChatMessage[], context?: StudentContext): {
+  topic: string;
+  isReferential: boolean;
+} {
+  const p = prompt.trim().toLowerCase();
 
-  const bioMatches = prompt.match(/(?:photosynthesis|respiration|genetics|dna|mitosis|meiosis|cell cycle|ecology|evolution)/i);
-  if (bioMatches) return bioMatches[0];
+  // 1. Detect if the student query is strictly referential (pronoun-based follow-up)
+  const isReferential = (
+    p.startsWith('why does it') ||
+    p.startsWith('why is it') ||
+    p.startsWith('how does it') ||
+    p === 'why?' ||
+    p === 'how?' ||
+    p === 'explain this' ||
+    p === 'explain that' ||
+    p === 'explain it' ||
+    p === 'tell me more' ||
+    p.includes('example of it') ||
+    p.includes('example of this') ||
+    p.includes('quiz me on this') ||
+    p.includes('test me on this') ||
+    (p.includes('increase') && !p.includes('chirality') && !p.includes('newton') && !p.includes('photosynthesis') && !p.includes('radius') && !p.includes('energy') && !p.includes('force'))
+  );
 
-  const chemMatches = prompt.match(/(?:ionisation energy|ionization energy|atomic radius|electron affinity|electronegativity|periodic table|hybridisation|vsepr|equilibrium|chemical kinetics|coordination compounds|organic chemistry|sn1|sn2)/i);
-  if (chemMatches) return chemMatches[0];
-
-  // 2. Pronoun & referential follow-ups: check conversation history
-  const isReferential = p.includes(' it ') || p.startsWith('why does it') || p.startsWith('why is it') || 
-    p.includes('this') || p.includes('that') || p.includes('the same') || p.includes('example of it') ||
-    p === 'why?' || p === 'how?' || p.includes('explain that') || p.includes('quiz me on this');
-
-  if (isReferential && history && history.length > 0) {
-    for (let i = history.length - 1; i >= 0; i--) {
-      const msg = history[i];
-      const match = msg.content.match(/(?:newton's second law|newton's laws|photosynthesis|ionisation energy|ionization energy|atomic radius|electron affinity|electronegativity|quantum computing|calculus|integration|organic chemistry)/i);
-      if (match) return match[0];
+  // If referential, first check recent conversation history
+  if (isReferential) {
+    if (history && history.length > 0) {
+      for (let i = history.length - 1; i >= 0; i--) {
+        const msg = history[i];
+        if (msg.role === 'user' && msg.content) {
+          const userQ = msg.content.trim().toLowerCase();
+          if (!userQ.startsWith('why does it') && !userQ.startsWith('explain this') && userQ.length > 3) {
+            return { topic: cleanTopicFromPrompt(msg.content), isReferential: true };
+          }
+        }
+      }
     }
+    // Fall back to active page context ONLY for referential follow-ups
+    if (context?.topic) {
+      return { topic: context.topic, isReferential: true };
+    }
+    return { topic: context?.chapter || "General Academic Science", isReferential: true };
   }
 
-  // 3. Fallback to active page context ONLY if query was referential
-  if (isReferential && context?.topic) {
-    return context.topic;
-  }
-
-  return context?.topic || "General Academic Science";
+  // 2. Explicit question: The topic MUST be extracted directly from the user's prompt!
+  // Active page context (e.g. Ionisation Energy) is NEVER allowed to override user's question!
+  const extracted = cleanTopicFromPrompt(prompt);
+  return { topic: extracted, isReferential: false };
 }
 
 /**
@@ -321,7 +354,7 @@ export async function askEducationalTutor(params: {
   // --------------------------------------------------------------------------
   // STEP 3: TOPIC RESOLUTION (USER INTENT WINS OVER PAGE CONTEXT)
   // --------------------------------------------------------------------------
-  const activeTopic = resolveTopic(prompt, history, context);
+  const { topic: activeTopic, isReferential } = resolveTopic(prompt, history, context);
 
   // --------------------------------------------------------------------------
   // STEP 4: STUDENT TELEMETRY TOOL (NeonDB)
@@ -455,7 +488,7 @@ export async function askEducationalTutor(params: {
   const systemInstruction = buildOpenEndedTutorPrompt({
     level: activeLevel,
     language: activeLanguage,
-    context,
+    context: isReferential ? context : { ...context, topic: activeTopic, chapter: undefined },
     groundedMaterials: explicitlyRequestsNotes || hasPiechemMaterials ? groundedMaterials : [],
     studentProfileSummary,
     detectedIntent: analysis.intent,
@@ -468,20 +501,45 @@ export async function askEducationalTutor(params: {
     return `${roleLabel}: ${msg.content}`;
   }).join('\n\n');
 
+  // ONLY inject Active Topic Context if the student's question is explicitly referential!
+  // If the student asked a direct question (e.g. "What is chirality?"), do NOT pollute with page context.
   const fullPrompt = historyText
-    ? `[ACTIVE TOPIC CONTEXT: ${activeTopic}]\n\n${historyText}\n\nStudent: ${prompt}\nPIECHEM AI Tutor:`
-    : `[ACTIVE TOPIC CONTEXT: ${activeTopic}]\n\nStudent: ${prompt}\nPIECHEM AI Tutor:`;
+    ? (isReferential
+        ? `[Active Topic Context: ${activeTopic}]\n\n${historyText}\n\nStudent: ${prompt}\nPIECHEM AI Tutor:`
+        : `${historyText}\n\nStudent: ${prompt}\nPIECHEM AI Tutor:`)
+    : (isReferential
+        ? `[Active Topic Context: ${activeTopic}]\n\nStudent: ${prompt}\nPIECHEM AI Tutor:`
+        : `Student: ${prompt}\nPIECHEM AI Tutor:`);
 
   // --------------------------------------------------------------------------
   // STEP 7: CALL GOOGLE GEMINI (CORE MODEL) WITH SELECTIVE GROUNDING
   // --------------------------------------------------------------------------
   const enableGrounding = analysis.isResearchQuery;
 
+  // Safe non-sensitive diagnostic trace
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_AI_DEBUG === 'true') {
+    console.log('[AI_DISPATCH_TRACE]', {
+      USER_MESSAGE: prompt,
+      RESOLVED_TOPIC: activeTopic,
+      IS_REFERENTIAL: isReferential,
+      PAGE_CONTEXT_TOPIC: context?.topic,
+      WILL_CALL_GEMINI: Boolean(userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY)
+    });
+  }
+
   const geminiResult = await callGemini(fullPrompt, {
     systemInstruction,
     userApiKey,
     enableGrounding
   });
+
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_AI_DEBUG === 'true') {
+    console.log('[AI_EXECUTION_RESULT]', {
+      MODEL_USED: geminiResult ? geminiResult.model : 'Autonomous Educational Engine (Fallback)',
+      GROUNDING_USED: geminiResult?.searchGroundingUsed || false,
+      ANSWER_PREVIEW: (geminiResult?.text || '').slice(0, 100)
+    });
+  }
 
   if (geminiResult && geminiResult.text) {
     // Determine exact source attribution
@@ -584,6 +642,14 @@ function synthesizeDynamicResponse(params: {
 }): string {
   const { prompt, topic, isBengali, isResearchQuery, researchSnippets, groundedNotes } = params;
   const p = prompt.toLowerCase();
+
+  // 0. Organic Chemistry: Chirality & Stereoisomerism (Directly answers user's prompt!)
+  if (p.includes('chirality') || topic.toLowerCase().includes('chirality') || p.includes('chiral')) {
+    if (isBengali) {
+      return `**কাইরালিটি (Chirality) এবং কাইরাল কার্বন**:\n\nরসায়নে **কাইরালিটি** হলো কোনো অণুর এমন একটি জ্যামিতিক বৈশিষ্ট্য যার ফলে অণুটি তার নিজের দর্পণ প্রতিবিম্বের (Mirror Image) ওপর উপরিপাতযোগ্য (Non-superimposable) হয় না—ঠিক যেমন আমাদের ডান ও বাঁ হাত।\n\n- **কাইরাল কেন্দ্র বা অসমমিত কার্বন ($C^*$)**: যে কার্বন পরমাণুর চারটি যোজ্যতা চারটি সম্পূর্ণ ভিন্ন পরমাণু বা মূলক দ্বারা যুক্ত থাকে, তাকে কাইরাল কেন্দ্র (Stereocenter) বলে।\n- **এনানশিওমার (Enantiomers)**: পরস্পর নন-সুপারইম্পোজিবল দর্পণ প্রতিবিম্ব স্টেরিওআইসোমার জোড়া, যা সমতল সমবর্তিত আলোর তলকে বিপরীত দিকে আবর্তন করে ($d/(+)$ ও $l/(-)$)।\n- **শর্তাবলী**: অণুতে কোনো প্রতিসাম্য তল (Plane of Symmetry, $\\sigma$) বা প্রতিসাম্য কেন্দ্র (Center of Inversion, $i$) থাকা চলবে না।\n\n**বাস্তব প্রয়োগ**: বিভিন্ন ওষুধে (যেমন থ্যালিডোমাইড, আইবুপ্রোফেন) এক এনানশিওমার জীবনদায়ী ও ফলপ্রসূ হলেও অন্যটি সম্পূর্ণ নিষ্ক্রিয় বা ক্ষতিকারক হতে পারে।`;
+    }
+    return `**Chirality** (derived from the Greek *kheir*, meaning "hand") is a geometric property of a molecule that makes it **non-superimposable on its mirror image**, much like human left and right hands.\n\n### Core Principles of Chirality:\n\n1. **Chiral Center / Asymmetric Carbon ($C^*$)**:\n   A tetrahedral carbon atom bonded to four distinctly different atoms or functional groups. For example, in Lactic acid:\n   $\\text{CH}_3-\\text{C}^*\\text{H}(\\text{OH})-\\text{COOH}$\n\n2. **Enantiomers**:\n   Pairs of stereoisomers that are non-superimposable mirror images of each other. They share identical physical properties (melting point, boiling point, density) but rotate plane-polarized light in equal and opposite directions ($d/(+)$ vs $l/(-)$).\n\n3. **Symmetry Criteria for Chirality**:\n   A molecule is chiral if and only if it **lacks an improper axis of rotation ($S_n$)**, meaning it has:\n   - **No plane of symmetry** ($\\sigma$)\n   - **No center of inversion** ($i$)\n\n4. **Pharmacological Significance**:\n   Biological receptors and enzymes are themselves chiral. Consequently, two enantiomers of a drug often have vastly different pharmacological effects (e.g., $R$-Thalidomide vs $S$-Thalidomide).\n\n*Would you like to solve an example problem identifying chiral centers or determine $R/S$ configurations?*`;
+  }
 
   // 1. Math step-by-step problem: 2x + 5 = 15
   if (p.includes('2x + 5 = 15') || (p.includes('solve') && p.includes('2x'))) {
