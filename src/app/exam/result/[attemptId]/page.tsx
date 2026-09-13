@@ -1,4 +1,6 @@
 "use client";
+
+import FormattedAiMessage from "@/components/ai/FormattedAiMessage";
 import AiQuestionExplainerModal from "@/components/AiQuestionExplainerModal";
 import PostExamAiAnalysisModal from "@/components/ai/PostExamAiAnalysisModal";
 import { Sparkles as SparklesIcon } from "lucide-react";
@@ -239,10 +241,10 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2 mb-3">
                         <div className="flex-1">
-                          <p className="font-semibold text-sm sm:text-base text-white leading-relaxed break-words">
+                          <div className="font-semibold text-sm sm:text-base text-white leading-relaxed break-words">
                             <span className="text-blue-400 font-bold mr-2">Q{idx + 1}.</span>
-                            {q.questionText}
-                          </p>
+                            <FormattedAiMessage content={q.questionText} className="inline text-inherit [&_p]:inline" />
+                          </div>
                           {q.imageUrl && (
                             <div className="mt-3 mb-2 flex justify-center">
                               <div className="relative max-w-full rounded-lg overflow-hidden border border-[#404040] bg-black/40 p-1.5 shadow-md">
@@ -294,7 +296,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                                 <span className="font-bold w-6 h-6 flex items-center justify-center rounded bg-black/40 text-xs shrink-0 border border-white/10">
                                   {opt}
                                 </span>
-                                <span className="break-words leading-snug">{optionText}</span>
+                                <div className="break-words leading-snug flex-1"><FormattedAiMessage content={optionText} className="text-inherit [&_p]:text-inherit [&_.katex]:text-inherit" /></div>
                               </div>
                               {isSelected && (
                                 <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-black/40 shrink-0">
@@ -327,7 +329,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                       {q.explanation && (
                         <div className="mt-3 p-3.5 rounded-lg bg-[#222222] border border-[#333333] text-xs text-[#cccccc] break-words">
                           <span className="font-bold text-white block mb-1">Explanation:</span>
-                          {q.explanation}
+                          <FormattedAiMessage content={q.explanation} className="text-[#cccccc]" />
                         </div>
                       )}
                     </div>

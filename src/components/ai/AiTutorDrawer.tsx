@@ -100,7 +100,31 @@ export default function AiTutorDrawer({
   initialContext
 }: AiTutorDrawerProps) {
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
-  const [language, setLanguage] = useState<'en' | 'bn'>('en');
+  const [language, setLanguage] = useState<'en' | 'bn'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('piechem_ai_lang') as 'en' | 'bn') || 'en';
+    }
+    return 'en';
+  });
+
+  // Synchronize language across all PIECHEM AI tools
+  useEffect(() => {
+    const handleGlobalLang = (e: any) => {
+      if (e?.detail && (e.detail === 'en' || e.detail === 'bn')) {
+        setLanguage(e.detail);
+      }
+    };
+    window.addEventListener('piechem-language-changed', handleGlobalLang);
+    return () => window.removeEventListener('piechem-language-changed', handleGlobalLang);
+  }, []);
+
+  const handleToggleLang = (newLang: 'en' | 'bn') => {
+    setLanguage(newLang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('piechem_ai_lang', newLang);
+      window.dispatchEvent(new CustomEvent('piechem-language-changed', { detail: newLang }));
+    }
+  };
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLevelMenu, setShowLevelMenu] = useState(false);
   
@@ -337,7 +361,7 @@ export default function AiTutorDrawer({
             <div className="flex items-center rounded-lg bg-white/[0.05] border border-white/[0.08] p-0.5 text-xs font-medium">
               <button
                 type="button"
-                onClick={() => setLanguage('en')}
+                onClick={() => handleToggleLang('en')}
                 className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
                   language === 'en' 
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-sm font-semibold' 
@@ -348,7 +372,7 @@ export default function AiTutorDrawer({
               </button>
               <button
                 type="button"
-                onClick={() => setLanguage('bn')}
+                onClick={() => handleToggleLang('bn')}
                 className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
                   language === 'bn' 
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-sm font-semibold' 

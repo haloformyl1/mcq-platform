@@ -5,6 +5,7 @@ import {
   X, Sparkles, AlertCircle, CheckCircle2, BookOpen, Lightbulb, 
   Atom, Loader2, ArrowRight, RefreshCw, Languages, HelpCircle 
 } from "lucide-react";
+import FormattedAiMessage from "./ai/FormattedAiMessage";
 
 interface AiExplainerProps {
   isOpen: boolean;
@@ -33,7 +34,25 @@ export default function AiQuestionExplainerModal({
   const [diagnosis, setDiagnosis] = useState<any>(null);
   const [hintLevel, setHintLevel] = useState<number>(1);
   const [showFullSolution, setShowFullSolution] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'bn'>('en');
+  
+  // Persistent language state (synchronized with other AI tools)
+  const [language, setLanguage] = useState<'en' | 'bn'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('piechem_ai_lang') as 'en' | 'bn') || 'en';
+    }
+    return 'en';
+  });
+
+  // Listen for language changes from other modals/drawers
+  useEffect(() => {
+    const handleGlobalLang = (e: any) => {
+      if (e?.detail && (e.detail === 'en' || e.detail === 'bn')) {
+        setLanguage(e.detail);
+      }
+    };
+    window.addEventListener('piechem-language-changed', handleGlobalLang);
+    return () => window.removeEventListener('piechem-language-changed', handleGlobalLang);
+  }, []);
 
   const fetchDoubtSolution = (level: number, full: boolean, lang: 'en' | 'bn') => {
     setLoading(true);
@@ -54,7 +73,6 @@ export default function AiQuestionExplainerModal({
         options: optionsMap,
         selectedAnswer,
         correctAnswer,
-        originalExplanation: question.explanation,
         hintLevel: level,
         revealFullSolution: full,
         language: lang
@@ -91,6 +109,10 @@ export default function AiQuestionExplainerModal({
 
   const handleToggleLang = (lang: 'en' | 'bn') => {
     setLanguage(lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('piechem_ai_lang', lang);
+      window.dispatchEvent(new CustomEvent('piechem-language-changed', { detail: lang }));
+    }
     fetchDoubtSolution(hintLevel, showFullSolution, lang);
   };
 
@@ -127,8 +149,8 @@ export default function AiQuestionExplainerModal({
               <button
                 type="button"
                 onClick={() => handleToggleLang('en')}
-                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all ${
-                  language === 'en' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-white'
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                  language === 'en' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 EN
@@ -136,8 +158,8 @@ export default function AiQuestionExplainerModal({
               <button
                 type="button"
                 onClick={() => handleToggleLang('bn')}
-                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all ${
-                  language === 'bn' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-white'
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                  language === 'bn' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 বাংলা
@@ -154,11 +176,11 @@ export default function AiQuestionExplainerModal({
           </div>
         </div>
 
-        {/* Question Review Strip */}
+        {/* Question Review Strip with KaTeX formula support */}
         <div className="bg-black/40 border-b border-white/10 p-4 space-y-2">
-          <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-relaxed break-words">
-            {question.questionText}
-          </p>
+          <div className="text-xs sm:text-sm font-semibold text-slate-200 leading-relaxed break-words">
+            <FormattedAiMessage content={question.questionText} className="text-slate-200 font-semibold" />
+          </div>
 
           <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
             <span className={`font-mono px-2 py-0.5 rounded border ${
@@ -193,7 +215,7 @@ export default function AiQuestionExplainerModal({
           ) : diagnosis ? (
             <div className="space-y-4">
               
-              {/* Progressive Hint Box */}
+              {/* Progressive Hint Box with KaTeX Equations */}
               {!showFullSolution && (
                 <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-3">
                   <div className="flex items-center justify-between text-xs">
@@ -205,9 +227,14 @@ export default function AiQuestionExplainerModal({
                       {hintLevel === 1 ? "Conceptual Clue" : hintLevel === 2 ? "Specific Guidance" : "Approach"}
                     </span>
                   </div>
-                  <p className="text-sm text-amber-100 leading-relaxed font-medium">
-                    {diagnosis.content || diagnosis.hint || diagnosis.explanation}
-                  </p>
+                  
+                  {/* KaTeX Equation Rendered Hint Content */}
+                  <div className="text-sm text-amber-100 leading-relaxed font-medium">
+                    <FormattedAiMessage 
+                      content={diagnosis.content || diagnosis.hint || diagnosis.explanation} 
+                      className="text-amber-100 [&_p]:text-amber-100 [&_.katex]:text-amber-200"
+                    />
+                  </div>
 
                   <div className="pt-2 border-t border-amber-500/20 flex flex-wrap items-center justify-between gap-2">
                     {hintLevel < 3 ? (
@@ -235,7 +262,7 @@ export default function AiQuestionExplainerModal({
                 </div>
               )}
 
-              {/* Full Detailed Solution */}
+              {/* Full Detailed Solution with KaTeX Equations */}
               {showFullSolution && (
                 <div className="space-y-3 animate-in fade-in duration-200">
                   {/* Why Choice was Incorrect */}
@@ -245,9 +272,9 @@ export default function AiQuestionExplainerModal({
                         <AlertCircle className="w-3.5 h-3.5" />
                         {language === 'bn' ? "আপনার উত্তরটি কেন ভুল ছিল" : "Why Your Answer Was Incorrect"}
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
-                        {diagnosis.whyIncorrect}
-                      </p>
+                      <div className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                        <FormattedAiMessage content={diagnosis.whyIncorrect} className="text-slate-200" />
+                      </div>
                     </div>
                   )}
 
@@ -256,23 +283,23 @@ export default function AiQuestionExplainerModal({
                     <div className="rounded-xl border border-cyan-500/30 bg-[#091f30] p-3.5 space-y-1">
                       <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
                         <Atom className="w-3.5 h-3.5" />
-                        {language === 'bn' ? "মূল রসায়ন ধারণা" : "Core Academic Concept"}
+                        {language === 'bn' ? "মূল অ্যাকাডেমিক ধারণা" : "Core Academic Concept"}
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
-                        {diagnosis.correctConcept}
-                      </p>
+                      <div className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                        <FormattedAiMessage content={diagnosis.correctConcept} className="text-slate-200" />
+                      </div>
                     </div>
                   )}
 
                   {/* Step-by-Step Reasoning */}
-                  {diagnosis.explanation && (
+                  {(diagnosis.explanation || diagnosis.content) && (
                     <div className="rounded-xl border border-white/10 bg-black/40 p-4 space-y-2">
                       <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        {language === 'bn' ? "ধাপে ধাপে বিশ্লেষণ ও সঠিক উত্তর" : "Step-by-Step Explanation"}
+                        {language === 'bn' ? "ধাপে ধাপে বিশ্লেষণ ও সমাধান" : "Step-by-Step Explanation"}
                       </div>
-                      <div className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
-                        {diagnosis.content || diagnosis.explanation}
+                      <div className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                        <FormattedAiMessage content={diagnosis.content || diagnosis.explanation} className="text-slate-200" />
                       </div>
                     </div>
                   )}
@@ -281,9 +308,9 @@ export default function AiQuestionExplainerModal({
                   {diagnosis.commonMistake && (
                     <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-3 text-xs text-amber-200">
                       <strong className="text-amber-300 font-bold block mb-1">
-                        {language === 'bn' ? "সাধারণ ভুল ফাঁদ:" : "Common Exam Mistake Trap:"}
+                        {language === 'bn' ? "সাধারণ পরীক্ষার ফাঁদ:" : "Common Exam Mistake Trap:"}
                       </strong>
-                      {diagnosis.commonMistake}
+                      <FormattedAiMessage content={diagnosis.commonMistake} className="text-amber-200" />
                     </div>
                   )}
 
@@ -291,9 +318,9 @@ export default function AiQuestionExplainerModal({
                   {diagnosis.similarExample && (
                     <div className="rounded-xl border border-white/5 bg-white/5 p-3 text-xs text-slate-300">
                       <strong className="text-cyan-300 font-bold block mb-1">
-                        {language === 'bn' ? "অনুরূপ উদাহরণ:" : "Similar Academic Application:"}
+                        {language === 'bn' ? "অনুরূপ অ্যাকাডেমিক প্রয়োগ:" : "Similar Academic Application:"}
                       </strong>
-                      {diagnosis.similarExample}
+                      <FormattedAiMessage content={diagnosis.similarExample} className="text-slate-300" />
                     </div>
                   )}
                 </div>
@@ -311,7 +338,7 @@ export default function AiQuestionExplainerModal({
             onClick={onClose}
             className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all cursor-pointer"
           >
-            Got It
+            {language === 'bn' ? "বুঝেছি" : "Got It"}
           </button>
         </div>
 
