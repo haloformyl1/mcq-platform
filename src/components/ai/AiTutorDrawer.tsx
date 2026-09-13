@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { 
   Sparkles, X, Send, Bot, User, Trash2, ArrowRight, 
   Atom, CheckCircle2, ChevronRight, BookOpen, Brain, 
-  Languages, GraduationCap, Copy, Check, RefreshCw, Calendar, Lightbulb
+  Languages, GraduationCap, Copy, Check, RefreshCw, Calendar, 
+  Lightbulb, HelpCircle, Layers, FileText, Globe, Activity
 } from "lucide-react";
 
 interface Message {
@@ -12,7 +13,10 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   groundedInPiechem?: boolean;
+  sourceCategory?: 'PIECHEM_MATERIAL' | 'STUDENT_DATA' | 'GENERAL_ACADEMIC';
   citations?: string[];
+  suggestedFollowUps?: string[];
+  activeTopic?: string;
   timestamp: string;
 }
 
@@ -31,75 +35,6 @@ interface AiTutorDrawerProps {
   initialContext?: AcademicContext;
 }
 
-const CHAPTERS_AND_TOPICS: Record<string, string[]> = {
-  "Periodic Table & Periodicity": [
-    "Atomic Radius & Ionic Radius",
-    "Ionisation Energy (IE) Trends & Exceptions",
-    "Electron Gain Enthalpy",
-    "Electronegativity (Pauling Scale)",
-    "Diagonal Relationships"
-  ],
-  "Atomic Structure": [
-    "Bohr Model & Rydberg Formula",
-    "de Broglie Hypothesis & Heisenberg Uncertainty",
-    "Quantum Numbers (n, l, m, s)",
-    "Aufbau Principle, Pauli Exclusion & Hund's Rule",
-    "Electronic Configurations & Half-filled Stability"
-  ],
-  "Chemical Bonding & Molecular Structure": [
-    "Lewis Structures & Formal Charge",
-    "VSEPR Theory & Molecular Geometry",
-    "Hybridisation (sp, sp2, sp3, sp3d, sp3d2)",
-    "Molecular Orbital Theory (MOT) & Bond Order",
-    "Hydrogen Bonding & Dipole Moments"
-  ],
-  "Thermodynamics & Thermochemistry": [
-    "First Law of Thermodynamics (ΔU = q + w)",
-    "Enthalpy Changes (ΔH) & Hess's Law",
-    "Entropy (ΔS) & Second Law",
-    "Gibbs Free Energy (ΔG) & Spontaneity"
-  ],
-  "Organic Chemistry Fundamentals": [
-    "IUPAC Nomenclature Rules",
-    "Inductive & Electromeric Effects",
-    "Resonance & Mesomeric Effects",
-    "Hyperconjugation & Carbocation Stability",
-    "Isomerism (Structural & Stereoisomerism)"
-  ]
-};
-
-const MODE_PROMPTS: Record<string, string[]> = {
-  tutor: [
-    "Explain periodicity of ionisation energy across Period 2 & 3.",
-    "Why does atomic radius decrease across a period?",
-    "Why is first IE of Nitrogen higher than Oxygen?",
-    "Teach me Quantum Numbers from basics with examples."
-  ],
-  practice: [
-    "Give me 5 moderate MCQs from Atomic Structure with explanations.",
-    "Quiz me on Periodic Trends exceptions.",
-    "Generate 3 HOTS questions on Chemical Bonding.",
-    "Give me 5 assertion-reason questions on Thermodynamics."
-  ],
-  doubt: [
-    "Does SN1 substitution always produce a 100% racemic mixture?",
-    "Why is pyridine more basic than pyrrole?",
-    "Can a catalyst shift the equilibrium position of a reaction?",
-    "Why does BF3 act as a Lewis acid despite having octet deficiency?"
-  ],
-  revision: [
-    "Give me a 5-minute high-yield summary of Periodic Trends.",
-    "Summarize all Quantum Numbers rules (Pauli, Hund, Aufbau).",
-    "List common exam mistakes in VSEPR geometry.",
-    "Important formula cheat-sheet for Thermodynamics."
-  ],
-  study_plan: [
-    "Create a realistic 7-day Chemistry revision schedule for me.",
-    "How should I revise Periodic Table and Atomic Structure in 3 days?",
-    "Recommend a daily strategy for mastering my weak chapters."
-  ]
-};
-
 export default function AiTutorDrawer({
   isOpen,
   onClose,
@@ -113,21 +48,31 @@ export default function AiTutorDrawer({
   const [context, setContext] = useState<AcademicContext>(initialContext || {
     subject: "Chemistry",
     className: "Class 11",
-    chapter: "Periodic Table & Periodicity",
-    topic: "Ionisation Energy (IE) Trends & Exceptions"
+    chapter: "Periodic Table",
+    topic: "Ionisation Energy"
   });
 
+  const [activeTopic, setActiveTopic] = useState<string>("Ionisation Energy");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>([
+    "Why does atomic radius decrease across a period?",
+    "Explain ionisation energy periodicity simply",
+    "What are the exceptions in Period 2?",
+    "Now quiz me on this with 3 MCQs"
+  ]);
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       role: 'assistant',
       content: language === 'bn' 
-        ? "নমস্কার! আমি আপনার **PIECHEM এআই স্টাডি টিউটর**।\n\nআমি আপনার রসায়ন ও বিজ্ঞান বিষয়ের সমস্ত ধারণা সহজভাবে বোঝাতে, কুইজ নিতে এবং পরীক্ষার জন্য প্রস্তুত করতে সাহায্য করব। আপনি যেকোনো প্রশ্ন বাংলা অথবা ইংরেজিতে জিজ্ঞাসা করতে পারেন!"
-        : "Hello! I am your **PIECHEM AI Study Tutor**.\n\nI am connected to PIECHEM's academic syllabus and question vaults. I adapt to your level (Beginner, Intermediate, Advanced) and can explain concepts step-by-step, generate validated MCQs, or build custom revision plans.\n\nHow can I help your preparation today?",
+        ? "নমস্কার! আমি আপনার **PIECHEM এআই স্টাডি টিউটর**।\n\nরসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো সাধারণ প্রশ্ন নির্দ্বিধায় জিজ্ঞাসা করুন। আমি আপনার সাথে স্বাভাবিক কথোপকথনে ধারণা ব্যাখ্যা করতে, উদাহরণ দিতে, কুইজ নিতে এবং দুর্বল বিষয় শনাক্ত করতে প্রস্তুত।"
+        : "Hello! I am your **PIECHEM AI Study Tutor**.\n\nAsk me any natural question across **Chemistry, Physics, Mathematics, Biology, or study strategies**. I maintain our conversational context, resolve follow-up questions, and can generate adaptive quizzes or progressive hints whenever you are ready!\n\nWhat would you like to explore or solve right now?",
+      sourceCategory: 'GENERAL_ACADEMIC',
+      groundedInPiechem: false,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -140,7 +85,10 @@ export default function AiTutorDrawer({
   }, [initialMode]);
 
   useEffect(() => {
-    if (initialContext) setContext(initialContext);
+    if (initialContext) {
+      setContext(initialContext);
+      if (initialContext.topic) setActiveTopic(initialContext.topic);
+    }
   }, [initialContext]);
 
   useEffect(() => {
@@ -170,18 +118,22 @@ export default function AiTutorDrawer({
     try {
       const history = messages
         .filter(m => m.id !== 'welcome')
-        .slice(-6)
+        .slice(-8)
         .map(m => ({ role: m.role, content: m.content }));
 
       const res = await fetch("/api/ai/tutor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          prompt: questionText,
           message: questionText,
           mode,
           level,
           language,
-          context,
+          context: {
+            ...context,
+            topic: activeTopic
+          },
           history
         })
       });
@@ -191,12 +143,23 @@ export default function AiTutorDrawer({
         throw new Error(data.error || "Failed to reach AI tutor");
       }
 
+      if (data.activeTopic) {
+        setActiveTopic(data.activeTopic);
+      }
+
+      if (data.suggestedFollowUps && data.suggestedFollowUps.length > 0) {
+        setDynamicSuggestions(data.suggestedFollowUps);
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.reply,
+        content: data.reply || data.answer,
         groundedInPiechem: data.groundedInPiechem,
-        citations: data.citations,
+        sourceCategory: data.sourceCategory || (data.groundedInPiechem ? 'PIECHEM_MATERIAL' : 'GENERAL_ACADEMIC'),
+        citations: data.sources || [],
+        suggestedFollowUps: data.suggestedFollowUps || [],
+        activeTopic: data.activeTopic,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -206,6 +169,8 @@ export default function AiTutorDrawer({
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: `**Notice**: ${err.message || "An unexpected error occurred. Please try asking again."}`,
+        sourceCategory: 'GENERAL_ACADEMIC',
+        groundedInPiechem: false,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -226,15 +191,23 @@ export default function AiTutorDrawer({
         id: 'welcome-fresh',
         role: 'assistant',
         content: language === 'bn'
-          ? "কথোপকথন পরিষ্কার করা হয়েছে। আপনি আপনার নতুন প্রশ্ন জিজ্ঞাসা করতে পারেন।"
-          : "Conversation cleared. Feel free to ask any new question or choose a topic to explore!",
+          ? "কথোপকথন পরিষ্কার করা হয়েছে। আপনি আপনার যেকোনো নতুন প্রশ্ন জিজ্ঞাসা করতে পারেন।"
+          : "Conversation cleared. Feel free to ask any academic question or explore a new concept!",
+        sourceCategory: 'GENERAL_ACADEMIC',
+        groundedInPiechem: false,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
+    ]);
+    setDynamicSuggestions([
+      "Explain periodicity of ionisation energy",
+      "What is the difference between orbit and orbital?",
+      "Why is nitrogen's first IE higher than oxygen?",
+      "Now quiz me with 3 MCQs"
     ]);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
       {/* Drawer Container */}
       <div className="flex h-full w-full max-w-2xl flex-col bg-[#071622] border-l border-cyan-500/30 text-white shadow-2xl shadow-cyan-950/80 animate-in slide-in-from-right duration-300">
         
@@ -249,10 +222,10 @@ export default function AiTutorDrawer({
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-base tracking-tight text-white">PIECHEM AI Tutor</h3>
                   <span className="rounded-full bg-cyan-950 px-2 py-0.5 text-[10px] font-semibold text-cyan-300 border border-cyan-500/40">
-                    Live Mentor
+                    Open-Ended Core
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400">Contextual pedagogical academic assistant</p>
+                <p className="text-[11px] text-slate-400">Conversational, multi-turn academic learning assistant</p>
               </div>
             </div>
 
@@ -289,41 +262,12 @@ export default function AiTutorDrawer({
             </div>
           </div>
 
-          {/* Mode Selector Tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-1 text-xs no-scrollbar">
-            {[
-              { key: 'tutor', label: 'Tutor Mode', icon: GraduationCap },
-              { key: 'practice', label: 'Practice MCQs', icon: CheckCircle2 },
-              { key: 'doubt', label: 'Doubt Solver', icon: Lightbulb },
-              { key: 'revision', label: 'Revision Notes', icon: BookOpen },
-              { key: 'study_plan', label: 'Study Planner', icon: Calendar }
-            ].map(tab => {
-              const Icon = tab.icon;
-              const isActive = mode === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  type="button"
-                  onClick={() => setMode(tab.key as any)}
-                  className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 font-medium transition-all cursor-pointer ${
-                    isActive 
-                      ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/30' 
-                      : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
           {/* Academic Context & Level Bar */}
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-black/40 border border-white/5 px-3 py-1.5 text-xs">
             <div className="flex items-center gap-1.5 text-slate-300 truncate max-w-full sm:max-w-md">
-              <span className="font-semibold text-cyan-400 shrink-0">Context:</span>
-              <span className="text-slate-400 truncate">
-                {context.subject} &rarr; {context.chapter || 'All Chapters'} {context.topic ? `&rarr; ${context.topic}` : ''}
+              <span className="font-semibold text-cyan-400 shrink-0">Active Topic:</span>
+              <span className="text-cyan-200 font-medium truncate">
+                {activeTopic || context.topic || context.chapter || 'Academic Concept'}
               </span>
             </div>
 
@@ -362,17 +306,31 @@ export default function AiTutorDrawer({
                   </div>
                 )}
 
-                <div className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed shadow-lg ${
+                <div className={`max-w-[88%] rounded-2xl p-4 text-sm leading-relaxed shadow-lg ${
                   isUser 
                     ? 'bg-cyan-600 text-white rounded-br-xs' 
                     : 'bg-[#0e2233] border border-white/10 text-slate-200 rounded-bl-xs'
                 }`}>
                   
-                  {/* Grounded Badge */}
-                  {!isUser && m.groundedInPiechem && (
-                    <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-cyan-950/80 px-2.5 py-0.5 text-[10px] font-semibold text-cyan-300 border border-cyan-500/30">
-                      <BookOpen className="h-3 w-3" />
-                      <span>Grounded in PIECHEM Study Vault</span>
+                  {/* Source Transparency Badge */}
+                  {!isUser && (
+                    <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
+                      {m.sourceCategory === 'PIECHEM_MATERIAL' ? (
+                        <div className="inline-flex items-center gap-1 rounded-full bg-emerald-950/80 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-300 border border-emerald-500/40 shadow-sm">
+                          <BookOpen className="h-3 w-3 text-emerald-400" />
+                          <span>From PIECHEM Study Materials</span>
+                        </div>
+                      ) : m.sourceCategory === 'STUDENT_DATA' ? (
+                        <div className="inline-flex items-center gap-1 rounded-full bg-cyan-950/80 px-2.5 py-0.5 text-[10px] font-semibold text-cyan-300 border border-cyan-500/40 shadow-sm">
+                          <Activity className="h-3 w-3 text-cyan-400" />
+                          <span>From Your PIECHEM Test Telemetry</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2.5 py-0.5 text-[10px] font-semibold text-slate-300 border border-white/10 shadow-sm">
+                          <Globe className="h-3 w-3 text-slate-400" />
+                          <span>General Academic Explanation</span>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -381,21 +339,70 @@ export default function AiTutorDrawer({
                     {m.content}
                   </div>
 
-                  {/* Citations / Sources */}
+                  {/* Real Citations */}
                   {!isUser && m.citations && m.citations.length > 0 && (
                     <div className="mt-3 pt-2 border-t border-white/10 text-[11px] text-slate-400">
-                      <span className="font-semibold text-cyan-300">Sources:</span> {m.citations.join(', ')}
+                      <span className="font-semibold text-cyan-300">Source:</span> {m.citations.join(' • ')}
                     </div>
                   )}
 
-                  {/* Footer & Copy */}
-                  <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400/80 pt-1 border-t border-white/5">
-                    <span>{m.timestamp}</span>
-                    {!isUser && (
+                  {/* 1-Click Interactive Response Actions (Section 24) */}
+                  {!isUser && m.id !== 'welcome' && (
+                    <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-wrap items-center gap-1.5 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => handleSendMessage("Explain this more simply with an easy analogy")}
+                        className="inline-flex items-center gap-1 rounded-md bg-white/5 hover:bg-cyan-950/60 hover:text-cyan-300 border border-white/5 hover:border-cyan-500/30 px-2 py-1 text-[11px] text-slate-300 transition-all cursor-pointer"
+                        title="Explain more simply"
+                      >
+                        <Lightbulb className="h-3 w-3 text-amber-400" />
+                        <span>Simplify</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendMessage("Explain this with deeper reasoning, mechanisms, and exceptions")}
+                        className="inline-flex items-center gap-1 rounded-md bg-white/5 hover:bg-cyan-950/60 hover:text-cyan-300 border border-white/5 hover:border-cyan-500/30 px-2 py-1 text-[11px] text-slate-300 transition-all cursor-pointer"
+                        title="Explain deeper"
+                      >
+                        <Atom className="h-3 w-3 text-cyan-400" />
+                        <span>Deeper</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendMessage("Give me an intuitive everyday analogy for this concept")}
+                        className="inline-flex items-center gap-1 rounded-md bg-white/5 hover:bg-cyan-950/60 hover:text-cyan-300 border border-white/5 hover:border-cyan-500/30 px-2 py-1 text-[11px] text-slate-300 transition-all cursor-pointer"
+                        title="Give analogy"
+                      >
+                        <Sparkles className="h-3 w-3 text-yellow-400" />
+                        <span>Analogy</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendMessage("Now test me on this with 3 practice MCQs")}
+                        className="inline-flex items-center gap-1 rounded-md bg-white/5 hover:bg-emerald-950/60 hover:text-emerald-300 border border-white/5 hover:border-emerald-500/30 px-2 py-1 text-[11px] text-slate-300 transition-all cursor-pointer"
+                        title="Test me"
+                      >
+                        <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                        <span>Quiz Me</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendMessage("Explain this concept in Bengali (বাংলায় অনুবাদ ও ব্যাখ্যা করো)")}
+                        className="inline-flex items-center gap-1 rounded-md bg-white/5 hover:bg-blue-950/60 hover:text-blue-300 border border-white/5 hover:border-blue-500/30 px-2 py-1 text-[11px] text-slate-300 transition-all cursor-pointer"
+                        title="Bengali explanation"
+                      >
+                        <Languages className="h-3 w-3 text-blue-400" />
+                        <span>বাংলা</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => handleCopy(m.id, m.content)}
-                        className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-md bg-white/5 hover:bg-white/10 px-2 py-1 text-[11px] text-slate-400 hover:text-white transition-all cursor-pointer ml-auto"
                         title="Copy text"
                       >
                         {copiedId === m.id ? (
@@ -410,7 +417,12 @@ export default function AiTutorDrawer({
                           </>
                         )}
                       </button>
-                    )}
+                    </div>
+                  )}
+
+                  {/* Timestamp */}
+                  <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400/80 pt-1 border-t border-white/5">
+                    <span>{m.timestamp}</span>
                   </div>
                 </div>
 
@@ -438,11 +450,11 @@ export default function AiTutorDrawer({
           <div ref={chatEndRef} />
         </div>
 
-        {/* Suggested Quick Prompt Chips */}
+        {/* Suggested Dynamic Follow-Up Prompt Chips */}
         <div className="border-t border-white/10 bg-[#081a28] px-4 py-2">
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            <span className="text-[10px] font-semibold text-slate-400 uppercase shrink-0">Quick Ask:</span>
-            {(MODE_PROMPTS[mode] || MODE_PROMPTS.tutor).map((prompt, idx) => (
+            <span className="text-[10px] font-semibold text-slate-400 uppercase shrink-0">Follow-up:</span>
+            {dynamicSuggestions.map((prompt, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -479,8 +491,8 @@ export default function AiTutorDrawer({
                 rows={2}
                 placeholder={
                   language === 'bn'
-                    ? "রসায়ন সম্পর্কে যেকোনো প্রশ্ন জিজ্ঞাসা করুন..."
-                    : "Ask anything about this chapter, concept, or doubt..."
+                    ? "যেকোনো অ্যাকাডেমিক প্রশ্ন বা ফলো-আপ জিজ্ঞাসা করুন..."
+                    : "Ask any academic question, follow-up, or doubt (Chemistry, Physics, Math)..."
                 }
                 className="w-full resize-none rounded-xl border border-white/10 bg-black/50 p-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
               />

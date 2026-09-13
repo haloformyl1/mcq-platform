@@ -6,6 +6,7 @@
 export type AiMode = 'TUTOR' | 'PRACTICE' | 'EXAM' | 'DOUBT' | 'REVISION' | 'STUDY_PLAN';
 export type AcademicLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 export type Language = 'en' | 'bn';
+export type SourceCategory = 'PIECHEM_MATERIAL' | 'STUDENT_DATA' | 'GENERAL_ACADEMIC';
 
 export type QuestionDifficulty = 'Easy' | 'Moderate' | 'Difficult' | 'HOTS';
 export type QuestionType = 'MCQ' | 'True/False' | 'Assertion-Reason' | 'Numerical' | 'Conceptual';
@@ -139,5 +140,20 @@ export interface AiChatMessage {
   context?: StudentContext;
   model?: string;
   sources?: string[];
+  sourceCategory?: SourceCategory;
+  groundedInPiechem?: boolean;
+  intent?: string;
   timestamp?: string;
+}
+
+export interface TutorResponse {
+  answer: string;
+  model: string;
+  sources: string[];
+  sourceCategory: SourceCategory;
+  groundedInPiechem: boolean;
+  suggestedFollowUps: string[];
+  language: Language;
+  intent?: string;
+  activeTopic?: string;
 }

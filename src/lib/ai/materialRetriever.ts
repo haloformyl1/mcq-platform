@@ -19,23 +19,29 @@ export interface RetrievedMaterial {
 
 export async function retrieveRelevantPiechemMaterials(query: string): Promise<RetrievedMaterial[]> {
   try {
+    if (!query || !query.trim()) return [];
+
     const materials = await prisma.studyMaterial.findMany({ take: 50 });
     const qLower = query.toLowerCase();
 
     const matches: RetrievedMaterial[] = [];
+    const stopWords = new Set(['what', 'when', 'where', 'which', 'who', 'whom', 'this', 'that', 'with', 'from', 'have', 'more', 'give', 'tell', 'show', 'explain', 'please', 'about']);
+    const words = qLower.split(/[^a-zA-Z0-9]+/).filter(w => w.length > 2 && !stopWords.has(w));
+
+    if (words.length === 0) return [];
 
     for (const mat of materials) {
       const { category, discipline, cleanDescription } = parseMaterialMetadata(mat.description);
       const titleLower = mat.title.toLowerCase();
       const descLower = (cleanDescription || mat.description || '').toLowerCase();
+      const categoryLower = category.toLowerCase();
 
-      // Check keyword overlap
-      const words = qLower.split(/\s+/).filter(w => w.length > 3);
+      // Check genuine keyword overlap
       const matchesTitle = words.some(w => titleLower.includes(w));
       const matchesDesc = words.some(w => descLower.includes(w));
-      const matchesCategory = words.some(w => category.toLowerCase().includes(w));
+      const matchesCategory = words.some(w => categoryLower.includes(w));
 
-      if (matchesTitle || matchesDesc || matchesCategory || words.length === 0) {
+      if (matchesTitle || matchesDesc || matchesCategory) {
         matches.push({
           id: mat.id,
           title: mat.title,
@@ -44,7 +50,7 @@ export async function retrieveRelevantPiechemMaterials(query: string): Promise<R
           url: mat.url,
           category,
           discipline,
-          sourceCitation: `PIECHEM → Chemistry → ${category} → ${mat.title}`
+          sourceCitation: `PIECHEM → ${discipline || 'Academic'} → ${category || 'Curriculum'} → ${mat.title}`
         });
       }
     }
@@ -58,6 +64,8 @@ export async function retrieveRelevantPiechemMaterials(query: string): Promise<R
 
 export async function retrieveRelevantVaultQuestions(chapterOrTopic: string, limit = 5) {
   try {
+    if (!chapterOrTopic || !chapterOrTopic.trim()) return [];
+
     const questions = await prisma.question.findMany({
       where: {
         OR: [
