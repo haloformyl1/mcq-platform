@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import FormattedAiMessage from "./FormattedAiMessage";
 import { 
   Sparkles, X, Send, Bot, User, Trash2, ArrowRight, 
   Atom, CheckCircle2, ChevronRight, BookOpen, Brain, 
@@ -335,9 +336,13 @@ export default function AiTutorDrawer({
                   )}
 
                   {/* Message Content */}
-                  <div className="whitespace-pre-wrap break-words font-sans">
-                    {m.content}
-                  </div>
+                  {isUser ? (
+                    <div className="whitespace-pre-wrap break-words font-sans">
+                      {m.content}
+                    </div>
+                  ) : (
+                    <FormattedAiMessage content={m.content} />
+                  )}
 
                   {/* Real Citations */}
                   {!isUser && m.citations && m.citations.length > 0 && (

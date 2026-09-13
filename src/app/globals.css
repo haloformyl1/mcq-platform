@@ -80,3 +80,21 @@ body {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* KaTeX math formatting & responsive containment */
+.katex-display {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 0.5rem 0.25rem !important;
+  margin: 0.75rem 0 !important;
+  text-align: center;
+  scrollbar-width: thin;
+}
+.katex {
+  font-size: 1.05em;
+  text-rendering: auto;
+}
+.formatted-ai-content .katex-display > .katex {
+  display: inline-block;
+  white-space: nowrap;
+}
