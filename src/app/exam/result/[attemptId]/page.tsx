@@ -1,4 +1,6 @@
 "use client";
+import AiQuestionExplainerModal from "@/components/AiQuestionExplainerModal";
+import { Sparkles as SparklesIcon } from "lucide-react";
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
@@ -10,6 +12,7 @@ import PiFiringLoader from "@/components/PiFiringLoader";
 export default function ExamResult({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
   const [result, setResult] = useState<any>(null);
+  const [explainingQuestion, setExplainingQuestion] = useState<any>(null);
   const [filter, setFilter] = useState<'All' | 'Correct' | 'Incorrect' | 'Unanswered'>('All');
   const router = useRouter();
 
@@ -292,6 +295,23 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                       </div>
 
                       {/* Explanation */}
+                      
+                      {/* AI Question Explainer Button */}
+                      <div className="mt-3 flex items-center justify-start">
+                        <button
+                          type="button"
+                          onClick={() => setExplainingQuestion({
+                            question: q,
+                            selectedAnswer: ans.selectedAnswer || 'Unanswered',
+                            correctAnswer: q.correctAnswer
+                          })}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-950/70 hover:bg-cyan-900/90 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 shadow-sm transition-all cursor-pointer"
+                        >
+                          <SparklesIcon className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>🤖 Explain with AI</span>
+                        </button>
+                      </div>
+
                       {q.explanation && (
                         <div className="mt-3 p-3.5 rounded-lg bg-[#222222] border border-[#333333] text-xs text-[#cccccc] break-words">
                           <span className="font-bold text-white block mb-1">Explanation:</span>

@@ -1,4 +1,6 @@
 ﻿"use client";
+import AdminAiQuestionGeneratorModal from "@/components/AdminAiQuestionGeneratorModal";
+import { Sparkles } from "lucide-react";
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
@@ -9,6 +11,7 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
   const [test, setTest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
+  const [showAiGenerator, setShowAiGenerator] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<any>(null);
   const router = useRouter();
 
@@ -24,6 +27,15 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
         setLoading(false);
       });
   }, [resolvedParams.id]);
+
+  
+  const refetchTest = () => {
+    fetch(`/api/admin/tests/${resolvedParams.id}`)
+      .then(res => res.json())
+      .then(data => {
+        setTest(data);
+      });
+  };
 
   const saveSettings = async () => {
     let testToSave = { ...test };
@@ -621,6 +633,14 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
       <div className="mt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h2 className="text-xl font-bold">Questions ({test.questions?.length || 0})</h2>
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setShowAiGenerator(true)}
+            className="flex-1 sm:flex-none bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-3.5 py-2 rounded shadow font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-cyan-200" />
+            <span>✨ AI Generate Questions</span>
+          </button>
           <button onClick={downloadTemplate} className="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-3 py-2 rounded shadow hover:bg-gray-300 font-medium text-xs sm:text-sm text-center">
             Download Template
           </button>
@@ -699,6 +719,14 @@ export default function EditTest({ params }: { params: Promise<{ id: string }> }
           </div>
         ))}
       </div>
+      <AdminAiQuestionGeneratorModal
+        isOpen={showAiGenerator}
+        onClose={() => setShowAiGenerator(false)}
+        testId={test?.id || ''}
+        onQuestionsAdded={() => {
+          refetchTest();
+        }}
+      />
     </div>
   );
 }

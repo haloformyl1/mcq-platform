@@ -1,4 +1,5 @@
 "use client";
+import AiChemistTutorModal from "@/components/AiChemistTutorModal";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -1201,6 +1202,7 @@ export default function StudentDashboard() {
           </p>
         </footer>
 
+        <AiChemistTutorModal />
       </main>
     </div>
   );
