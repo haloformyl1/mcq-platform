@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, Sparkles, Loader2, CheckCircle2, AlertCircle, Plus, BookOpen, Trash2 } from "lucide-react";
+import PiechemAiLogo from "./ai/PiechemAiLogo";
 
 interface AdminAiGeneratorProps {
   isOpen: boolean;
@@ -110,14 +111,14 @@ export default function AdminAiQuestionGeneratorModal({
         {/* Header */}
         <div className="px-6 py-5 bg-[#08101a] border-b border-cyan-950/80 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/30">
-              <Sparkles className="w-5 h-5" />
+            <div className="p-2 rounded-xl bg-red-950/70 border border-red-500/40 text-white shadow-md shadow-red-950/50 flex items-center justify-center">
+              <PiechemAiLogo size="xs" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-white text-base sm:text-lg">AI MCQ Question Generator</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-cyan-950 text-cyan-300 border border-cyan-500/30">
-                  Gemini Powered
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-red-950/80 text-red-300 border border-red-500/40 shadow-sm">
+                  PIECHEM AI Powered
                 </span>
               </div>
               <p className="text-xs text-slate-400">Instantly generate authentic NEET, JEE, & Board MCQs with full solutions</p>

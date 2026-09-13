@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
+import PiechemAiLogo from "@/components/ai/PiechemAiLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
 import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
@@ -1235,10 +1236,10 @@ export default function StudentDashboard() {
           <button
             type="button"
             onClick={() => handleOpenAiTutor("tutor")}
-            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-4 py-3 text-white shadow-2xl shadow-blue-500/30 hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20 backdrop-blur-xl"
+            className="group flex items-center gap-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-800 hover:from-red-500 hover:to-rose-500 px-4 py-3 text-white shadow-2xl shadow-red-950/70 hover:shadow-red-900/50 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-red-500/40 backdrop-blur-xl"
           >
-            <Sparkles className="h-5 w-5 animate-pulse text-cyan-200 group-hover:rotate-12 transition-transform" />
-            <span className="font-semibold text-xs sm:text-sm tracking-tight pr-1">Ask Gemini AI</span>
+            <PiechemAiLogo size="xs" animated />
+            <span className="font-bold text-xs sm:text-sm tracking-tight pr-1">Ask PIECHEM AI</span>
           </button>
         </div>
 

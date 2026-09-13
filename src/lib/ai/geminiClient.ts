@@ -216,7 +216,7 @@ export async function callGemini(
 
       return {
         text: text.trim(),
-        model: `Google Gemini (${model})`,
+        model: "PIECHEM AI (Reddish Black AI)",
         webSources: webSources.length > 0 ? webSources : undefined,
         searchGroundingUsed,
         searchQueries: searchQueries.length > 0 ? searchQueries : undefined

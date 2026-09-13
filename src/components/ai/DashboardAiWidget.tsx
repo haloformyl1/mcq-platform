@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import PiechemAiLogo from "./PiechemAiLogo";
 import { Sparkles, Brain, AlertTriangle, ArrowRight, Target, Zap, BookOpen, Calendar, RefreshCw } from "lucide-react";
 
 interface TopicMastery {
@@ -79,16 +80,17 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
       {/* Header Bar */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30">
-            <Sparkles className="h-5 w-5 animate-pulse" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-950/60 border border-red-500/40 text-white shadow-lg shadow-red-950/50">
+            <PiechemAiLogo size="sm" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                PIECHEM Gemini AI
+              <h3 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-1.5">
+                PIECHEM <span className="bg-gradient-to-r from-red-500 via-rose-400 to-red-400 bg-clip-text text-transparent font-black">AI</span>
               </h3>
-              <span className="inline-flex items-center rounded-full bg-cyan-950 px-2 py-0.5 text-[10px] font-semibold text-cyan-300 border border-cyan-500/40">
-                Gemini 3.6 Flash
+              <span className="inline-flex items-center gap-1 rounded-full bg-red-950/80 px-2.5 py-0.5 text-[10px] font-bold text-red-300 border border-red-500/40 shadow-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                REDDISH BLACK AI
               </span>
             </div>
             <p className="text-xs text-slate-400">
@@ -111,10 +113,10 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
           <button
             type="button"
             onClick={() => onOpenTutor?.('tutor')}
-            className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-red-950/40 border border-red-500/30 transition-all active:scale-95 cursor-pointer"
           >
-            <Brain className="h-3.5 w-3.5" />
-            <span>Ask Gemini AI</span>
+            <PiechemAiLogo size="xs" />
+            <span>Ask PIECHEM AI</span>
           </button>
         </div>
       </div>

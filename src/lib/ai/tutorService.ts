@@ -355,7 +355,7 @@ export async function askEducationalTutor(params: {
       : "Goodbye! Wishing you all the best with your studies. Whenever you are ready to tackle Physics, Chemistry, Mathematics, or Biology again, I'll be right here to help. Have a great day!";
     return {
       answer: farewell,
-      model: "Google Gemini (gemini-3.6-flash)",
+      model: "PIECHEM AI (Reddish Black AI)",
       sources: [],
       sourceCategory: 'GENERAL_ACADEMIC',
       groundedInPiechem: false,
