@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { explainQuestionError } from "@/lib/aiClient";
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
+    const student = sessionCookie ? await decrypt(sessionCookie) : null;
+
+    // Rate Limiting (20 requests / minute)
+    const clientId = getClientIdentifier(req, student?.id);
+    const rateLimit = checkRateLimit(clientId, 20, 60 * 1000);
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit.retryAfterSeconds);
+    }
+
     const body = await req.json();
     const { questionText, options, selectedAnswer, correctAnswer, originalExplanation, apiKey } = body;
     const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;

@@ -68,7 +68,7 @@ async function callGemini(
   userApiKey?: string,
   enableGrounding = true
 ): Promise<string | null> {
-  const key = userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const key = userApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
   if (!key) return null;
 
   try {
@@ -97,7 +97,8 @@ async function callGemini(
     let response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(12000)
     });
 
     // If search grounding was rejected by endpoint format, retry without tool

@@ -1,13 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generatePerformanceReport } from "@/lib/ai/performanceAnalyzer";
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
+    const student = sessionCookie ? await decrypt(sessionCookie) : null;
+
+    if (!student || !student.id) {
+      return NextResponse.json(
+        { error: "Unauthorized. Student session required to view performance reports." },
+        { status: 401 }
+      );
+    }
+
+    // Rate Limiting (15 requests / minute)
+    const clientId = getClientIdentifier(req, student.id);
+    const rateLimit = checkRateLimit(clientId, 15, 60 * 1000);
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit.retryAfterSeconds);
+    }
+
     const body = await req.json();
     const { attemptId, language, apiKey } = body;
 
-    if (!attemptId) {
-      return NextResponse.json({ error: "Attempt ID is required." }, { status: 400 });
+    if (!attemptId || typeof attemptId !== 'string') {
+      return NextResponse.json({ error: "Valid Attempt ID is required." }, { status: 400 });
+    }
+
+    // STRICT IDOR & AUTHORIZATION VERIFICATION:
+    const attempt = await prisma.testAttempt.findUnique({
+      where: { id: attemptId },
+      select: {
+        id: true,
+        studentId: true,
+        status: true
+      }
+    });
+
+    if (!attempt) {
+      return NextResponse.json({ error: "Attempt record not found." }, { status: 404 });
+    }
+
+    // Verify ownership: Students can ONLY access their own test attempts
+    if (attempt.studentId !== student.id) {
+      return NextResponse.json(
+        { error: "Access denied. You can only view performance reports for your own examinations." },
+        { status: 403 }
+      );
+    }
+
+    // Verify exam is submitted: Cannot analyze test while in progress
+    if (attempt.status !== 'SUBMITTED') {
+      return NextResponse.json(
+        { error: "Performance analysis is only available after submitting the examination." },
+        { status: 400 }
+      );
     }
 
     const baseReport = await generatePerformanceReport({
@@ -17,7 +69,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!baseReport) {
-      return NextResponse.json({ error: "Attempt record not found." }, { status: 404 });
+      return NextResponse.json({ error: "Failed to generate report for this attempt." }, { status: 404 });
     }
 
     // Enrich with convenience aliases

@@ -48,7 +48,8 @@ export async function computeStudentLearningProfile(studentId: string): Promise<
         }
       }
     },
-    orderBy: { submittedAt: 'desc' }
+    orderBy: { submittedAt: 'desc' },
+    take: 20
   });
 
   // If no attempts found, return foundational onboarding profile

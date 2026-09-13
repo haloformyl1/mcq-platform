@@ -3,7 +3,7 @@
  * Server-side wrapper for Google Gemini 1.5 / 2.0 Flash with Google Search Grounding and structured output.
  */
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
 
 export interface GeminiCallOptions {
   systemInstruction?: string;
@@ -54,7 +54,8 @@ export async function callGemini(
     let response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(12000)
     });
 
     // If search grounding was rejected by endpoint format, retry without tool
@@ -63,7 +64,8 @@ export async function callGemini(
       response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: AbortSignal.timeout(12000)
       });
     }
 

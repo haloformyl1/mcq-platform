@@ -25,7 +25,12 @@ export async function retrieveRelevantPiechemMaterials(query: string): Promise<R
     const qLower = query.toLowerCase();
 
     const matches: RetrievedMaterial[] = [];
-    const stopWords = new Set(['what', 'when', 'where', 'which', 'who', 'whom', 'this', 'that', 'with', 'from', 'have', 'more', 'give', 'tell', 'show', 'explain', 'please', 'about']);
+    const stopWords = new Set([
+      'what', 'when', 'where', 'which', 'who', 'whom', 'this', 'that', 'with', 'from', 'have', 
+      'more', 'give', 'tell', 'show', 'explain', 'please', 'about', 'notes', 'note', 'piechem', 
+      'according', 'study', 'material', 'materials', 'pdf', 'chapter', 'academic', 'science', 
+      'classified', 'question', 'questions', 'test'
+    ]);
     const words = qLower.split(/[^a-zA-Z0-9]+/).filter(w => w.length > 2 && !stopWords.has(w));
 
     if (words.length === 0) return [];
@@ -39,9 +44,8 @@ export async function retrieveRelevantPiechemMaterials(query: string): Promise<R
       // Check genuine keyword overlap
       const matchesTitle = words.some(w => titleLower.includes(w));
       const matchesDesc = words.some(w => descLower.includes(w));
-      const matchesCategory = words.some(w => categoryLower.includes(w));
-
-      if (matchesTitle || matchesDesc || matchesCategory) {
+      // Match strictly on genuine academic title or description content (avoid generic category meta-matching)
+      if (matchesTitle || matchesDesc) {
         matches.push({
           id: mat.id,
           title: mat.title,

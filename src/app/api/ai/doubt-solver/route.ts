@@ -1,8 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProgressiveHint } from "@/lib/ai/doubtSolver";
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
+    const student = sessionCookie ? await decrypt(sessionCookie) : null;
+
+    // Server-Side Rate Limiting (20 requests / minute)
+    const clientId = getClientIdentifier(req, student?.id);
+    const rateLimit = checkRateLimit(clientId, 20, 60 * 1000);
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit.retryAfterSeconds);
+    }
+
+    // SERVER-SIDE ANTI-CHEATING VERIFICATION:
+    if (student?.id) {
+      const activeAttempt = await prisma.testAttempt.findFirst({
+        where: {
+          studentId: student.id,
+          status: 'IN_PROGRESS'
+        }
+      });
+      if (activeAttempt) {
+        return NextResponse.json(
+          {
+            error: "AI assistance is disabled during active examinations. Complete your test before seeking AI explanations.",
+            activeExamBlocked: true
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     const body = await req.json();
     const { questionText, options, correctAnswer, hintLevel, revealFullSolution, language, apiKey } = body;
 

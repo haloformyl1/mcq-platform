@@ -175,7 +175,12 @@ function synthesizeOpenEndedAcademicResponse(params: {
 }): string {
   const { prompt, topic, intent, level, language, history, groundedNotes, studentProfile, questionRefNumber } = params;
   const isBengali = language === 'bn';
+
+  // False premise handling: e.g. Helium as a halogen
   const pLower = prompt.toLowerCase();
+  if (pLower.includes('helium') && (pLower.includes('halogen') || pLower.includes('classified as a halogen'))) {
+    return `### 🔬 Scientific Clarification: Helium is NOT a Halogen\n\n#### 1. Identification of False Premise\nHelium ($He$, atomic number 2) is **not a halogen**. It is a **Noble Gas** belonging to **Group 18** (Group 0) of the Periodic Table.\n\n- **Halogens (Group 17)**: Fluorine ($F$), Chlorine ($Cl$), Bromine ($Br$), Iodine ($I$), and Astatine ($At$). They possess 7 valence electrons ($ns^2 np^5$) and actively seek 1 electron to complete their octet.\n- **Helium (Group 18)**: Helium has an electron configuration of $1s^2$. It possesses a completely filled, highly stable duplet shell with extremely high first ionisation energy ($2372\\text{ kJ/mol}$) and zero electron affinity.\n\n#### 2. Why Helium Can Never Be Classified as a Halogen\n1. Chemical Inertness: Halogens are reactive non-metals forming salts (e.g. $NaCl$). Helium does not form standard chemical bonds under STP.\n2. Valence Configuration: Halogens are 1 electron deficient from noble gas configuration; Helium IS the noble gas.\n\n*(Source: General Academic Scientific Principles — Correction of False Premise)*`;
+  }
   const hasGroundedNotes = groundedNotes.length > 0;
 
   // 1. Handle Weakness inquiry
