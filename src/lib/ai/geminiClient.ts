@@ -46,7 +46,7 @@ export async function fetchLiveWebResearch(query: string): Promise<{ snippets: s
       const wikiUrl = 'https://en.wikipedia.org/w/api.php?action=opensearch&search=' + encodeURIComponent(searchTerm) + '&limit=3&namespace=0&format=json';
       const wikiRes = await fetch(wikiUrl, {
         headers: { 'User-Agent': 'PIECHEM-AI-Tutor/1.0' },
-        signal: AbortSignal.timeout(4000)
+        signal: AbortSignal.timeout(35000)
       });
       if (wikiRes.ok) {
         const wikiData = await wikiRes.json();
@@ -70,7 +70,7 @@ export async function fetchLiveWebResearch(query: string): Promise<{ snippets: s
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(35000)
       });
 
       if (res.ok) {
@@ -135,7 +135,7 @@ export async function callGemini(
   } = options;
 
   // Primary model: gemini-2.0-flash, with fallback to gemini-1.5-flash
-  const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  const models = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
 
   for (const model of models) {
     try {
@@ -165,7 +165,7 @@ export async function callGemini(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
-        signal: AbortSignal.timeout(14000)
+        signal: AbortSignal.timeout(35000)
       });
 
       // If grounding was rejected by endpoint format, retry without search tool
@@ -175,7 +175,7 @@ export async function callGemini(
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody),
-          signal: AbortSignal.timeout(12000)
+          signal: AbortSignal.timeout(35000)
         });
       }
 
