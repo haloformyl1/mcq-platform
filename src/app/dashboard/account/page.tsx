@@ -1230,6 +1230,10 @@ export default function StudentAccountPage() {
                     </div>
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Unlimited 24/7 AI Tutor & Doubt Solver</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
                       <span>Instant Step-by-Step Answer Explanations</span>
                     </div>
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
@@ -1846,6 +1850,10 @@ export default function StudentAccountPage() {
                         <span className="font-semibold text-slate-200">Selected tests are free.</span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">AI Tutor & Doubt Solver</span>
+                        <span className="font-semibold text-slate-200">Basic Access (5 queries / day)</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-300 font-medium">Answer Explanations</span>
                         <span className="font-semibold text-slate-200">Standard Answer Key</span>
                       </div>
@@ -1917,6 +1925,12 @@ export default function StudentAccountPage() {
                         </span>
                       </div>
                       <div className="flex justify-between items-center pt-3">
+                        <span className="text-slate-300 font-medium">AI Tutor & Doubt Solver</span>
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Unlimited AI Access
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-300 font-medium">Answer Explanations</span>
                         <span className="font-bold text-white flex items-center gap-1.5">
                           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Full Solutions & 3D Models
@@ -1937,7 +1951,7 @@ export default function StudentAccountPage() {
                       <div className="flex justify-between items-center pt-3">
                         <span className="text-slate-300 font-medium">Supported Devices</span>
                         <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Mobile, Tablet, PC / Laptop (Max 2 device)
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Mobile, Tablet, PC / Laptop (Max 2 devices)
                         </span>
                       </div>
                     </div>
