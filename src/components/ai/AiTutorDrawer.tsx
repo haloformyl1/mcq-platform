@@ -329,38 +329,38 @@ export default function AiTutorDrawer({
       <div className="pointer-events-none absolute -bottom-40 -left-40 w-[36rem] h-[36rem] rounded-full bg-gradient-to-tr from-red-950/20 via-black to-transparent blur-3xl" />
 
       {/* Top Header - Fixed & Pinned at the Very Top */}
-      <header className="relative z-30 shrink-0 h-16 border-b border-red-950/80 px-4 sm:px-8 flex items-center justify-between bg-[#0b0304]/95 backdrop-blur-xl">
-        <div className="flex items-center gap-3.5">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-red-950/60 border border-red-500/40 shadow-inner">
+      <header className="relative z-30 shrink-0 min-h-16 border-b border-red-950/80 px-3 py-2 sm:px-8 sm:py-0 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 bg-[#0b0304]/95 backdrop-blur-xl">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3.5">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-950/60 border border-red-500/40 shadow-inner sm:h-10 sm:w-10">
             <PiechemAiLogo size="sm" />
           </div>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-1.5">
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+              <h2 className="truncate text-sm sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-1.5">
                 PIECHEM
                 <span className="bg-gradient-to-r from-red-500 via-rose-400 to-red-400 bg-clip-text text-transparent font-black">
                   AI
                 </span>
               </h2>
-              <span className="rounded-full bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 text-[10px] text-red-300 font-bold uppercase shadow-sm">
+              <span className="hidden sm:inline-flex shrink-0 rounded-full bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 text-[10px] text-red-300 font-bold uppercase shadow-sm">
                 AI Tutor
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="hidden text-[11px] text-slate-400 sm:block">
               {language === 'bn' ? "শিক্ষামূলক এআই সহকারী" : "Conversational STEM Learning Assistant"}
             </p>
           </div>
         </div>
 
         {/* Right Action Controls */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex w-full items-center justify-end gap-1.5 sm:w-auto sm:gap-2.5">
           {/* Language Toggle */}
           <div className="flex items-center rounded-lg bg-white/[0.04] border border-red-950/60 p-0.5 text-xs font-medium">
             <button
               type="button"
               onClick={() => handleToggleLang('en')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                className={`px-2 py-1 rounded-md transition-all cursor-pointer sm:px-2.5 ${
                 language === 'en' 
                   ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-sm font-semibold' 
                   : 'text-slate-400 hover:text-white'
@@ -371,7 +371,7 @@ export default function AiTutorDrawer({
             <button
               type="button"
               onClick={() => handleToggleLang('bn')}
-              className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                className={`px-2 py-1 rounded-md transition-all cursor-pointer sm:px-2.5 ${
                 language === 'bn' 
                   ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-sm font-semibold' 
                   : 'text-slate-400 hover:text-white'
@@ -386,7 +386,7 @@ export default function AiTutorDrawer({
             <button
               type="button"
               onClick={() => setShowLevelMenu(prev => !prev)}
-              className="flex items-center gap-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-red-950/60 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors cursor-pointer"
+              className="flex items-center gap-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-red-950/60 px-2 py-1.5 text-xs font-medium text-slate-300 transition-colors cursor-pointer sm:gap-1.5 sm:px-3"
               title="Academic Depth"
             >
               <GraduationCap className="h-3.5 w-3.5 text-red-400" />
@@ -420,11 +420,11 @@ export default function AiTutorDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-red-950/70 border border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white transition-all cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-red-950/70 border border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white transition-all cursor-pointer sm:gap-1.5 sm:px-3"
             title="Exit Full Screen AI (Esc)"
           >
             <X className="h-4 w-4" />
-            <span className="text-xs font-semibold">Exit</span>
+            <span className="hidden text-xs font-semibold sm:inline">Exit</span>
           </button>
         </div>
       </header>
@@ -432,17 +432,17 @@ export default function AiTutorDrawer({
       {/* Middle Scrollable Chat Area */}
       <main 
         ref={chatContainerRef} 
-        className="relative flex-1 min-h-0 overflow-y-auto px-4 sm:px-8 py-6 scroll-smooth z-10"
+        className="relative flex-1 min-h-0 overflow-y-auto px-3 sm:px-8 py-4 sm:py-6 scroll-smooth z-10"
       >
         <div className="max-w-4xl lg:max-w-5xl mx-auto w-full flex flex-col space-y-5">
           {/* Welcome Hero / Empty State */}
           {messages.length === 0 && (
-            <div className="py-6 sm:py-10 text-center animate-in fade-in duration-200">
-              <div className="mx-auto mb-3.5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-tr from-red-600/25 via-rose-950/40 to-black/80 border border-red-500/40 shadow-2xl shadow-red-950/60 backdrop-blur-xl group hover:scale-105 transition-all">
+            <div className="py-4 sm:py-10 text-center animate-in fade-in duration-200">
+              <div className="mx-auto mb-3.5 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-red-600/25 via-rose-950/40 to-black/80 border border-red-500/40 shadow-2xl shadow-red-950/60 backdrop-blur-xl group hover:scale-105 transition-all sm:h-20 sm:w-20">
                 <PiechemAiLogo size="lg" animated />
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              <h3 className="text-xl sm:text-3xl font-black text-white tracking-tight">
                 {language === 'bn' ? "নমস্কার, শিক্ষার্থী" : "Hello, Scholar"}
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto mt-2 leading-relaxed">
@@ -460,7 +460,7 @@ export default function AiTutorDrawer({
                       key={idx}
                       type="button"
                       onClick={() => handleSendMessage(card.prompt)}
-                      className={`group relative p-4 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
+                      className={`group relative p-3 sm:p-4 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">
@@ -707,7 +707,7 @@ export default function AiTutorDrawer({
       </main>
 
       {/* Bottom Pinned Action Area - Always Anchored at the Bottom */}
-      <footer className="relative z-30 shrink-0 border-t border-red-950/80 bg-[#090203]/95 px-4 sm:px-8 py-3 backdrop-blur-xl">
+      <footer className="relative z-30 shrink-0 border-t border-red-950/80 bg-[#090203]/95 px-3 sm:px-8 py-2 sm:py-3 backdrop-blur-xl">
         <div className="max-w-4xl lg:max-w-5xl mx-auto w-full space-y-2">
           {/* Pill Follow-Up Suggestions */}
           {dynamicSuggestions.length > 0 && (
