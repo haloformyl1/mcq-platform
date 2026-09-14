@@ -143,11 +143,14 @@ export default function AiTutorDrawer({
   // Lock body scroll when full-screen AI modal is active
   useEffect(() => {
     if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       setTimeout(() => inputRef.current?.focus(), 200);
       return () => {
-        document.body.style.overflow = originalOverflow;
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
       };
     }
   }, [isOpen]);
@@ -351,7 +354,7 @@ export default function AiTutorDrawer({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 w-screen h-screen flex flex-col bg-[#070203] text-slate-100 overflow-hidden select-text animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 w-full h-full flex flex-col bg-[#070203] text-slate-100 overflow-hidden select-text animate-in fade-in duration-200">
       {/* Ambient Reddish-Black Nebula Glows */}
       <div className="pointer-events-none absolute -top-40 -right-40 w-[36rem] h-[36rem] rounded-full bg-gradient-to-br from-red-600/15 via-rose-950/10 to-transparent blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -left-40 w-[36rem] h-[36rem] rounded-full bg-gradient-to-tr from-red-950/20 via-black to-transparent blur-3xl" />
@@ -476,7 +479,8 @@ export default function AiTutorDrawer({
       {/* Middle Scrollable Chat Area */}
       <main 
         ref={chatContainerRef} 
-        className="relative flex-1 min-h-0 overflow-y-auto px-3 sm:px-8 py-4 sm:py-6 scroll-smooth z-10"
+        className="relative flex-1 min-h-0 overflow-y-auto ai-scroll-container no-scrollbar px-3 sm:px-8 py-4 sm:py-6 scroll-smooth z-10"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <div className="max-w-4xl lg:max-w-5xl mx-auto w-full flex flex-col space-y-5">
           {/* Welcome Hero / Empty State */}
@@ -755,7 +759,7 @@ export default function AiTutorDrawer({
         <div className="max-w-4xl lg:max-w-5xl mx-auto w-full space-y-2">
           {/* Pill Follow-Up Suggestions */}
           {dynamicSuggestions.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
               {dynamicSuggestions.map((prompt, idx) => (
                 <button
                   key={idx}
@@ -812,8 +816,8 @@ export default function AiTutorDrawer({
                   ? "রসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো প্রশ্ন বা সংশয় জিজ্ঞাসা করুন..."
                   : "Ask anything in Chemistry, Physics, Math, or request a drill..."
               }
-              className="w-full resize-none bg-transparent px-3 py-1 text-sm text-white placeholder-slate-500 focus:outline-none leading-relaxed"
-              style={{ minHeight: '38px', maxHeight: '120px' }}
+              className="w-full resize-none bg-transparent px-3 py-1 text-sm text-white placeholder-slate-500 focus:outline-none leading-relaxed no-scrollbar"
+              style={{ minHeight: "38px", maxHeight: "120px", scrollbarWidth: "none", msOverflowStyle: "none" }}
             />
 
             {/* Bottom Capsule Controls */}
