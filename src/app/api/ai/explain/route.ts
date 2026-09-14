@@ -3,6 +3,7 @@ import { explainQuestionError } from "@/lib/aiClient";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
+import { consumeAiQuota, createAiQuotaExceededResponse } from "@/lib/ai/aiQuota";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +29,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // DAILY FREE TIER AI QUOTA CHECK
+    const quota = await consumeAiQuota(student?.id, userApiKey);
+    if (!quota.allowed) {
+      return createAiQuotaExceededResponse(quota);
+    }
+
     const result = await explainQuestionError({
       questionText,
       options,
@@ -37,7 +44,15 @@ export async function POST(req: NextRequest) {
       userApiKey
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ...result,
+      quota: {
+        queriesUsed: quota.queriesUsed,
+        dailyLimit: quota.totalLimit,
+        remaining: quota.remaining,
+        isUnlimited: quota.isUnlimited
+      }
+    });
   } catch (error: any) {
     console.error("AI Explain Route Error:", error);
     return NextResponse.json(

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { computeStudentLearningProfile } from "@/lib/ai/weaknessDetector";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
+import { getAiQuotaStatus } from "@/lib/ai/aiQuota";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,8 +16,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized. Student session required." }, { status: 401 });
     }
 
-    const profile = await computeStudentLearningProfile(student.id);
-    return NextResponse.json({ profile });
+    const [profile, aiQuota] = await Promise.all([
+      computeStudentLearningProfile(student.id),
+      getAiQuotaStatus(student.id)
+    ]);
+
+    return NextResponse.json({ profile, aiQuota });
   } catch (err: any) {
     console.error("AI Profile Route Error:", err);
     return NextResponse.json(

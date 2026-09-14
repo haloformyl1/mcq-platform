@@ -44,6 +44,7 @@ export default function AdaptiveQuizModal({
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isQuotaExceeded, setIsQuotaExceeded] = useState<boolean>(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, 'A' | 'B' | 'C' | 'D'>>({});
@@ -68,6 +69,7 @@ export default function AdaptiveQuizModal({
   const fetchAdaptiveQuestions = async (lang: 'en' | 'bn' = language) => {
     setLoading(true);
     setError(null);
+    setIsQuotaExceeded(false);
     setIsFinished(false);
     setCurrentIdx(0);
     setSelectedAnswers({});
@@ -104,7 +106,11 @@ export default function AdaptiveQuizModal({
       if (data.targetTopic) setDrillTopic(data.targetTopic);
     } catch (err: any) {
       console.error("Adaptive quiz load error:", err);
-      setError(err.message || "Failed to generate adaptive quiz");
+      const msg = err.message || "Failed to generate adaptive quiz";
+      if (msg.includes("limit reached") || msg.includes("Daily free AI")) {
+        setIsQuotaExceeded(true);
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }

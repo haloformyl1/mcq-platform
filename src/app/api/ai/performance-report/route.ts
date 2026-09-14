@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
+import { consumeAiQuota, createAiQuotaExceededResponse } from "@/lib/ai/aiQuota";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { attemptId, language, apiKey } = body;
+    const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
 
     if (!attemptId || typeof attemptId !== 'string') {
       return NextResponse.json({ error: "Valid Attempt ID is required." }, { status: 400 });
@@ -62,10 +64,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // DAILY FREE TIER AI QUOTA CHECK
+    const quota = await consumeAiQuota(student.id, userApiKey);
+    if (!quota.allowed) {
+      return createAiQuotaExceededResponse(quota);
+    }
+
     const baseReport = await generatePerformanceReport({
       attemptId,
       language,
-      userApiKey: apiKey || req.headers.get("x-gemini-api-key") || undefined
+      userApiKey
     });
 
     if (!baseReport) {
@@ -88,7 +96,16 @@ export async function POST(req: NextRequest) {
         : "Complete recommended recovery drills."
     };
 
-    return NextResponse.json({ success: true, report: enrichedReport });
+    return NextResponse.json({
+      success: true,
+      report: enrichedReport,
+      quota: {
+        queriesUsed: quota.queriesUsed,
+        dailyLimit: quota.totalLimit,
+        remaining: quota.remaining,
+        isUnlimited: quota.isUnlimited
+      }
+    });
   } catch (err: any) {
     console.error("Performance Report Route Error:", err);
     return NextResponse.json(

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
+import { consumeAiQuota, createAiQuotaExceededResponse } from "@/lib/ai/aiQuota";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,13 +22,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const userPrompt = body.prompt || body.message;
     const { history, context, mode, level, language, apiKey } = body;
+    const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
 
     if (!userPrompt || typeof userPrompt !== 'string' || !userPrompt.trim()) {
       return NextResponse.json({ error: "Please enter a valid study question." }, { status: 400 });
     }
 
     // SERVER-SIDE ANTI-CHEATING VERIFICATION:
-    // Check if the student has any active timed examination in progress in the database.
     let isExamActive = Boolean(context?.isExamActive);
     if (student?.id) {
       const activeAttempt = await prisma.testAttempt.findFirst({
@@ -61,6 +62,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // DAILY FREE TIER AI QUOTA CHECK
+    const quota = await consumeAiQuota(student?.id, userApiKey);
+    if (!quota.allowed) {
+      return createAiQuotaExceededResponse(quota);
+    }
+
     const mergedContext = {
       ...context,
       studentId: student?.id,
@@ -75,10 +82,20 @@ export async function POST(req: NextRequest) {
       mode,
       level,
       language,
-      userApiKey: apiKey || req.headers.get("x-gemini-api-key") || undefined
+      userApiKey
     });
 
-    return NextResponse.json({ ...result, reply: result.answer, content: result.answer });
+    return NextResponse.json({
+      ...result,
+      reply: result.answer,
+      content: result.answer,
+      quota: {
+        queriesUsed: quota.queriesUsed,
+        dailyLimit: quota.totalLimit,
+        remaining: quota.remaining,
+        isUnlimited: quota.isUnlimited
+      }
+    });
   } catch (err: any) {
     console.error("AI Tutor Route Error:", err);
     return NextResponse.json(

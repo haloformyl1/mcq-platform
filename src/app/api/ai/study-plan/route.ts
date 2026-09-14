@@ -3,6 +3,7 @@ import { generatePersonalizedStudyPlan } from "@/lib/ai/studyPlanner";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
+import { consumeAiQuota, createAiQuotaExceededResponse } from "@/lib/ai/aiQuota";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +26,13 @@ export async function POST(req: NextRequest) {
     const durationDays = Math.min(Math.max(parseInt(body.durationDays || body.days, 10) || 7, 1), 30);
     const targetGoal = body.targetGoal || body.targetExam || "NEET / Board Examination";
     const { language, level, apiKey } = body;
+    const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
+
+    // DAILY FREE TIER AI QUOTA CHECK
+    const quota = await consumeAiQuota(student.id, userApiKey);
+    if (!quota.allowed) {
+      return createAiQuotaExceededResponse(quota);
+    }
 
     const plan = await generatePersonalizedStudyPlan({
       studentId: student.id,
@@ -32,13 +40,19 @@ export async function POST(req: NextRequest) {
       targetGoal,
       language,
       level,
-      userApiKey: apiKey || req.headers.get("x-gemini-api-key") || undefined
+      userApiKey
     });
 
     return NextResponse.json({ 
       success: true, 
       plan, 
-      studyPlan: plan 
+      studyPlan: plan,
+      quota: {
+        queriesUsed: quota.queriesUsed,
+        dailyLimit: quota.totalLimit,
+        remaining: quota.remaining,
+        isUnlimited: quota.isUnlimited
+      }
     });
   } catch (err: any) {
     console.error("Study Plan Route Error:", err);

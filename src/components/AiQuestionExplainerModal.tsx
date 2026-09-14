@@ -31,6 +31,7 @@ export default function AiQuestionExplainerModal({
 }: AiExplainerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isQuotaExceeded, setIsQuotaExceeded] = useState<boolean>(false);
   const [diagnosis, setDiagnosis] = useState<any>(null);
   const [hintLevel, setHintLevel] = useState<number>(1);
   const [showFullSolution, setShowFullSolution] = useState(false);
@@ -57,6 +58,7 @@ export default function AiQuestionExplainerModal({
   const fetchDoubtSolution = (level: number, full: boolean, lang: 'en' | 'bn') => {
     setLoading(true);
     setError(null);
+    setIsQuotaExceeded(false);
 
     const optionsMap: Record<string, string> = {
       A: question.optionA,
@@ -80,11 +82,18 @@ export default function AiQuestionExplainerModal({
     })
       .then(res => res.json())
       .then(data => {
-        if (data.error) throw new Error(data.error);
+        if (data.error) {
+          if (data.requiresSubscription) setIsQuotaExceeded(true);
+          throw new Error(data.error);
+        }
         setDiagnosis(data.doubtSolution);
       })
       .catch(err => {
-        setError(err.message || "Failed to load AI pedagogical guidance.");
+        const msg = err.message || "Failed to load AI pedagogical guidance.";
+        if (msg.includes("limit reached") || msg.includes("Daily free AI")) {
+          setIsQuotaExceeded(true);
+        }
+        setError(msg);
       })
       .finally(() => setLoading(false));
   };
@@ -209,9 +218,39 @@ export default function AiQuestionExplainerModal({
               </p>
             </div>
           ) : error ? (
-            <div className="p-4 rounded-xl bg-red-950/30 border border-red-500/30 text-xs text-red-300 text-center">
-              {error}
-            </div>
+            isQuotaExceeded ? (
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#120608] via-[#1a080c] to-[#0d0305] border border-amber-500/40 text-center space-y-4 shadow-2xl">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+                  <Sparkles className="w-6 h-6 animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-base font-extrabold text-white">Daily Free AI Limit Reached (5/5)</h4>
+                  <p className="text-xs text-amber-200/80 max-w-md mx-auto leading-relaxed">
+                    You have used your 5 free AI queries for today. Upgrade to <strong>PIECHEM Gold (₹99/month)</strong> for unlimited AI doubts, progressive hints, and adaptive mocks — or return tomorrow for 5 new queries!
+                  </p>
+                </div>
+                <div className="pt-2 flex justify-center items-center gap-3">
+                  <a
+                    href="/dashboard/account"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold text-xs shadow-lg shadow-amber-950/50 transition-all active:scale-95"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Upgrade to Gold (₹99)</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-red-950/30 border border-red-500/30 text-xs text-red-300 text-center">
+                {error}
+              </div>
+            )
           ) : diagnosis ? (
             <div className="space-y-4">
               

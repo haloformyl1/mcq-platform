@@ -23,6 +23,8 @@ model Student {
   subscriptionStatus String @default("FREE") // FREE, PAID
   subscriptionStartedAt DateTime?
   subscriptionExpiresAt DateTime?
+  aiQueriesToday        Int       @default(0)
+  aiLastResetDate       DateTime? @default(now())
   avatarUrl String?  @default("/avatars/atom.jpg")
   lastLogin DateTime?
   createdAt DateTime @default(now())

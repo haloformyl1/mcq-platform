@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
+import { consumeAiQuota, createAiQuotaExceededResponse } from "@/lib/ai/aiQuota";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,9 +40,16 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { questionText, options, correctAnswer, hintLevel, revealFullSolution, language, apiKey } = body;
+    const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
 
     if (!questionText) {
       return NextResponse.json({ error: "Question text is required." }, { status: 400 });
+    }
+
+    // DAILY FREE TIER AI QUOTA CHECK
+    const quota = await consumeAiQuota(student?.id, userApiKey);
+    if (!quota.allowed) {
+      return createAiQuotaExceededResponse(quota);
     }
 
     const safeLevel = (hintLevel >= 1 && hintLevel <= 4) ? hintLevel : (revealFullSolution ? 4 : 1);
@@ -52,13 +60,19 @@ export async function POST(req: NextRequest) {
       correctAnswer,
       hintLevel: safeLevel as 1 | 2 | 3 | 4,
       language,
-      userApiKey: apiKey || req.headers.get("x-gemini-api-key") || undefined
+      userApiKey
     });
 
     return NextResponse.json({ 
       success: true, 
       hint, 
-      doubtSolution: hint 
+      doubtSolution: hint,
+      quota: {
+        queriesUsed: quota.queriesUsed,
+        dailyLimit: quota.totalLimit,
+        remaining: quota.remaining,
+        isUnlimited: quota.isUnlimited
+      }
     });
   } catch (err: any) {
     console.error("Doubt Solver Route Error:", err);

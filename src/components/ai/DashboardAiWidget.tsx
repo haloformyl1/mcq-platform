@@ -40,6 +40,7 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
   const [profile, setProfile] = useState<StudentLearningProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [quota, setQuota] = useState<{ remaining: number; totalLimit: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
 
   const fetchProfile = async () => {
     try {
@@ -48,6 +49,7 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
       if (res.ok) {
         const data = await res.json();
         setProfile(data.profile);
+        if (data.aiQuota) setQuota(data.aiQuota);
       }
     } catch (err) {
       console.error("Failed to load AI student profile:", err);
@@ -92,6 +94,22 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
                 AI Assistant
               </span>
+              {quota && (
+                quota.isUnlimited ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-300 shadow-sm">
+                    <Sparkles className="h-3 w-3 text-amber-400" />
+                    Gold Unlimited
+                  </span>
+                ) : (
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border shadow-sm ${
+                    quota.remaining === 0
+                      ? 'bg-rose-950/80 border-rose-500/50 text-rose-300'
+                      : 'bg-cyan-950/80 border-cyan-500/40 text-cyan-300'
+                  }`}>
+                    {quota.remaining === 0 ? '0/5 Free Left' : `${quota.remaining}/${quota.totalLimit} Daily Free AI left`}
+                  </span>
+                )
+              )}
             </div>
             <p className="text-xs text-slate-400">
               {greeting}, <span className="text-cyan-200 font-semibold">{studentFirstName}</span>! Your personalized academic learning loop.

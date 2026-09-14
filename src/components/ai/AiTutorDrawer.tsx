@@ -119,6 +119,7 @@ export default function AiTutorDrawer({
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [quota, setQuota] = useState<{ remaining: number; totalLimit: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
 
   const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>([
     "Explain chirality & optical isomers with 3D intuition",
@@ -148,6 +149,18 @@ export default function AiTutorDrawer({
       return () => {
         document.body.style.overflow = originalOverflow;
       };
+    }
+  }, [isOpen]);
+
+  // Fetch daily AI quota on drawer open
+  useEffect(() => {
+    if (isOpen) {
+      fetch("/api/ai/quota")
+        .then(res => res.json())
+        .then(data => {
+          if (data?.quota) setQuota(data.quota);
+        })
+        .catch(() => {});
     }
   }, [isOpen]);
 
@@ -223,7 +236,19 @@ export default function AiTutorDrawer({
       });
 
       const data = await res.json();
+      if (data.quota) {
+        setQuota(data.quota);
+      }
       if (!res.ok || data.error) {
+        if (data.requiresSubscription) {
+          setQuota(prev => ({
+            remaining: 0,
+            totalLimit: 5,
+            isUnlimited: false,
+            queriesUsed: 5,
+            ...prev
+          }));
+        }
         throw new Error(data.error || "Failed to reach PIECHEM AI tutor");
       }
 
@@ -252,10 +277,13 @@ export default function AiTutorDrawer({
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err: any) {
+      const isQuotaExceeded = err.message?.includes("limit reached") || err.message?.includes("Daily free AI");
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `**Notice**: ${err.message || "An unexpected error occurred. Please try asking again."}`,
+        content: isQuotaExceeded
+          ? `✨ **Daily Free AI Quota Reached (5/5)**\n\nYou've used your 5 free AI queries for today. Upgrade to **[PIECHEM Gold (₹99/month)](/dashboard/account)** for unlimited AI tutoring, adaptive tests, and step-by-step guidance — or return tomorrow for 5 new free questions!`
+          : `**Notice**: ${err.message || "An unexpected error occurred. Please try asking again."}`,
         sourceCategory: 'GENERAL_ACADEMIC',
         groundedInPiechem: false,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -346,6 +374,22 @@ export default function AiTutorDrawer({
               <span className="hidden sm:inline-flex shrink-0 rounded-full bg-red-950/80 border border-red-500/40 px-2.5 py-0.5 text-[10px] text-red-300 font-bold uppercase shadow-sm">
                 AI Tutor
               </span>
+              {quota && (
+                quota.isUnlimited ? (
+                  <span className="hidden sm:inline-flex items-center gap-1 shrink-0 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] text-amber-300 font-bold uppercase shadow-sm">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    Gold Unlimited
+                  </span>
+                ) : (
+                  <span className={`hidden sm:inline-flex items-center gap-1 shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase shadow-sm border ${
+                    quota.remaining === 0
+                      ? 'bg-rose-950/80 border-rose-500/50 text-rose-300'
+                      : 'bg-red-950/60 border-red-500/30 text-red-200'
+                  }`}>
+                    {quota.remaining} / {quota.totalLimit} Free Left Today
+                  </span>
+                )
+              )}
             </div>
             <p className="hidden text-[11px] text-slate-400 sm:block">
               {language === 'bn' ? "শিক্ষামূলক এআই সহকারী" : "Conversational STEM Learning Assistant"}
@@ -728,6 +772,23 @@ export default function AiTutorDrawer({
           )}
 
           {/* Floating Prompt Capsule */}
+          {quota && !quota.isUnlimited && quota.remaining === 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 rounded-2xl bg-gradient-to-r from-amber-950/90 via-rose-950/80 to-amber-950/90 border border-amber-500/40 p-3 text-xs text-amber-200 shadow-xl mb-2">
+              <div className="flex items-center gap-2 text-center sm:text-left">
+                <Sparkles className="h-4 w-4 text-amber-400 shrink-0 animate-pulse" />
+                <span>
+                  You have reached your <strong>5 free AI queries</strong> for today. Upgrade to PIECHEM Gold to unlock unlimited AI prompts!
+                </span>
+              </div>
+              <a
+                href="/dashboard/account"
+                className="shrink-0 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold px-4 py-1.5 text-xs shadow-md transition-all active:scale-95"
+              >
+                Upgrade to Gold (₹99)
+              </a>
+            </div>
+          )}
+
           <form
             onSubmit={(e) => {
               e.preventDefault();

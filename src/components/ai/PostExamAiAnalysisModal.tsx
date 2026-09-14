@@ -31,6 +31,7 @@ export default function PostExamAiAnalysisModal({
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isQuotaExceeded, setIsQuotaExceeded] = useState<boolean>(false);
   const [report, setReport] = useState<any>(null);
   const [showAdaptiveDrill, setShowAdaptiveDrill] = useState(false);
   const [drillTopic, setDrillTopic] = useState<string | undefined>(undefined);
@@ -50,6 +51,7 @@ export default function PostExamAiAnalysisModal({
     if (!attemptId) return;
     setLoading(true);
     setError(null);
+    setIsQuotaExceeded(false);
 
     fetch("/api/ai/performance-report", {
       method: "POST",
