@@ -40,7 +40,7 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
   const [profile, setProfile] = useState<StudentLearningProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [quota, setQuota] = useState<{ remaining: number; totalLimit: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
+  const [quota, setQuota] = useState<{ remaining: number; totalLimit: number; dailyLimit?: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
 
   const fetchProfile = async () => {
     try {
@@ -106,7 +106,7 @@ export default function DashboardAiWidget({ onOpenTutor, onOpenAdaptiveQuiz }: D
                       ? 'bg-rose-950/80 border-rose-500/50 text-rose-300'
                       : 'bg-cyan-950/80 border-cyan-500/40 text-cyan-300'
                   }`}>
-                    {quota.remaining === 0 ? '0/5 Free Left' : `${quota.remaining}/${quota.totalLimit} Daily Free AI left`}
+                    {quota.remaining === 0 ? '0/5 Free Left' : `${quota.remaining}/${quota.totalLimit || (quota as any).dailyLimit || 5} Daily Free AI left`}
                   </span>
                 )
               )}

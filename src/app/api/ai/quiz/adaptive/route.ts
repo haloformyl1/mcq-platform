@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       ...result,
       quota: {
         queriesUsed: quota.queriesUsed,
+        totalLimit: quota.totalLimit,
         dailyLimit: quota.totalLimit,
         remaining: quota.remaining,
         isUnlimited: quota.isUnlimited

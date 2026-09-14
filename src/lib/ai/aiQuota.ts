@@ -9,6 +9,7 @@ export interface AiQuotaResult {
   isUnlimited: boolean;
   remaining: number;
   totalLimit: number;
+  dailyLimit: number;
   queriesUsed: number;
   requiresSubscription?: boolean;
   isCustomKey?: boolean;
@@ -43,6 +44,7 @@ export async function consumeAiQuota(
       isUnlimited: true,
       remaining: 999,
       totalLimit: 999,
+      dailyLimit: 999,
       queriesUsed: 0,
       isCustomKey: true
     };
@@ -54,6 +56,7 @@ export async function consumeAiQuota(
       isUnlimited: false,
       remaining: 0,
       totalLimit: DAILY_FREE_AI_LIMIT,
+      dailyLimit: DAILY_FREE_AI_LIMIT,
       queriesUsed: DAILY_FREE_AI_LIMIT,
       requiresSubscription: true,
       error: 'Please log in to use PIECHEM AI.'
@@ -77,6 +80,7 @@ export async function consumeAiQuota(
       isUnlimited: false,
       remaining: 0,
       totalLimit: DAILY_FREE_AI_LIMIT,
+      dailyLimit: DAILY_FREE_AI_LIMIT,
       queriesUsed: DAILY_FREE_AI_LIMIT,
       requiresSubscription: true,
       error: 'Student account not found.'
@@ -91,6 +95,7 @@ export async function consumeAiQuota(
       isUnlimited: true,
       remaining: 999,
       totalLimit: 999,
+      dailyLimit: 999,
       queriesUsed: student.aiQueriesToday || 0
     };
   }
@@ -105,6 +110,7 @@ export async function consumeAiQuota(
       isUnlimited: false,
       remaining: 0,
       totalLimit: DAILY_FREE_AI_LIMIT,
+      dailyLimit: DAILY_FREE_AI_LIMIT,
       queriesUsed: currentCount,
       requiresSubscription: true,
       error: `Daily free AI limit reached (${DAILY_FREE_AI_LIMIT}/${DAILY_FREE_AI_LIMIT}). Upgrade to PIECHEM Gold for unlimited AI queries or return tomorrow!`
@@ -126,6 +132,7 @@ export async function consumeAiQuota(
     isUnlimited: false,
     remaining: Math.max(0, DAILY_FREE_AI_LIMIT - updatedCount),
     totalLimit: DAILY_FREE_AI_LIMIT,
+    dailyLimit: DAILY_FREE_AI_LIMIT,
     queriesUsed: updatedCount
   };
 }
@@ -140,6 +147,7 @@ export async function getAiQuotaStatus(studentId?: string | null): Promise<AiQuo
       isUnlimited: false,
       remaining: 0,
       totalLimit: DAILY_FREE_AI_LIMIT,
+      dailyLimit: DAILY_FREE_AI_LIMIT,
       queriesUsed: 0
     };
   }
@@ -160,6 +168,7 @@ export async function getAiQuotaStatus(studentId?: string | null): Promise<AiQuo
       isUnlimited: false,
       remaining: 0,
       totalLimit: DAILY_FREE_AI_LIMIT,
+      dailyLimit: DAILY_FREE_AI_LIMIT,
       queriesUsed: 0
     };
   }
@@ -171,6 +180,7 @@ export async function getAiQuotaStatus(studentId?: string | null): Promise<AiQuo
       isUnlimited: true,
       remaining: 999,
       totalLimit: 999,
+      dailyLimit: 999,
       queriesUsed: student.aiQueriesToday || 0
     };
   }
@@ -183,6 +193,7 @@ export async function getAiQuotaStatus(studentId?: string | null): Promise<AiQuo
     isUnlimited: false,
     remaining: Math.max(0, DAILY_FREE_AI_LIMIT - currentCount),
     totalLimit: DAILY_FREE_AI_LIMIT,
+    dailyLimit: DAILY_FREE_AI_LIMIT,
     queriesUsed: currentCount,
     requiresSubscription: currentCount >= DAILY_FREE_AI_LIMIT
   };
@@ -198,6 +209,7 @@ export function createAiQuotaExceededResponse(quota: AiQuotaResult): NextRespons
       requiresSubscription: true,
       quota: {
         queriesUsed: quota.queriesUsed,
+        totalLimit: quota.totalLimit,
         dailyLimit: quota.totalLimit,
         remaining: quota.remaining,
         isUnlimited: quota.isUnlimited

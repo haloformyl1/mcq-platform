@@ -40,6 +40,7 @@ interface AiTutorDrawerProps {
   onClose: () => void;
   initialMode?: 'tutor' | 'practice' | 'doubt' | 'revision' | 'study_plan' | 'exam';
   initialContext?: AcademicContext;
+  initialStudentName?: string;
 }
 
 const PROMPT_STARTERS = [
@@ -77,7 +78,8 @@ export default function AiTutorDrawer({
   isOpen,
   onClose,
   initialMode = 'tutor',
-  initialContext
+  initialContext,
+  initialStudentName
 }: AiTutorDrawerProps) {
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
   const [language, setLanguage] = useState<'en' | 'bn'>(() => {
@@ -119,7 +121,14 @@ export default function AiTutorDrawer({
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
-  const [quota, setQuota] = useState<{ remaining: number; totalLimit: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
+  const [quota, setQuota] = useState<{ remaining: number; totalLimit?: number; dailyLimit?: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
+  const [studentName, setStudentName] = useState<string>(() => {
+    if (initialStudentName && initialStudentName.trim()) return initialStudentName.trim();
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('piechem_student_name') || 'Scholar';
+    }
+    return 'Scholar';
+  });
 
   const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>([
     "Explain chirality & optical isomers with 3D intuition",
@@ -133,12 +142,15 @@ export default function AiTutorDrawer({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Synchronize initial context
+  // Synchronize initial context & name
   useEffect(() => {
     if (initialContext) {
       setContext(initialContext);
     }
-  }, [initialContext]);
+    if (initialStudentName && initialStudentName.trim()) {
+      setStudentName(initialStudentName.trim());
+    }
+  }, [initialContext, initialStudentName]);
 
   // Lock body scroll when full-screen AI modal is active
   useEffect(() => {
@@ -155,13 +167,19 @@ export default function AiTutorDrawer({
     }
   }, [isOpen]);
 
-  // Fetch daily AI quota on drawer open
+  // Fetch daily AI quota and student profile on drawer open
   useEffect(() => {
     if (isOpen) {
       fetch("/api/ai/quota")
         .then(res => res.json())
         .then(data => {
           if (data?.quota) setQuota(data.quota);
+          if (data?.studentName && data.studentName !== 'Scholar') {
+            setStudentName(data.studentName);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('piechem_student_name', data.studentName);
+            }
+          }
         })
         .catch(() => {});
     }
@@ -247,6 +265,7 @@ export default function AiTutorDrawer({
           setQuota(prev => ({
             remaining: 0,
             totalLimit: 5,
+            dailyLimit: 5,
             isUnlimited: false,
             queriesUsed: 5,
             ...prev
@@ -389,7 +408,7 @@ export default function AiTutorDrawer({
                       ? 'bg-rose-950/80 border-rose-500/50 text-rose-300'
                       : 'bg-red-950/60 border-red-500/30 text-red-200'
                   }`}>
-                    {quota.remaining} / {quota.totalLimit} Free Left Today
+                    {quota.remaining} / {quota.totalLimit || (quota as any).dailyLimit || 5} Free Left Today
                   </span>
                 )
               )}
@@ -476,31 +495,40 @@ export default function AiTutorDrawer({
         </div>
       </header>
 
-      {/* Middle Scrollable Chat Area */}
+      {/* Middle Chat Area - Fixed/Stationary when empty, Scrollable when messages exist */}
       <main 
         ref={chatContainerRef} 
-        className="relative flex-1 min-h-0 overflow-y-auto ai-scroll-container no-scrollbar px-3 sm:px-8 py-4 sm:py-6 scroll-smooth z-10"
+        className={`relative flex-1 min-h-0 ${
+          messages.length === 0 
+            ? 'overflow-hidden flex flex-col justify-center' 
+            : 'overflow-y-auto ai-scroll-container no-scrollbar scroll-smooth'
+        } px-3 sm:px-8 py-2 sm:py-4 z-10`}
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="max-w-4xl lg:max-w-5xl mx-auto w-full flex flex-col space-y-5">
-          {/* Welcome Hero / Empty State */}
+        <div className={`max-w-4xl lg:max-w-5xl mx-auto w-full flex flex-col ${messages.length === 0 ? 'h-full justify-center' : 'space-y-5'}`}>
+          {/* Welcome Hero / Empty State - Strictly stationary, fixed in viewport (no mouse wheel scroll) */}
           {messages.length === 0 && (
-            <div className="py-4 sm:py-10 text-center animate-in fade-in duration-200">
-              <div className="mx-auto mb-3.5 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-red-600/25 via-rose-950/40 to-black/80 border border-red-500/40 shadow-2xl shadow-red-950/60 backdrop-blur-xl group hover:scale-105 transition-all sm:h-20 sm:w-20">
-                <PiechemAiLogo size="lg" animated />
+            <div 
+              className="py-1 sm:py-2 text-center animate-in fade-in duration-200 select-none my-auto"
+              onWheel={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-tr from-red-600/25 via-rose-950/40 to-black/80 border border-red-500/40 shadow-2xl shadow-red-950/60 backdrop-blur-xl group hover:scale-105 transition-all sm:h-16 sm:w-16">
+                <PiechemAiLogo size="md" animated />
               </div>
 
-              <h3 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-                {language === 'bn' ? "নমস্কার, শিক্ষার্থী" : "Hello, Scholar"}
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {language === 'bn' 
+                  ? `নমস্কার, ${studentName && studentName !== 'Scholar' ? studentName : 'শিক্ষার্থী'}` 
+                  : `Hello, ${studentName || 'Scholar'}`}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto mt-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto mt-1.5 sm:mt-2 leading-relaxed">
                 {language === 'bn'
                   ? "আজ কোন বিষয়টি আয়ত্ত করবেন? রসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো একাডেমিক প্রশ্ন, প্রতিপাদন বা সংশয় জিজ্ঞাসা করুন।"
                   : "What concept shall we master today? Ask any academic question, derivation, or doubt in Chemistry, Physics, and Math."}
               </p>
 
               {/* Quick Starter Cards */}
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+              <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 max-w-2xl mx-auto">
                 {PROMPT_STARTERS.map((card, idx) => {
                   const Icon = card.icon;
                   return (
@@ -508,9 +536,9 @@ export default function AiTutorDrawer({
                       key={idx}
                       type="button"
                       onClick={() => handleSendMessage(card.prompt)}
-                      className={`group relative p-3 sm:p-4 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
+                      className={`group relative p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
                     >
-                      <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">
                           {card.subject}
                         </span>
@@ -519,7 +547,7 @@ export default function AiTutorDrawer({
                       <h4 className="text-xs sm:text-sm font-semibold text-white group-hover:text-red-200 transition-colors">
                         {card.title}
                       </h4>
-                      <p className="text-[11px] text-slate-400 line-clamp-2 mt-1 leading-normal">
+                      <p className="text-[11px] text-slate-400 line-clamp-2 mt-0.5 sm:mt-1 leading-normal">
                         {card.prompt}
                       </p>
                     </button>

@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       studyPlan: plan,
       quota: {
         queriesUsed: quota.queriesUsed,
+        totalLimit: quota.totalLimit,
         dailyLimit: quota.totalLimit,
         remaining: quota.remaining,
         isUnlimited: quota.isUnlimited
