@@ -122,6 +122,16 @@ export default function AiTutorDrawer({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number; totalLimit?: number; dailyLimit?: number; isUnlimited: boolean; queriesUsed?: number } | null>(null);
+  const [goldPrice, setGoldPrice] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('piechem_gold_price');
+      if (cached) {
+        const p = parseInt(cached, 10);
+        if (!isNaN(p) && p > 0) return p;
+      }
+    }
+    return 199;
+  });
   const [studentName, setStudentName] = useState<string>(() => {
     if (initialStudentName && initialStudentName.trim()) return initialStudentName.trim();
     if (typeof window !== 'undefined') {
@@ -174,6 +184,12 @@ export default function AiTutorDrawer({
         .then(res => res.json())
         .then(data => {
           if (data?.quota) setQuota(data.quota);
+          if (data?.goldPrice) {
+            setGoldPrice(data.goldPrice);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('piechem_gold_price', String(data.goldPrice));
+            }
+          }
           if (data?.studentName && data.studentName !== 'Scholar') {
             setStudentName(data.studentName);
             if (typeof window !== 'undefined') {
@@ -260,6 +276,12 @@ export default function AiTutorDrawer({
       if (data.quota) {
         setQuota(data.quota);
       }
+      if (data.goldPrice) {
+        setGoldPrice(data.goldPrice);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('piechem_gold_price', String(data.goldPrice));
+        }
+      }
       if (!res.ok || data.error) {
         if (data.requiresSubscription) {
           setQuota(prev => ({
@@ -304,7 +326,7 @@ export default function AiTutorDrawer({
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: isQuotaExceeded
-          ? `✨ **Daily Free AI Quota Reached (5/5)**\n\nYou've used your 5 free AI queries for today. Upgrade to **[PIECHEM Gold (₹99/month)](/dashboard/account)** for unlimited AI tutoring, adaptive tests, and step-by-step guidance — or return tomorrow for 5 new free questions!`
+          ? `✨ **Daily Free AI Quota Reached (5/5)**\n\nYou've used your 5 free AI queries for today. Upgrade to **[PIECHEM Gold (₹${goldPrice}/month)](/dashboard/account)** for unlimited AI tutoring, adaptive tests, and step-by-step guidance — or return tomorrow for 5 new free questions!`
           : `**Notice**: ${err.message || "An unexpected error occurred. Please try asking again."}`,
         sourceCategory: 'GENERAL_ACADEMIC',
         groundedInPiechem: false,
@@ -816,7 +838,7 @@ export default function AiTutorDrawer({
                 href="/dashboard/account"
                 className="shrink-0 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold px-4 py-1.5 text-xs shadow-md transition-all active:scale-95"
               >
-                Upgrade to Gold (₹99)
+                Upgrade to Gold (₹{goldPrice})
               </a>
             </div>
           )}

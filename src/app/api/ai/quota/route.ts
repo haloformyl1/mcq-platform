@@ -12,8 +12,28 @@ export async function GET(req: NextRequest) {
     const sessionCookie = cookieStore.get('session')?.value;
     const student = sessionCookie ? await decrypt(sessionCookie) : null;
 
+    // Fetch dynamic gold membership price set by Admin in PaymentSetting
+    const paymentSetting = await prisma.paymentSetting.findUnique({
+      where: { id: 'default' },
+      select: { monthlyFee: true }
+    });
+    const goldPrice = paymentSetting?.monthlyFee ? Math.round(paymentSetting.monthlyFee) : 199;
+
     if (!student || !student.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({
+        success: false,
+        error: 'Unauthorized',
+        goldPrice,
+        quota: {
+          allowed: false,
+          isUnlimited: false,
+          remaining: 0,
+          totalLimit: 5,
+          dailyLimit: 5,
+          queriesUsed: 0
+        },
+        studentName: 'Scholar'
+      }, { status: 401 });
     }
 
     const [quota, studentRecord] = await Promise.all([
@@ -41,10 +61,11 @@ export async function GET(req: NextRequest) {
         totalLimit: quota.totalLimit,
         dailyLimit: quota.totalLimit
       },
-      studentName: givenName
+      studentName: givenName,
+      goldPrice
     });
   } catch (err: any) {
     console.error('AI Quota Route Error:', err);
-    return NextResponse.json({ error: 'Failed to retrieve AI quota status' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to retrieve AI quota status', goldPrice: 199 }, { status: 500 });
   }
 }

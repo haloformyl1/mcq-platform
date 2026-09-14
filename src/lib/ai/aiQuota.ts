@@ -202,11 +202,31 @@ export async function getAiQuotaStatus(studentId?: string | null): Promise<AiQuo
 /**
  * Standard HTTP 403 Response for exhausted AI Quota
  */
-export function createAiQuotaExceededResponse(quota: AiQuotaResult): NextResponse {
+/**
+ * Retrieves the dynamic Gold membership price set by Admin in PaymentSetting
+ */
+export async function getDynamicGoldPrice(): Promise<number> {
+  try {
+    const setting = await prisma.paymentSetting.findUnique({
+      where: { id: 'default' },
+      select: { monthlyFee: true }
+    });
+    return setting?.monthlyFee ? Math.round(setting.monthlyFee) : 199;
+  } catch {
+    return 199;
+  }
+}
+
+/**
+ * Standard HTTP 403 Response for exhausted AI Quota with dynamic Gold price
+ */
+export async function createAiQuotaExceededResponse(quota: AiQuotaResult, customPrice?: number): Promise<NextResponse> {
+  const goldPrice = customPrice || (await getDynamicGoldPrice());
   return NextResponse.json(
     {
-      error: quota.error || 'Daily free AI quota reached.',
+      error: quota.error || `Daily free AI limit reached (${quota.totalLimit}/${quota.totalLimit}). Upgrade to PIECHEM Gold (₹${goldPrice}/month) for unlimited AI queries or return tomorrow!`,
       requiresSubscription: true,
+      goldPrice,
       quota: {
         queriesUsed: quota.queriesUsed,
         totalLimit: quota.totalLimit,

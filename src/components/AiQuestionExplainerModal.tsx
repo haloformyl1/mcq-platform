@@ -35,6 +35,16 @@ export default function AiQuestionExplainerModal({
   const [diagnosis, setDiagnosis] = useState<any>(null);
   const [hintLevel, setHintLevel] = useState<number>(1);
   const [showFullSolution, setShowFullSolution] = useState(false);
+  const [goldPrice, setGoldPrice] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('piechem_gold_price');
+      if (cached) {
+        const p = parseInt(cached, 10);
+        if (!isNaN(p) && p > 0) return p;
+      }
+    }
+    return 199;
+  });
   
   // Persistent language state (synchronized with other AI tools)
   const [language, setLanguage] = useState<'en' | 'bn'>(() => {
@@ -43,6 +53,23 @@ export default function AiQuestionExplainerModal({
     }
     return 'en';
   });
+
+  // Fetch dynamic Gold price on modal open
+  useEffect(() => {
+    if (isOpen) {
+      fetch("/api/ai/quota")
+        .then(res => res.json())
+        .then(data => {
+          if (data?.goldPrice) {
+            setGoldPrice(data.goldPrice);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('piechem_gold_price', String(data.goldPrice));
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isOpen]);
 
   // Listen for language changes from other modals/drawers
   useEffect(() => {
@@ -226,7 +253,7 @@ export default function AiQuestionExplainerModal({
                 <div className="space-y-1">
                   <h4 className="text-base font-extrabold text-white">Daily Free AI Limit Reached (5/5)</h4>
                   <p className="text-xs text-amber-200/80 max-w-md mx-auto leading-relaxed">
-                    You have used your 5 free AI queries for today. Upgrade to <strong>PIECHEM Gold (₹99/month)</strong> for unlimited AI doubts, progressive hints, and adaptive mocks — or return tomorrow for 5 new queries!
+                    You have used your 5 free AI queries for today. Upgrade to <strong>PIECHEM Gold (₹{goldPrice}/month)</strong> for unlimited AI doubts, progressive hints, and adaptive mocks — or return tomorrow for 5 new queries!
                   </p>
                 </div>
                 <div className="pt-2 flex justify-center items-center gap-3">
@@ -235,7 +262,7 @@ export default function AiQuestionExplainerModal({
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold text-xs shadow-lg shadow-amber-950/50 transition-all active:scale-95"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Upgrade to Gold (₹99)</span>
+                    <span>Upgrade to Gold (₹{goldPrice})</span>
                   </a>
                   <button
                     type="button"

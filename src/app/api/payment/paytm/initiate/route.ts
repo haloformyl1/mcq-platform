@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const mid = settings?.paytmMid || process.env.PAYTM_MID;
     const mkey = settings?.paytmMerchantKey || process.env.PAYTM_MERCHANT_KEY;
     const website = settings?.paytmWebsite || process.env.PAYTM_WEBSITE || "DEFAULT";
-    const amount = (settings?.monthlyFee || 99.0).toFixed(2);
+    const amount = (settings?.monthlyFee || 199.0).toFixed(2);
 
     if (!mid || !mkey) {
       return NextResponse.json({ 

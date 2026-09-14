@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "@/lib/ai/rateLimiter";
-import { consumeAiQuota, createAiQuotaExceededResponse } from "@/lib/ai/aiQuota";
+import { consumeAiQuota, createAiQuotaExceededResponse, getDynamicGoldPrice } from "@/lib/ai/aiQuota";
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     // DAILY FREE TIER AI QUOTA CHECK
     const quota = await consumeAiQuota(student?.id, userApiKey);
     if (!quota.allowed) {
-      return createAiQuotaExceededResponse(quota);
+      return await createAiQuotaExceededResponse(quota);
     }
 
     const mergedContext = {
@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
       ...result,
       reply: result.answer,
       content: result.answer,
+      goldPrice: await getDynamicGoldPrice(),
       quota: {
         queriesUsed: quota.queriesUsed,
         totalLimit: quota.totalLimit,

@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     // DAILY FREE TIER AI QUOTA CHECK
     const quota = await consumeAiQuota(student.id, userApiKey);
     if (!quota.allowed) {
-      return createAiQuotaExceededResponse(quota);
+      return await createAiQuotaExceededResponse(quota);
     }
 
     const baseReport = await generatePerformanceReport({
