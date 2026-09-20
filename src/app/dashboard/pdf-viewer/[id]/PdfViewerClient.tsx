@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Shield, FileText, Lock, Sparkles } from "lucide-react";
+import PiechemLogo from "@/components/PiechemLogo";
+import { Shield, FileText, Lock, Sparkles } from "lucide-react";
 
 interface PdfViewerClientProps {
   material: {
@@ -51,13 +52,13 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
       {/* 1. SECURE TOP NAVIGATION BAR */}
       <header className="h-14 sm:h-16 px-3 sm:px-6 bg-[#081320]/95 border-b border-cyan-500/20 backdrop-blur-md flex items-center justify-between gap-3 z-30 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-bold transition shadow-sm shrink-0"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back to Vault</span>
-          </Link>
+          <div className="shrink-0 flex items-center pr-1 sm:pr-2 border-r border-slate-800/80">
+            <PiechemLogo 
+              size="sm" 
+              href="/dashboard" 
+              isGoldMember={student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
+            />
+          </div>
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
