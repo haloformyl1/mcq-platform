@@ -4,8 +4,9 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { hasPremiumAccess } from "@/lib/subscription";
+import { validateStudentSession } from "@/lib/sessionService";
 import LabViewerClient from "./LabViewerClient";
-import { Lock, Crown, ArrowLeft, Sparkles, CheckCircle2 } from "lucide-react";
+import { Crown, ArrowLeft, Sparkles, CheckCircle2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,13 @@ export default async function LabViewerPage({
 
   if (!payload || !payload.id) {
     redirect("/login");
+  }
+
+  // Enforce single active device concurrency check
+  const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore);
+  if (!isValid || isRevoked) {
+    cookieStore.delete("session");
+    redirect("/login?reason=concurrent_device");
   }
 
   const student = await prisma.student.findUnique({

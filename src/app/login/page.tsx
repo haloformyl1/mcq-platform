@@ -51,6 +51,15 @@ export default function StudentLogin() {
   const allReqsMet = reqLength && reqUpper && reqLower && reqNumber && reqSpecial;
 
   useEffect(() => {
+    // Check if redirected due to concurrent device login
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("reason") === "concurrent_device") {
+        setError("You have been logged out because your account was logged into on another device. Only 1 active device is permitted at a time.");
+        return;
+      }
+    }
+
     fetch("/api/student/dashboard")
       .then((res) => {
         if (!res.ok) return null;

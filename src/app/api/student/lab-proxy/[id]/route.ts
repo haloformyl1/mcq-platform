@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import { hasPremiumAccess } from "@/lib/subscription";
+import { validateStudentSession } from "@/lib/sessionService";
 
 export const dynamic = 'force-dynamic';
 
@@ -32,9 +33,39 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
 </head>
 <body>
   <div class="card">
-    <h2>🔒 Student Login Required</h2>
+    <h2>Student Login Required</h2>
     <p>Please log in to your student account to access this 3D Chemistry Interactive Simulation.</p>
     <a href="/login" target="_top">Go to Login</a>
+  </div>
+</body>
+</html>`,
+        { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } }
+      );
+    }
+
+    // Enforce single active device concurrency check
+    const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore, req);
+    if (!isValid || isRevoked) {
+      cookieStore.delete("session");
+      return new NextResponse(
+        `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Session Terminated</title>
+  <style>
+    body { background: #040b12; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+    .card { background: #081420; border: 1px solid rgba(239, 68, 68, 0.4); padding: 32px; border-radius: 16px; max-width: 440px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    h2 { color: #f87171; margin: 0 0 12px 0; font-size: 20px; }
+    p { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 0 0 20px 0; }
+    a { display: inline-block; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; text-decoration: none; padding: 10px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Session Terminated</h2>
+    <p>Your account was logged into on another device. In accordance with platform security rules, only one active device session is permitted at a time.</p>
+    <a href="/login?reason=concurrent_device" target="_top">Log In on This Device</a>
   </div>
 </body>
 </html>`,
@@ -79,7 +110,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
 </head>
 <body>
   <div class="card">
-    <h2>👑 Gold Access Required</h2>
+    <h2>Gold Access Required</h2>
     <p>This 3D Interactive Chemistry Lab is an exclusive feature of the Gold membership. Upgrade your subscription to unlock all 3D virtual simulations and premium vaults.</p>
     <a href="/dashboard/account" target="_top">Upgrade to Gold Membership</a>
   </div>
@@ -114,28 +145,21 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       const urlObj = new URL(finalUrl);
       
       let baseHref = finalUrl;
-      // If the pathname ends with a specific file like index.html or sim.php, get directory
       if (/\.[a-zA-Z0-9]+$/.test(urlObj.pathname)) {
         baseHref = finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
       } else if (!baseHref.endsWith('/')) {
         baseHref += '/';
       }
 
-      // Security and resilience injections:
-      // 1. Canonical base tag for relative assets (./assets/...)
-      // 2. Neutralize ServiceWorker to prevent cross-origin DOMExceptions
-      // 3. Redirect back to platform viewer if opened directly
       const injection = `
   <base href="${baseHref}">
   <script>
     try {
-      // Neutralize cross-origin ServiceWorker registrations that cause DOMExceptions in proxied frames
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register = function() {
           return Promise.reject(new Error('PWA ServiceWorker bypassed in secure viewer'));
         };
       }
-      // Frame Guard: redirect back to full platform viewer if launched standalone
       if (window.top === window.self) {
         window.location.replace('/dashboard/lab-viewer/${cleanId}');
       }
@@ -151,11 +175,9 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         html = `<head>${injection}</head>${html}`;
       }
 
-      // Strip any restrictive meta CSP or X-Frame-Options tags inside the HTML
       html = html.replace(/<meta[^>]*http-equiv=["']content-security-policy["'][^>]*>/gi, '');
       html = html.replace(/<meta[^>]*http-equiv=["']x-frame-options["'][^>]*>/gi, '');
 
-      // Rewrite root-relative URLs (/assets/ -> origin/assets/) for bundles not using relative ./
       const origin = urlObj.origin;
       html = html.replace(/(src|href)=["']\/(?!\/)([^"']*)["']/gi, (match, attr, path) => {
         return `${attr}="${origin}/${path}"`;
@@ -171,7 +193,6 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       });
     }
 
-    // Stream other content types directly (CSS, JS, textures, GLTF, binary)
     const buffer = await response.arrayBuffer();
     return new NextResponse(buffer, {
       status: 200,

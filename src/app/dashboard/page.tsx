@@ -79,7 +79,11 @@ export default function StudentDashboard() {
       .then(res => res.json())
       .then(data => {
         if (data.error) {
-          router.push("/");
+          if (data.error.includes("revoked") || data.code === "CONCURRENT_DEVICE") {
+            router.push("/login?reason=concurrent_device");
+          } else {
+            router.push("/");
+          }
           return;
         }
         setData(data);

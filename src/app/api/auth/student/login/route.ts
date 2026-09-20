@@ -1,4 +1,4 @@
-﻿import { touchOrCreateStudentSession } from "@/lib/sessionService";
+import { registerStudentLoginSession } from "@/lib/sessionService";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -121,7 +121,8 @@ export async function POST(req: Request) {
     });
 
     try {
-      await touchOrCreateStudentSession(student.id, req, cookieStore);
+      // Enforce strict single active device: Revoke all existing sessions and activate this device
+      await registerStudentLoginSession(student.id, req, cookieStore);
     } catch (err) {
       console.error("Device session registration error:", err);
     }

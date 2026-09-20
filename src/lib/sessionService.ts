@@ -37,7 +37,6 @@ export async function ensureSessionTable() {
     `);
     sessionTableInitialized = true;
   } catch (err) {
-    // Suppress if already exists
     sessionTableInitialized = true;
   }
 }
@@ -100,7 +99,6 @@ export function parseUserAgent(uaString: string | null | undefined): ParsedDevic
     ? "Mobile browser" 
     : (deviceType === "tablet" ? "Tablet browser" : "Web browser");
   
-  // Format exact Netflix style: "PC Chrome - Web browser"
   const deviceName = `${os} ${browser} - ${browserSuffix}`;
 
   return {
@@ -115,7 +113,6 @@ export function formatNetflixDeviceDate(dateInput: Date | string | number): stri
   const d = new Date(dateInput);
   if (isNaN(d.getTime())) return "-";
 
-  // Match: 05/09/26, 10:02 pm IST
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = String(d.getFullYear()).slice(-2);
@@ -141,24 +138,25 @@ export function extractClientIp(req?: Request): string {
   return "Unknown";
 }
 
-export async function touchOrCreateStudentSession(
+/**
+ * Called exclusively upon successful login (/api/auth/student/login).
+ * Revokes all previous active sessions for this student so only the newly logged-in device is active.
+ */
+export async function registerStudentLoginSession(
   studentId: string,
   req: Request,
   cookieStore: any
-): Promise<{ deviceId: string; isRevoked: boolean }> {
+): Promise<{ deviceId: string }> {
   await ensureSessionTable();
 
   let deviceId = cookieStore.get("piechem_device_id")?.value;
-  let isNew = false;
   if (!deviceId) {
     deviceId = `dev_${crypto.randomBytes(12).toString("hex")}`;
-    isNew = true;
   }
 
-  // Always ensure deviceId cookie is set/extended
   cookieStore.set("piechem_device_id", deviceId, {
     path: "/",
-    maxAge: 60 * 60 * 24 * 400, // 400 days
+    maxAge: 60 * 60 * 24 * 400,
     httpOnly: false,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -168,8 +166,70 @@ export async function touchOrCreateStudentSession(
   const parsed = parseUserAgent(uaString);
   const ip = extractClientIp(req);
 
+  // 1. Strict single-device policy: Mark ALL existing active sessions for this student as revoked
+  await prisma.studentSession.updateMany({
+    where: {
+      studentId,
+      isRevoked: false,
+    },
+    data: {
+      isRevoked: true,
+    },
+  });
+
+  // 2. Activate or reactivate this device session
+  await prisma.studentSession.upsert({
+    where: {
+      studentId_deviceId: {
+        studentId,
+        deviceId,
+      },
+    },
+    create: {
+      studentId,
+      deviceId,
+      deviceName: parsed.deviceName,
+      deviceType: parsed.deviceType,
+      browser: parsed.browser,
+      os: parsed.os,
+      ipAddress: ip,
+      userAgent: uaString || undefined,
+      lastActive: new Date(),
+      isRevoked: false,
+    },
+    update: {
+      deviceName: parsed.deviceName,
+      deviceType: parsed.deviceType,
+      browser: parsed.browser,
+      os: parsed.os,
+      ipAddress: ip,
+      userAgent: uaString || undefined,
+      lastActive: new Date(),
+      isRevoked: false,
+    },
+  });
+
+  return { deviceId };
+}
+
+/**
+ * Validates whether the student's current device is the single authorized active device.
+ * If revoked or missing, returns isValid: false, isRevoked: true.
+ */
+export async function validateStudentSession(
+  studentId: string,
+  cookieStore: any,
+  req?: Request
+): Promise<{ isValid: boolean; isRevoked: boolean; deviceId: string; reason?: string }> {
+  await ensureSessionTable();
+
+  const deviceId = cookieStore.get("piechem_device_id")?.value;
+  if (!deviceId) {
+    return { isValid: false, isRevoked: true, deviceId: "", reason: "NO_DEVICE" };
+  }
+
   try {
-    const existing = await prisma.studentSession.findUnique({
+    const session = await prisma.studentSession.findUnique({
       where: {
         studentId_deviceId: {
           studentId,
@@ -178,45 +238,64 @@ export async function touchOrCreateStudentSession(
       },
     });
 
-    if (existing) {
-      if (existing.isRevoked) {
-        return { deviceId, isRevoked: true };
-      }
-      await prisma.studentSession.update({
-        where: { id: existing.id },
-        data: {
-          lastActive: new Date(),
-          deviceName: parsed.deviceName,
-          deviceType: parsed.deviceType,
-          browser: parsed.browser,
-          os: parsed.os,
-          ipAddress: ip,
-          userAgent: uaString || undefined,
-        },
+    if (!session) {
+      // If the student has NO sessions registered yet (legacy migration), register this first device
+      const totalSessions = await prisma.studentSession.count({
+        where: { studentId },
       });
-      return { deviceId, isRevoked: false };
+      if (totalSessions === 0) {
+        const uaString = req?.headers?.get("user-agent");
+        const parsed = parseUserAgent(uaString);
+        const ip = extractClientIp(req);
+        await prisma.studentSession.create({
+          data: {
+            studentId,
+            deviceId,
+            deviceName: parsed.deviceName,
+            deviceType: parsed.deviceType,
+            browser: parsed.browser,
+            os: parsed.os,
+            ipAddress: ip,
+            userAgent: uaString || undefined,
+            lastActive: new Date(),
+            isRevoked: false,
+          },
+        });
+        return { isValid: true, isRevoked: false, deviceId };
+      }
+      return { isValid: false, isRevoked: true, deviceId, reason: "NOT_ACTIVE_DEVICE" };
     }
 
-    await prisma.studentSession.create({
-      data: {
-        studentId,
-        deviceId,
-        deviceName: parsed.deviceName,
-        deviceType: parsed.deviceType,
-        browser: parsed.browser,
-        os: parsed.os,
-        ipAddress: ip,
-        userAgent: uaString || undefined,
-        lastActive: new Date(),
-        isRevoked: false,
-      },
+    if (session.isRevoked) {
+      return { isValid: false, isRevoked: true, deviceId, reason: "CONCURRENT_DEVICE_REVOKED" };
+    }
+
+    // Touch last active timestamp
+    await prisma.studentSession.update({
+      where: { id: session.id },
+      data: { lastActive: new Date() },
     });
 
-    return { deviceId, isRevoked: false };
-  } catch (error) {
-    console.error("Error in touchOrCreateStudentSession:", error);
-    return { deviceId, isRevoked: false };
+    return { isValid: true, isRevoked: false, deviceId };
+  } catch (err) {
+    console.error("Error in validateStudentSession:", err);
+    return { isValid: true, isRevoked: false, deviceId };
   }
+}
+
+/**
+ * Backward compatibility wrapper for existing routes.
+ */
+export async function touchOrCreateStudentSession(
+  studentId: string,
+  req: Request,
+  cookieStore: any
+): Promise<{ deviceId: string; isRevoked: boolean }> {
+  const result = await validateStudentSession(studentId, cookieStore, req);
+  return {
+    deviceId: result.deviceId,
+    isRevoked: result.isRevoked || !result.isValid,
+  };
 }
 
 export async function getActiveStudentSessions(studentId: string, currentDeviceId?: string) {
@@ -238,7 +317,7 @@ export async function getActiveStudentSessions(studentId: string, currentDeviceI
     return sessions.map((s) => {
       const isCurrent = Boolean(currentDeviceId && s.deviceId === currentDeviceId);
       const diffMs = now - new Date(s.lastActive).getTime();
-      const isActiveNow = diffMs < 3 * 60 * 1000; // within 3 minutes
+      const isActiveNow = diffMs < 3 * 60 * 1000;
 
       return {
         id: s.id,
@@ -265,13 +344,16 @@ export async function getActiveStudentSessions(studentId: string, currentDeviceI
 export async function revokeStudentSession(studentId: string, sessionIdOrDeviceId: string) {
   await ensureSessionTable();
   try {
-    await prisma.studentSession.deleteMany({
+    await prisma.studentSession.updateMany({
       where: {
         studentId,
         OR: [
           { id: sessionIdOrDeviceId },
           { deviceId: sessionIdOrDeviceId },
         ],
+      },
+      data: {
+        isRevoked: true,
       },
     });
     return true;
@@ -284,8 +366,9 @@ export async function revokeStudentSession(studentId: string, sessionIdOrDeviceI
 export async function revokeAllStudentSessions(studentId: string) {
   await ensureSessionTable();
   try {
-    await prisma.studentSession.deleteMany({
-      where: { studentId },
+    await prisma.studentSession.updateMany({
+      where: { studentId, isRevoked: false },
+      data: { isRevoked: true },
     });
     return true;
   } catch (error) {
