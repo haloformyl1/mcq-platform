@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { ArrowLeft, Atom } from "lucide-react";
+import { Atom } from "lucide-react";
 
 interface LabViewerClientProps {
   material: {
@@ -48,16 +47,6 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
       className="relative h-screen w-screen bg-[#02060b] text-slate-100 overflow-hidden select-none"
       onContextMenu={(e) => e.preventDefault()}
     >
-      {/* Discreet Floating Exit Button (Transparent glass, never blocks the 3D lab interface) */}
-      <Link
-        href="/dashboard"
-        className="fixed top-3 left-3 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/70 hover:bg-slate-900/90 text-slate-300 hover:text-white border border-slate-700/40 backdrop-blur-md text-xs font-semibold shadow-xl opacity-40 hover:opacity-100 transition-all duration-200"
-        title="Back to Library Vault"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Exit Lab</span>
-      </Link>
-
       {/* Loading Spinner */}
       {isIframeLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#030911]/90 backdrop-blur-sm gap-3">
@@ -69,7 +58,7 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
         </div>
       )}
 
-      {/* The 100% Fullscreen In-App Iframe (No Header Offset) */}
+      {/* The 100% Fullscreen Clean In-App Iframe */}
       {frameSrc && (
         <iframe
           key={iframeKey}
