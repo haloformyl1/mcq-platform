@@ -65,6 +65,11 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       key = material.url;
     }
 
+    const { searchParams } = new URL(req.url);
+    const isDownload = searchParams.get("download") === "true" || searchParams.get("download") === "1";
+    const disposition = isDownload ? "attachment" : "inline";
+    const safeTitle = (material.title || "document").replace(/[^a-zA-Z0-9_-]/g, "_");
+
     if (key) {
       const command = new GetObjectCommand({
         Bucket: R2_BUCKET,
@@ -73,15 +78,12 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       const s3Response = await r2Client.send(command);
       const stream = (s3Response.Body as any).transformToWebStream();
 
-      const safeTitle = (material.title || "document").replace(/[^a-zA-Z0-9_-]/g, "_");
-
       return new NextResponse(stream, {
         headers: {
           "Content-Type": s3Response.ContentType || "application/pdf",
-          "Content-Disposition": `inline; filename="${safeTitle}.pdf"`,
-          "Cache-Control": "private, no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          "Content-Disposition": `${disposition}; filename="${safeTitle}.pdf"`,
+          "Cache-Control": isDownload ? "private, max-age=3600" : "private, no-cache, no-store, must-revalidate",
+          "Pragma": isDownload ? "cache" : "no-cache",
           "X-Content-Type-Options": "nosniff",
         },
       });
