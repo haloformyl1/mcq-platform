@@ -5,14 +5,15 @@ import {
   Upload, FileText, Image as ImageIcon, Link as LinkIcon, Trash2, 
   Plus, ExternalLink, Download, File, CheckCircle2, BookOpen, 
   Atom, CheckSquare, Flame, Award, GraduationCap, FileCheck, 
-  Search, Filter, Sparkles, Eye, Tag, CloudUpload, Pencil, X
+  Search, Filter, Sparkles, Eye, Tag, CloudUpload, Pencil, X, FolderUp, Folders, CheckCheck, Loader2, FileStack
 } from "lucide-react";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import { 
   LIBRARY_CATEGORIES, 
   LibraryCategoryType,
   SUBJECT_DISCIPLINES,
-  SubjectDisciplineType 
+  SubjectDisciplineType,
+  parseMaterialMetadata
 } from "@/lib/studyMaterialMetadata";
 
 
@@ -72,6 +73,180 @@ export default function AdminStudyMaterials() {
   const [filterTier, setFilterTier] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Batch Folder Upload State
+  const [uploadMode, setUploadMode] = useState<"single" | "batch">("single");
+  const [stagedFiles, setStagedFiles] = useState<Array<{
+    id: string;
+    file: File;
+    title: string;
+    category: LibraryCategoryType;
+    discipline: SubjectDisciplineType;
+    isPremium: boolean;
+    sizeFormatted: string;
+    status: "pending" | "uploading" | "done" | "error";
+    errorMsg?: string;
+  }>>([]);
+  const [batchUploading, setBatchUploading] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({
+    current: 0,
+    total: 0,
+    percent: 0,
+    currentFileName: ""
+  });
+  const [bulkCategory, setBulkCategory] = useState<LibraryCategoryType>("Chapter wise PDF Notes");
+  const [bulkDiscipline, setBulkDiscipline] = useState<SubjectDisciplineType>("GENERAL");
+
+  const handleFolderSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFiles = Array.from(e.target.files || []);
+    if (rawFiles.length === 0) return;
+
+    const valid = rawFiles.filter(f => 
+      f.name.toLowerCase().endsWith(".pdf") || 
+      f.type === "application/pdf" || 
+      f.type.startsWith("image/")
+    );
+
+    if (valid.length === 0) {
+      alert("No PDF documents or images found in the selected folder.");
+      return;
+    }
+
+    const newItems = valid.map((file, idx) => {
+      // Clean filename into default Material Title
+      const rawBase = file.name.replace(/\.[^/.]+$/, "");
+      const cleanTitle = rawBase
+        .replace(/^\d+[-_.]\s*/, "") // Strip leading numbering e.g. 01_ or 1.
+        .replace(/[-_]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim() || rawBase;
+
+      // Auto-detect best category & branch from title keywords
+      const meta = parseMaterialMetadata("", cleanTitle, file.type.startsWith("image/") ? "IMAGE" : "PDF");
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+      return {
+        id: "staged-" + Date.now() + "-" + idx + "-" + Math.random().toString(36).substr(2, 6),
+        file,
+        title: cleanTitle,
+        category: meta.category,
+        discipline: meta.discipline,
+        isPremium: false,
+        sizeFormatted: sizeMB + " MB",
+        status: "pending" as const,
+      };
+    });
+
+    setStagedFiles(prev => [...prev, ...newItems]);
+    e.target.value = "";
+  };
+
+  const handleUpdateStaged = (id: string, updates: Partial<(typeof stagedFiles)[0]>) => {
+    setStagedFiles(prev => prev.map(item => item.id === id ? { ...item, ...updates } : item));
+  };
+
+  const handleRemoveStaged = (id: string) => {
+    setStagedFiles(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleApplyBulkCategory = () => {
+    setStagedFiles(prev => prev.map(item => ({ ...item, category: bulkCategory })));
+  };
+
+  const handleApplyBulkDiscipline = () => {
+    setStagedFiles(prev => prev.map(item => ({ ...item, discipline: bulkDiscipline })));
+  };
+
+  const handleToggleAllPremium = (isPrem: boolean) => {
+    setStagedFiles(prev => prev.map(item => ({ ...item, isPremium: isPrem })));
+  };
+
+  const handleClearStaged = () => {
+    if (batchUploading) return;
+    if (confirm("Clear all staged files from the queue?")) {
+      setStagedFiles([]);
+    }
+  };
+
+  const handleStartBatchUpload = async () => {
+    const pendingItems = stagedFiles.filter(item => item.status === "pending" || item.status === "error");
+    if (pendingItems.length === 0) {
+      alert("No pending files in the upload queue.");
+      return;
+    }
+
+    setBatchUploading(true);
+    setError(null);
+    let successCount = 0;
+
+    for (let i = 0; i < pendingItems.length; i++) {
+      const item = pendingItems[i];
+      setBatchProgress({
+        current: i + 1,
+        total: pendingItems.length,
+        percent: Math.round(((i) / pendingItems.length) * 100),
+        currentFileName: item.title
+      });
+
+      handleUpdateStaged(item.id, { status: "uploading" });
+
+      try {
+        // 1. Get Direct Presigned R2 URL
+        const presignRes = await fetch("/api/admin/study-materials/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: item.file.name,
+            contentType: item.file.type || (item.file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg"),
+          }),
+        });
+        const presignData = await presignRes.json();
+        if (!presignRes.ok) throw new Error(presignData.error || "Failed to initialize cloud upload");
+
+        // 2. Direct PUT to Cloudflare R2
+        await uploadFileToR2(presignData.uploadUrl, item.file, () => {});
+
+        // 3. Register Record with Custom Title, Shelf Category & Discipline
+        const createRes = await fetch("/api/admin/study-materials", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: item.title.trim(),
+            description: "",
+            type: item.file.name.toLowerCase().endsWith(".pdf") ? "PDF" : "IMAGE",
+            category: item.category,
+            discipline: item.discipline,
+            isPremium: item.isPremium,
+            url: presignData.publicUrl,
+            fileSize: item.sizeFormatted,
+          }),
+        });
+
+        if (!createRes.ok) {
+          const errData = await createRes.json();
+          throw new Error(errData.error || "Failed to register record in database");
+        }
+
+        handleUpdateStaged(item.id, { status: "done" });
+        successCount++;
+      } catch (err: any) {
+        console.error("Batch upload failed for", item.title, err);
+        handleUpdateStaged(item.id, { status: "error", errorMsg: err?.message || "Upload failed" });
+      }
+    }
+
+    setBatchUploading(false);
+    setBatchProgress({
+      current: pendingItems.length,
+      total: pendingItems.length,
+      percent: 100,
+      currentFileName: ""
+    });
+
+    fetchMaterials();
+    setSuccess("Batch upload completed! " + successCount + " of " + pendingItems.length + " materials published into the student vault.");
+    setTimeout(() => setSuccess(null), 6000);
+  };
 
   // Edit Modal State
   const [editingItem, setEditingItem] = useState<any | null>(null);
@@ -439,190 +614,558 @@ export default function AdminStudyMaterials() {
 
       {/* 2. UPLOAD & CATEGORISE FORM */}
       <section className="bg-[#111111] border border-[#262626] p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
-        <div className="border-b border-[#222] pb-4">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Plus className="w-5 h-5 text-cyan-400" />
-            <span>Publish New Material into Library</span>
-          </h2>
-          <p className="text-xs text-gray-400 mt-1">
-            Select the exact library shelf category and subject branch so students find it in their dashboard.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#222] pb-4">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Plus className="w-5 h-5 text-cyan-400" />
+              <span>Publish Study Materials into Library</span>
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">
+              Direct Cloudflare R2 uploads bypassing Vercel size limits with full shelf categorisation.
+            </p>
+          </div>
+
+          {/* Mode Switcher Tabs */}
+          <div className="flex items-center gap-1.5 bg-[#161616] p-1.5 rounded-xl border border-[#2a2a2a] shrink-0 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setUploadMode("single")}
+              className={"px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer " + (
+                uploadMode === "single"
+                  ? "bg-cyan-500 text-black shadow-md shadow-cyan-500/20 font-black"
+                  : "text-gray-400 hover:text-white"
+              )}
+            >
+              <File className="w-3.5 h-3.5" />
+              <span>Single Upload</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setUploadMode("batch")}
+              className={"px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer " + (
+                uploadMode === "batch"
+                  ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-md shadow-cyan-500/20 font-black"
+                  : "text-gray-400 hover:text-white"
+              )}
+            >
+              <FolderUp className="w-3.5 h-3.5" />
+              <span>📁 Upload Entire Folder / Batch</span>
+              {stagedFiles.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-black/40 text-[10px] font-mono text-cyan-200">
+                  {stagedFiles.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Title */}
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                Material Title <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={e => setForm({ ...form, title: e.target.value })}
-                placeholder="e.g. CHEMICAL BONDING (3D Visualised) or DPP-01: Mole Concept"
-                className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
-                required
-              />
-            </div>
-
-            {/* Shelf Category Selector */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Library Shelf Category <span className="text-red-400">*</span></span>
-              </label>
-              <select
-                value={form.category}
-                onChange={e => setForm({ ...form, category: e.target.value as LibraryCategoryType })}
-                className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer font-medium"
-              >
-                {LIBRARY_CATEGORIES.map(cat => (
-                  <option key={cat} value={cat} className="bg-[#181818] text-white">
-                    {cat}
-                  </option>
-                ))}
-              </select>
-              <p className="text-[11px] text-gray-500">Determines which tab this material appears under in the student vault.</p>
-            </div>
-
-            {/* Chemistry Branch / Discipline Selector */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                Subject Branch / Discipline
-              </label>
-              <select
-                value={form.discipline}
-                onChange={e => setForm({ ...form, discipline: e.target.value as SubjectDisciplineType })}
-                className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
-              >
-                <option value="GENERAL">General / All Branches</option>
-                <option value="PHYSICAL">Physical Chemistry</option>
-                <option value="INORGANIC">Inorganic Chemistry</option>
-                <option value="ORGANIC">Organic Chemistry</option>
-              </select>
-            </div>
-
-            {/* Resource Type */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                Format Type <span className="text-red-400">*</span>
-              </label>
-              <select
-                value={form.type}
-                onChange={e => setForm({ ...form, type: e.target.value })}
-                className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
-              >
-                <option value="PDF">PDF Document</option>
-                <option value="LINK">External Link / 3D Simulation</option>
-                <option value="IMAGE">Image</option>
-              </select>
-            </div>
-
-            {/* Premium / Free Checkbox */}
-            <div className="space-y-1.5 flex flex-col justify-center">
-              <label className="text-xs font-bold text-gray-300 uppercase tracking-wide mb-1">
-                Access Plan Tier
-              </label>
-              <label className="flex items-center gap-2.5 cursor-pointer bg-[#181818] border border-[#333] px-4 py-2 rounded-xl hover:border-[#444] transition">
-                <input
-                  type="checkbox"
-                  checked={form.isPremium}
-                  onChange={e => setForm({ ...form, isPremium: e.target.checked })}
-                  className="w-4 h-4 rounded text-amber-500 bg-[#222] border-gray-600 focus:ring-amber-500 cursor-pointer"
-                />
-                <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span>⭐ Mark as Premium</span>
-                  <span className="text-[11px] text-gray-400 font-normal">(Requires Gold Subscription)</span>
-                </span>
-              </label>
-            </div>
-
-            {/* URL Input */}
-            {(form.type === "LINK" || !selectedFile) && (
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                  {form.type === "LINK" ? "Interactive Lab URL / Link *" : "External File URL (Optional if uploading file below)"}
-                </label>
-                <input
-                  type="url"
-                  value={form.url}
-                  onChange={e => setForm({ ...form, url: e.target.value })}
-                  placeholder={form.type === "LINK" ? "https://molview.org/?cid=222" : "https://example.com/notes.pdf"}
-                  className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
-                  required={form.type === "LINK"}
-                />
+        {uploadMode === "single" ? (
+          <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {/* Title */}
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                          Material Title <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={form.title}
+                          onChange={e => setForm({ ...form, title: e.target.value })}
+                          placeholder="e.g. CHEMICAL BONDING (3D Visualised) or DPP-01: Mole Concept"
+                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
+                          required
+                        />
+                      </div>
+          
+                      {/* Shelf Category Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>Library Shelf Category <span className="text-red-400">*</span></span>
+                        </label>
+                        <select
+                          value={form.category}
+                          onChange={e => setForm({ ...form, category: e.target.value as LibraryCategoryType })}
+                          className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer font-medium"
+                        >
+                          {LIBRARY_CATEGORIES.map(cat => (
+                            <option key={cat} value={cat} className="bg-[#181818] text-white">
+                              {cat}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-[11px] text-gray-500">Determines which tab this material appears under in the student vault.</p>
+                      </div>
+          
+                      {/* Chemistry Branch / Discipline Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                          Subject Branch / Discipline
+                        </label>
+                        <select
+                          value={form.discipline}
+                          onChange={e => setForm({ ...form, discipline: e.target.value as SubjectDisciplineType })}
+                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
+                        >
+                          <option value="GENERAL">General / All Branches</option>
+                          <option value="PHYSICAL">Physical Chemistry</option>
+                          <option value="INORGANIC">Inorganic Chemistry</option>
+                          <option value="ORGANIC">Organic Chemistry</option>
+                        </select>
+                      </div>
+          
+                      {/* Resource Type */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                          Format Type <span className="text-red-400">*</span>
+                        </label>
+                        <select
+                          value={form.type}
+                          onChange={e => setForm({ ...form, type: e.target.value })}
+                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
+                        >
+                          <option value="PDF">PDF Document</option>
+                          <option value="LINK">External Link / 3D Simulation</option>
+                          <option value="IMAGE">Image</option>
+                        </select>
+                      </div>
+          
+                      {/* Premium / Free Checkbox */}
+                      <div className="space-y-1.5 flex flex-col justify-center">
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wide mb-1">
+                          Access Plan Tier
+                        </label>
+                        <label className="flex items-center gap-2.5 cursor-pointer bg-[#181818] border border-[#333] px-4 py-2 rounded-xl hover:border-[#444] transition">
+                          <input
+                            type="checkbox"
+                            checked={form.isPremium}
+                            onChange={e => setForm({ ...form, isPremium: e.target.checked })}
+                            className="w-4 h-4 rounded text-amber-500 bg-[#222] border-gray-600 focus:ring-amber-500 cursor-pointer"
+                          />
+                          <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>⭐ Mark as Premium</span>
+                            <span className="text-[11px] text-gray-400 font-normal">(Requires Gold Subscription)</span>
+                          </span>
+                        </label>
+                      </div>
+          
+                      {/* URL Input */}
+                      {(form.type === "LINK" || !selectedFile) && (
+                        <div className="space-y-1.5 md:col-span-2">
+                          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                            {form.type === "LINK" ? "Interactive Lab URL / Link *" : "External File URL (Optional if uploading file below)"}
+                          </label>
+                          <input
+                            type="url"
+                            value={form.url}
+                            onChange={e => setForm({ ...form, url: e.target.value })}
+                            placeholder={form.type === "LINK" ? "https://molview.org/?cid=222" : "https://example.com/notes.pdf"}
+                            className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
+                            required={form.type === "LINK"}
+                          />
+                        </div>
+                      )}
+          
+                      {/* File Upload for PDF/IMAGE */}
+                      {form.type !== "LINK" && (
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="text-xs font-bold text-gray-300 uppercase tracking-wide flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <CloudUpload className="w-4 h-4 text-cyan-400" />
+                              <span>Upload Local {form.type} File (Cloudflare R2 Direct)</span>
+                            </span>
+                            <span className="text-[11px] text-cyan-400/80 font-normal font-mono">No 4.5MB limit</span>
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="file"
+                              accept={form.type === "PDF" ? "application/pdf" : "image/*"}
+                              onChange={e => {
+                              const f = e.target.files?.[0] || null;
+                              setSelectedFile(f);
+                              if (f && !form.title.trim()) {
+                                const rawBase = f.name.replace(/\.[^/.]+$/, "");
+                                const cleanTitle = rawBase
+                                  .replace(/^\d+[-_.]\s*/, "")
+                                  .replace(/[-_]/g, " ")
+                                  .replace(/\s+/g, " ")
+                                  .trim() || rawBase;
+                                setForm(prev => ({ ...prev, title: cleanTitle }));
+                              }
+                            }}
+                              className="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#252525] file:text-white hover:file:bg-[#303030] cursor-pointer"
+                            />
+                            {selectedFile && (
+                              <button
+                                type="button"
+                                onClick={() => setSelectedFile(null)}
+                                className="text-xs text-red-400 hover:underline shrink-0"
+                              >
+                                Clear File
+                              </button>
+                            )}
+                          </div>
+          
+                          {uploadProgress !== null && (
+                            <div className="space-y-1.5 p-3 rounded-xl bg-[#161616] border border-cyan-500/30">
+                              <div className="flex justify-between text-xs font-mono text-cyan-300">
+                                <span>{uploadStatusText}</span>
+                                <span>{uploadProgress}%</span>
+                              </div>
+                              <div className="w-full bg-[#222] h-2 rounded-full overflow-hidden">
+                                <div 
+                                  className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-150 ease-out" 
+                                  style={{ width: `${uploadProgress}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+          
+                      {/* Description */}
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                          Description / Syllabus Notes (Optional)
+                        </label>
+                        <textarea
+                          value={form.description}
+                          onChange={e => setForm({ ...form, description: e.target.value })}
+                          placeholder="Brief summary of topics covered, derivations, question count, or instructions..."
+                          rows={3}
+                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
+                        />
+                      </div>
+                    </div>
+          
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-sm uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 cursor-pointer disabled:opacity-50"
+                    >
+                      {submitting ? (uploadStatusText || "Publishing to Digital Vault...") : "Publish Material to Student Vault"}
+                    </button>
+                  </form>
+        ) : (
+          /* BATCH / COMPLETE FOLDER UPLOAD VIEW */
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Upload Options Card */}
+            <div className="p-8 border-2 border-dashed border-cyan-500/30 hover:border-cyan-400/60 rounded-2xl bg-[#141414]/60 text-center space-y-4 transition">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-950/50">
+                <FolderUp className="w-7 h-7" />
               </div>
-            )}
 
-            {/* File Upload for PDF/IMAGE */}
-            {form.type !== "LINK" && (
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-xs font-bold text-gray-300 uppercase tracking-wide flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <CloudUpload className="w-4 h-4 text-cyan-400" />
-                    <span>Upload Local {form.type} File (Cloudflare R2 Direct)</span>
-                  </span>
-                  <span className="text-[11px] text-cyan-400/80 font-normal font-mono">No 4.5MB limit</span>
-                </label>
-                <div className="flex items-center gap-3">
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-white">
+                  Select a Complete Folder from Your Device
+                </h3>
+                <p className="text-xs text-gray-400 max-w-xl mx-auto">
+                  Upload an entire chapter folder at once. Filenames automatically become the <strong>Material Title *</strong>, and you can freely reassign each document to its exact shelf category below.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <label className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center gap-2">
+                  <FolderUp className="w-4 h-4" />
+                  <span>Choose Entire Folder</span>
                   <input
                     type="file"
-                    accept={form.type === "PDF" ? "application/pdf" : "image/*"}
-                    onChange={e => setSelectedFile(e.target.files?.[0] || null)}
-                    className="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#252525] file:text-white hover:file:bg-[#303030] cursor-pointer"
+                    {...({ webkitdirectory: "", directory: "" } as any)}
+                    multiple
+                    onChange={handleFolderSelect}
+                    className="hidden"
                   />
-                  {selectedFile && (
+                </label>
+
+                <label className="px-4 py-2.5 rounded-xl bg-[#202020] hover:bg-[#282828] text-white text-xs font-bold border border-[#333] transition cursor-pointer flex items-center gap-2">
+                  <FileStack className="w-4 h-4 text-cyan-400" />
+                  <span>Or Select Multiple PDFs</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,application/pdf,image/*"
+                    onChange={handleFolderSelect}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Staging Queue & Shelf Assignment */}
+            {stagedFiles.length > 0 && (
+              <div className="space-y-4 bg-[#141414] border border-[#2a2a2a] p-4 sm:p-6 rounded-2xl">
+                {/* Bulk Controls Toolbar */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#252525]">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white flex items-center gap-1.5">
+                      <Folders className="w-4 h-4 text-cyan-400" />
+                      <span>Staged Documents ({stagedFiles.length})</span>
+                    </span>
+                    <span className="text-xs text-gray-500 font-mono">
+                      ({stagedFiles.filter(f => f.status === "done").length} uploaded, {stagedFiles.filter(f => f.status === "pending" || f.status === "error").length} pending)
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    {/* Bulk Shelf Category */}
+                    <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
+                      <span className="text-gray-400 text-[11px] pl-1 font-semibold">Bulk Shelf:</span>
+                      <select
+                        value={bulkCategory}
+                        onChange={e => setBulkCategory(e.target.value as LibraryCategoryType)}
+                        className="bg-[#111] border border-cyan-500/30 text-cyan-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
+                      >
+                        {LIBRARY_CATEGORIES.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={handleApplyBulkCategory}
+                        disabled={batchUploading}
+                        className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded-lg text-xs font-bold transition cursor-pointer"
+                      >
+                        Apply to All
+                      </button>
+                    </div>
+
+                    {/* Bulk Discipline */}
+                    <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
+                      <span className="text-gray-400 text-[11px] pl-1 font-semibold">Branch:</span>
+                      <select
+                        value={bulkDiscipline}
+                        onChange={e => setBulkDiscipline(e.target.value as SubjectDisciplineType)}
+                        className="bg-[#111] border border-[#444] text-gray-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
+                      >
+                        {SUBJECT_DISCIPLINES.map(d => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={handleApplyBulkDiscipline}
+                        disabled={batchUploading}
+                        className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition cursor-pointer"
+                      >
+                        Apply to All
+                      </button>
+                    </div>
+
+                    {/* Quick Toggles */}
                     <button
                       type="button"
-                      onClick={() => setSelectedFile(null)}
-                      className="text-xs text-red-400 hover:underline shrink-0"
+                      onClick={() => handleToggleAllPremium(true)}
+                      disabled={batchUploading}
+                      className="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition cursor-pointer"
                     >
-                      Clear File
+                      Make All Gold
                     </button>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAllPremium(false)}
+                      disabled={batchUploading}
+                      className="px-2.5 py-1.5 bg-[#222] hover:bg-[#282828] text-gray-300 border border-[#333] rounded-lg text-xs font-bold transition cursor-pointer"
+                    >
+                      Make All Free
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearStaged}
+                      disabled={batchUploading}
+                      className="px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition cursor-pointer ml-auto"
+                    >
+                      Clear Queue
+                    </button>
+                  </div>
                 </div>
 
-                {uploadProgress !== null && (
-                  <div className="space-y-1.5 p-3 rounded-xl bg-[#161616] border border-cyan-500/30">
+                {/* Staged Items List */}
+                <div className="space-y-2.5 max-h-[550px] overflow-y-auto pr-1">
+                  {stagedFiles.map((item, index) => {
+                    const isDone = item.status === "done";
+                    const isUploading = item.status === "uploading";
+                    const isErr = item.status === "error";
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={"p-3 sm:p-4 rounded-xl border transition flex flex-col md:flex-row items-start md:items-center gap-3.5 " + (
+                          isDone
+                            ? "bg-emerald-950/20 border-emerald-800/40"
+                            : isUploading
+                            ? "bg-cyan-950/30 border-cyan-500/50 shadow-md shadow-cyan-950/30"
+                            : isErr
+                            ? "bg-red-950/20 border-red-800/40"
+                            : "bg-[#181818] border-[#292929] hover:border-[#383838]"
+                        )}
+                      >
+                        {/* Index & File Type Badge */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] font-mono text-gray-500 w-5">
+                            #{index + 1}
+                          </span>
+                          <div className={"w-8 h-8 rounded-lg flex items-center justify-center " + (
+                            item.file.name.toLowerCase().endsWith(".pdf")
+                              ? "bg-red-500/10 text-red-400 border border-red-500/30"
+                              : "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
+                          )}>
+                            {item.file.name.toLowerCase().endsWith(".pdf") ? (
+                              <FileText className="w-4 h-4" />
+                            ) : (
+                              <ImageIcon className="w-4 h-4" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Material Title * (Auto-filled from filename, fully editable) */}
+                        <div className="flex-1 min-w-0 w-full md:w-auto">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                              <span>Material Title *</span>
+                              <span className="text-[9px] text-cyan-400/80 font-normal lowercase">(auto-named from file)</span>
+                            </span>
+                            <span className="text-[10px] text-gray-500 font-mono truncate max-w-[200px]" title={item.file.name}>
+                              {item.file.name}
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            value={item.title}
+                            onChange={e => handleUpdateStaged(item.id, { title: e.target.value })}
+                            disabled={isDone || isUploading}
+                            placeholder="Material Title *"
+                            className="w-full bg-[#121212] border border-[#333] focus:border-cyan-500 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none font-medium transition"
+                          />
+                        </div>
+
+                        {/* Shelf Category Selector */}
+                        <div className="w-full md:w-56 shrink-0">
+                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                            Library Shelf *
+                          </span>
+                          <select
+                            value={item.category}
+                            onChange={e => handleUpdateStaged(item.id, { category: e.target.value as LibraryCategoryType })}
+                            disabled={isDone || isUploading}
+                            className="w-full bg-[#121212] border border-cyan-500/40 text-cyan-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
+                          >
+                            {LIBRARY_CATEGORIES.map(c => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Subject Branch Dropdown */}
+                        <div className="w-full md:w-28 shrink-0">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                            Branch
+                          </span>
+                          <select
+                            value={item.discipline}
+                            onChange={e => handleUpdateStaged(item.id, { discipline: e.target.value as SubjectDisciplineType })}
+                            disabled={isDone || isUploading}
+                            className="w-full bg-[#121212] border border-[#333] text-gray-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none cursor-pointer"
+                          >
+                            {SUBJECT_DISCIPLINES.map(d => (
+                              <option key={d} value={d}>{d}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Gold / Premium & Size & Actions */}
+                        <div className="flex items-center gap-2.5 shrink-0 self-end md:self-center pt-2 md:pt-4">
+                          <label className="flex items-center gap-1.5 cursor-pointer text-xs text-amber-400 select-none bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/30">
+                            <input
+                              type="checkbox"
+                              checked={item.isPremium}
+                              onChange={e => handleUpdateStaged(item.id, { isPremium: e.target.checked })}
+                              disabled={isDone || isUploading}
+                              className="w-3.5 h-3.5 rounded text-amber-500 bg-[#121212] border-gray-600 focus:ring-amber-500 cursor-pointer"
+                            />
+                            <span className="text-[11px] font-bold">Gold</span>
+                          </label>
+
+                          <span className="text-[10px] font-mono text-gray-400 bg-[#1f1f1f] px-2 py-1 rounded border border-[#333]">
+                            {item.sizeFormatted}
+                          </span>
+
+                          {/* Status Badge */}
+                          {isDone ? (
+                            <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Uploaded</span>
+                            </span>
+                          ) : isUploading ? (
+                            <span className="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold flex items-center gap-1 animate-pulse">
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span className="hidden sm:inline">Sending...</span>
+                            </span>
+                          ) : isErr ? (
+                            <span className="px-2 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold" title={item.errorMsg}>
+                              Failed
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 rounded-lg bg-[#202020] text-gray-400 text-[10px] font-mono">
+                              Ready
+                            </span>
+                          )}
+
+                          {!isDone && !isUploading && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveStaged(item.id)}
+                              className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition cursor-pointer"
+                              title="Remove document"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Progress Bar (Visible while batchUploading) */}
+                {batchUploading && (
+                  <div className="space-y-1.5 p-3 rounded-xl bg-[#181818] border border-cyan-500/40 animate-pulse">
                     <div className="flex justify-between text-xs font-mono text-cyan-300">
-                      <span>{uploadStatusText}</span>
-                      <span>{uploadProgress}%</span>
+                      <span>Uploading {batchProgress.current} of {batchProgress.total}: {batchProgress.currentFileName}...</span>
+                      <span>{batchProgress.percent}%</span>
                     </div>
                     <div className="w-full bg-[#222] h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-150 ease-out" 
-                        style={{ width: `${uploadProgress}%` }}
+                      <div
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-200"
+                        style={{ width: batchProgress.percent + "%" }}
                       />
                     </div>
                   </div>
                 )}
+
+                {/* Start Batch Upload Button */}
+                <button
+                  type="button"
+                  onClick={handleStartBatchUpload}
+                  disabled={batchUploading || stagedFiles.filter(f => f.status === "pending" || f.status === "error").length === 0}
+                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 cursor-pointer disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                  {batchUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Uploading Files Directly to Cloudflare R2 ({batchProgress.current}/{batchProgress.total})...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FolderUp className="w-4 h-4" />
+                      <span>Publish All {stagedFiles.filter(f => f.status === "pending" || f.status === "error").length} Materials to Student Vault</span>
+                    </>
+                  )}
+                </button>
               </div>
             )}
-
-            {/* Description */}
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                Description / Syllabus Notes (Optional)
-              </label>
-              <textarea
-                value={form.description}
-                onChange={e => setForm({ ...form, description: e.target.value })}
-                placeholder="Brief summary of topics covered, derivations, question count, or instructions..."
-                rows={3}
-                className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
-              />
-            </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-sm uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 cursor-pointer disabled:opacity-50"
-          >
-            {submitting ? (uploadStatusText || "Publishing to Digital Vault...") : "Publish Material to Student Vault"}
-          </button>
-        </form>
+        )}
       </section>
 
       {/* 3. UPLOADED CATALOG & CATEGORY CONTROLS */}
