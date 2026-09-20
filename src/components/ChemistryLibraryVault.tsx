@@ -50,7 +50,7 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
       return {
         id: 'db-' + mat.id,
         title: mat.title,
-        description: mat.description || mat.cleanDescription || 'Curated study material provided for your syllabus and batch.',
+        description: (mat.cleanDescription && mat.cleanDescription.trim()) || (mat.description ? mat.description.replace(/<!--[\s\S]*?-->/g, '').trim() : '') || 'Curated study material provided for your syllabus and batch.',
         category: targetCat,
         discipline: disc,
         chapter: mat.title.split('(')[0]?.trim() || 'Curriculum Vault',

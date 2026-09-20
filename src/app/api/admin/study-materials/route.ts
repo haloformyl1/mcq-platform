@@ -169,7 +169,7 @@ export async function DELETE(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const body = await req.json();
-    const { id, isPremium, category, discipline } = body;
+    const { id, title, description, isPremium, category, discipline, type, url, fileSize } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Material ID is required" }, { status: 400 });
@@ -184,15 +184,34 @@ export async function PATCH(req: Request) {
     }
 
     const updateData: any = {};
+
+    if (typeof title === "string" && title.trim()) {
+      updateData.title = title.trim();
+    }
+
+    if (typeof type === "string" && type.trim()) {
+      updateData.type = type.trim();
+    }
+
+    if (typeof url === "string" && url.trim()) {
+      updateData.url = url.trim();
+    }
+
+    if (typeof fileSize === "string" && fileSize.trim()) {
+      updateData.fileSize = fileSize.trim();
+    }
+
     if (typeof isPremium === "boolean") {
       updateData.isPremium = isPremium;
     }
 
-    if (category || discipline) {
-      const currentMeta = parseMaterialMetadata(existing.description, existing.title, existing.type);
-      const newCategory = category || currentMeta.category;
-      const newDiscipline = discipline || currentMeta.discipline;
-      updateData.description = encodeMaterialMetadata(currentMeta.cleanDescription, newCategory, newDiscipline);
+    const currentMeta = parseMaterialMetadata(existing.description, existing.title, existing.type);
+    const newCategory = category || currentMeta.category;
+    const newDiscipline = discipline || currentMeta.discipline;
+    const cleanDesc = typeof description === "string" ? description.trim() : currentMeta.cleanDescription;
+
+    if (category || discipline || typeof description === "string") {
+      updateData.description = encodeMaterialMetadata(cleanDesc, newCategory, newDiscipline);
     }
 
     const updated = await prisma.studyMaterial.update({
@@ -211,8 +230,8 @@ export async function PATCH(req: Request) {
         cleanDescription: meta.cleanDescription
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Update study material error:", error);
-    return NextResponse.json({ error: "Failed to update material" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Failed to update material" }, { status: 500 });
   }
 }

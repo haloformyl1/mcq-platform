@@ -5,7 +5,7 @@ import {
   Upload, FileText, Image as ImageIcon, Link as LinkIcon, Trash2, 
   Plus, ExternalLink, Download, File, CheckCircle2, BookOpen, 
   Atom, CheckSquare, Flame, Award, GraduationCap, FileCheck, 
-  Search, Filter, Sparkles, Eye, Tag, CloudUpload
+  Search, Filter, Sparkles, Eye, Tag, CloudUpload, Pencil, X
 } from "lucide-react";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import { 
@@ -72,6 +72,123 @@ export default function AdminStudyMaterials() {
   const [filterTier, setFilterTier] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Edit Modal State
+  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    type: "PDF",
+    category: "Chapter wise PDF Notes" as LibraryCategoryType,
+    discipline: "GENERAL" as SubjectDisciplineType,
+    url: "",
+    isPremium: false,
+  });
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editUploadProgress, setEditUploadProgress] = useState<number | null>(null);
+  const [editUploadStatusText, setEditUploadStatusText] = useState<string>("");
+
+  const handleOpenEdit = (item: any) => {
+    const rawDesc = item.cleanDescription !== undefined
+      ? item.cleanDescription
+      : (item.description ? item.description.replace(/<!--[\s\S]*?-->/g, "").trim() : "");
+
+    setEditingItem(item);
+    setEditForm({
+      title: item.title || "",
+      description: rawDesc || "",
+      type: item.type || "PDF",
+      category: item.category || "Chapter wise PDF Notes",
+      discipline: item.discipline || "GENERAL",
+      url: item.url || "",
+      isPremium: Boolean(item.isPremium),
+    });
+    setEditFile(null);
+    setEditUploadProgress(null);
+    setEditUploadStatusText("");
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    if (!editForm.title.trim()) return alert("Please enter a title");
+    if (editForm.type === "LINK" && !editForm.url.trim()) return alert("Please enter a valid URL");
+
+    setEditSubmitting(true);
+    setEditUploadProgress(null);
+    setEditUploadStatusText("");
+
+    try {
+      let finalUrl = editForm.url.trim();
+      let fileSizeFormatted = editingItem.fileSize || null;
+
+      if (editFile) {
+        setEditUploadStatusText("Requesting secure upload channel...");
+        const presignRes = await fetch("/api/admin/study-materials/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: editFile.name,
+            contentType: editFile.type || (editForm.type === "PDF" ? "application/pdf" : "image/jpeg"),
+          }),
+        });
+
+        const presignData = await presignRes.json();
+        if (!presignRes.ok) {
+          throw new Error(presignData.error || "Failed to initialize cloud upload");
+        }
+
+        setEditUploadStatusText("Uploading replacement to Cloudflare R2...");
+        setEditUploadProgress(0);
+
+        await uploadFileToR2(presignData.uploadUrl, editFile, (pct) => {
+          setEditUploadProgress(pct);
+          setEditUploadStatusText(`Uploading replacement to Cloudflare R2 (${pct}%)...`);
+        });
+
+        finalUrl = presignData.publicUrl;
+        const sizeMB = (editFile.size / (1024 * 1024)).toFixed(2);
+        fileSizeFormatted = `${sizeMB} MB`;
+      }
+
+      setEditUploadStatusText("Saving changes...");
+
+      const res = await fetch("/api/admin/study-materials", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingItem.id,
+          title: editForm.title.trim(),
+          description: editForm.description.trim(),
+          type: editForm.type,
+          category: editForm.category,
+          discipline: editForm.discipline,
+          isPremium: editForm.isPremium,
+          url: finalUrl,
+          fileSize: fileSizeFormatted,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.material) {
+        setSuccess("Study material updated successfully!");
+        setMaterials((prev) =>
+          prev.map((m) => (m.id === editingItem.id ? { ...m, ...data.material } : m))
+        );
+        setEditingItem(null);
+        setTimeout(() => setSuccess(null), 4000);
+      } else {
+        alert(data.error || "Failed to update study material");
+      }
+    } catch (err: any) {
+      alert(err?.message || "Failed to save changes");
+    } finally {
+      setEditSubmitting(false);
+      setEditUploadProgress(null);
+      setEditUploadStatusText("");
+    }
+  };
 
   const fetchMaterials = () => {
     fetch("/api/admin/study-materials")
@@ -647,11 +764,16 @@ export default function AdminStudyMaterials() {
 
                     <div>
                       <h3 className="font-bold text-white text-base leading-snug">{item.title}</h3>
-                      {(item.cleanDescription || item.description) && (
-                        <p className="text-xs text-gray-400 leading-relaxed mt-1 line-clamp-3">
-                          {item.cleanDescription || item.description}
-                        </p>
-                      )}
+                      {(() => {
+                        const clean = item.cleanDescription !== undefined 
+                          ? item.cleanDescription 
+                          : (item.description ? item.description.replace(/<!--[\s\S]*?-->/g, "").trim() : "");
+                        return clean ? (
+                          <p className="text-xs text-gray-400 leading-relaxed mt-1 line-clamp-3">
+                            {clean}
+                          </p>
+                        ) : null;
+                      })()}
                     </div>
 
                     {/* Quick Category / Branch Changer */}
@@ -704,6 +826,15 @@ export default function AdminStudyMaterials() {
                     </button>
 
                     <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(item)}
+                        className="p-1.5 text-gray-400 hover:text-cyan-400 hover:bg-cyan-950/40 rounded-lg transition cursor-pointer"
+                        title="Edit material details"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+
                       <a
                         href={item.url}
                         target="_blank"
@@ -716,7 +847,7 @@ export default function AdminStudyMaterials() {
 
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-950/40 rounded-lg transition"
+                        className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-950/40 rounded-lg transition cursor-pointer"
                         title="Delete material"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -729,6 +860,209 @@ export default function AdminStudyMaterials() {
           </div>
         )}
       </section>
+
+      {/* 4. EDIT MATERIAL MODAL */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-[#111111] border border-cyan-500/40 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl shadow-cyan-950/50 space-y-6 relative">
+            <div className="flex items-center justify-between border-b border-[#222] pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+                  <Pencil className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white">Edit Published Material</h2>
+                  <p className="text-xs text-gray-400">Update title, syllabus notes, category shelf, or replace the file.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingItem(null)}
+                className="p-2 rounded-xl bg-[#1c1c1c] hover:bg-[#252525] text-gray-400 hover:text-white transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Title */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                    Material Title <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.title}
+                    onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                    className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
+                    required
+                  />
+                </div>
+
+                {/* Shelf Category */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide">
+                    Library Shelf Category <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={editForm.category}
+                    onChange={e => setEditForm({ ...editForm, category: e.target.value as LibraryCategoryType })}
+                    className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
+                  >
+                    {LIBRARY_CATEGORIES.map(cat => (
+                      <option key={cat} value={cat} className="bg-[#181818] text-white">
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Subject Branch */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                    Subject Branch / Discipline
+                  </label>
+                  <select
+                    value={editForm.discipline}
+                    onChange={e => setEditForm({ ...editForm, discipline: e.target.value as SubjectDisciplineType })}
+                    className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
+                  >
+                    <option value="GENERAL">General / All Branches</option>
+                    <option value="PHYSICAL">Physical Chemistry</option>
+                    <option value="INORGANIC">Inorganic Chemistry</option>
+                    <option value="ORGANIC">Organic Chemistry</option>
+                  </select>
+                </div>
+
+                {/* Format Type */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                    Format Type <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={editForm.type}
+                    onChange={e => setEditForm({ ...editForm, type: e.target.value })}
+                    className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
+                  >
+                    <option value="PDF">PDF Document</option>
+                    <option value="LINK">External Link / 3D Simulation</option>
+                    <option value="IMAGE">Image</option>
+                  </select>
+                </div>
+
+                {/* Access Plan Tier */}
+                <div className="space-y-1.5 flex flex-col justify-center">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wide mb-1">
+                    Access Plan Tier
+                  </label>
+                  <label className="flex items-center gap-2.5 cursor-pointer bg-[#181818] border border-[#333] px-4 py-2 rounded-xl hover:border-[#444] transition">
+                    <input
+                      type="checkbox"
+                      checked={editForm.isPremium}
+                      onChange={e => setEditForm({ ...editForm, isPremium: e.target.checked })}
+                      className="w-4 h-4 rounded text-amber-500 bg-[#222] border-gray-600 focus:ring-amber-500 cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <span>⭐ Mark as Premium</span>
+                    </span>
+                  </label>
+                </div>
+
+                {/* Current URL or Link */}
+                {editForm.type === "LINK" && (
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                      Interactive Lab URL / Link <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={editForm.url}
+                      onChange={e => setEditForm({ ...editForm, url: e.target.value })}
+                      className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition"
+                      required
+                    />
+                  </div>
+                )}
+
+                {/* Replace File (Optional) */}
+                {editForm.type !== "LINK" && (
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-xs font-bold text-gray-300 uppercase tracking-wide flex items-center justify-between">
+                      <span>Replace {editForm.type} File (Optional)</span>
+                      <span className="text-[11px] text-cyan-400 font-normal">Cloudflare R2 Direct</span>
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        accept={editForm.type === "PDF" ? "application/pdf" : "image/*"}
+                        onChange={e => setEditFile(e.target.files?.[0] || null)}
+                        className="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#252525] file:text-white hover:file:bg-[#303030] cursor-pointer"
+                      />
+                      {editFile && (
+                        <button
+                          type="button"
+                          onClick={() => setEditFile(null)}
+                          className="text-xs text-red-400 hover:underline shrink-0"
+                        >
+                          Cancel File
+                        </button>
+                      )}
+                    </div>
+                    {editUploadProgress !== null && (
+                      <div className="space-y-1.5 p-3 rounded-xl bg-[#161616] border border-cyan-500/30">
+                        <div className="flex justify-between text-xs font-mono text-cyan-300">
+                          <span>{editUploadStatusText}</span>
+                          <span>{editUploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-[#222] h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-150 ease-out" 
+                            style={{ width: `${editUploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Description */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
+                    Description / Syllabus Notes (Optional)
+                  </label>
+                  <textarea
+                    value={editForm.description}
+                    onChange={e => setEditForm({ ...editForm, description: e.target.value })}
+                    rows={3}
+                    placeholder="Topics covered, derivations, question count..."
+                    className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#222]">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  disabled={editSubmitting}
+                  className="px-5 py-2.5 rounded-xl bg-[#222] hover:bg-[#2a2a2a] text-gray-300 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSubmitting}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {editSubmitting ? (editUploadStatusText || "Saving Changes...") : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
