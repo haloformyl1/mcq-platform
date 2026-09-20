@@ -242,23 +242,8 @@ export default function LabViewerClient({ material }: LabViewerClientProps) {
         />
       )}
 
-      {/* Prominent Creator Watermark (Dense, Multi-Angle Grid) */}
-      <div 
-        className="absolute inset-0 z-20 pointer-events-none select-none overflow-hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-14 p-6 opacity-[0.24]"
-        aria-hidden="true"
-      >
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div 
-            key={i} 
-            className="transform -rotate-25 text-xs sm:text-sm md:text-base font-mono font-black tracking-wider text-cyan-300 whitespace-nowrap flex items-center justify-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-          >
-            <span>{watermarkText}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Corner Anchor Badge (Guarantees attribution on corner crops) */}
-      <div className="absolute bottom-3 right-3 z-30 pointer-events-none select-none hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#030911]/85 border border-cyan-500/35 text-cyan-300 text-xs font-mono font-bold tracking-wide shadow-2xl backdrop-blur-md opacity-90">
+      {/* Clean Creator Attribution Badge (Zero background noise, 100% study clarity) */}
+      <div className="absolute bottom-3 right-3 z-30 pointer-events-none select-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#030911]/90 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold tracking-wide shadow-2xl backdrop-blur-md opacity-90">
         <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
         <span>{watermarkText}</span>
       </div>
