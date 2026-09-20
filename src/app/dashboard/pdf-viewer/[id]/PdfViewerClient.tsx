@@ -211,8 +211,21 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
         </div>
       </header>
 
-      {/* 2. BEAUTIFIED BLACKISH-BLUE CANVAS */}
-      <main className="flex-1 relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-gradient-to-b from-[#05111f] via-[#020710] to-[#010306] overflow-auto p-2 sm:p-4 md:p-6 flex justify-center items-start">
+      {/* 2. BEAUTIFIED BLACKISH-BLUE CANVAS (ZERO SCROLLBAR) */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        * {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        ::-webkit-scrollbar {
+          display: none !important;
+          width: 0px !important;
+          height: 0px !important;
+          background: transparent !important;
+        }
+      ` }} />
+
+      <main className="flex-1 relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-gradient-to-b from-[#05111f] via-[#020710] to-[#010306] overflow-hidden p-2 sm:p-4 md:p-6 flex justify-center items-center select-none">
         {/* Subtle Ambient Radial Glow */}
         <div 
           className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-96 bg-cyan-500/10 blur-[120px] pointer-events-none z-0" 
@@ -247,7 +260,6 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
           style={{ 
             width: `${Math.min(100, Math.max(70, zoom))}%`,
             maxWidth: zoom > 100 ? `${zoom * 11}px` : "1100px",
-            minHeight: "88vh",
             height: "100%",
             transition: "width 0.2s ease-out, max-width 0.2s ease-out"
           }}
@@ -256,7 +268,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
           <iframe
             key={zoom}
             src={`/api/student/pdf-proxy/${material.id}#toolbar=0&navpanes=0&zoom=${zoom}`}
-            className="w-full flex-1 border-0 bg-transparent min-h-full"
+            className="w-full flex-1 border-0 bg-transparent h-full"
             title={material.title}
             onLoad={() => setIsLoading(false)}
           />
