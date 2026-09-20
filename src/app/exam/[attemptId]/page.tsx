@@ -342,9 +342,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const currentQuestion = questions[currentQ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white select-none font-sans">
+    <div className="min-h-screen flex flex-col text-white select-none">
       <AdminPreviewBanner />
-      <header className="bg-[#161616]/40 p-4 flex flex-col md:flex-row md:justify-between md:items-center border-b border-[#404040] gap-4">
+      <header className="mcq-panel rounded-none border-x-0 border-t-0 p-3 sm:p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div className="flex justify-between items-center w-full md:w-auto gap-2 min-w-0">
           <PiechemLogo size="sm" showText={false} isGoldMember={
             examData?.student?.subscriptionStatus === "COMPLIMENTARY" ||
@@ -354,7 +354,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             <h1 className="text-base sm:text-lg md:text-xl font-bold tracking-wide truncate" title={examData.test.title}>{examData.test.title}</h1>
             <p className="text-xs sm:text-sm text-[#a6a6a6] mt-0.5">Question {currentQ + 1} of {questions.length}</p>
           </div>
-          <div className="text-base sm:text-lg md:text-2xl font-mono font-bold bg-[#262626] px-2.5 py-1 sm:px-3 sm:py-1.5 md:py-2 md:px-4 rounded-lg text-cyan-300 border border-cyan-500/30 shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+          <div className="text-base sm:text-lg md:text-2xl font-mono font-bold bg-[var(--surface-secondary)] px-2.5 py-1 sm:px-3 sm:py-1.5 md:py-2 md:px-4 rounded-lg text-cyan-300 border border-cyan-500/30 shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
             {timeLeft}
           </div>
         </div>
@@ -365,7 +365,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               if (docEl.requestFullscreen) docEl.requestFullscreen().catch((e: any) => console.warn(e));
               else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
             }}
-            className="flex items-center justify-center space-x-1.5 py-2 px-3 bg-[#262626] hover:bg-[#333333] rounded-md text-cyan-400 border border-cyan-500/40 text-sm md:text-base"
+            className="mcq-button mcq-button-secondary py-2 px-3 text-cyan-400 border-cyan-500/40 text-sm md:text-base"
             title="Enter Fullscreen"
           >
             <Maximize2 size={18} />
@@ -374,13 +374,13 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           <button 
             onClick={handleManualSubmit}
             disabled={isSubmitting}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md shadow-sm disabled:opacity-50 text-sm md:text-base flex-1 md:flex-none"
+            className="mcq-button bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 text-sm md:flex-none"
           >
             Submit
           </button>
           <button
             onClick={() => setShowPalette(!showPalette)}
-            className="flex items-center justify-center space-x-2 py-2 px-3 md:px-4 bg-[#262626] hover:bg-[#333333] rounded-md text-white transition-colors border border-[#404040] text-sm md:text-base flex-1 md:flex-none"
+            className="mcq-button mcq-button-secondary text-sm md:flex-none"
             title="Toggle Question Palette"
             aria-label={showPalette ? "Hide question palette" : "Show question palette"}
           >
@@ -393,7 +393,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
 
       <div className="flex flex-1 overflow-hidden relative">
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8">
-          <div className="max-w-4xl mx-auto w-full bg-[#161616]/80 border border-[#404040] rounded-xl p-4 sm:p-6 md:p-8 shadow-2xl">
+          <div className="mcq-panel-elevated max-w-4xl mx-auto w-full p-4 sm:p-6 md:p-8">
             <div className="mb-6 flex justify-between items-start gap-4">
               <h2 className="text-xl font-medium text-[#a6a6a6] pt-1">
                 Question <span className="font-bold text-white text-2xl">{currentQ + 1}</span>
@@ -426,7 +426,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   <div 
                     key={opt}
                     onClick={() => handleOptionSelect(currentQuestion.id, opt)}
-                    className={`p-3.5 sm:p-4 border-2 rounded-xl cursor-pointer transition-colors duration-150 touch-manipulation select-none active:scale-[0.99] break-words text-sm sm:text-base ${
+                    className={`mcq-choice p-3.5 sm:p-4 border-2 cursor-pointer touch-manipulation select-none active:scale-[0.99] break-words text-sm sm:text-base ${
                       isSelected 
                         ? 'border-[#0099ff] bg-[#0099ff]/20' 
                         : 'border-[#404040] hover:border-white hover:bg-[#262626]'
@@ -444,14 +444,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                 <button 
                   onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
                   disabled={currentQ === 0}
-                  className="flex-1 py-3 px-4 bg-[#262626] text-[#a6a6a6] font-semibold text-sm rounded-xl hover:bg-[#333333] hover:text-white disabled:opacity-40 transition active:scale-[0.98]"
+                  className="mcq-button mcq-button-secondary flex-1 text-sm disabled:opacity-40"
                 >
                   ← Previous
                 </button>
                 <button 
                   onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
                   disabled={currentQ === questions.length - 1}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm rounded-xl hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 transition shadow-md active:scale-[0.98]"
+                  className="mcq-button mcq-button-primary flex-1 text-sm disabled:opacity-40"
                 >
                   Next →
                 </button>
@@ -461,7 +461,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button 
                 onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
                 disabled={currentQ === 0}
-                className="hidden sm:block order-1 px-6 py-2.5 bg-[#262626] text-[#a6a6a6] font-medium rounded-lg hover:bg-[#333333] hover:text-white disabled:opacity-40 transition"
+                className="mcq-button mcq-button-secondary hidden sm:block order-1 px-6 disabled:opacity-40"
               >
                 Previous
               </button>
@@ -493,7 +493,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button 
                 onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
                 disabled={currentQ === questions.length - 1}
-                className="hidden sm:block order-3 px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 transition shadow"
+                className="mcq-button mcq-button-primary hidden sm:block order-3 px-6 disabled:opacity-40"
               >
                 Next
               </button>
@@ -528,7 +528,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               className="fixed inset-0 bg-black/50 z-40 lg:hidden"
               onClick={() => setShowPalette(false)}
             />
-            <aside className="fixed inset-y-0 right-0 z-50 w-[85vw] sm:w-80 bg-[#161616] border-l border-[#404040] p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[#161616]/40 transition-transform flex flex-col">
+            <aside className="fixed inset-y-0 right-0 z-50 w-[85vw] sm:w-80 mcq-panel rounded-none border-y-0 border-r-0 p-5 sm:p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[color-mix(in_srgb,var(--surface-primary)_40%,transparent)] transition-transform flex flex-col">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-bold text-[#a6a6a6] uppercase tracking-wider">Question Palette</h3>
                 <button 
@@ -596,7 +596,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       {/* Fullscreen Warning Modal */}
       {showFullscreenWarning && (
         <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-red-500/50">
+          <div className="mcq-panel-elevated shadow-2xl p-6 sm:p-8 max-w-md w-full text-center border-red-500/50">
             <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="w-8 h-8 animate-bounce" />
             </div>
@@ -639,7 +639,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       {/* Submit Confirmation Modal */}
       {showSubmitConfirm && !showFullscreenWarning && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#161616] rounded-xl shadow-2xl p-8 max-w-md w-full text-center border border-[#404040]">
+          <div className="mcq-panel-elevated shadow-2xl p-6 sm:p-8 max-w-md w-full text-center">
             <div className="w-16 h-16 bg-[#0099ff]/10 text-[#0099ff] border border-[#0099ff]/30 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

@@ -741,7 +741,7 @@ export default function StudentDashboard() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-10 pt-4 sm:pt-6">
+      <main className="mcq-shell space-y-6 sm:space-y-10 pt-4 sm:pt-6">
 
         {/* ========================================================= */}
         {/* 2. UPCOMING TEST MARQUEE ALERT BANNER                    */}

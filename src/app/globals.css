@@ -4,6 +4,35 @@
   color-scheme: dark;
   --background: #030811;
   --foreground: #ededed;
+  --page-background: #06131d;
+  --page-background-secondary: #0a1d29;
+  --surface-primary: #102736;
+  --surface-secondary: #143143;
+  --surface-elevated: #193b4f;
+  --surface-interactive: #173648;
+  --text-primary: #f1f7fa;
+  --text-secondary: #c5d8e4;
+  --text-muted: #94adbc;
+  --accent-primary: #38bdf8;
+  --accent-primary-strong: #7dd3fc;
+  --accent-secondary: #2dd4bf;
+  --accent-violet: #a38aff;
+  --accent-amber: #fbbf24;
+  --border-default: #29495c;
+  --border-strong: #527589;
+  --border-interactive: #38bdf8;
+  --success: #55d799;
+  --warning: #f5c35a;
+  --error: #f58b95;
+  --focus-ring: rgba(56, 189, 248, 0.52);
+  --selected-state: rgba(56, 189, 248, 0.14);
+  --hover-state: rgba(125, 211, 252, 0.09);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-low: 0 1px 2px rgba(0, 0, 0, 0.24), 0 10px 24px rgba(0, 0, 0, 0.12);
+  --shadow-medium: 0 14px 38px rgba(0, 0, 0, 0.28);
+  --control-size: 44px;
 }
 
 @theme inline {
@@ -22,11 +51,100 @@ html {
 
 body {
   color-scheme: dark;
-  background: var(--background);
+  background-color: var(--page-background);
+  background-image:
+    linear-gradient(to right, rgba(103, 202, 250, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(103, 202, 250, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 78% 4%, rgba(56, 189, 248, 0.09), transparent 36rem);
+  background-size: 72px 72px, 72px 72px, auto;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), "Noto Sans", sans-serif;
   overflow-x: hidden;
   max-width: 100vw;
+}
+
+h1, h2, h3, h4 {
+  font-family: Georgia, var(--font-geist-sans), serif;
+  text-wrap: balance;
+}
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+.mcq-shell {
+  width: min(100%, 1280px);
+  margin-inline: auto;
+  padding: clamp(24px, 4vw, 56px) clamp(12px, 3vw, 32px);
+}
+
+.mcq-panel {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-primary) 88%, transparent);
+  box-shadow: var(--shadow-low);
+  backdrop-filter: blur(16px) saturate(1.08);
+}
+
+.mcq-panel-elevated {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, rgba(25, 59, 79, 0.94), rgba(10, 29, 41, 0.95));
+  box-shadow: var(--shadow-medium);
+}
+
+.mcq-button {
+  min-height: var(--control-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  transition: transform 140ms ease, border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.mcq-button:hover:not(:disabled) { transform: translateY(-1px); }
+.mcq-button:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
+
+.mcq-button-primary {
+  background: var(--accent-primary);
+  color: #04131d;
+  box-shadow: 0 8px 22px rgba(56, 189, 248, 0.22);
+}
+
+.mcq-button-secondary {
+  border-color: var(--border-strong);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.mcq-button-secondary:hover:not(:disabled) { border-color: var(--accent-secondary); background: var(--hover-state); }
+
+.mcq-choice {
+  min-height: 56px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: rgba(16, 39, 54, 0.74);
+  color: var(--text-secondary);
+  transition: border-color 180ms ease, background-color 180ms ease, transform 140ms ease;
+}
+
+.mcq-choice:hover { border-color: var(--border-interactive); background: var(--hover-state); transform: translateY(-1px); }
+
+@media (max-width: 640px) {
+  .mcq-shell { padding: 20px 12px; }
+  .mcq-panel, .mcq-panel-elevated { border-radius: 14px; }
+  .mcq-button { min-height: 46px; padding-inline: 14px; }
+  .mcq-choice { min-height: 52px; }
 }
 
 /* Custom dark scrollbar matching Piechem aesthetic without white edges */

@@ -51,13 +51,16 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center text-white font-sans">
+    <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 lg:px-8 flex flex-col items-center text-white">
       <AdminPreviewBanner />
-      <div className="max-w-2xl w-full bg-[#161616]/80 rounded-lg p-8 border border-[#404040] mt-6">
-        <h1 className="text-3xl font-bold mb-6 text-white tracking-wide">Test Instructions</h1>
+      <div className="mcq-panel-elevated max-w-2xl w-full p-5 sm:p-8 mt-5 sm:mt-6">
+        <div className="mb-6 border-b border-[var(--border-default)] pb-5">
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--accent-primary)]">Exam readiness</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">Test Instructions</h1>
+        </div>
         
         <div className="prose mb-8">
-          <ul className="list-disc pl-5 space-y-2 text-[#a6a6a6]">
+          <ul className="list-disc pl-5 space-y-3 text-[var(--text-secondary)] leading-relaxed">
             <li>Ensure you have a stable internet connection before starting.</li>
             <li>The timer will start immediately after you click "Start Test".</li>
             <li>You must not switch browser tabs, minimize the window, or open other applications during the test.</li>
@@ -88,17 +91,17 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
           </div>
         )}
 
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#404040]">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3 mt-8 pt-6 border-t border-[var(--border-default)]">
           <button 
             onClick={() => router.push("/dashboard")}
-            className="px-4 py-2 text-sm font-medium text-[#a6a6a6] bg-[#262626] hover:bg-[#333333] hover:text-white transition rounded-md"
+            className="mcq-button mcq-button-secondary w-full sm:w-auto"
           >
             Cancel
           </button>
           <button
             onClick={startTest}
             disabled={loading}
-            className="px-6 py-2 text-sm font-medium text-white bg-[#0099ff] hover:bg-[#007acc] transition rounded-md shadow-sm disabled:opacity-50"
+            className="mcq-button mcq-button-primary w-full sm:w-auto disabled:opacity-50"
           >
             {loading ? "Starting..." : "I Understand, Start Test"}
           </button>

@@ -63,11 +63,11 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black py-10 px-4 sm:px-6 lg:px-8 text-white font-sans">
-      <div className="max-w-6xl mx-auto space-y-6 pb-24 md:pb-8">
+    <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 lg:px-8 text-white">
+      <div className="mcq-shell space-y-5 sm:space-y-6 pb-20 md:pb-8">
         
         {/* Top Header & Logo */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#161616]/70 border border-[#333333] p-4 rounded-xl backdrop-blur-md">
+        <div className="mcq-panel flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4">
           <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
             <PiechemLogo size="sm" isGoldMember={
                 result?.student?.subscriptionStatus === "COMPLIMENTARY" ||
@@ -82,19 +82,19 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
             <button
               type="button"
               onClick={() => setShowAiAnalysis(true)}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2.5 rounded-lg shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="mcq-button mcq-button-primary w-full sm:w-auto"
             >
               <SparklesIcon className="w-4 h-4 text-cyan-200 animate-pulse" />
               <span>Analyze with PIECHEM AI</span>
             </button>
-            <Link href="/dashboard" className="w-full sm:w-auto text-center flex items-center justify-center gap-2 text-xs bg-[#222222] hover:bg-[#333333] text-white px-4 py-2.5 rounded-lg border border-[#404040] transition font-medium">
+            <Link href="/dashboard" className="mcq-button mcq-button-secondary w-full sm:w-auto">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
             </Link>
           </div>
         </div>
 
         {/* Overview Header & Timing Stats Grid */}
-        <div className="bg-[#161616]/80 border border-[#333333] p-4 sm:p-6 rounded-xl backdrop-blur-md space-y-6 shadow-xl">
+        <div className="mcq-panel space-y-6 p-4 sm:p-6">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-[#2d2d2d] pb-4">
             <div className="min-w-0">
               <span className="text-[10px] sm:text-xs font-semibold uppercase text-blue-400 tracking-wider">Exam Scrutiny Report</span>
