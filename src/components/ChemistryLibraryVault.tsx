@@ -592,8 +592,7 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                       ) : (
                         <a
                           href={item.url.startsWith('#') ? '#' : item.url}
-                          target={item.url.startsWith('#') ? undefined : '_blank'}
-                          rel={item.url.startsWith('#') ? undefined : 'noreferrer'}
+                          target="_self"
                           onClick={(e) => {
                             if (item.url.startsWith('#')) {
                               e.preventDefault();
@@ -709,8 +708,7 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
               ) : (
                 <a
                   href={previewItem.url.startsWith('#') ? '#' : previewItem.url}
-                  target={previewItem.url.startsWith('#') ? undefined : '_blank'}
-                  rel={previewItem.url.startsWith('#') ? undefined : 'noreferrer'}
+                  target="_self"
                   onClick={(e) => {
                     if (previewItem.url.startsWith('#')) {
                       e.preventDefault();
