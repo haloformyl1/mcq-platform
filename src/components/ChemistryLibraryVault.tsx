@@ -42,6 +42,11 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
       const targetCat: Exclude<LibraryCategory, 'ALL'> = mat.category || (is3D ? '3D animations' : 'Chapter wise PDF Notes');
       const disc: LibraryItem['discipline'] = mat.discipline || 'GENERAL';
 
+      let resolvedUrl = mat.url;
+      if (is3D && !resolvedUrl?.startsWith('/dashboard/lab-viewer') && !resolvedUrl?.startsWith('#')) {
+        resolvedUrl = `/dashboard/lab-viewer/${mat.id}`;
+      }
+
       return {
         id: 'db-' + mat.id,
         title: mat.title,
@@ -51,7 +56,7 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
         chapter: mat.title.split('(')[0]?.trim() || 'Curriculum Vault',
         badgeText: mat.type === 'LINK' ? '3D Interactive Lab' : 'Official PDF',
         fileSize: mat.fileSize || (mat.type === 'LINK' ? 'Interactive Lab' : 'PDF Document'),
-        url: mat.url,
+        url: resolvedUrl,
         isPremium: !!mat.isPremium,
         pagesOrCount: mat.type === 'LINK' ? 'Interactive 3D' : 'Official Guide',
         isFromDb: true
@@ -571,10 +576,8 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                       </button>
 
                       {is3D ? (
-                        <a
+                        <Link
                           href={item.url.startsWith('#') ? '#' : item.url}
-                          target={item.url.startsWith('#') ? undefined : '_blank'}
-                          rel={item.url.startsWith('#') ? undefined : 'noreferrer'}
                           onClick={(e) => {
                             if (item.url.startsWith('#')) {
                               e.preventDefault();
@@ -584,8 +587,8 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                           className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,195,255,0.25)] active:scale-95 cursor-pointer"
                         >
                           <span>Launch 3D Lab</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
+                          <Atom className="w-3.5 h-3.5" />
+                        </Link>
                       ) : (
                         <a
                           href={item.url.startsWith('#') ? '#' : item.url}
@@ -689,6 +692,20 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                 >
                   Upgrade to Gold
                 </Link>
+              ) : previewItem.category === '3D animations' ? (
+                <Link
+                  href={previewItem.url.startsWith('#') ? '#' : previewItem.url}
+                  onClick={(e) => {
+                    if (previewItem.url.startsWith('#')) {
+                      e.preventDefault();
+                      setPreviewItem(null);
+                    }
+                  }}
+                  className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-500/25 cursor-pointer"
+                >
+                  <span>Launch Interactive 3D Lab</span>
+                  <Atom className="w-3.5 h-3.5" />
+                </Link>
               ) : (
                 <a
                   href={previewItem.url.startsWith('#') ? '#' : previewItem.url}
@@ -702,8 +719,8 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                   }}
                   className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-500/25 cursor-pointer"
                 >
-                  <span>{previewItem.category === '3D animations' ? 'Launch Interactive 3D' : 'Open / Download PDF'}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Open / Download PDF</span>
+                  <Download className="w-3.5 h-3.5" />
                 </a>
               )}
             </div>

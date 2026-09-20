@@ -32,9 +32,19 @@ export async function GET() {
     const sanitized = materials.map(m => {
       const meta = parseMaterialMetadata(m.description, m.title, m.type);
       const isLocked = m.isPremium && !isSubscribed;
+      const is3D = meta.category === '3D animations' || m.type === 'LINK';
+
+      let safeUrl = m.url;
+      if (isLocked) {
+        safeUrl = "#locked";
+      } else if (is3D) {
+        // Protect 3D labs: Never leak raw destination URL in client JSON responses
+        safeUrl = `/dashboard/lab-viewer/${m.id}`;
+      }
+
       return {
         ...m,
-        url: isLocked ? "#locked" : m.url,
+        url: safeUrl,
         isLocked,
         category: meta.category,
         discipline: meta.discipline,
