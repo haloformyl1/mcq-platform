@@ -5,7 +5,7 @@ import {
   Upload, FileText, Image as ImageIcon, Link as LinkIcon, Trash2, 
   Plus, ExternalLink, Download, File, CheckCircle2, BookOpen, 
   Atom, CheckSquare, Flame, Award, GraduationCap, FileCheck, 
-  Search, Filter, Sparkles, Eye, Tag
+  Search, Filter, Sparkles, Eye, Tag, CloudUpload
 } from "lucide-react";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import { 
@@ -15,12 +15,44 @@ import {
   SubjectDisciplineType 
 } from "@/lib/studyMaterialMetadata";
 
+
+const uploadFileToR2 = (uploadUrl: string, file: File, onProgress: (pct: number) => void): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", uploadUrl);
+    xhr.setRequestHeader("Content-Type", file.type || "application/pdf");
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        onProgress(percentComplete);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve();
+      } else {
+        reject(new Error(`Direct cloud upload failed with status ${xhr.status}: ${xhr.statusText}`));
+      }
+    };
+
+    xhr.onerror = () => {
+      reject(new Error("Network error during direct Cloudflare R2 upload. Check CORS settings if uploading from a new domain."));
+    };
+
+    xhr.send(file);
+  });
+};
+
 export default function AdminStudyMaterials() {
   const [materials, setMaterials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadStatusText, setUploadStatusText] = useState<string>("");
 
   // Upload Form State
   const [form, setForm] = useState({
@@ -73,21 +105,53 @@ export default function AdminStudyMaterials() {
     setSuccess(null);
 
     try {
-      const formData = new FormData();
-      formData.append("title", form.title.trim());
-      formData.append("description", form.description.trim());
-      formData.append("type", form.type);
-      formData.append("category", form.category);
-      formData.append("discipline", form.discipline);
-      formData.append("isPremium", String(form.isPremium));
-      formData.append("url", form.url.trim());
+      let finalUrl = form.url.trim();
+      let fileSizeFormatted: string | null = null;
+
       if (selectedFile) {
-        formData.append("file", selectedFile);
+        setUploadStatusText("Requesting secure Cloudflare R2 upload channel...");
+        const presignRes = await fetch("/api/admin/study-materials/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: selectedFile.name,
+            contentType: selectedFile.type || (form.type === "PDF" ? "application/pdf" : "image/jpeg"),
+          }),
+        });
+
+        const presignData = await presignRes.json();
+        if (!presignRes.ok) {
+          throw new Error(presignData.error || "Failed to initialize cloud upload");
+        }
+
+        setUploadStatusText("Uploading directly to Cloudflare R2 (0%)...");
+        setUploadProgress(0);
+
+        await uploadFileToR2(presignData.uploadUrl, selectedFile, (pct) => {
+          setUploadProgress(pct);
+          setUploadStatusText(`Uploading directly to Cloudflare R2 (${pct}%)...`);
+        });
+
+        finalUrl = presignData.publicUrl;
+        const sizeMB = (selectedFile.size / (1024 * 1024)).toFixed(2);
+        fileSizeFormatted = `${sizeMB} MB`;
       }
+
+      setUploadStatusText("Saving material record to vault...");
 
       const res = await fetch("/api/admin/study-materials", {
         method: "POST",
-        body: formData
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title.trim(),
+          description: form.description.trim(),
+          type: form.type,
+          category: form.category,
+          discipline: form.discipline,
+          isPremium: form.isPremium,
+          url: finalUrl,
+          fileSize: fileSizeFormatted,
+        }),
       });
 
       const data = await res.json();
@@ -97,12 +161,14 @@ export default function AdminStudyMaterials() {
           title: "",
           description: "",
           type: "PDF",
-          category: "3D animations",
+          category: "Chapter wise PDF Notes",
           discipline: "GENERAL",
           url: "",
           isPremium: false
         });
         setSelectedFile(null);
+        setUploadProgress(null);
+        setUploadStatusText("");
         fetchMaterials();
         setTimeout(() => setSuccess(null), 4500);
       } else {
@@ -112,6 +178,8 @@ export default function AdminStudyMaterials() {
       setError(err?.message || "Failed to process upload request");
     } finally {
       setSubmitting(false);
+      setUploadProgress(null);
+      setUploadStatusText("");
     }
   };
 
@@ -372,9 +440,13 @@ export default function AdminStudyMaterials() {
 
             {/* File Upload for PDF/IMAGE */}
             {form.type !== "LINK" && (
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                  Upload Local {form.type} File
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-xs font-bold text-gray-300 uppercase tracking-wide flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <CloudUpload className="w-4 h-4 text-cyan-400" />
+                    <span>Upload Local {form.type} File (Cloudflare R2 Direct)</span>
+                  </span>
+                  <span className="text-[11px] text-cyan-400/80 font-normal font-mono">No 4.5MB limit</span>
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -393,6 +465,21 @@ export default function AdminStudyMaterials() {
                     </button>
                   )}
                 </div>
+
+                {uploadProgress !== null && (
+                  <div className="space-y-1.5 p-3 rounded-xl bg-[#161616] border border-cyan-500/30">
+                    <div className="flex justify-between text-xs font-mono text-cyan-300">
+                      <span>{uploadStatusText}</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-[#222] h-2 rounded-full overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-150 ease-out" 
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -416,7 +503,7 @@ export default function AdminStudyMaterials() {
             disabled={submitting}
             className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-sm uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 cursor-pointer disabled:opacity-50"
           >
-            {submitting ? "Publishing to Digital Vault..." : "Publish Material to Student Vault"}
+            {submitting ? (uploadStatusText || "Publishing to Digital Vault...") : "Publish Material to Student Vault"}
           </button>
         </form>
       </section>

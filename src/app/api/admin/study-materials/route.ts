@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { r2Client, R2_BUCKET, R2_PUBLIC_DOMAIN } from "@/lib/r2";
 import { 
   encodeMaterialMetadata, 
   parseMaterialMetadata,
@@ -32,48 +34,63 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const formData = await req.formData();
-    const title = formData.get("title") as string;
-    const rawDescription = formData.get("description") as string || "";
-    const type = formData.get("type") as string;
-    const isPremium = formData.get("isPremium") === "true";
-    const url = formData.get("url") as string || "";
-    const file = formData.get("file") as Blob | null;
-    const category = (formData.get("category") as string) || "Chapter wise PDF Notes";
-    const discipline = (formData.get("discipline") as string) || "GENERAL";
+    const contentType = req.headers.get("content-type") || "";
+    let title = "";
+    let rawDescription = "";
+    let type = "";
+    let isPremium = false;
+    let url = "";
+    let fileSizeFormatted: string | null = null;
+    let category = "Chapter wise PDF Notes";
+    let discipline = "GENERAL";
+
+    if (contentType.includes("application/json")) {
+      const body = await req.json();
+      title = body.title?.trim() || "";
+      rawDescription = body.description?.trim() || "";
+      type = body.type || "PDF";
+      isPremium = Boolean(body.isPremium);
+      url = body.url?.trim() || "";
+      fileSizeFormatted = body.fileSize || null;
+      category = body.category || "Chapter wise PDF Notes";
+      discipline = body.discipline || "GENERAL";
+    } else {
+      const formData = await req.formData();
+      title = (formData.get("title") as string)?.trim() || "";
+      rawDescription = (formData.get("description") as string)?.trim() || "";
+      type = formData.get("type") as string;
+      isPremium = formData.get("isPremium") === "true";
+      url = (formData.get("url") as string)?.trim() || "";
+      const file = formData.get("file") as Blob | null;
+      category = (formData.get("category") as string) || "Chapter wise PDF Notes";
+      discipline = (formData.get("discipline") as string) || "GENERAL";
+
+      if (file && typeof (file as any).arrayBuffer === "function") {
+        const bytes = await (file as any).arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        const sizeMB = ((file as any).size / (1024 * 1024)).toFixed(2);
+        fileSizeFormatted = `${sizeMB} MB`;
+
+        const uploadsDir = path.join(process.cwd(), "public", "uploads", "study_materials");
+        await mkdir(uploadsDir, { recursive: true });
+
+        const rawName = (file as any).name || `file_${Date.now()}`;
+        const sanitizeName = rawName.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const fileName = `${Date.now()}_${sanitizeName}`;
+        const filePath = path.join(uploadsDir, fileName);
+        await writeFile(filePath, buffer);
+
+        url = `/uploads/study_materials/${fileName}`;
+      }
+    }
 
     if (!title || !type) {
       return NextResponse.json({ error: "Title and type are required" }, { status: 400 });
     }
 
-    let finalUrl = url;
-    let fileSizeFormatted: string | null = null;
-
-    if (type === "LINK") {
-      if (!url) {
-        return NextResponse.json({ error: "Link URL is required" }, { status: 400 });
-      }
-    } else if (file && typeof (file as any).arrayBuffer === "function") {
-      const bytes = await (file as any).arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      const sizeMB = ((file as any).size / (1024 * 1024)).toFixed(2);
-      fileSizeFormatted = `${sizeMB} MB`;
-
-      const uploadsDir = path.join(process.cwd(), "public", "uploads", "study_materials");
-      await mkdir(uploadsDir, { recursive: true });
-
-      const rawName = (file as any).name || `file_${Date.now()}`;
-      const sanitizeName = rawName.replace(/[^a-zA-Z0-9.-]/g, "_");
-      const fileName = `${Date.now()}_${sanitizeName}`;
-      const filePath = path.join(uploadsDir, fileName);
-      await writeFile(filePath, buffer);
-
-      finalUrl = `/uploads/study_materials/${fileName}`;
-    } else if (url.trim()) {
-      finalUrl = url.trim();
-    } else {
-      return NextResponse.json({ error: "Please select a valid file or enter a link URL" }, { status: 400 });
+    if (!url) {
+      return NextResponse.json({ error: "A valid file upload or URL is required" }, { status: 400 });
     }
 
     const encodedDescription = encodeMaterialMetadata(rawDescription, category, discipline);
@@ -83,7 +100,7 @@ export async function POST(req: Request) {
         title,
         description: encodedDescription,
         type,
-        url: finalUrl,
+        url,
         fileSize: fileSizeFormatted,
         isPremium
       }
@@ -102,7 +119,7 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error("Create study material error:", error);
-    const detailMsg = error?.message || (typeof error === 'string' ? error : "Failed to upload study material");
+    const detailMsg = error?.message || (typeof error === "string" ? error : "Failed to upload study material");
     return NextResponse.json({ error: detailMsg }, { status: 500 });
   }
 }
@@ -116,9 +133,31 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Material ID is required" }, { status: 400 });
     }
 
-    await prisma.studyMaterial.delete({
+    const existing = await prisma.studyMaterial.findUnique({
       where: { id }
     });
+
+    if (existing) {
+      // If hosted on R2, optionally delete from bucket
+      try {
+        if (existing.url.includes(".r2.dev") || (R2_PUBLIC_DOMAIN && existing.url.startsWith(R2_PUBLIC_DOMAIN))) {
+          const urlObj = new URL(existing.url);
+          const key = urlObj.pathname.replace(/^\//, "");
+          if (key) {
+            await r2Client.send(new DeleteObjectCommand({
+              Bucket: R2_BUCKET,
+              Key: key,
+            }));
+          }
+        }
+      } catch (r2Err) {
+        console.warn("Could not delete from R2 (continuing DB delete):", r2Err);
+      }
+
+      await prisma.studyMaterial.delete({
+        where: { id }
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
