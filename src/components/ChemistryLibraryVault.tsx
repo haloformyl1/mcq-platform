@@ -590,9 +590,8 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                           <Atom className="w-3.5 h-3.5" />
                         </Link>
                       ) : (
-                        <a
-                          href={item.url.startsWith('#') ? '#' : item.url}
-                          target="_self"
+                        <Link
+                          href={item.url.startsWith('#') ? '#' : `/dashboard/pdf-viewer/${item.id}`}
                           onClick={(e) => {
                             if (item.url.startsWith('#')) {
                               e.preventDefault();
@@ -603,7 +602,7 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                         >
                           <span>Read / Download PDF</span>
                           <Download className="w-3.5 h-3.5" />
-                        </a>
+                        </Link>
                       )}
                     </>
                   )}
@@ -706,9 +705,8 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                   <Atom className="w-3.5 h-3.5" />
                 </Link>
               ) : (
-                <a
-                  href={previewItem.url.startsWith('#') ? '#' : previewItem.url}
-                  target="_self"
+                <Link
+                  href={previewItem.url.startsWith('#') ? '#' : `/dashboard/pdf-viewer/${previewItem.id}`}
                   onClick={(e) => {
                     if (previewItem.url.startsWith('#')) {
                       e.preventDefault();
@@ -717,9 +715,9 @@ export default function ChemistryLibraryVault({ studyMaterials = [], student }: 
                   }}
                   className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition shadow-lg shadow-cyan-500/25 cursor-pointer"
                 >
-                  <span>Open / Download PDF</span>
+                  <span>Open Secure PDF Viewer</span>
                   <Download className="w-3.5 h-3.5" />
-                </a>
+                </Link>
               )}
             </div>
           </div>
