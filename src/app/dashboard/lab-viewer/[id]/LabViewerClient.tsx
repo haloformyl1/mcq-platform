@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { 
   ArrowLeft, Atom, Maximize, Minimize, 
-  ShieldCheck, Lock, Sparkles, RefreshCw 
+  ShieldCheck, Sparkles, RefreshCw 
 } from "lucide-react";
 
 interface LabViewerClientProps {
@@ -156,7 +156,7 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
           key={iframeKey}
           src={`/api/student/lab-proxy/${material.id}`}
           onLoad={() => setIsIframeLoading(false)}
-          className="w-full h-full border-0 relative z-0"
+          className="w-full h-full border-0 relative z-0 bg-[#06131d]"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking; fullscreen"
           title={material.title}
         />

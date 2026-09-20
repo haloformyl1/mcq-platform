@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
@@ -90,11 +90,12 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       }
     }
 
-    // Fetch external lab content server-to-server
+    // Fetch external lab content server-to-server with full redirect following
     const response = await fetch(material.url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9,bn;q=0.8"
       },
       redirect: "follow"
     });
@@ -108,17 +109,33 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     if (contentType.includes("text/html")) {
       let html = await response.text();
 
-      // Resolve base URL for external relative assets
-      const baseHref = material.url.endsWith('/') 
-        ? material.url 
-        : material.url.substring(0, material.url.lastIndexOf('/') + 1) || (new URL(material.url).origin + '/');
+      // Resolve the canonical directory base URL from final redirected URL
+      const finalUrl = response.url || material.url;
+      const urlObj = new URL(finalUrl);
+      
+      let baseHref = finalUrl;
+      // If the pathname ends with a specific file like index.html or sim.php, get directory
+      if (/\.[a-zA-Z0-9]+$/.test(urlObj.pathname)) {
+        baseHref = finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
+      } else if (!baseHref.endsWith('/')) {
+        baseHref += '/';
+      }
 
-      // Injected frame security guard and base tag
+      // Security and resilience injections:
+      // 1. Canonical base tag for relative assets (./assets/...)
+      // 2. Neutralize ServiceWorker to prevent cross-origin DOMExceptions
+      // 3. Redirect back to platform viewer if opened directly
       const injection = `
   <base href="${baseHref}">
   <script>
     try {
-      // Guard: If opened directly outside the in-app viewer, redirect back into platform
+      // Neutralize cross-origin ServiceWorker registrations that cause DOMExceptions in proxied frames
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register = function() {
+          return Promise.reject(new Error('PWA ServiceWorker bypassed in secure viewer'));
+        };
+      }
+      // Frame Guard: redirect back to full platform viewer if launched standalone
       if (window.top === window.self) {
         window.location.replace('/dashboard/lab-viewer/${cleanId}');
       }
@@ -134,6 +151,16 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         html = `<head>${injection}</head>${html}`;
       }
 
+      // Strip any restrictive meta CSP or X-Frame-Options tags inside the HTML
+      html = html.replace(/<meta[^>]*http-equiv=["']content-security-policy["'][^>]*>/gi, '');
+      html = html.replace(/<meta[^>]*http-equiv=["']x-frame-options["'][^>]*>/gi, '');
+
+      // Rewrite root-relative URLs (/assets/ -> origin/assets/) for bundles not using relative ./
+      const origin = urlObj.origin;
+      html = html.replace(/(src|href)=["']\/(?!\/)([^"']*)["']/gi, (match, attr, path) => {
+        return `${attr}="${origin}/${path}"`;
+      });
+
       return new NextResponse(html, {
         status: 200,
         headers: {
@@ -144,7 +171,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       });
     }
 
-    // Stream other content types directly (CSS, JS, textures)
+    // Stream other content types directly (CSS, JS, textures, GLTF, binary)
     const buffer = await response.arrayBuffer();
     return new NextResponse(buffer, {
       status: 200,
