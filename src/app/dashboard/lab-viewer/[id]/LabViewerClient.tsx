@@ -11,7 +11,7 @@ interface LabViewerClientProps {
     isPremium: boolean;
     token?: string;
   };
-  student: {
+  student?: {
     id: string;
     email: string;
     name?: string | null;
@@ -19,7 +19,7 @@ interface LabViewerClientProps {
   };
 }
 
-export default function LabViewerClient({ material, student }: LabViewerClientProps) {
+export default function LabViewerClient({ material }: LabViewerClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [iframeKey, setIframeKey] = useState(0);
   const [isIframeLoading, setIsIframeLoading] = useState(true);
@@ -39,7 +39,7 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
     }
   }, [material.token, material.id]);
 
-  const watermarkText = `${student.email || student.id.slice(0, 8)} • PIECHEM SECURE LAB`;
+  const watermarkText = "Designed by Arghyadeep Roy • 9830507435";
 
   return (
     <div 
@@ -53,7 +53,7 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
           <Atom className="w-10 h-10 text-cyan-400 animate-spin" />
           <div className="text-center space-y-1">
             <p className="text-sm font-semibold text-cyan-300">Loading 3D Simulation...</p>
-            <p className="text-xs text-slate-400 font-mono">Connecting secure stream</p>
+            <p className="text-xs text-slate-400 font-mono">Connecting stream</p>
           </div>
         </div>
       )}
@@ -73,18 +73,17 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
         />
       )}
 
-      {/* Anti-Piracy Forensic Floating Watermark */}
+      {/* Branding Watermark */}
       <div 
-        className="absolute inset-0 z-20 pointer-events-none select-none overflow-hidden grid grid-cols-2 sm:grid-cols-3 gap-24 p-8 opacity-[0.07]"
+        className="absolute inset-0 z-20 pointer-events-none select-none overflow-hidden grid grid-cols-2 sm:grid-cols-3 gap-24 p-8 opacity-[0.08]"
         aria-hidden="true"
       >
         {Array.from({ length: 9 }).map((_, i) => (
           <div 
             key={i} 
-            className="transform -rotate-25 text-[11px] font-mono font-bold tracking-widest text-cyan-400 whitespace-nowrap flex flex-col gap-1 items-center justify-center"
+            className="transform -rotate-25 text-[11px] font-mono font-bold tracking-widest text-cyan-400 whitespace-nowrap flex items-center justify-center"
           >
             <span>{watermarkText}</span>
-            <span className="text-[9px] opacity-75">LICENSED USER SESSION</span>
           </div>
         ))}
       </div>
