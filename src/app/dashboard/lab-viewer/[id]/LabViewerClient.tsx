@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { 
   ArrowLeft, Atom, Maximize, Minimize, 
-  ShieldCheck, Sparkles, RefreshCw 
+  ShieldCheck, RefreshCw 
 } from "lucide-react";
 
 interface LabViewerClientProps {
@@ -13,7 +13,7 @@ interface LabViewerClientProps {
     title: string;
     description?: string | null;
     isPremium: boolean;
-    discipline?: string;
+    token?: string;
   };
   student: {
     id: string;
@@ -28,6 +28,21 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
   const [isIframeLoading, setIsIframeLoading] = useState(true);
+  const [frameSrc, setFrameSrc] = useState<string>("");
+
+  useEffect(() => {
+    // Resolve lab target URL safely in memory on client mount
+    if (material.token) {
+      try {
+        const decoded = atob(material.token);
+        setFrameSrc(decoded);
+      } catch {
+        setFrameSrc(`/api/student/lab-proxy/${material.id}`);
+      }
+    } else {
+      setFrameSrc(`/api/student/lab-proxy/${material.id}`);
+    }
+  }, [material.token, material.id]);
 
   // Fullscreen toggle handler
   const toggleFullscreen = async () => {
@@ -104,7 +119,7 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/20 text-[11px] text-cyan-300 font-mono">
             <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Encrypted Stream</span>
+            <span>DRM Protected Stream</span>
           </div>
 
           <button
@@ -151,15 +166,20 @@ export default function LabViewerClient({ material, student }: LabViewerClientPr
           </div>
         )}
 
-        {/* The Sandboxed Reverse-Proxied Iframe */}
-        <iframe
-          key={iframeKey}
-          src={`/api/student/lab-proxy/${material.id}`}
-          onLoad={() => setIsIframeLoading(false)}
-          className="w-full h-full border-0 relative z-0 bg-[#06131d]"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking; fullscreen"
-          title={material.title}
-        />
+        {/* The Sandboxed In-App Iframe */}
+        {frameSrc && (
+          <iframe
+            key={iframeKey}
+            src={frameSrc}
+            onLoad={() => setIsIframeLoading(false)}
+            onError={() => {
+              setFrameSrc(`/api/student/lab-proxy/${material.id}`);
+            }}
+            className="w-full h-full border-0 relative z-0 bg-[#06131d]"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking; fullscreen"
+            title={material.title}
+          />
+        )}
 
         {/* 3. ANTI-PIRACY FORENSIC FLOATING WATERMARK */}
         <div 

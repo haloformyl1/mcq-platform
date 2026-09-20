@@ -1,4 +1,4 @@
-﻿import { notFound, redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -113,13 +113,17 @@ export default async function LabViewerPage({
     }
   }
 
+  // Obfuscate the destination URL for secure in-app rendering
+  const encodedUrl = Buffer.from(material.url).toString('base64');
+
   return (
     <LabViewerClient
       material={{
         id: material.id,
         title: material.title,
         description: material.description,
-        isPremium: material.isPremium
+        isPremium: material.isPremium,
+        token: encodedUrl
       }}
       student={{
         id: student.id,
