@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import PiechemLogo from "@/components/PiechemLogo";
+import LandingIntroScreen from "@/components/LandingIntroScreen";
 import { 
   ChevronRight, 
   ShieldCheck, 
@@ -267,6 +268,7 @@ export default function StudentLogin() {
 
   return (
     <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+      <LandingIntroScreen />
       
       {/* ========================================================= */}
       {/* 1. UPPER SIDE (HERO SECTION - NETFLIX INSPIRATION)       */}
