@@ -141,17 +141,17 @@ export default function LandingIntroScreen() {
         cursor: descFinished ? "default" : "pointer",
       }}
     >
-      {/* Top Header Bar: Far Left Status Badge & Far Right Logo */}
+      {/* Top Header Bar: Far Left Logo & Far Right Status Badge */}
       <header className="w-full flex items-center justify-between px-2 sm:px-4 pb-2 border-b border-white/[0.08] shrink-0">
-        {/* Left Side: SMART LEARNING PLATFORM */}
+        {/* Far Left Side: Piechem Logo */}
+        <div className="flex items-center">
+          <PiechemLogo size="md" subtitle="Learning Platform" />
+        </div>
+
+        {/* Far Right Side: SMART LEARNING PLATFORM */}
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d0d0d] border border-cyan-500/30 text-cyan-300 text-[10px] sm:text-xs font-mono tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.15)]">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
           <span>SMART LEARNING PLATFORM</span>
-        </div>
-
-        {/* Far Right Side: Piechem Logo */}
-        <div className="flex items-center">
-          <PiechemLogo size="md" subtitle="Learning Platform" />
         </div>
       </header>
 

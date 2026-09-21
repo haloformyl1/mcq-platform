@@ -301,6 +301,12 @@ export default function StudentLogin() {
 
         {/* --- Top Navigation Header --- */}
         <header className="relative z-20 w-full px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between gap-4">
+          {/* Logo on Far Left */}
+          <div className="flex items-center">
+            <PiechemLogo size="md" isGoldMember={false} subtitle="Learning Platform" />
+          </div>
+
+          {/* Designer Badge on Far Right */}
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full border border-cyan-500/30 bg-[#03111c]/90 backdrop-blur-md shadow-sm">
             <span className="text-[11px] sm:text-xs text-slate-400 font-medium whitespace-nowrap">
               Designed by <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
@@ -313,10 +319,6 @@ export default function StudentLogin() {
               <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current text-cyan-400 shrink-0" />
               <span>9830507435</span>
             </a>
-          </div>
-
-          <div className="flex items-center">
-            <PiechemLogo size="md" isGoldMember={false} subtitle="Learning Platform" />
           </div>
         </header>
 
