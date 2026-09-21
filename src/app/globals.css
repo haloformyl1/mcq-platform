@@ -140,6 +140,50 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .mcq-choice:hover { border-color: var(--border-interactive); background: var(--hover-state); transform: translateY(-1px); }
 
+.overflow-wrap-anywhere { overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .admin-preview-banner { align-items: flex-start; }
+  .admin-preview-banner > div:first-child { flex: 1 1 auto; }
+  .admin-preview-banner > div:last-child { align-self: center; }
+
+  .exam-session-body { min-height: 0; overflow: visible; }
+  .exam-session-main { min-height: 0; overflow-y: visible; }
+  .exam-session-header .mcq-button { min-height: 44px; }
+  .exam-session-header > div:last-child { display: grid; grid-template-columns: auto 1fr 1fr; width: 100%; }
+  .exam-session-header > div:last-child .mcq-button { width: 100%; }
+  .exam-author-badge { width: min(100%, 360px); flex-wrap: wrap; justify-content: center; border-radius: 14px; line-height: 1.4; }
+  .exam-palette { width: min(88vw, 360px); }
+}
+
+@media (max-width: 380px) {
+  .admin-preview-banner { flex-direction: column; gap: 8px; }
+  .admin-preview-banner > div:last-child { width: 100%; }
+  .admin-preview-banner > div:last-child button { width: 100%; }
+  .exam-session-header { padding-inline: 10px; }
+  .exam-session-header > div:first-child { gap: 6px; }
+  .exam-session-header > div:last-child { grid-template-columns: 1fr 1fr; }
+  .exam-session-header > div:last-child button:first-child { grid-column: 1 / -1; }
+  .exam-author-badge { padding-inline: 10px; }
+  .admin-top-bar { height: auto; min-height: 4rem; flex-wrap: wrap; padding-block: 10px; }
+  .admin-panel-title { overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media (max-width: 640px) {
+  .dashboard-header-inner > div:first-child { flex-wrap: wrap; row-gap: 8px; }
+  .dashboard-header-inner > div:first-child > div:first-child { min-width: 0; }
+  .dashboard-hero h1 { overflow-wrap: anywhere; }
+  .dashboard-hero-actions > div:first-child { flex-wrap: wrap; }
+  .dashboard-hero-actions > div:first-child > a { min-width: min(100%, 150px); white-space: normal; }
+  .dashboard-hero-actions > div:first-child > a span { white-space: normal; }
+}
+
+@media (max-width: 380px) {
+  .dashboard-header-inner { padding-inline: 8px; }
+  .dashboard-hero-actions > div:first-child { flex-direction: column; }
+  .dashboard-hero-actions > div:first-child > a { width: 100%; }
+}
+
 @media (max-width: 640px) {
   .mcq-shell { padding: 20px 12px; }
   .mcq-panel, .mcq-panel-elevated { border-radius: 14px; }

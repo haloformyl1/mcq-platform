@@ -313,9 +313,9 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
-      <header className="sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="w-full px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3">
-          <div className="flex items-center justify-between gap-1.5 sm:gap-4">
+      <header className="dashboard-header sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+        <div className="dashboard-header-inner w-full px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3">
+          <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-4">
             
             {/* Left Group: Brand Identity & Designer Attribution at Far Left for Mobile & Desktop */}
             <div className="flex items-center gap-2 sm:gap-5 min-w-0">
@@ -775,7 +775,7 @@ export default function StudentDashboard() {
         {/* ========================================================= */}
         {/* 3. FEATURED SPOTLIGHT BILLBOARD (NETFLIX HERO - IMAGE 2) */}
         {/* ========================================================= */}
-        <section id="overview" className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_15px_40px_rgba(0,180,255,0.12)]">
+        <section id="overview" className="dashboard-hero relative rounded-2xl sm:rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_15px_40px_rgba(0,180,255,0.12)]">
           
           {/* Ambient Lighting & Abstract Chemistry Backdrop */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_75%_35%,rgba(0,195,255,0.18),transparent_65%)] pointer-events-none" />
@@ -846,7 +846,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Actions & Floating Tags Row */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-cyan-500/20 w-full">
+            <div className="dashboard-hero-actions flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-cyan-500/20 w-full">
               
               {/* Action CTA Buttons: Side-by-side row on mobile for fast access */}
               <div className="flex flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">

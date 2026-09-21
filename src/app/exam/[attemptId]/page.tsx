@@ -342,9 +342,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const currentQuestion = questions[currentQ];
 
   return (
-    <div className="min-h-screen flex flex-col text-white select-none">
+    <div className="exam-session-shell min-h-screen flex flex-col text-white select-none">
       <AdminPreviewBanner />
-      <header className="mcq-panel rounded-none border-x-0 border-t-0 p-3 sm:p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      <header className="exam-session-header mcq-panel rounded-none border-x-0 border-t-0 p-3 sm:p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div className="flex justify-between items-center w-full md:w-auto gap-2 min-w-0">
           <PiechemLogo size="sm" showText={false} isGoldMember={
             examData?.student?.subscriptionStatus === "COMPLIMENTARY" ||
@@ -391,8 +391,8 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative">
-        <main className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8">
+      <div className="exam-session-body flex flex-1 overflow-hidden relative">
+        <main className="exam-session-main flex-1 overflow-y-auto p-3 sm:p-6 md:p-8">
           <div className="mcq-panel-elevated max-w-4xl mx-auto w-full p-4 sm:p-6 md:p-8">
             <div className="mb-6 flex justify-between items-start gap-4">
               <h2 className="text-xl font-medium text-[#a6a6a6] pt-1">
@@ -400,7 +400,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               </h2>
             </div>
 
-            <h2 className="text-lg sm:text-xl md:text-2xl font-medium mb-4 leading-relaxed break-words overflow-x-auto">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-medium mb-4 leading-relaxed break-words overflow-wrap-anywhere">
               {currentQuestion.questionText}
             </h2>
 
@@ -501,7 +501,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             
             {/* Modern Glassmorphic Author Badge */}
             <div className="mt-8 flex justify-center pb-4">
-              <div className="px-4 py-2 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
+              <div className="exam-author-badge max-w-full px-4 py-2 rounded-full bg-slate-900/90 backdrop-blur-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-xs text-slate-300 font-medium tracking-wide flex items-center space-x-2">
                 <span className="text-slate-400">Designed by</span>
                 <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400">
                   Arghyadeep Roy
@@ -528,7 +528,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               className="fixed inset-0 bg-black/50 z-40 lg:hidden"
               onClick={() => setShowPalette(false)}
             />
-            <aside className="fixed inset-y-0 right-0 z-50 w-[85vw] sm:w-80 mcq-panel rounded-none border-y-0 border-r-0 p-5 sm:p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[color-mix(in_srgb,var(--surface-primary)_40%,transparent)] transition-transform flex flex-col">
+            <aside className="exam-palette fixed inset-y-0 right-0 z-50 w-[85vw] sm:w-80 mcq-panel rounded-none border-y-0 border-r-0 p-5 sm:p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[color-mix(in_srgb,var(--surface-primary)_40%,transparent)] transition-transform flex flex-col">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-bold text-[#a6a6a6] uppercase tracking-wider">Question Palette</h3>
                 <button 

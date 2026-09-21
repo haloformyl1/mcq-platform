@@ -218,12 +218,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <nav className="bg-[#0b1724]/95 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-3 sm:px-6">
           {/* Main Top Bar */}
-          <div className="flex items-center justify-between h-16 gap-3">
+          <div className="admin-top-bar flex items-center justify-between h-16 gap-3">
             
             {/* Left Brand & Title */}
-            <div className="flex items-center space-x-2.5 sm:space-x-3 shrink-0">
+            <div className="flex min-w-0 items-center space-x-2.5 sm:space-x-3 shrink-0">
               <PiechemLogo size="sm" isGoldMember={false} />
-              <span className="border-l border-slate-700/80 pl-2 sm:pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
+              <span className="admin-panel-title border-l border-slate-700/80 pl-2 sm:pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
                 Admin Panel
               </span>
             </div>

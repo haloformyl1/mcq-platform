@@ -23,20 +23,20 @@ export default function AdminPreviewBanner() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-2 text-sm font-medium flex items-center justify-between shadow-lg z-50 sticky top-0">
-      <div className="flex items-center space-x-2">
+    <div className="admin-preview-banner bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-3 sm:px-4 py-2 text-sm font-medium flex items-center justify-between gap-3 shadow-lg z-50 sticky top-0">
+      <div className="flex min-w-0 items-start space-x-2">
         <div className="p-1 bg-black/20 rounded-md">
           <Eye className="w-4 h-4 text-amber-200 animate-pulse" />
         </div>
-        <span>
+        <span className="min-w-0 break-words leading-snug">
           <strong className="font-semibold text-amber-100">Admin Preview Mode:</strong> You are currently testing the platform as a student.
         </span>
       </div>
 
-      <div className="flex items-center space-x-3">
+      <div className="flex shrink-0 items-center space-x-3">
         <button
           onClick={handleReturnToAdmin}
-          className="flex items-center space-x-1.5 bg-black/30 hover:bg-black/50 text-white px-3 py-1 rounded-md text-xs font-semibold transition border border-white/20 hover:border-white/40 shadow-sm active:scale-95"
+          className="flex items-center space-x-1.5 bg-black/30 hover:bg-black/50 text-white px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-md text-xs font-semibold transition border border-white/20 hover:border-white/40 shadow-sm active:scale-95 whitespace-nowrap"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Return to Admin Panel</span>
