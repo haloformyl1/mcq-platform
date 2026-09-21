@@ -20,6 +20,15 @@ export default function LandingIntroScreen() {
     "Explore interactive 3D chemistry visualizations, comprehensive chapter notes, curated DPPs, and real-time NTA mock tests powered by AI.\n\n" +
     "Let's study together.";
 
+  // Lock body scroll while the intro screen is active to prevent double scrollbars
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   // 1. Type "Hello," letter by letter (H -> e -> l -> l -> o -> ,)
   useEffect(() => {
     if (helloIndex < helloTarget.length) {
@@ -64,6 +73,8 @@ export default function LandingIntroScreen() {
   // Continue to normal login
   const handleContinue = () => {
     setIsExiting(true);
+    // Restore normal browser scrolling for the login page
+    document.body.style.overflow = "";
     setTimeout(() => {
       setVisible(false);
     }, 600);
@@ -77,28 +88,31 @@ export default function LandingIntroScreen() {
   return (
     <div
       onClick={handleFastForward}
-      className={`fixed inset-0 z-50 bg-[#000000] text-white flex flex-col justify-between items-center px-6 py-8 sm:py-12 overflow-y-auto selection:bg-cyan-500/30 selection:text-cyan-200 transition-all duration-700 ease-out ${
+      className={`fixed inset-0 z-50 bg-[#000000] text-white flex flex-col justify-between items-center px-6 py-6 sm:py-8 overflow-y-auto no-scrollbar selection:bg-cyan-500/30 selection:text-cyan-200 transition-all duration-700 ease-out ${
         isExiting
           ? "opacity-0 scale-[1.02] pointer-events-none"
           : "opacity-100 scale-100"
       }`}
-      style={{ cursor: descFinished ? "default" : "pointer" }}
+      style={{
+        cursor: descFinished ? "default" : "pointer",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+      }}
     >
-      {/* Top Bar with Clean Fixed Piechem Logo (No skip buttons) */}
-      <div className="w-full max-w-5xl flex items-center justify-between pt-2">
+      {/* Top Bar with Clean Fixed Piechem Logo */}
+      <div className="w-full max-w-5xl flex items-center justify-between pt-1 sm:pt-2">
         <div className="flex items-center">
           <PiechemLogo size="md" />
         </div>
-        {/* Right side is intentionally empty per request (no skip button) */}
         <div />
       </div>
 
       {/* Main Center Container */}
-      <div className="w-full max-w-3xl my-auto py-6 sm:py-10 space-y-6 sm:space-y-8 text-center">
+      <div className="w-full max-w-3xl my-auto py-4 sm:py-8 space-y-5 sm:space-y-6 text-center">
         
         {/* "Hello," + "A initiative by Arghyadeep Roy" */}
-        <div className="space-y-2.5">
-          <div className="min-h-[50px] sm:min-h-[72px] flex items-center justify-center">
+        <div className="space-y-2">
+          <div className="min-h-[48px] sm:min-h-[64px] flex items-center justify-center">
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight font-mono inline-flex items-center">
               <span>{currentHello}</span>
               {(!helloFinished || !descFinished) && (
@@ -116,7 +130,7 @@ export default function LandingIntroScreen() {
         </div>
 
         {/* Dynamic Description Area */}
-        <div className="min-h-[140px] sm:min-h-[160px] flex flex-col items-center justify-center space-y-4">
+        <div className="min-h-[130px] sm:min-h-[150px] flex flex-col items-center justify-center space-y-3.5">
           {helloFinished && !descFinished ? (
             /* While typing */
             <p className="text-base sm:text-xl md:text-2xl text-gray-300 font-light leading-relaxed whitespace-pre-line font-mono">
@@ -125,7 +139,7 @@ export default function LandingIntroScreen() {
             </p>
           ) : descFinished ? (
             /* Finished rich display with glowing badges and colored accents */
-            <div className="space-y-5 animate-in fade-in zoom-in-95 duration-500">
+            <div className="space-y-4 animate-in fade-in zoom-in-95 duration-500">
               <p className="text-lg sm:text-2xl md:text-3xl text-gray-200 font-light leading-relaxed max-w-2xl mx-auto">
                 Whether preparing for{" "}
                 <span className="text-cyan-400 font-bold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">JEE</span>,{" "}
@@ -137,14 +151,14 @@ export default function LandingIntroScreen() {
                 Explore interactive 3D chemistry visualizations, comprehensive chapter notes, curated DPPs, and real-time NTA mock tests powered by AI.
               </p>
 
-              <div className="pt-2">
+              <div className="pt-1">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                   Let&apos;s study together.
                 </span>
               </div>
 
               {/* Feature Pills */}
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                 <span className="px-3 py-1 rounded-full bg-[#111] border border-cyan-500/30 text-cyan-300 text-[11px] font-medium flex items-center gap-1.5 shadow-sm">
                   <Atom className="w-3.5 h-3.5 text-cyan-400" />
                   <span>3D Molecular Labs</span>
@@ -167,7 +181,7 @@ export default function LandingIntroScreen() {
         </div>
 
         {/* Continue Button & Contact Us Section */}
-        <div className={`space-y-5 transition-all duration-500 ${descFinished ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"}`}>
+        <div className={`space-y-4 transition-all duration-500 ${descFinished ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"}`}>
           <div>
             <button
               type="button"
@@ -175,18 +189,18 @@ export default function LandingIntroScreen() {
                 e.stopPropagation();
                 handleContinue();
               }}
-              className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-[0_0_35px_rgba(6,182,212,0.4)] hover:shadow-[0_0_55px_rgba(6,182,212,0.7)] hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+              className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-[0_0_35px_rgba(6,182,212,0.4)] hover:shadow-[0_0_55px_rgba(6,182,212,0.7)] hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
             >
               <span>Continue</span>
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
-            <p className="text-[11px] text-gray-500 mt-2 font-mono">
+            <p className="text-[11px] text-gray-500 mt-1.5 font-mono">
               Click to enter the learning portal
             </p>
           </div>
 
           {/* Contact Details Bar */}
-          <div className="pt-3 border-t border-[#1a1a1a] max-w-xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-400 font-sans">
+          <div className="pt-2.5 border-t border-[#1a1a1a] max-w-xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-400 font-sans">
             <span className="text-gray-400">Contact us at</span>
             <a
               href="mailto:mailarghyadeeproy@gmail.com"
@@ -212,7 +226,7 @@ export default function LandingIntroScreen() {
       </div>
 
       {/* Bottom Minimal Subtitle */}
-      <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 font-mono gap-2 pt-2">
+      <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 font-mono gap-2 pt-1">
         <span>© {new Date().getFullYear()} PIECHEM • Chemistry Excellence</span>
         <span>Empowering JEE, NEET & Board Aspirants</span>
       </div>
