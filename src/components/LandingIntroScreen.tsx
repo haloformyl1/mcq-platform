@@ -26,7 +26,7 @@ export default function LandingIntroScreen() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Time & Sequence States (7.0s Total)
+  // Time & Sequence States (15.0s Total)
   const [elapsed, setElapsed] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -34,7 +34,7 @@ export default function LandingIntroScreen() {
   const pausedAtRef = useRef<number>(0);
   const redirectTriggeredRef = useRef(false);
 
-  const TOTAL_DURATION = 7000; // 7.0 seconds
+  const TOTAL_DURATION = 15000; // 15.0 seconds // 7.0 seconds
 
   // Lock body scroll while splash screen is active
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function LandingIntroScreen() {
     };
   }, []);
 
-  // 1. Precision Animation Frame Clock (0 to 7000ms)
+  // 1. Precision Animation Frame Clock (0 to 15000ms)
   useEffect(() => {
     let animFrameId: number;
 
@@ -392,9 +392,9 @@ export default function LandingIntroScreen() {
   const isPhase1 = elapsed >= 1000;
   const isPhase3 = elapsed >= 3500;
   const isPhase4 = elapsed >= 5000;
-  const isPhase5 = elapsed >= 6400;
+  const isPhase5 = elapsed >= 13500;
 
-  // Exact progress line tracking 0% to 100% across 7000ms
+  // Exact progress line tracking 0% to 100% across 15000ms
   const progressPercent = Math.min(100, Math.max(0, (elapsed / TOTAL_DURATION) * 100));
 
   return (
