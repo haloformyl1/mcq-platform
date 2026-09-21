@@ -300,26 +300,25 @@ export default function StudentLogin() {
         />
 
         {/* --- Top Navigation Header --- */}
-        <header className="relative z-20 w-full px-4 sm:px-8 py-5 sm:py-6 flex items-start justify-between gap-4">
-          {/* Logo & Compact Designer Badge (Image 2 style) */}
-          <div className="flex flex-col items-start gap-1.5 sm:gap-2">
-            <PiechemLogo size="md" isGoldMember={false} />
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full border border-cyan-500/30 bg-[#03111c]/90 backdrop-blur-md shadow-sm">
-              <span className="text-[11px] sm:text-xs text-slate-400 font-medium whitespace-nowrap">
-                Designed by <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-              </span>
-              <span className="text-cyan-400/80 text-[10px]">•</span>
-              <a
-                href="tel:9830507435"
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-cyan-500/50 bg-[#041d2d]/80 text-cyan-300 hover:text-cyan-200 hover:border-cyan-400 transition-colors text-[10px] sm:text-[11px] font-semibold tracking-wide whitespace-nowrap"
-              >
-                <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current text-cyan-400 shrink-0" />
-                <span>9830507435</span>
-              </a>
-            </div>
+        <header className="relative z-20 w-full px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between gap-4">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full border border-cyan-500/30 bg-[#03111c]/90 backdrop-blur-md shadow-sm">
+            <span className="text-[11px] sm:text-xs text-slate-400 font-medium whitespace-nowrap">
+              Designed by <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
+            </span>
+            <span className="text-cyan-400/80 text-[10px]">•</span>
+            <a
+              href="tel:9830507435"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-cyan-500/50 bg-[#041d2d]/80 text-cyan-300 hover:text-cyan-200 hover:border-cyan-400 transition-colors text-[10px] sm:text-[11px] font-semibold tracking-wide whitespace-nowrap"
+            >
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current text-cyan-400 shrink-0" />
+              <span>9830507435</span>
+            </a>
           </div>
 
-                  </header>
+          <div className="flex items-center">
+            <PiechemLogo size="md" isGoldMember={false} subtitle="Learning Platform" />
+          </div>
+        </header>
 
         {/* --- Center Hero Content --- */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center my-auto pt-6 pb-12 w-full">

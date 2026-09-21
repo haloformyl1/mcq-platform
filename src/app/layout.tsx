@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PIECHEM - Smart Exam Platform",
+  title: "PIECHEM - Smart Learning Platform",
   description: "PIECHEM Online Chemistry Exam and Assessment Platform",
   icons: {
     icon: [

@@ -1234,7 +1234,7 @@ export default function StudentDashboard() {
             <span>Log out from Piechem</span>
           </button>
           <p className="text-xs text-slate-500">
-            PIECHEM Smart Exam Platform • Administrator Helpline:{" "}
+            PIECHEM Smart Learning Platform • Administrator Helpline:{" "}
             <a href="tel:9830507435" className="text-cyan-400 hover:underline font-mono">
               9830507435
             </a>

@@ -175,7 +175,7 @@ export async function sendSubscriptionUpgradeEmail(params: SubscriptionUpgradeEm
 
           <div style="text-align:center; color:#64748b; font-size:11px; line-height:1.5;">
             <p style="margin:0;">For support or inquiries, contact Administrator Arghyadeep Roy: <a href="tel:9830507435" style="color:#38bdf8;">9830507435</a></p>
-            <p style="margin:5px 0 0 0;">PIECHEM Smart Exam Platform • All rights reserved</p>
+            <p style="margin:5px 0 0 0;">PIECHEM Smart Learning Platform • All rights reserved</p>
           </div>
         </div>
       `;
