@@ -1,5 +1,4 @@
 "use client";
-import DashboardAiWidget from "@/components/ai/DashboardAiWidget";
 import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
 
 import { useEffect, useState, useMemo } from "react";
@@ -757,14 +756,6 @@ export default function StudentDashboard() {
             </div>
           </div>
         )}
-
-        {/* ========================================================= */}
-        {/* PIECHEM AI STUDENT DASHBOARD COPILOT                    */}
-        {/* ========================================================= */}
-        <DashboardAiWidget
-          onOpenTutor={handleOpenAiTutor}
-          onOpenAdaptiveQuiz={handleOpenAdaptiveDrill}
-        />
 
         {/* ========================================================= */}
         {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (IMAGE 2) */}
