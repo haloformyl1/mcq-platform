@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, Sparkles, Atom, BookOpen, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Sparkles, Atom, BookOpen, CheckCircle2, Mail, Phone } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 
 export default function LandingIntroScreen() {
@@ -25,12 +25,12 @@ export default function LandingIntroScreen() {
     if (helloIndex < helloTarget.length) {
       const timer = setTimeout(() => {
         setHelloIndex(prev => prev + 1);
-      }, 120);
+      }, 110);
       return () => clearTimeout(timer);
     } else {
       const pauseTimer = setTimeout(() => {
         setHelloFinished(true);
-      }, 350);
+      }, 300);
       return () => clearTimeout(pauseTimer);
     }
   }, [helloIndex]);
@@ -41,8 +41,7 @@ export default function LandingIntroScreen() {
 
     if (descIndex < descTarget.length) {
       const char = descTarget[descIndex];
-      // Slightly longer pause on punctuation for natural typing rhythm
-      const delay = char === "." || char === "\n" ? 45 : 18;
+      const delay = char === "." || char === "\n" ? 40 : 16;
       const timer = setTimeout(() => {
         setDescIndex(prev => prev + 1);
       }, delay);
@@ -52,7 +51,7 @@ export default function LandingIntroScreen() {
     }
   }, [helloFinished, descIndex]);
 
-  // Quick skip typing on click anywhere
+  // Fast-forward on click anywhere before completion
   const handleFastForward = () => {
     if (!descFinished) {
       setHelloIndex(helloTarget.length);
@@ -78,59 +77,42 @@ export default function LandingIntroScreen() {
   return (
     <div
       onClick={handleFastForward}
-      className={`fixed inset-0 z-50 bg-[#000000] text-white flex flex-col justify-between items-center px-6 py-10 sm:py-16 overflow-y-auto selection:bg-cyan-500/30 selection:text-cyan-200 transition-all duration-700 ease-out ${
+      className={`fixed inset-0 z-50 bg-[#000000] text-white flex flex-col justify-between items-center px-6 py-8 sm:py-12 overflow-y-auto selection:bg-cyan-500/30 selection:text-cyan-200 transition-all duration-700 ease-out ${
         isExiting
           ? "opacity-0 scale-[1.02] pointer-events-none"
           : "opacity-100 scale-100"
       }`}
       style={{ cursor: descFinished ? "default" : "pointer" }}
     >
-      {/* Top Bar with Minimal Piechem Logo & Skip Option */}
-      <div className="w-full max-w-4xl flex items-center justify-between">
-        <div className="flex items-center gap-2.5 opacity-90 hover:opacity-100 transition">
-          <PiechemLogo className="w-8 h-8 drop-shadow-[0_0_12px_rgba(6,182,212,0.4)]" />
-          <span className="font-extrabold text-sm sm:text-base tracking-widest text-white font-mono">
-            PIECHEM
-          </span>
+      {/* Top Bar with Clean Fixed Piechem Logo (No skip buttons) */}
+      <div className="w-full max-w-5xl flex items-center justify-between pt-2">
+        <div className="flex items-center">
+          <PiechemLogo size="md" />
         </div>
-
-        {!descFinished ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFastForward();
-            }}
-            className="text-xs text-gray-500 hover:text-cyan-400 font-mono transition cursor-pointer"
-          >
-            Skip typing ⏭
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleContinue();
-            }}
-            className="text-xs text-gray-400 hover:text-white font-mono transition cursor-pointer flex items-center gap-1"
-          >
-            <span>Skip to Login</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        )}
+        {/* Right side is intentionally empty per request (no skip button) */}
+        <div />
       </div>
 
-      {/* Main Center Message Container */}
-      <div className="w-full max-w-3xl my-auto py-8 sm:py-12 space-y-6 sm:space-y-8 text-center">
+      {/* Main Center Container */}
+      <div className="w-full max-w-3xl my-auto py-6 sm:py-10 space-y-6 sm:space-y-8 text-center">
         
-        {/* "Hello," typed letter-by-letter */}
-        <div className="min-h-[50px] sm:min-h-[72px] flex items-center justify-center">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight font-mono inline-flex items-center">
-            <span>{currentHello}</span>
-            {(!helloFinished || !descFinished) && (
-              <span className="inline-block w-1 sm:w-1.5 h-8 sm:h-12 bg-cyan-400 ml-1.5 animate-pulse rounded-sm" />
-            )}
-          </h1>
+        {/* "Hello," + "A initiative by Arghyadeep Roy" */}
+        <div className="space-y-2.5">
+          <div className="min-h-[50px] sm:min-h-[72px] flex items-center justify-center">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight font-mono inline-flex items-center">
+              <span>{currentHello}</span>
+              {(!helloFinished || !descFinished) && (
+                <span className="inline-block w-1 sm:w-1.5 h-8 sm:h-12 bg-cyan-400 ml-1.5 animate-pulse rounded-sm" />
+              )}
+            </h1>
+          </div>
+
+          {/* Subtitle directly after Hello: A initiative by Arghyadeep Roy */}
+          <div className={`transition-all duration-500 ${helloFinished ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}>
+            <p className="text-xs sm:text-sm md:text-base font-semibold tracking-wider text-cyan-300/90 uppercase font-mono">
+              A initiative by <span className="text-white font-black underline decoration-cyan-500/50 underline-offset-4">Arghyadeep Roy</span>
+            </p>
+          </div>
         </div>
 
         {/* Dynamic Description Area */}
@@ -162,7 +144,7 @@ export default function LandingIntroScreen() {
               </div>
 
               {/* Feature Pills */}
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                 <span className="px-3 py-1 rounded-full bg-[#111] border border-cyan-500/30 text-cyan-300 text-[11px] font-medium flex items-center gap-1.5 shadow-sm">
                   <Atom className="w-3.5 h-3.5 text-cyan-400" />
                   <span>3D Molecular Labs</span>
@@ -184,28 +166,53 @@ export default function LandingIntroScreen() {
           ) : null}
         </div>
 
-        {/* Continue Button */}
-        <div className={`pt-4 transition-all duration-500 ${descFinished ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"}`}>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleContinue();
-            }}
-            className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-[0_0_35px_rgba(6,182,212,0.4)] hover:shadow-[0_0_55px_rgba(6,182,212,0.7)] hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
-          >
-            <span>Continue</span>
-            <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
-          <p className="text-[11px] text-gray-500 mt-2 font-mono">
-            Click to enter the learning portal
-          </p>
+        {/* Continue Button & Contact Us Section */}
+        <div className={`space-y-5 transition-all duration-500 ${descFinished ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"}`}>
+          <div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleContinue();
+              }}
+              className="group relative inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-black font-extrabold text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-[0_0_35px_rgba(6,182,212,0.4)] hover:shadow-[0_0_55px_rgba(6,182,212,0.7)] hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+            >
+              <span>Continue</span>
+              <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+            <p className="text-[11px] text-gray-500 mt-2 font-mono">
+              Click to enter the learning portal
+            </p>
+          </div>
+
+          {/* Contact Details Bar */}
+          <div className="pt-3 border-t border-[#1a1a1a] max-w-xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-400 font-sans">
+            <span className="text-gray-400">Contact us at</span>
+            <a
+              href="mailto:mailarghyadeeproy@gmail.com"
+              onClick={(e) => e.stopPropagation()}
+              className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-4 flex items-center gap-1.5 transition"
+            >
+              <Mail className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span>mailarghyadeeproy@gmail.com</span>
+            </a>
+            <span className="text-gray-600 hidden sm:inline">•</span>
+            <span className="text-gray-400">or call us</span>
+            <a
+              href="tel:9830507435"
+              onClick={(e) => e.stopPropagation()}
+              className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1.5 transition"
+            >
+              <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span>9830507435</span>
+            </a>
+          </div>
         </div>
 
       </div>
 
-      {/* Bottom Minimal Footer */}
-      <div className="w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 font-mono gap-2">
+      {/* Bottom Minimal Subtitle */}
+      <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 font-mono gap-2 pt-2">
         <span>© {new Date().getFullYear()} PIECHEM • Chemistry Excellence</span>
         <span>Empowering JEE, NEET & Board Aspirants</span>
       </div>
