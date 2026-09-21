@@ -2,44 +2,41 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  Atom, 
-  BookOpen, 
-  ShieldCheck, 
-  Sparkles, 
-  ArrowRight, 
-  Pause, 
-  Play
-} from "lucide-react";
+import { ArrowRight, Pause, Play } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 
-// Scientific 3D Molecular Orbital Node Structure
-interface MolecularNode {
+// Scientific 3D Molecular Node Definition
+interface AtomNode {
   x: number;
   y: number;
   z: number;
-  baseX: number;
-  baseY: number;
-  baseZ: number;
   radius: number;
   color: string;
+  glow: string;
+  emergeTime: number; // in ms when this atom blooms
+}
+
+interface BondLine {
+  from: number;
+  to: number;
+  emergeTime: number;
 }
 
 export default function LandingIntroScreen() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Time & Animation Sequence (7.0s Total)
-  const [elapsed, setElapsed] = useState(0); // milliseconds
+  // Time & Sequence States (7.0s Total)
+  const [elapsed, setElapsed] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const pausedAtRef = useRef<number>(0);
   const redirectTriggeredRef = useRef(false);
 
-  const TOTAL_DURATION = 7000; // 7 seconds
+  const TOTAL_DURATION = 7000; // 7.0 seconds
 
-  // Lock body scroll during splash screen
+  // Lock body scroll while splash screen is active
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -48,7 +45,7 @@ export default function LandingIntroScreen() {
     };
   }, []);
 
-  // 1. High-precision animation frame timer for the 7.0s sequence
+  // 1. Precision Animation Frame Clock (0 to 7000ms)
   useEffect(() => {
     let animFrameId: number;
 
@@ -67,7 +64,7 @@ export default function LandingIntroScreen() {
 
       if (currentElapsed >= TOTAL_DURATION && !redirectTriggeredRef.current) {
         redirectTriggeredRef.current = true;
-        handleCompleteRedirect();
+        handleTransitionToLogin();
         return;
       }
 
@@ -94,8 +91,8 @@ export default function LandingIntroScreen() {
     }
   };
 
-  // Automated or Instant Redirect
-  const handleCompleteRedirect = () => {
+  // Automated or Manual Transition to Login
+  const handleTransitionToLogin = () => {
     setIsExiting(true);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("visited_landing", "true");
@@ -103,19 +100,19 @@ export default function LandingIntroScreen() {
     document.body.style.overflow = "";
     setTimeout(() => {
       router.push("/login");
-    }, 600);
+    }, 550);
   };
 
-  // Instant bypass button for returning users
-  const handleEnterNow = (e: React.MouseEvent) => {
+  // Instant bypass button
+  const handleBypass = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!redirectTriggeredRef.current) {
       redirectTriggeredRef.current = true;
-      handleCompleteRedirect();
+      handleTransitionToLogin();
     }
   };
 
-  // 2. Sophisticated 3D Molecular Orbital Canvas Background
+  // 2. Ultra-Premium 3D Molecular Laboratory Canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -123,179 +120,256 @@ export default function LandingIntroScreen() {
     if (!ctx) return;
 
     let animId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let width = 0;
+    let height = 0;
 
-    const handleResize = () => {
+    const resize = () => {
       if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
     };
-    window.addEventListener("resize", handleResize);
 
-    // Generate sophisticated molecular cluster (Tetrahedral & Icosahedral geometry)
-    const nodes: MolecularNode[] = [];
-    const colors = ["#00D9FF", "#248BFF", "#8B5CF6", "#38BDF8", "#A78BFA"];
+    resize();
+    window.addEventListener("resize", resize);
 
-    // Nucleus & inner core
-    nodes.push({ x: 0, y: 0, z: 0, baseX: 0, baseY: 0, baseZ: 0, radius: 4.5, color: "#00D9FF" });
+    // Build Octahedral-Porphyrin Scientific Coordination Complex
+    const atoms: AtomNode[] = [];
+    const bonds: BondLine[] = [];
 
-    // Inner orbital sphere (radius ~120px)
-    const count1 = 12;
-    for (let i = 0; i < count1; i++) {
-      const phi = Math.acos(-1 + (2 * i) / count1);
-      const theta = Math.sqrt(count1 * Math.PI) * phi;
-      const r = 110 + (i % 3) * 15;
-      const x = r * Math.cos(theta) * Math.sin(phi);
-      const y = r * Math.sin(theta) * Math.sin(phi);
-      const z = r * Math.cos(phi);
-      nodes.push({
-        x, y, z,
-        baseX: x, baseY: y, baseZ: z,
-        radius: 2 + (i % 3) * 0.8,
-        color: colors[i % colors.length]
+    // 0: Central Luminous Nucleus (Active from 0s)
+    atoms.push({
+      x: 0, y: 0, z: 0,
+      radius: 5.5,
+      color: "#FFFFFF",
+      glow: "#5DE6FF",
+      emergeTime: 0
+    });
+
+    // 1-6: Primary Octahedral Coordination Shell (emerges 900ms - 1500ms)
+    const octDist = 85;
+    const octCoords = [
+      [octDist, 0, 0],
+      [-octDist, 0, 0],
+      [0, octDist, 0],
+      [0, -octDist, 0],
+      [0, 0, octDist],
+      [0, 0, -octDist],
+    ];
+
+    octCoords.forEach((coord, i) => {
+      atoms.push({
+        x: coord[0],
+        y: coord[1],
+        z: coord[2],
+        radius: 3.8,
+        color: i % 2 === 0 ? "#5DE6FF" : "#7B7CFF",
+        glow: i % 2 === 0 ? "rgba(93, 230, 255, 0.6)" : "rgba(123, 124, 255, 0.5)",
+        emergeTime: 900 + i * 110
       });
+      // Connect to center nucleus
+      bonds.push({ from: 0, to: i + 1, emergeTime: 1000 + i * 100 });
+    });
+
+    // 7-18: Equatorial Aromatic Porphyrin Ring (emerges 1600ms - 2400ms)
+    const ringRadius = 145;
+    const ringCount = 12;
+    for (let i = 0; i < ringCount; i++) {
+      const angle = (i / ringCount) * Math.PI * 2;
+      const zOffset = Math.sin(angle * 2) * 22;
+      const idx = atoms.length;
+      atoms.push({
+        x: Math.cos(angle) * ringRadius,
+        y: Math.sin(angle) * ringRadius,
+        z: zOffset,
+        radius: 2.8,
+        color: i % 3 === 0 ? "#FFFFFF" : "#5DE6FF",
+        glow: "rgba(93, 230, 255, 0.4)",
+        emergeTime: 1500 + i * 80
+      });
+
+      // Connect perimeter ring
+      if (i > 0) {
+        bonds.push({ from: idx - 1, to: idx, emergeTime: 1600 + i * 80 });
+      }
+      if (i === ringCount - 1) {
+        bonds.push({ from: idx, to: idx - ringCount + 1, emergeTime: 2400 });
+      }
+
+      // Inter-spoke bonds to inner octahedral nodes
+      if (i % 2 === 0) {
+        const targetOct = 1 + ((i / 2) % 4);
+        bonds.push({ from: targetOct, to: idx, emergeTime: 1800 + i * 60 });
+      }
     }
 
-    // Outer orbital shell (radius ~220px)
-    const count2 = 18;
-    for (let i = 0; i < count2; i++) {
-      const phi = Math.acos(-1 + (2 * i) / count2);
-      const theta = Math.sqrt(count2 * Math.PI) * phi * 1.2;
-      const r = 210 + (i % 4) * 20;
-      const x = r * Math.cos(theta) * Math.sin(phi);
-      const y = r * Math.sin(theta) * Math.sin(phi);
-      const z = r * Math.cos(phi);
-      nodes.push({
+    // 19-30: Distal Outer Satellite Nodes (emerges 2200ms - 3000ms)
+    const outerDist = 195;
+    const outerCount = 8;
+    for (let i = 0; i < outerCount; i++) {
+      const phi = (i / outerCount) * Math.PI;
+      const theta = i * 2.39996; // Golden ratio spiral
+      const x = Math.sin(phi) * Math.cos(theta) * outerDist;
+      const y = Math.sin(phi) * Math.sin(theta) * outerDist;
+      const z = Math.cos(phi) * outerDist * 0.75;
+      const idx = atoms.length;
+
+      atoms.push({
         x, y, z,
-        baseX: x, baseY: y, baseZ: z,
-        radius: 1.5 + (i % 2) * 0.8,
-        color: colors[(i + 2) % colors.length]
+        radius: 2.2,
+        color: "#9298A3",
+        glow: "rgba(123, 124, 255, 0.3)",
+        emergeTime: 2200 + i * 90
       });
+
+      bonds.push({ from: 1 + (i % 6), to: idx, emergeTime: 2400 + i * 80 });
     }
 
-    let angleX = 0.0012;
-    let angleY = 0.0022;
-    let currentRotationY = 0;
-    let currentRotationX = 0;
+    // Directional Key Light Vector (normalized, from top-left-front)
+    const lightDir = [-0.577, -0.577, 0.577];
+
+    let rotY = 0.4;
+    let rotX = 0.25;
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Subtle ambient background illumination
+      const currentT = startTimeRef.current !== null 
+        ? (isPaused ? pausedAtRef.current : performance.now() - startTimeRef.current) 
+        : 0;
+
+      // Slow, weighted scientific instrument precession
+      rotY += 0.0016;
+      rotX += 0.0008;
+
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
+
+      // Camera focal distance
+      const focal = 480;
       const cx = width / 2;
       const cy = height / 2;
 
-      // Draw faint center glow
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(width, height) * 0.6);
-      grad.addColorStop(0, "rgba(0, 217, 255, 0.045)");
-      grad.addColorStop(0.4, "rgba(36, 139, 255, 0.02)");
-      grad.addColorStop(0.8, "rgba(139, 92, 246, 0.01)");
-      grad.addColorStop(1, "rgba(5, 6, 8, 0)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
+      // Project all atoms
+      const projected = atoms.map((atom, idx) => {
+        // Assembly emergence factor (0 to 1)
+        const age = currentT - atom.emergeTime;
+        const emergence = Math.max(0, Math.min(1, age / 600));
 
-      // Update rotation
-      currentRotationY += angleY;
-      currentRotationX += angleX;
-
-      const cosY = Math.cos(currentRotationY);
-      const sinY = Math.sin(currentRotationY);
-      const cosX = Math.cos(currentRotationX);
-      const sinX = Math.sin(currentRotationX);
-
-      const focalLength = 480;
-      const projected: { px: number; py: number; pz: number; scale: number; node: MolecularNode }[] = [];
-
-      // Rotate and project points
-      for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
+        // Initial nucleation scale (starts at core and expands outward)
+        const scaleFactor = 0.2 + 0.8 * emergence;
+        const rawX = atom.x * scaleFactor;
+        const rawY = atom.y * scaleFactor;
+        const rawZ = atom.z * scaleFactor;
 
         // Rotate Y
-        let x1 = n.baseX * cosY - n.baseZ * sinY;
-        let z1 = n.baseZ * cosY + n.baseX * sinY;
+        const x1 = rawX * cosY - rawZ * sinY;
+        const z1 = rawZ * cosY + rawX * sinY;
 
         // Rotate X
-        let y2 = n.baseY * cosX - z1 * sinX;
-        let z2 = z1 * cosX + n.baseY * sinX;
+        const y2 = rawY * cosX - z1 * sinX;
+        const z2 = z1 * cosX + rawY * sinX;
 
-        const scale = focalLength / (focalLength + z2 + 180);
+        // Perspective
+        const scale = focal / (focal + z2 + 220);
         const px = cx + x1 * scale;
         const py = cy + y2 * scale;
 
-        projected.push({ px, py, pz: z2, scale, node: n });
-      }
+        // Directional lighting calculation on node surface
+        const len = Math.sqrt(x1 * x1 + y2 * y2 + z2 * z2) || 1;
+        const nx = x1 / len;
+        const ny = y2 / len;
+        const nz = z2 / len;
+        const dot = Math.max(0.15, nx * lightDir[0] + ny * lightDir[1] + nz * lightDir[2]);
 
-      // Sort by depth (painter's algorithm)
+        return {
+          idx,
+          atom,
+          px, py, pz: z2,
+          scale,
+          emergence,
+          lighting: dot
+        };
+      });
+
+      // Sort by depth (back to front)
       projected.sort((a, b) => a.pz - b.pz);
 
-      // 1. Draw connecting molecular bond lines
-      for (let i = 0; i < projected.length; i++) {
-        for (let j = i + 1; j < projected.length; j++) {
-          const p1 = projected[i];
-          const p2 = projected[j];
+      // 1. Draw Bonds
+      bonds.forEach((b) => {
+        const p1 = projected.find((p) => p.idx === b.from);
+        const p2 = projected.find((p) => p.idx === b.to);
+        if (!p1 || !p2) return;
 
-          const dx = p1.px - p2.px;
-          const dy = p1.py - p2.py;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        const bondAge = currentT - b.emergeTime;
+        if (bondAge <= 0) return;
+        const bondAlpha = Math.min(1, bondAge / 500) * Math.min(p1.emergence, p2.emergence);
+        if (bondAlpha <= 0.01) return;
 
-          // Connect nodes that are close in 2D and 3D space
-          if (dist < 115) {
-            const alpha = Math.max(0, (1 - dist / 115) * 0.18 * ((p1.scale + p2.scale) / 2));
-            ctx.beginPath();
-            ctx.moveTo(p1.px, p1.py);
-            ctx.lineTo(p2.px, p2.py);
-            ctx.strokeStyle = `rgba(0, 217, 255, ${alpha})`;
-            ctx.lineWidth = 0.75;
-            ctx.stroke();
-          }
-        }
+        // Depth fading
+        const avgDepth = (p1.pz + p2.pz) / 2;
+        const depthFade = Math.max(0.08, Math.min(0.45, (focal - avgDepth) / (focal * 1.5)));
+
+        ctx.beginPath();
+        ctx.moveTo(p1.px, p1.py);
+        ctx.lineTo(p2.px, p2.py);
+        ctx.strokeStyle = `rgba(93, 230, 255, ${depthFade * bondAlpha * 0.45})`;
+        ctx.lineWidth = Math.max(0.5, 0.85 * ((p1.scale + p2.scale) / 2));
+        ctx.stroke();
+      });
+
+      // 2. Draw Translucent Planetary Orbital Ring
+      if (currentT > 1800) {
+        const ringAlpha = Math.min(0.18, (currentT - 1800) / 1000);
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rotY * 0.45);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 150, 48, Math.PI / 4, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(93, 230, 255, ${ringAlpha})`;
+        ctx.lineWidth = 0.75;
+        ctx.setLineDash([3, 6]);
+        ctx.stroke();
+        ctx.restore();
       }
 
-      // 2. Draw orbital rings
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(currentRotationY * 0.6);
+      // 3. Draw Atoms with Specular & Corona Shading
+      projected.forEach(({ px, py, scale, atom, emergence, lighting }) => {
+        if (emergence <= 0.01) return;
 
-      // Orbital ellipse 1
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 160, 60, Math.PI / 4, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(0, 217, 255, 0.05)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 6]);
-      ctx.stroke();
+        const r = Math.max(1.2, atom.radius * scale * emergence);
 
-      // Orbital ellipse 2
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 220, 80, -Math.PI / 3, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(139, 92, 246, 0.04)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([5, 8]);
-      ctx.stroke();
-
-      ctx.restore();
-
-      // 3. Draw nodes with glowing corona
-      for (let i = 0; i < projected.length; i++) {
-        const { px, py, scale, node } = projected[i];
-        const r = Math.max(1.2, node.radius * scale);
-        const nodeAlpha = Math.min(0.85, Math.max(0.15, (scale - 0.5) * 1.5));
-
-        // Outer glow
-        const nodeGlow = ctx.createRadialGradient(px, py, 0, px, py, r * 4);
-        nodeGlow.addColorStop(0, node.color);
-        nodeGlow.addColorStop(1, "rgba(5, 6, 8, 0)");
-        ctx.fillStyle = nodeGlow;
+        // Core soft corona
+        const corona = ctx.createRadialGradient(px, py, 0, px, py, r * 3.5);
+        corona.addColorStop(0, atom.glow);
+        corona.addColorStop(1, "rgba(3, 4, 5, 0)");
+        ctx.fillStyle = corona;
         ctx.beginPath();
-        ctx.arc(px, py, r * 4, 0, Math.PI * 2);
+        ctx.arc(px, py, r * 3.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Solid core
-        ctx.fillStyle = `rgba(255, 255, 255, ${nodeAlpha})`;
+        // Solid atom sphere with directional lighting highlight
+        ctx.fillStyle = atom.color;
+        ctx.globalAlpha = Math.min(1, emergence * (0.6 + lighting * 0.4));
         ctx.beginPath();
         ctx.arc(px, py, r, 0, Math.PI * 2);
         ctx.fill();
-      }
+        ctx.globalAlpha = 1.0;
+
+        // Specular glint
+        if (lighting > 0.4 && r > 2) {
+          ctx.fillStyle = "#FFFFFF";
+          ctx.beginPath();
+          ctx.arc(px - r * 0.3, py - r * 0.3, r * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
 
       animId = requestAnimationFrame(render);
     };
@@ -304,194 +378,205 @@ export default function LandingIntroScreen() {
 
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
-  // Sequence Milestones
-  // Phase 1: 0.0s - 1.0s (Canvas node awakens)
-  // Phase 2: 1.0s - 2.0s (Header logo & author badge)
-  // Phase 3: 2.0s - 4.0s (Hero statement & description)
-  // Phase 4: 4.0s - 5.5s (4 capability indicators)
-  // Phase 5: 5.5s - 7.0s (Progress bar & ready state)
-  const isPhase2 = elapsed >= 1000;
-  const isPhase3 = elapsed >= 2000;
-  const isPhase4 = elapsed >= 4000;
-  const isPhase5 = elapsed >= 5500;
+  // Cinematic Timeline Milestones
+  // 0.0s - 1.0s: Initial dark void with pulsing node
+  // 1.0s - 2.0s: Brand header & author badge appear
+  // 2.0s - 3.5s: Complete molecule assembled
+  // 3.5s - 5.0s: Hero headline "Chemistry, reimagined." appears with blur-to-sharp ease
+  // 5.0s - 6.5s: Minimal capability strip & scientific metadata settle
+  // 6.5s - 7.0s: Transition contraction to login
+  const isPhase1 = elapsed >= 1000;
+  const isPhase3 = elapsed >= 3500;
+  const isPhase4 = elapsed >= 5000;
+  const isPhase5 = elapsed >= 6400;
 
-  // Smooth progress calculation (0 to 100%) across 7.0s
+  // Exact progress line tracking 0% to 100% across 7000ms
   const progressPercent = Math.min(100, Math.max(0, (elapsed / TOTAL_DURATION) * 100));
-  const remainingSeconds = Math.max(0, Math.ceil((TOTAL_DURATION - elapsed) / 1000));
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-[#050608] text-[#F5F7FA] flex flex-col justify-between items-center px-4 sm:px-8 py-4 sm:py-5 overflow-hidden select-none selection:bg-cyan-500/20 selection:text-cyan-200 transition-all duration-700 ease-out ${
-        isExiting ? "opacity-0 scale-[1.02] blur-md pointer-events-none" : "opacity-100 scale-100"
+      className={`fixed inset-0 z-50 bg-[#030405] text-[#F5F5F2] flex flex-col justify-between overflow-hidden select-none selection:bg-cyan-500/20 selection:text-cyan-200 transition-all duration-700 ease-out ${
+        isExiting ? "opacity-0 scale-[1.015] blur-md pointer-events-none" : "opacity-100 scale-100"
       }`}
-      style={{ backgroundColor: "#050608" }}
+      style={{ backgroundColor: "#030405" }}
     >
-      {/* 3D Canvas Molecular Orbital Background */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 z-0 pointer-events-none w-full h-full"
+      {/* Background Volumetric Directional Illumination behind the Molecule */}
+      <div 
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-[55vw] h-[75vh] pointer-events-none opacity-40 blur-[130px] rounded-full z-0"
+        style={{
+          background: "radial-gradient(circle, rgba(93, 230, 255, 0.12) 0%, rgba(123, 124, 255, 0.05) 45%, transparent 75%)"
+        }}
       />
 
-      {/* Subtle Depth Vignette & Hairline Noise */}
+      {/* Subtle Depth Vignette */}
       <div 
-        className="absolute inset-0 pointer-events-none z-[1] opacity-40 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(5,6,8,0.7)_80%,#050608_100%)]" 
+        className="absolute inset-0 pointer-events-none z-[1] opacity-70 bg-[radial-gradient(ellipse_at_center,transparent_20%,#030405_95%)]"
       />
 
       {/* ============================================================ */}
-      {/* TOP NAVIGATION: Minimalist Precision Header                  */}
+      {/* TOP BAR: Minimalist Scientific Precision Header              */}
       {/* ============================================================ */}
       <header 
-        className={`relative z-10 w-full flex items-center justify-between px-2 sm:px-6 pb-3 border-b border-white/[0.06] shrink-0 transition-all duration-1000 ease-out ${
-          isPhase2 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
+        className={`relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 pt-5 sm:pt-7 flex items-center justify-between transition-all duration-1000 ease-out ${
+          isPhase1 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
         }`}
       >
-        {/* Far Left: PIECHEM Refined Logo */}
+        {/* Far Left: PIECHEM Clean Wordmark */}
         <div className="flex items-center gap-3">
           <PiechemLogo size="md" subtitle="Learning Platform" />
         </div>
 
-        {/* Far Right: Ultra-clean Status Pill */}
-        <div className="flex items-center gap-2.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md text-[10px] sm:text-xs font-mono tracking-widest text-slate-300 shadow-[0_0_15px_rgba(0,217,255,0.08)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00D9FF] shadow-[0_0_8px_#00D9FF] animate-pulse" />
-          <span className="text-white/40 hidden sm:inline">SYSTEM ONLINE</span>
+        {/* Far Right: Precision Scientific Instrumentation Status */}
+        <div className="flex items-center gap-2.5 px-3 py-1 rounded-full bg-white/[0.02] border border-white/[0.07] backdrop-blur-md text-[10px] sm:text-[11px] font-mono tracking-[0.2em] text-[#9298A3]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#5DE6FF] shadow-[0_0_8px_#5DE6FF] animate-pulse" />
+          <span className="text-white/40 hidden sm:inline">SYSTEM 01</span>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <span className="text-cyan-300/90 font-medium">SMART LEARNING PLATFORM</span>
+          <span className="text-slate-200">SMART LEARNING PLATFORM</span>
         </div>
       </header>
 
       {/* ============================================================ */}
-      {/* MAIN HERO: Cinematic Centerpiece                             */}
+      {/* CENTER STAGE: Asymmetric Apple Keynote Spatial Composition   */}
       {/* ============================================================ */}
-      <main className="relative z-10 w-full max-w-2xl my-auto py-2 flex flex-col items-center justify-center text-center shrink-0 space-y-4 sm:space-y-5">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 my-auto py-4 flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-12">
         
-        {/* Initiative Badge (Phase 2) */}
-        <div 
-          className={`transition-all duration-700 ease-out ${
-            isPhase2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-          }`}
-        >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/[0.025] border border-cyan-500/25 text-cyan-300/90 text-[10.5px] sm:text-xs tracking-[0.14em] font-mono uppercase backdrop-blur-md shadow-[0_0_20px_rgba(0,217,255,0.12)]">
-            <span className="w-1 h-1 rounded-full bg-[#00D9FF] shadow-[0_0_6px_#00D9FF]" />
-            <span>AN INITIATIVE BY <strong className="text-white font-semibold tracking-wider">ARGHYADEEP ROY</strong></span>
+        {/* LEFT COLUMN: Editorial Typography Statement (Col 1-7) */}
+        <div className="lg:col-span-7 flex flex-col justify-center text-left space-y-5 sm:space-y-6 z-20">
+          
+          {/* Scientific Initiative Micro-Badge */}
+          <div 
+            className={`transition-all duration-1000 ease-out ${
+              isPhase1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+            }`}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.02] border border-white/[0.08] text-[#9298A3] text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase backdrop-blur-sm">
+              <span className="w-1 h-1 rounded-full bg-[#5DE6FF]" />
+              <span>AN INITIATIVE BY <strong className="text-[#F5F5F2] font-medium tracking-wider">ARGHYADEEP ROY</strong></span>
+            </div>
+          </div>
+
+          {/* Primary Statement: "Chemistry, reimagined." */}
+          <div 
+            className={`space-y-3 transition-all duration-1000 ease-out ${
+              isPhase3 ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-4 blur-[6px]"
+            }`}
+          >
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl tracking-tight text-[#F5F5F2] leading-[1.04]">
+              <span className="font-serif italic font-light text-slate-100">
+                Chemistry,
+              </span>
+              <br />
+              <span className="font-sans font-extralight tracking-tight text-[#F5F5F2]">
+                reimagined.
+              </span>
+            </h1>
+
+            {/* Academic Scope: Minimal Line */}
+            <p className="text-xs sm:text-sm font-mono tracking-[0.22em] text-[#9298A3] uppercase pt-1">
+              PREPARATION FOR <span className="text-[#F5F5F2] font-normal">JEE</span> · <span className="text-[#F5F5F2] font-normal">NEET</span> · <span className="text-[#F5F5F2] font-normal">BOARDS</span>
+            </p>
+
+            {/* Supporting Text */}
+            <p className="text-xs sm:text-sm text-[#9298A3]/85 font-light leading-relaxed max-w-md pt-0.5">
+              Interactive learning engineered for scientific precision. Explore 3D molecular structures, master concepts through curated notes, and practice with AI-calibrated examinations.
+            </p>
+          </div>
+
+          {/* Instrumentation Annotation */}
+          <div 
+            className={`text-[10px] font-mono tracking-[0.2em] text-[#9298A3]/60 transition-all duration-1000 ease-out ${
+              isPhase4 ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <span>[ MOLECULAR ENGINE // 100% NCERT ALIGNED ]</span>
           </div>
         </div>
 
-        {/* Main Title: "Chemistry, Visualized." (Phase 3) */}
-        <div 
-          className={`space-y-2 transition-all duration-1000 ease-out ${
-            isPhase3 ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-4 blur-sm"
-          }`}
-        >
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extralight tracking-tight text-white leading-[1.08]">
-            <span className="font-serif italic font-normal text-slate-100 drop-shadow-[0_2px_20px_rgba(255,255,255,0.15)]">
-              Chemistry,
-            </span>{" "}
-            <span className="font-sans font-bold bg-gradient-to-r from-white via-cyan-100 to-[#00D9FF] bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(0,217,255,0.35)]">
-              Visualized.
-            </span>
-          </h1>
+        {/* RIGHT COLUMN: The Hero Scientific Molecular Object (Col 8-12) */}
+        <div className="lg:col-span-5 relative h-[260px] sm:h-[340px] lg:h-[440px] w-full flex items-center justify-center pointer-events-none mt-2 lg:mt-0">
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full object-contain"
+          />
 
-          <p className="text-sm sm:text-base md:text-lg text-slate-300 font-light tracking-wide max-w-xl mx-auto pt-1">
-            Interactive learning for{" "}
-            <span className="text-[#00D9FF] font-medium">JEE</span>,{" "}
-            <span className="text-amber-300 font-medium">NEET</span> &{" "}
-            <span className="text-emerald-300 font-medium">Boards</span>.
-          </p>
-
-          <p className="text-xs sm:text-sm text-slate-400/90 max-w-lg mx-auto leading-relaxed font-light">
-            Explore molecules in 3D, master concepts through curated notes, practice with DPPs, and challenge yourself with AI-powered tests.
-          </p>
-        </div>
-
-        {/* ============================================================ */}
-        {/* CAPABILITIES: 4 Refined Scientific Indicators (Phase 4)      */}
-        {/* ============================================================ */}
-        <div 
-          className={`w-full max-w-xl grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-1 transition-all duration-700 ease-out ${
-            isPhase4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"
-          }`}
-        >
-          {/* 1. 3D Molecular Labs */}
-          <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-white/[0.025] border border-white/[0.08] hover:border-cyan-500/40 backdrop-blur-md transition-colors group">
-            <Atom className="w-3.5 h-3.5 text-[#00D9FF] shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="text-[10.5px] sm:text-[11px] font-mono tracking-wider text-slate-200 uppercase whitespace-nowrap">
-              3D Labs
-            </span>
-          </div>
-
-          {/* 2. Smart Notes */}
-          <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-white/[0.025] border border-white/[0.08] hover:border-amber-400/40 backdrop-blur-md transition-colors group">
-            <BookOpen className="w-3.5 h-3.5 text-amber-300 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="text-[10.5px] sm:text-[11px] font-mono tracking-wider text-slate-200 uppercase whitespace-nowrap">
-              Smart Notes
-            </span>
-          </div>
-
-          {/* 3. NTA Test Engine */}
-          <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-white/[0.025] border border-white/[0.08] hover:border-emerald-400/40 backdrop-blur-md transition-colors group">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-300 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="text-[10.5px] sm:text-[11px] font-mono tracking-wider text-slate-200 uppercase whitespace-nowrap">
-              NTA Engine
-            </span>
-          </div>
-
-          {/* 4. AI Chem Tutor */}
-          <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg bg-white/[0.025] border border-white/[0.08] hover:border-purple-400/40 backdrop-blur-md transition-colors group">
-            <Sparkles className="w-3.5 h-3.5 text-purple-300 shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="text-[10.5px] sm:text-[11px] font-mono tracking-wider text-slate-200 uppercase whitespace-nowrap">
-              AI Tutor
-            </span>
+          {/* Scientific Coordinates Overlay */}
+          <div 
+            className={`absolute bottom-2 right-2 text-[9px] font-mono tracking-[0.25em] text-[#9298A3]/50 flex flex-col items-end gap-0.5 transition-all duration-1000 ${
+              isPhase4 ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <span>COORD: SP³D² OCTAHEDRAL</span>
+            <span>PRECESSION: 0.0016 RAD/S</span>
           </div>
         </div>
 
-        {/* ============================================================ */}
-        {/* TRANSITION & PREPARATION ENGINE (Phase 5: 5.5s - 7.0s)       */}
-        {/* ============================================================ */}
+      </div>
+
+      {/* ============================================================ */}
+      {/* BOTTOM ANCHOR: Minimalist Capability Strip & Progress        */}
+      {/* ============================================================ */}
+      <footer className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 pb-5 sm:pb-7 space-y-3 shrink-0">
+        
+        {/* Capability Strip: Minimal Uppercase Typography (Phase 4) */}
         <div 
-          className={`w-full max-w-md pt-2 space-y-2 transition-all duration-700 ease-out ${
-            isPhase3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"
+          className={`flex flex-wrap items-center justify-between gap-y-2 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-[#9298A3] border-b border-white/[0.06] pb-3 transition-all duration-1000 ease-out ${
+            isPhase4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
-          {/* Subtle preparation label & status */}
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono tracking-wider text-slate-400 px-0.5">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00D9FF] animate-ping" />
-              {isPhase5 ? "ENTERING PIECHEM PORTAL" : "PREPARING LEARNING ENVIRONMENT"}
-            </span>
+          <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1">
+            <span className="hover:text-white transition-colors">3D MOLECULAR LABS</span>
+            <span className="text-white/20">·</span>
+            <span className="hover:text-white transition-colors">SMART NOTES</span>
+            <span className="text-white/20">·</span>
+            <span className="hover:text-white transition-colors">TEST ENGINE</span>
+            <span className="text-white/20">·</span>
+            <span className="hover:text-white transition-colors">AI CHEM TUTOR</span>
+          </div>
 
-            <span className="text-cyan-300/80">
-              {isPaused ? "PAUSED" : `${String(remainingSeconds).padStart(2, '0')}s`}
+          <div className="hidden sm:flex items-center gap-2 text-white/40 text-[9.5px]">
+            <span>ENGINEERED FOR SCIENTIFIC EXCELLENCE</span>
+          </div>
+        </div>
+
+        {/* Instrumentation Progress Line & Seamless Transition */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-1 text-[10px] font-mono text-[#9298A3]">
+          
+          {/* Status Label */}
+          <div className="flex items-center gap-2 tracking-[0.2em] uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#5DE6FF] animate-ping" />
+            <span className="text-[#F5F5F2]">
+              {isPhase5 ? "ENTERING PIECHEM" : "INITIALIZING PIECHEM"}
             </span>
           </div>
 
-          {/* Synchronized Precision Hairline Progress Bar */}
-          <div className="relative w-full h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
+          {/* Minimalist Hairline Progress Line */}
+          <div className="w-full sm:max-w-xs relative h-[1.5px] bg-white/[0.08] overflow-hidden rounded-full my-auto">
             <div 
-              className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#248BFF] via-[#00D9FF] to-[#8B5CF6] transition-all duration-100 ease-linear shadow-[0_0_12px_#00D9FF]"
+              className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-white/60 via-[#5DE6FF] to-white transition-all duration-100 ease-linear shadow-[0_0_8px_#5DE6FF]"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
 
-          {/* Action Row: Pause/Play & Enter Now Bypass */}
-          <div className="flex items-center justify-between pt-1 text-[10.5px] font-mono">
+          {/* Action Row: Pause & Instant Enter Bypass */}
+          <div className="flex items-center gap-3 tracking-widest text-[10px]">
             <button
               type="button"
               onClick={togglePause}
-              className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.02] border border-white/[0.06]"
-              title={isPaused ? "Resume loading" : "Pause loading"}
+              className="text-[#9298A3] hover:text-white transition-colors flex items-center gap-1.5"
+              title={isPaused ? "Resume sequence" : "Pause sequence"}
             >
               {isPaused ? (
                 <>
-                  <Play className="w-3 h-3 text-emerald-400" />
+                  <Play className="w-2.5 h-2.5 text-emerald-400" />
                   <span>RESUME</span>
                 </>
               ) : (
                 <>
-                  <Pause className="w-3 h-3 text-slate-400" />
+                  <Pause className="w-2.5 h-2.5 text-[#9298A3]" />
                   <span>PAUSE</span>
                 </>
               )}
@@ -499,31 +584,16 @@ export default function LandingIntroScreen() {
 
             <button
               type="button"
-              onClick={handleEnterNow}
-              className="group inline-flex items-center gap-1 text-cyan-300 hover:text-white transition-colors px-2.5 py-0.5 rounded bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/30 shadow-sm"
+              onClick={handleBypass}
+              className="group inline-flex items-center gap-1 text-[#F5F5F2] hover:text-[#5DE6FF] transition-colors font-medium"
             >
-              <span>ENTER PORTAL</span>
-              <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5 text-[#00D9FF]" />
+              <span>ENTER NOW</span>
+              <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5 text-[#5DE6FF]" />
             </button>
           </div>
+
         </div>
 
-      </main>
-
-      {/* ============================================================ */}
-      {/* MINIMAL FOOTER: Direct Scientific Touch                     */}
-      {/* ============================================================ */}
-      <footer 
-        className={`relative z-10 w-full flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-slate-500 gap-1 px-2 sm:px-6 pt-2 border-t border-white/[0.06] shrink-0 transition-all duration-1000 ease-out ${
-          isPhase2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <span>PIECHEM CHEMISTRY ARCHIVES</span>
-          <span>•</span>
-          <span className="text-slate-400">PRECISION + SCIENCE + TECHNOLOGY</span>
-        </div>
-        <span>© {new Date().getFullYear()} PIECHEM • ALL RIGHTS RESERVED</span>
       </footer>
     </div>
   );
