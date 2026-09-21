@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { 
   ArrowRight, 
   Sparkles, 
@@ -11,7 +12,6 @@ import {
   Phone, 
   Pause, 
   Play, 
-  ChevronRight,
   ShieldCheck,
   Zap,
   Layers
@@ -19,7 +19,7 @@ import {
 import PiechemLogo from "@/components/PiechemLogo";
 
 export default function LandingIntroScreen() {
-  const [visible, setVisible] = useState(true);
+  const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
 
   // Typewriter states
@@ -53,12 +53,12 @@ export default function LandingIntroScreen() {
     if (helloIndex < helloTarget.length) {
       const timer = setTimeout(() => {
         setHelloIndex(prev => prev + 1);
-      }, 95);
+      }, 90);
       return () => clearTimeout(timer);
     } else {
       const pauseTimer = setTimeout(() => {
         setHelloFinished(true);
-      }, 250);
+      }, 220);
       return () => clearTimeout(pauseTimer);
     }
   }, [helloIndex]);
@@ -69,7 +69,7 @@ export default function LandingIntroScreen() {
 
     if (descIndex < descTarget.length) {
       const char = descTarget[descIndex];
-      const delay = char === "." || char === "\n" ? 35 : 14;
+      const delay = char === "." || char === "\n" ? 30 : 12;
       const timer = setTimeout(() => {
         setDescIndex(prev => prev + 1);
       }, delay);
@@ -110,16 +110,17 @@ export default function LandingIntroScreen() {
     }
   };
 
-  // Continue / Redirect to normal login
+  // Continue / Redirect to normal login page
   const handleContinue = () => {
     setIsExiting(true);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("visited_landing", "true");
+    }
     document.body.style.overflow = "";
     setTimeout(() => {
-      setVisible(false);
-    }, 650);
+      router.push("/login");
+    }, 600);
   };
-
-  if (!visible) return null;
 
   const currentHello = helloTarget.slice(0, helloIndex);
   const currentDesc = descTarget.slice(0, descIndex);
@@ -130,59 +131,39 @@ export default function LandingIntroScreen() {
   return (
     <div
       onClick={handleFastForward}
-      className={`fixed inset-0 z-50 bg-[#050811] text-white flex flex-col justify-between items-center px-4 sm:px-8 py-6 sm:py-8 overflow-y-auto no-scrollbar selection:bg-cyan-500/30 selection:text-cyan-200 transition-all duration-700 ease-out relative ${
+      className={`fixed inset-0 z-50 bg-[#000000] text-white flex flex-col justify-between items-center px-4 sm:px-8 py-6 sm:py-8 overflow-y-auto no-scrollbar selection:bg-cyan-500/30 selection:text-cyan-200 transition-all duration-700 ease-out ${
         isExiting
           ? "opacity-0 scale-[1.03] blur-sm pointer-events-none"
           : "opacity-100 scale-100"
       }`}
       style={{
+        backgroundColor: "#000000",
         cursor: descFinished ? "default" : "pointer",
         scrollbarWidth: "none",
         msOverflowStyle: "none",
       }}
     >
-      {/* Background Volumetric Ambient Lighting & Cyber Mesh */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Top-center Cyan Aurora */}
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[650px] sm:w-[900px] h-[450px] bg-gradient-to-b from-cyan-500/18 via-blue-600/10 to-transparent blur-[120px] rounded-full" />
-        
-        {/* Bottom-right Purple Atmosphere */}
-        <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-purple-600/12 blur-[140px] rounded-full" />
-        
-        {/* Bottom-left Emerald Atmosphere */}
-        <div className="absolute -bottom-32 -left-32 w-[450px] h-[450px] bg-teal-500/10 blur-[130px] rounded-full" />
-
-        {/* Subtle Cyber Perspective Grid Lines */}
-        <div 
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.7) 1px, transparent 0)`,
-            backgroundSize: '36px 36px',
-          }}
-        />
-      </div>
-
-      {/* Top Header Bar with Verified Badge */}
-      <header className="relative z-10 w-full max-w-5xl flex items-center justify-between pt-1 sm:pt-2 border-b border-white/[0.06] pb-3 sm:pb-4">
+      {/* Top Header Bar with Clean Piechem Logo */}
+      <header className="w-full max-w-5xl flex items-center justify-between pt-1 sm:pt-2 border-b border-white/[0.08] pb-3 sm:pb-4">
         <div className="flex items-center gap-3">
           <PiechemLogo size="md" />
         </div>
         
-        {/* High-tech status pill */}
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-[10px] sm:text-xs font-mono tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+        {/* High-tech status indicator */}
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d0d0d] border border-cyan-500/30 text-cyan-300 text-[10px] sm:text-xs font-mono tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.15)]">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span className="hidden sm:inline">SMART PORTAL GATEWAY</span>
+          <span className="hidden sm:inline">SMART EXAM PLATFORM</span>
           <span className="sm:hidden">PORTAL</span>
         </div>
       </header>
 
       {/* Main Center Container */}
-      <main className="relative z-10 w-full max-w-3xl my-auto py-6 sm:py-10 space-y-6 sm:space-y-8 text-center">
+      <main className="w-full max-w-3xl my-auto py-6 sm:py-10 space-y-6 sm:space-y-8 text-center">
         
         {/* Headline & Initiative Badge */}
         <div className="space-y-3">
           {/* Glowing Badge: AN INITIATIVE BY ARGHYADEEP ROY */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-cyan-950/60 via-blue-950/40 to-slate-900/60 border border-cyan-400/30 text-cyan-300 text-xs sm:text-sm font-semibold tracking-wide shadow-[0_0_20px_rgba(6,182,212,0.18)]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a0a0a] border border-cyan-500/40 text-cyan-300 text-xs sm:text-sm font-semibold tracking-wide shadow-[0_0_15px_rgba(6,182,212,0.2)]">
             <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
             <span className="uppercase font-mono text-[11px] sm:text-xs">
               AN INITIATIVE BY <strong className="text-white font-black tracking-wider">ARGHYADEEP ROY</strong>
@@ -192,9 +173,7 @@ export default function LandingIntroScreen() {
           {/* Dynamic "Hello," with Typewriter */}
           <div className="min-h-[52px] sm:min-h-[70px] flex items-center justify-center pt-1">
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight font-sans inline-flex items-center">
-              <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-                {currentHello}
-              </span>
+              <span>{currentHello}</span>
               {(!helloFinished || !descFinished) && (
                 <span className="inline-block w-1.5 sm:w-2 h-8 sm:h-12 bg-cyan-400 ml-2 animate-pulse rounded-sm shadow-[0_0_12px_#06b6d4]" />
               )}
@@ -230,31 +209,31 @@ export default function LandingIntroScreen() {
                 </span>
               </div>
 
-              {/* Bento Feature Cards */}
+              {/* Bento Feature Cards on Pure Black */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 max-w-2xl mx-auto">
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-cyan-500/25 backdrop-blur-md flex flex-col items-center gap-1.5 shadow-sm hover:border-cyan-400/50 transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-cyan-500/15 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                <div className="p-3 rounded-xl bg-[#0a0a0a] border border-white/10 hover:border-cyan-500/50 flex flex-col items-center gap-1.5 shadow-sm transition-all group">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
                     <Atom className="w-4 h-4" />
                   </div>
                   <span className="text-[11px] font-semibold text-gray-200">3D Molecular Labs</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-amber-500/25 backdrop-blur-md flex flex-col items-center gap-1.5 shadow-sm hover:border-amber-400/50 transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                <div className="p-3 rounded-xl bg-[#0a0a0a] border border-white/10 hover:border-amber-500/50 flex flex-col items-center gap-1.5 shadow-sm transition-all group">
+                  <div className="w-8 h-8 rounded-lg bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <span className="text-[11px] font-semibold text-gray-200">Notes & DPPs</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-emerald-500/25 backdrop-blur-md flex flex-col items-center gap-1.5 shadow-sm hover:border-emerald-400/50 transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                <div className="p-3 rounded-xl bg-[#0a0a0a] border border-white/10 hover:border-emerald-500/50 flex flex-col items-center gap-1.5 shadow-sm transition-all group">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <span className="text-[11px] font-semibold text-gray-200">NTA Mock Tests</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-900/60 border border-purple-500/25 backdrop-blur-md flex flex-col items-center gap-1.5 shadow-sm hover:border-purple-400/50 transition-all group">
-                  <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                <div className="p-3 rounded-xl bg-[#0a0a0a] border border-white/10 hover:border-purple-500/50 flex flex-col items-center gap-1.5 shadow-sm transition-all group">
+                  <div className="w-8 h-8 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <span className="text-[11px] font-semibold text-gray-200">AI Chem Tutor</span>
@@ -281,12 +260,12 @@ export default function LandingIntroScreen() {
 
         {/* REPLACED CONTINUE BUTTON: Automated 7-to-0 Second Countdown Engine */}
         <div className={`space-y-4 transition-all duration-500 ${descFinished ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3 pointer-events-none"}`}>
-          <div className="max-w-md mx-auto p-4 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-cyan-500/30 backdrop-blur-xl shadow-[0_0_35px_rgba(6,182,212,0.2)]">
+          <div className="max-w-md mx-auto p-4 rounded-2xl bg-[#080808] border border-cyan-500/40 shadow-[0_0_35px_rgba(6,182,212,0.18)]">
             
             {/* Top row: Countdown message and seconds ticker */}
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2.5 text-left">
-                <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-cyan-950 border border-cyan-400/40 text-cyan-300 font-mono font-black text-sm shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-[#111] border border-cyan-400/50 text-cyan-300 font-mono font-black text-sm shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                   <span>{countdown}</span>
                   <span className="absolute inset-0 rounded-full border border-cyan-400/60 animate-ping opacity-30" />
                 </div>
@@ -302,12 +281,12 @@ export default function LandingIntroScreen() {
                       </>
                     ) : (
                       <span className="text-cyan-300 font-bold flex items-center gap-1">
-                        Landing on login portal...
+                        Entering login portal...
                       </span>
                     )}
                   </div>
                   <div className="text-[10px] text-gray-400 font-mono">
-                    {isPaused ? "Timer paused by user" : "Preparing your chemistry workspace"}
+                    {isPaused ? "Countdown paused" : "Preparing examination portal"}
                   </div>
                 </div>
               </div>
@@ -321,7 +300,7 @@ export default function LandingIntroScreen() {
                     setIsPaused((p) => !p);
                   }}
                   title={isPaused ? "Resume countdown" : "Pause countdown"}
-                  className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 text-gray-300 hover:text-white transition-all shadow-sm"
+                  className="p-2 rounded-xl bg-[#141414] hover:bg-[#202020] border border-white/10 text-gray-300 hover:text-white transition-all shadow-sm"
                 >
                   {isPaused ? <Play className="w-3.5 h-3.5 text-emerald-400" /> : <Pause className="w-3.5 h-3.5 text-amber-400" />}
                 </button>
@@ -341,7 +320,7 @@ export default function LandingIntroScreen() {
             </div>
 
             {/* Glowing countdown progress bar */}
-            <div className="w-full h-1.5 rounded-full bg-slate-800/80 overflow-hidden relative border border-white/5">
+            <div className="w-full h-1.5 rounded-full bg-[#181818] overflow-hidden relative border border-white/5">
               <div
                 className="h-full bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500 transition-all duration-1000 ease-linear shadow-[0_0_10px_#06b6d4]"
                 style={{ width: `${progressPercent}%` }}
@@ -349,7 +328,7 @@ export default function LandingIntroScreen() {
             </div>
           </div>
 
-          {/* Contact Details Bar with Glass Badges */}
+          {/* Contact Details Bar on Black */}
           <div className="pt-2 border-t border-white/[0.08] max-w-xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-gray-400 font-sans">
             <span className="text-gray-400">Direct Support:</span>
             <a
@@ -374,8 +353,8 @@ export default function LandingIntroScreen() {
 
       </main>
 
-      {/* Bottom Minimal Status Footer */}
-      <footer className="relative z-10 w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 font-mono gap-2 pt-2 border-t border-white/[0.04]">
+      {/* Bottom Status Footer */}
+      <footer className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-500 font-mono gap-2 pt-2 border-t border-white/[0.06]">
         <span>© {new Date().getFullYear()} PIECHEM • Chemistry Excellence</span>
         <span className="text-gray-400">Empowering JEE, NEET & Board Aspirants</span>
       </footer>

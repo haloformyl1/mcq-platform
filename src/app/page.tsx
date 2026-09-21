@@ -1,7 +1,8 @@
-﻿import { redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import LandingIntroScreen from '@/components/LandingIntroScreen';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,5 +38,6 @@ export default async function Home() {
     }
   }
 
-  redirect('/login');
+  // Render the completely black landing page with 7s auto-redirect to /login
+  return <LandingIntroScreen />;
 }

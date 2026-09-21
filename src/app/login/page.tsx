@@ -43,6 +43,16 @@ export default function StudentLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  // If user visits /login directly without viewing the landing intro first, redirect to landing page
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const visited = sessionStorage.getItem("visited_landing");
+      if (!visited) {
+        router.replace("/");
+      }
+    }
+  }, [router]);
+
   // Validation checklist
   const reqLength = password.length >= 8;
   const reqUpper = /[A-Z]/.test(password);
@@ -268,7 +278,7 @@ export default function StudentLogin() {
 
   return (
     <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-      <LandingIntroScreen />
+      {/* Landing intro is rendered on root / and redirects here */}
       
       {/* ========================================================= */}
       {/* 1. UPPER SIDE (HERO SECTION - NETFLIX INSPIRATION)       */}
