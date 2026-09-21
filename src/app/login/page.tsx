@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import PiechemLogo from "@/components/PiechemLogo";
 import LandingIntroScreen from "@/components/LandingIntroScreen";
-import { 
+import {
+  Atom,
   ChevronRight, 
   ShieldCheck, 
   Clock, 
@@ -755,38 +756,75 @@ export default function StudentLogin() {
             </div>
           </div>
 
-          {/* Card 3: In-Depth Question Analytics */}
-          <div className="relative bg-gradient-to-b from-[#0e1d2c] to-[#050e17] border border-cyan-500/20 hover:border-cyan-400/50 rounded-2xl p-6 flex flex-col justify-between min-h-[250px] sm:min-h-[280px] shadow-lg hover:shadow-[0_10px_30px_rgba(16,185,129,0.15)] hover:-translate-y-1 transition-all duration-300 group">
+          {/* Card 3: PIECHEM 3D Molecular Lab Showcase */}
+          <div className="relative bg-gradient-to-b from-[#0c1e30] via-[#071322] to-[#040b14] border border-cyan-400/40 hover:border-cyan-300 rounded-2xl p-6 flex flex-col justify-between min-h-[250px] sm:min-h-[280px] shadow-[0_4px_25px_rgba(0,217,255,0.12)] hover:shadow-[0_12px_35px_rgba(0,217,255,0.28)] hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
+            {/* Background Molecular Glow */}
+            <div className="absolute -top-12 -right-12 w-36 h-36 bg-cyan-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-cyan-400/25 transition-colors" />
+
             <div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
-                Instant Score & Solutions
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-300 bg-cyan-950/80 border border-cyan-400/40 px-2.5 py-0.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  See Chemistry in 3D
+                </span>
+                <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded">
+                  INTERACTIVE
+                </span>
+              </div>
+
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors flex items-center gap-2">
+                <span>PIECHEM Molecular Lab</span>
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed">
-                Review step-by-step chemistry explanations, KaTeX formulas, accuracy metrics, and pinpoint weak topics instantly.
+              <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed font-light">
+                Rotate crystal lattices, examine VSEPR spatial bond angles, and inspect unit cell voids in immersive real-time 3D.
               </p>
             </div>
-            {/* Visual bottom-right glowing icon */}
-            <div className="self-end mt-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-500/30 to-teal-600/40 border border-emerald-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform">
-                <BarChart3 className="w-6 h-6 text-emerald-300" />
+
+            {/* Bottom Actions & Visual Animated Atom */}
+            <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex items-center justify-between">
+              <Link
+                href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+                className="inline-flex items-center gap-1 text-xs font-mono font-bold text-cyan-300 hover:text-white transition-colors group/btn"
+              >
+                <span>Explore 3D Lab</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
+              </Link>
+
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-cyan-500/30 to-blue-600/40 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_18px_rgba(0,217,255,0.35)] group-hover:scale-110 group-hover:rotate-12 transition-all">
+                <Atom className="w-5 h-5 text-cyan-300 animate-spin [animation-duration:12s]" />
               </div>
             </div>
           </div>
 
-          {/* Card 4: Gold Study Materials */}
-          <div className="relative bg-gradient-to-b from-[#0e1d2c] to-[#050e17] border border-cyan-500/20 hover:border-cyan-400/50 rounded-2xl p-6 flex flex-col justify-between min-h-[250px] sm:min-h-[280px] shadow-lg hover:shadow-[0_10px_30px_rgba(245,158,11,0.15)] hover:-translate-y-1 transition-all duration-300 group">
+          {/* Card 4: Academic Study Repository */}
+          <div className="relative bg-gradient-to-b from-[#0e1d2c] to-[#050e17] border border-amber-500/30 hover:border-amber-400/60 rounded-2xl p-6 flex flex-col justify-between min-h-[250px] sm:min-h-[280px] shadow-lg hover:shadow-[0_10px_30px_rgba(245,158,11,0.2)] hover:-translate-y-1 transition-all duration-300 group">
             <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-300 bg-amber-950/80 border border-amber-500/40 px-2.5 py-0.5 rounded-full">
+                  CBSE · ICSE · WBCHSE
+                </span>
+                <span className="text-[10px] font-mono text-amber-400/80">
+                  XI / XII / SEM 1–4
+                </span>
+              </div>
               <h3 className="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">
-                Curated Study Vault
+                Academic Study Repository
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed">
-                Access chapter-wise revision notes, high-yield organic mechanism sheets, and premium question banks anytime.
+              <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed font-light">
+                Structured chapter-wise notes, DPPs, PYQs, and semester question banks organized strictly by board and curriculum.
               </p>
             </div>
             {/* Visual bottom-right glowing icon */}
-            <div className="self-end mt-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500/30 to-yellow-600/40 border border-amber-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)] group-hover:scale-110 transition-transform">
-                <Sparkles className="w-6 h-6 text-amber-300" />
+            <div className="mt-4 pt-3.5 border-t border-white/[0.08] flex items-center justify-between">
+              <Link
+                href="/study-material"
+                className="inline-flex items-center gap-1 text-xs font-mono font-bold text-amber-300 hover:text-white transition-colors group/btn"
+              >
+                <span>Browse Materials</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
+              </Link>
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500/30 to-yellow-600/40 border border-amber-400/50 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)] group-hover:scale-110 transition-transform">
+                <Sparkles className="w-5 h-5 text-amber-300" />
               </div>
             </div>
           </div>

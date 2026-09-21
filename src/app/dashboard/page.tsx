@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { 
-  BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, 
+  Atom, BookOpen, Trophy, Target, TrendingUp, ChevronRight, ChevronDown, 
   LogOut, Medal, AlertCircle, FileText, Image as ImageIcon, Link as LinkIcon, 
   Download, ExternalLink, FolderOpen, Clock, User, Play, Info, Sparkles, 
   Flame, ShieldCheck, CheckCircle2, Award, Bell, Phone, X, Check, Lock as LockIcon
@@ -375,8 +375,15 @@ export default function StudentDashboard() {
                       : "text-slate-300 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  3D Notes & Lab
+                  Study Materials
                 </a>
+                <Link
+                  href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap text-emerald-300 hover:text-white hover:bg-emerald-950/60 border border-emerald-500/30 flex items-center gap-1.5"
+                >
+                  <Atom className="w-3.5 h-3.5 text-emerald-400 animate-spin [animation-duration:15s]" />
+                  <span>3D Molecular Lab</span>
+                </Link>
                 <a 
                   href="#leaderboard" 
                   onClick={() => setActiveTab("leaderboard")}
@@ -632,7 +639,7 @@ export default function StudentDashboard() {
                     {[
                       { id: 'overview', label: 'Overview' },
                       { id: 'tests', label: 'Tests' },
-                      { id: 'materials', label: '3D Notes' },
+                      { id: 'materials', label: 'Study Materials' },
                       { id: 'leaderboard', label: 'Ranks' },
                       { id: 'performance', label: 'Tracker' }
                     ].map((item) => {
@@ -712,8 +719,15 @@ export default function StudentDashboard() {
                   : "text-slate-300 hover:text-white hover:bg-white/10"
               }`}
             >
-              3D Notes & Lab
+              Study Materials
             </a>
+            <Link
+              href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+              className="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 text-emerald-300 hover:text-white bg-emerald-950/60 border border-emerald-500/30 flex items-center gap-1"
+            >
+              <Atom className="w-3 h-3 text-emerald-400" />
+              <span>3D Lab</span>
+            </Link>
             <a 
               href="#leaderboard" 
               onClick={() => setActiveTab("leaderboard")}
@@ -891,8 +905,15 @@ export default function StudentDashboard() {
                   className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
                 >
                   <Info className="w-4 h-4 text-cyan-300 shrink-0" />
-                  <span>3D Notes & Lab</span>
+                  <span>Study Materials</span>
                 </a>
+                <Link
+                  href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 hover:text-white font-bold text-xs sm:text-base border border-emerald-500/30 backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
+                >
+                  <Atom className="w-4 h-4 text-emerald-400 shrink-0 animate-spin [animation-duration:12s]" />
+                  <span>3D Molecular Lab</span>
+                </Link>
               </div>
 
               {/* Floating Bottom-Right Badges */}
