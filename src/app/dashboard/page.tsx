@@ -2,7 +2,7 @@
 import DashboardAiWidget from "@/components/ai/DashboardAiWidget";
 import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -31,6 +31,14 @@ export default function StudentDashboard() {
   const [updatingCurriculum, setUpdatingCurriculum] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "tests" | "materials" | "leaderboard" | "performance">("overview");
   const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
+  const [isExploreShelfOpen, setIsExploreShelfOpen] = useState(false);
+
+  // 3D WebGL animations & interactive simulation models
+  const threeDMaterials = useMemo(() => {
+    return (studyMaterials || []).filter((mat: any) => {
+      return mat.type === "LINK" || mat.category === "3D animations" || (mat.url && mat.url.includes("lab-viewer"));
+    });
+  }, [studyMaterials]);
 
   // PIECHEM AI Integration States
   const [isAdaptiveQuizOpen, setIsAdaptiveQuizOpen] = useState(false);
@@ -265,21 +273,7 @@ export default function StudentDashboard() {
     }
   });
 
-  // Pick Spotlight Featured Item (Netflix Billboard)
-  const activeAttemptTest = currentAvailableTests.find((t: any) => 
-    allAttempts.some((a: any) => a.testId === t.id && a.status === 'IN_PROGRESS')
-  );
-  const unattemptedTest = currentAvailableTests.find((t: any) => 
-    !allAttempts.some((a: any) => a.testId === t.id && a.status === 'SUBMITTED')
-  );
-  const spotlightTest = activeAttemptTest || unattemptedTest || currentAvailableTests[0] || upcomingTests[0] || null;
 
-  const isSubscribedStudent = Boolean(
-    student?.subscriptionStatus === "COMPLIMENTARY" || 
-    (student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student?.subscriptionExpiresAt).getTime() > now.getTime()))
-  );
-  const isSpotlightPremium = Boolean(spotlightTest?.isPremium);
-  const isSpotlightLocked = isSpotlightPremium && !isSubscribedStudent;
 
   // Upcoming Alert Banner Items
   const bannerItems: any[] = [];
@@ -377,14 +371,7 @@ export default function StudentDashboard() {
                 >
                   Study Materials
                 </a>
-                <Link
-                  href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
-                  className="px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap text-emerald-300 hover:text-white hover:bg-emerald-950/60 border border-emerald-500/30 flex items-center gap-1.5"
-                >
-                  <Atom className="w-3.5 h-3.5 text-emerald-400 animate-spin [animation-duration:15s]" />
-                  <span>3D Molecular Lab</span>
-                </Link>
-                <a 
+                                <a 
                   href="#leaderboard" 
                   onClick={() => setActiveTab("leaderboard")}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
@@ -721,14 +708,7 @@ export default function StudentDashboard() {
             >
               Study Materials
             </a>
-            <Link
-              href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
-              className="px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 text-emerald-300 hover:text-white bg-emerald-950/60 border border-emerald-500/30 flex items-center gap-1"
-            >
-              <Atom className="w-3 h-3 text-emerald-400" />
-              <span>3D Lab</span>
-            </Link>
-            <a 
+                        <a 
               href="#leaderboard" 
               onClick={() => setActiveTab("leaderboard")}
               className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
@@ -787,9 +767,9 @@ export default function StudentDashboard() {
         />
 
         {/* ========================================================= */}
-        {/* 3. FEATURED SPOTLIGHT BILLBOARD (NETFLIX HERO - IMAGE 2) */}
+        {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (IMAGE 2) */}
         {/* ========================================================= */}
-        <section id="overview" className="dashboard-hero relative rounded-2xl sm:rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_15px_40px_rgba(0,180,255,0.12)]">
+        <section id="overview" className="dashboard-hero relative rounded-2xl sm:rounded-3xl overflow-hidden border border-sky-500/30 bg-gradient-to-br from-[#061524] via-[#040e18] to-[#02070c] shadow-[0_15px_40px_rgba(0,180,255,0.12)]">
           
           {/* Ambient Lighting & Abstract Chemistry Backdrop */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_75%_35%,rgba(0,195,255,0.18),transparent_65%)] pointer-events-none" />
@@ -800,132 +780,84 @@ export default function StudentDashboard() {
           <div className="absolute -right-20 -bottom-20 w-80 sm:w-[500px] h-80 sm:h-[500px] border border-cyan-500/5 rounded-full pointer-events-none" />
 
           {/* Billboard Content */}
-          <div className="relative z-10 p-3.5 sm:p-8 lg:p-12 max-w-3xl flex flex-col justify-between min-h-0 sm:min-h-[380px]">
+          <div className="relative z-10 p-5 sm:p-8 lg:p-10 max-w-4xl flex flex-col justify-between min-h-0 sm:min-h-[340px]">
             
             <div>
-              {/* Category / Meta Badges Row */}
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2.5 sm:mb-4">
-                <span className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(0,195,255,0.4)] uppercase tracking-wider">
-                  <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
-                  {spotlightTest ? (spotlightTest.lockState === "SCHEDULED_OPEN" ? "Live Now" : "Featured Mock") : "Master Series"}
-                </span>
+              {/* Top Row: Icon and Status Pill (Direct Image 2 Identity) */}
+              <div className="flex items-start justify-between gap-3 mb-4 sm:mb-6">
+                <div className="p-3 rounded-2xl border border-sky-500/30 bg-sky-950/80 text-sky-400 shadow-inner flex items-center justify-center">
+                  <Atom className="w-6 h-6 sm:w-7 sm:h-7 text-sky-400 animate-spin [animation-duration:15s]" />
+                </div>
 
-                {/* Free vs Premium Badge */}
-                {spotlightTest?.isPremium ? (
-                  <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-black bg-gradient-to-r from-amber-500/30 via-yellow-500/20 to-amber-500/30 text-amber-300 border border-amber-500/60 flex items-center gap-1 shadow-[0_0_15px_rgba(245,158,11,0.25)]">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
-                    Premium Test
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-black font-mono border bg-sky-500/15 text-sky-300 border-sky-500/30 animate-pulse flex items-center gap-1.5 shadow-[0_0_15px_rgba(56,189,248,0.25)]">
+                    <span>{threeDMaterials.length || 2}</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider font-sans">LIVE</span>
                   </span>
-                ) : spotlightTest ? (
-                  <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-slate-800/80 text-slate-300 border border-slate-600/50 flex items-center gap-1">
-                    🔓 Free Test
-                  </span>
-                ) : null}
-                
-                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-white/10 backdrop-blur-md text-slate-200 border border-white/10">
-                  {student.board || 'CBSE'} • {student.board === 'WBCHSE' ? student.academicLevel : `Class ${student.academicLevel}`}
-                </span>
-
-                {spotlightTest?.durationMinutes && (
-                  <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-white/10 backdrop-blur-md text-cyan-300 border border-white/10 flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {spotlightTest.durationMinutes} Mins
-                  </span>
-                )}
-
-                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" />
-                  AI Proctored
-                </span>
-
-                {student.subscriptionStatus === "PAID" && (
-                  <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-gradient-to-r from-amber-500/30 to-yellow-500/20 text-amber-300 border border-amber-500/50 flex items-center gap-1 shadow-[0_0_15px_rgba(245,158,11,0.25)]">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
-                    Gold Pass Active • Unlimited Attempts
-                  </span>
-                )}
+                </div>
               </div>
 
-              {/* Big Stylized Title */}
-              <h1 className="text-xl sm:text-3xl lg:text-5xl font-black text-white tracking-tight uppercase leading-tight mb-2 sm:mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] break-words">
-                {spotlightTest ? spotlightTest.title : "PIE CHEM EXAM SERIES 2026"}
+              {/* Title (Image 2 Dominant Heading) */}
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight mb-2 sm:mb-3 drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif">
+                3D animations
               </h1>
 
-              {/* Description */}
-              <p className="text-xs sm:text-base text-slate-200/90 max-w-2xl leading-relaxed mb-3 sm:mb-8 drop-shadow line-clamp-2 sm:line-clamp-none">
-                {spotlightTest?.description 
-                  ? spotlightTest.description 
-                  : "Practice full-length timed chemistry mocks designed specifically for board exam perfection and competitive entrance benchmark rankings with instant AI evaluation."}
+              {/* Subtitle / Description (Image 2 exact wording + details) */}
+              <p className="text-sm sm:text-lg text-slate-200/90 font-medium max-w-2xl leading-relaxed mb-2 drop-shadow">
+                Interactive WebGL molecular structures &amp; reaction mechanics
+              </p>
+              <p className="text-xs sm:text-sm text-slate-400 font-light max-w-2xl leading-relaxed">
+                Explore real-time 3D simulations of solid state crystal lattices, atomic voids, and spatial chemical bonding directly in your browser.
               </p>
             </div>
 
-            {/* Actions & Floating Tags Row */}
-            <div className="dashboard-hero-actions flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-cyan-500/20 w-full">
+            {/* Divider Line (Image 2 structure) */}
+            <div className="w-full border-t border-slate-800/80 my-4 sm:my-5" />
+
+            {/* Actions Row: Explore Shelf + Direct Lab Launch Buttons */}
+            <div className="dashboard-hero-actions flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
               
-              {/* Action CTA Buttons: Side-by-side row on mobile for fast access */}
-              <div className="flex flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                {spotlightTest ? (
-                  isSpotlightLocked ? (
+              {/* Primary Action Button (Explore Shelf with ChevronRight) */}
+              <button
+                type="button"
+                onClick={() => setIsExploreShelfOpen(true)}
+                className="group/shelf inline-flex items-center justify-between sm:justify-start gap-2 text-xs sm:text-sm font-bold text-sky-300 hover:text-white transition-colors cursor-pointer py-1"
+              >
+                <span className="group-hover/shelf:underline underline-offset-4">Explore Shelf</span>
+                <ChevronRight className="w-4 h-4 transition-transform group-hover/shelf:translate-x-1" />
+              </button>
+
+              {/* Direct Quick-Launch CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {threeDMaterials.length > 0 ? (
+                  threeDMaterials.map((lab: any) => (
                     <Link
-                      href="/dashboard/account"
-                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(245,158,11,0.5)] active:scale-95 whitespace-nowrap uppercase tracking-wider"
+                      key={lab.id}
+                      href={`/dashboard/lab-viewer/${lab.id}`}
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-sm transition duration-200 shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 whitespace-nowrap"
                     >
-                      <LockIcon className="w-4 h-4 text-slate-950 shrink-0" />
-                      <span>⭐ Subscribe to Unlock Test</span>
+                      <Play className="w-3.5 h-3.5 fill-current text-black shrink-0" />
+                      <span>{lab.title.replace(/\(.*?\)/g, "").trim() || "Launch 3D Lab"}</span>
                     </Link>
-                  ) : activeAttemptTest ? (
-                    <Link
-                      href={`/exam/start/${spotlightTest.id}`}
-                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 whitespace-nowrap"
-                    >
-                      <Play className="w-4 h-4 fill-current text-black shrink-0" />
-                      <span>Resume Test</span>
-                    </Link>
-                  ) : (
-                    <Link
-                      href={`/exam/start/${spotlightTest.id}`}
-                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 whitespace-nowrap"
-                    >
-                      <Play className="w-4 h-4 fill-current text-black shrink-0" />
-                      <span>Start Test</span>
-                    </Link>
-                  )
+                  ))
                 ) : (
-                  <a
-                    href="#tests"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-base transition duration-200 shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95 whitespace-nowrap"
-                  >
-                    <Play className="w-4 h-4 fill-current text-black shrink-0" />
-                    <span>Explore Tests</span>
-                  </a>
+                  <>
+                    <Link
+                      href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-sm transition duration-200 shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 whitespace-nowrap"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current text-black shrink-0" />
+                      <span>Solid State 3D</span>
+                    </Link>
+                    <Link
+                      href="/dashboard/lab-viewer/5f10cd48-de6c-4dfc-8d0c-56b157708208"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-sky-950/60 hover:bg-sky-900/80 border border-sky-500/30 text-sky-300 hover:text-white font-bold text-xs sm:text-sm backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
+                    >
+                      <Atom className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                      <span>Chemical Bonding 3D</span>
+                    </Link>
+                  </>
                 )}
-
-                <a
-                  href="#materials"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-base border border-white/20 backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
-                >
-                  <Info className="w-4 h-4 text-cyan-300 shrink-0" />
-                  <span>Study Materials</span>
-                </a>
-                <Link
-                  href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 hover:text-white font-bold text-xs sm:text-base border border-emerald-500/30 backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
-                >
-                  <Atom className="w-4 h-4 text-emerald-400 shrink-0 animate-spin [animation-duration:12s]" />
-                  <span>3D Molecular Lab</span>
-                </Link>
-              </div>
-
-              {/* Floating Bottom-Right Badges */}
-              <div className="hidden sm:flex items-center gap-2.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-cyan-500/30 text-xs font-bold text-cyan-300 shadow">
-                  <Flame className="w-3.5 h-3.5 fill-current text-cyan-400" />
-                  <span>Most Attempted Mock</span>
-                </div>
-                <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-amber-500/30 text-xs font-bold text-amber-300 shadow">
-                  <Sparkles className="w-3.5 h-3.5 fill-current text-amber-400" />
-                  <span>High Yield Content</span>
-                </div>
               </div>
 
             </div>
@@ -1282,7 +1214,98 @@ export default function StudentDashboard() {
           onClose={() => setIsAdaptiveQuizOpen(false)}
           targetTopic={adaptiveDrillTopic}
         />
-      </main>
+      
+      {/* ============================================================ */}
+      {/* 3D ANIMATIONS SHELF MODAL                                     */}
+      {/* ============================================================ */}
+      {isExploreShelfOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#091522] border border-sky-500/40 rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-7 shadow-2xl shadow-sky-950/80 space-y-5 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setIsExploreShelfOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-black uppercase bg-sky-950 text-sky-300 border border-sky-500/40">
+                  3D ANIMATIONS SHELF
+                </span>
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950/70 text-emerald-300 border border-emerald-500/30">
+                  {threeDMaterials.length || 2} Interactive Simulations
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-snug font-serif">
+                WebGL Molecular Simulations &amp; Visualizers
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+                Fully interactive 3D chemistry environments. Rotate crystal structures, inspect lattice parameters, examine voids, and visualize orbital geometries in real time.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {(threeDMaterials.length > 0 ? threeDMaterials : [
+                {
+                  id: "fff042ca-a686-4e84-a35b-271fac192ad9",
+                  title: "SOLID STATE CHEMISTRY",
+                  description: "Explore FCC, BCC, and HCP unit cells, coordination numbers, packing efficiency, and octahedral/tetrahedral voids in real-time WebGL 3D.",
+                  discipline: "PHYSICAL"
+                },
+                {
+                  id: "5f10cd48-de6c-4dfc-8d0c-56b157708208",
+                  title: "CHEMICAL BONDING & MOLECULAR GEOMETRY",
+                  description: "Visualize VSEPR geometries, bond angles, hybridization orbitals (sp, sp², sp³), and sigma/pi electron densities interactively.",
+                  discipline: "INORGANIC"
+                }
+              ]).map((sim: any) => (
+                <div
+                  key={sim.id}
+                  className="bg-[#050f1a] border border-sky-500/25 hover:border-sky-400/50 rounded-2xl p-4 flex flex-col justify-between gap-3 group transition"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="p-2 rounded-xl bg-sky-950/70 border border-sky-500/30 text-sky-400">
+                        <Atom className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-sky-950/60 text-sky-300 border border-sky-500/30">
+                        WebGL 3D
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white group-hover:text-sky-300 transition">
+                      {sim.title.replace(/\(.*?\)/g, "").trim()}
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
+                      {sim.description || "Interactive WebGL molecular structures & reaction mechanics."}
+                    </p>
+                  </div>
+
+                  <Link
+                    href={`/dashboard/lab-viewer/${sim.id}`}
+                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-[0_0_12px_rgba(56,189,248,0.25)]"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>Launch Simulation</span>
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsExploreShelfOpen(false)}
+                className="py-2 px-5 rounded-xl text-xs font-mono text-slate-300 bg-slate-800 hover:bg-slate-700 transition cursor-pointer"
+              >
+                Close Shelf
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+</main>
     </div>
   );
 }
