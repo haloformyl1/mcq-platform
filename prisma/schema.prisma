@@ -36,6 +36,7 @@ model Student {
   upgradeRequests SubscriptionUpgradeRequest[]
   proctoringWarnings ProctoringWarningLog[]
   sessions           StudentSession[]
+  aiConversations    AiConversation[]
 }
 
 model StudentSession {
@@ -289,4 +290,18 @@ model PaytmTransaction {
   gatewayResponse Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model AiConversation {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title     String
+  subject   String   @default("stem")
+  level     String   @default("intermediate")
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId, updatedAt(sort: Desc)])
 }
