@@ -324,3 +324,18 @@ div {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+
+/* Right-headed Arrow Glide Animation */
+@keyframes arrowGlide {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+.animate-arrow-glide {
+  animation: arrowGlide 1.4s ease-in-out infinite;
+}
