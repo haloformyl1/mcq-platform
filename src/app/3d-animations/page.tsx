@@ -535,6 +535,9 @@ function ThreeDAnimationsContent() {
         animationTitle={selectedLockedItem?.title?.replace(/\(.*?\)/g, "").trim()}
       />
 
+      {/* Global Footer */}
+      <GlobalFooter />
+
     </div>
   );
 }
@@ -544,8 +547,7 @@ export default function ThreeDAnimationsPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
-            <GlobalFooter />
-    </div>
+      </div>
     }>
       <ThreeDAnimationsContent />
     </Suspense>
