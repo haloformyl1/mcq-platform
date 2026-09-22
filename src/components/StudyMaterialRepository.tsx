@@ -368,25 +368,27 @@ export default function StudyMaterialRepository({
     <div className="w-full text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-200">
       
       {/* ============================================================ */}
-      {/* 1. PERSISTENT BREADCRUMB NAVIGATION                          */}
+      {/* 1. SECTION TITLE & BREADCRUMB NAVIGATION                     */}
       {/* ============================================================ */}
-      <nav aria-label="Breadcrumb" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-3">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-transparent py-1">
-          <Link href="/dashboard" className="text-slate-400 hover:text-white transition-colors flex items-center gap-1">
-            <span>PIECHEM</span>
-          </Link>
-
-          <span className="text-slate-600">/</span>
-
-          <button 
-            onClick={handleResetBoard}
-            className={`hover:text-cyan-300 transition-colors font-semibold ${!selectedBoard ? "text-cyan-400" : "text-slate-400"}`}
-          >
-            STUDY MATERIAL
-          </button>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span 
+              onClick={selectedBoard ? handleResetBoard : undefined}
+              className={selectedBoard ? "cursor-pointer hover:text-cyan-300 transition-colors" : ""}
+            >
+              Study Materials
+            </span>
+          </h2>
 
           {selectedBoard && (
-            <>
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-transparent py-1">
+              <button 
+                onClick={handleResetBoard}
+                className="hover:text-cyan-300 transition-colors font-semibold text-cyan-400"
+              >
+                All Curriculums
+              </button>
               <span className="text-slate-600">/</span>
               <button 
                 onClick={handleResetLevel}
@@ -394,31 +396,31 @@ export default function StudyMaterialRepository({
               >
                 {selectedBoard}
               </button>
-            </>
-          )}
 
-          {selectedLevel && (
-            <>
-              <span className="text-slate-600">/</span>
-              <button 
-                onClick={handleResetCategory}
-                className={`hover:text-cyan-300 transition-colors uppercase font-semibold ${!selectedCategory ? "text-cyan-400" : "text-slate-400"}`}
-              >
-                {getLevelLabel(selectedLevel)}
-              </button>
-            </>
-          )}
+              {selectedLevel && (
+                <>
+                  <span className="text-slate-600">/</span>
+                  <button 
+                    onClick={handleResetCategory}
+                    className={`hover:text-cyan-300 transition-colors uppercase font-semibold ${!selectedCategory ? "text-cyan-400" : "text-slate-400"}`}
+                  >
+                    {getLevelLabel(selectedLevel)}
+                  </button>
+                </>
+              )}
 
-          {selectedCategory && activeCategoryObject && (
-            <>
-              <span className="text-slate-600">/</span>
-              <span className="text-cyan-300 font-bold uppercase truncate max-w-[200px] sm:max-w-none">
-                {activeCategoryObject.name}
-              </span>
-            </>
+              {selectedCategory && activeCategoryObject && (
+                <>
+                  <span className="text-slate-600">/</span>
+                  <span className="text-cyan-300 font-bold uppercase truncate max-w-[200px] sm:max-w-none">
+                    {activeCategoryObject.name}
+                  </span>
+                </>
+              )}
+            </nav>
           )}
         </div>
-      </nav>
+      </div>
 
       {/* ============================================================ */}
       {/* STEP 1: BOARD SELECTION ("Choose your curriculum")            */}
