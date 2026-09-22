@@ -1,5 +1,5 @@
-﻿"use client";
-
+"use client";
+import GlobalFooter from "@/components/GlobalFooter";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -2884,6 +2884,7 @@ export default function StudentAccountPage() {
 
       {/* Footer Support */}
       
+          <GlobalFooter />
     </div>
   );
 }

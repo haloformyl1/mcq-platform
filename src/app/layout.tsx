@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
-import GlobalFooter from "@/components/GlobalFooter";
+
 import GlobalBackground from "@/components/GlobalBackground";
 
 const geistSans = Geist({
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="relative z-10 flex flex-col flex-1 min-h-full">
           {children}
         </div>
-        <GlobalFooter />
+        
       </body>
     </html>
   );

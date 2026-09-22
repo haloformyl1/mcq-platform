@@ -1,5 +1,5 @@
 "use client";
-
+import GlobalFooter from "@/components/GlobalFooter";
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -547,7 +547,8 @@ export default function ThreeDAnimationsPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
-      </div>
+            <GlobalFooter />
+    </div>
     }>
       <ThreeDAnimationsContent />
     </Suspense>

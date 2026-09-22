@@ -1,5 +1,5 @@
 "use client";
-
+import GlobalFooter from "@/components/GlobalFooter";
 import React, { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -132,6 +132,7 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
 
       {/* Footer */}
       
+          <GlobalFooter />
     </div>
   );
 }

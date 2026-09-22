@@ -1,4 +1,5 @@
 "use client";
+import GlobalFooter from "@/components/GlobalFooter";
 import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
 
 import { useEffect, useState, useMemo } from "react";
@@ -1135,6 +1136,9 @@ export default function StudentDashboard() {
         </section>
 
         
+
+        {/* Global Footer - ONLY shown after dashboard has fully loaded */}
+        <GlobalFooter />
 
         {/* AI Floating Summon Button for Mobile & Desktop */}
         <div className="fixed bottom-5 right-5 z-40">

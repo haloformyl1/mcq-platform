@@ -530,7 +530,7 @@ export default function PiFiringLoader({ fullScreen = true }: { fullScreen?: boo
   }, []);
 
   const containerClasses = fullScreen
-    ? "fixed inset-0 z-50 flex flex-col items-center justify-end bg-gradient-to-br from-[#020b12] via-[#01060a] to-[#000305] text-white overflow-hidden font-mono select-none"
+    ? "fixed inset-0 z-[9999] flex flex-col items-center justify-end bg-black text-white overflow-hidden font-mono select-none"
     : "w-full py-16 flex flex-col items-center justify-end bg-[#071926]/80 rounded-xl border border-[#0099ff]/30 text-white overflow-hidden font-mono relative backdrop-blur-md select-none";
 
   return (
