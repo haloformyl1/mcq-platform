@@ -1127,7 +1127,7 @@ export default function StudentDashboard() {
 
 
         {/* AI Floating Summon Button for Mobile & Desktop */}
-        <div className="fixed bottom-5 right-5 z-40">
+        <div className="fixed bottom-5 left-4 sm:left-6 z-40">
           <button
             type="button"
             onClick={() => handleOpenAiTutor("tutor")}
