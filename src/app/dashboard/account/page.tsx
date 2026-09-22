@@ -764,7 +764,7 @@ export default function StudentAccountPage() {
                     rawPayerUpi.toLowerCase().endsWith("@axl");
 
   return (
-    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500 selection:text-black pb-24 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-transparent text-white font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={student} />
       <GoldUpgradeCelebrationModal student={student} />
@@ -878,7 +878,7 @@ export default function StudentAccountPage() {
         </div>
       </header>
       {/* 2. MAIN LAYOUT (FULL SCREEN NETFLIX ACCOUNT SETTINGS PAGE) */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1">
         
         {/* Top Navigation Row */}
         <div className="flex items-center justify-between">

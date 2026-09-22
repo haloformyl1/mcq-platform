@@ -299,7 +299,7 @@ export default function StudentDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={data?.student} />
       <GoldUpgradeCelebrationModal student={student || data?.student} />
@@ -809,7 +809,7 @@ export default function StudentDashboard() {
       </section>
 
       {/* Main Container */}
-      <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10">
+      <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10 flex-1">
 
         {/* ========================================================= */}
         {/* 4. CONTENT ROW 1: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
@@ -1125,8 +1125,6 @@ export default function StudentDashboard() {
 
         
 
-        {/* Global Footer - ONLY shown after dashboard has fully loaded */}
-        <GlobalFooter />
 
         {/* AI Floating Summon Button for Mobile & Desktop */}
         <div className="fixed bottom-5 right-5 z-40">
@@ -1150,6 +1148,8 @@ export default function StudentDashboard() {
         />
       
 </main>
+      {/* Global Footer - Pinned to very bottom, extending far right & left */}
+      <GlobalFooter />
     </div>
   );
 }

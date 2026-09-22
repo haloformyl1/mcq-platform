@@ -94,7 +94,7 @@ export default function GlobalFooter() {
   };
 
   return (
-    <footer className="relative z-20 w-full bg-[#02070D] text-[#91A5B8] border-t border-[rgba(0,180,255,0.12)] mt-10 sm:mt-14 font-sans overflow-hidden">
+    <footer className="relative z-20 w-full bg-[#02070D] text-[#91A5B8] border-t border-[rgba(0,180,255,0.12)] mt-auto font-sans overflow-hidden">
       {/* Top Subtle Cyan Glow Accent Line */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/25 to-transparent pointer-events-none" />
 
@@ -121,26 +121,26 @@ export default function GlobalFooter() {
       </div>
 
       {/* Main Container - Aligns with the site's content container */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8">
+      <div className="relative w-full px-4 sm:px-8 lg:px-12 2xl:px-16 pt-4 sm:pt-5 pb-3 sm:pb-3.5">
         
         {/* Main Grid: Brand (~30%), Explore (~18%), Learn (~18%), Support (~34%) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
           
           {/* Brand Column (Left Anchor) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col items-start">
             <PiechemLogo size="md" href="/dashboard" subtitle="Smart Learning Platform" />
-            <p className="mt-3 text-xs sm:text-[13px] text-[#91A5B8] leading-relaxed max-w-xs sm:max-w-sm">
+            <p className="mt-2 text-xs sm:text-[12.5px] text-[#91A5B8] leading-normal max-w-xs sm:max-w-sm">
               Interactive learning for the sciences.
             </p>
           </div>
 
           {/* Navigation Group 1: EXPLORE */}
           <div className="lg:col-span-2 flex flex-col">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-3 sm:mb-3.5 flex items-center gap-1.5">
+            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-cyan-400" />
               {NAVIGATION_GROUPS[0].title}
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-[13px]">
+            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12.5px]">
               {NAVIGATION_GROUPS[0].links.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -156,11 +156,11 @@ export default function GlobalFooter() {
 
           {/* Navigation Group 2: LEARN */}
           <div className="lg:col-span-2 flex flex-col">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-3 sm:mb-3.5 flex items-center gap-1.5">
+            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-cyan-400" />
               {NAVIGATION_GROUPS[1].title}
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-[13px]">
+            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12.5px]">
               {NAVIGATION_GROUPS[1].links.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -176,13 +176,13 @@ export default function GlobalFooter() {
 
           {/* Navigation Group 3: SUPPORT (Links + Single Dedicated Support Card) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-3 sm:mb-3.5 flex items-center gap-1.5">
+            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-cyan-400" />
               Support
             </h3>
 
             {/* Quick Support Links */}
-            <ul className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-[13px] mb-3.5">
+            <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-[12px] mb-2">
               {SUPPORT_LINKS.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -196,7 +196,7 @@ export default function GlobalFooter() {
             </ul>
 
             {/* Single Source of Contact / Support Block */}
-            <div className="p-3 sm:p-3.5 rounded-lg bg-[#06111A]/80 border border-[rgba(0,180,255,0.14)] shadow-[0_4px_24px_rgba(0,0,0,0.35)]">
+            <div className="p-2.5 sm:p-3 rounded-lg bg-[#06111A]/80 border border-[rgba(0,180,255,0.14)] shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
               <div className="text-[11px] text-[#91A5B8] font-medium">
                 {SUPPORT_INFO.tagline}
               </div>
@@ -245,10 +245,10 @@ export default function GlobalFooter() {
         </div>
 
         {/* Subtle Horizontal Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(0,180,255,0.12)] to-transparent my-6" />
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(0,180,255,0.12)] to-transparent my-3 sm:my-3.5" />
 
         {/* Bottom Metadata Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs text-[#607487]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs text-[#607487]">
           
           {/* Left: Copyright */}
           <div className="text-[11px] sm:text-xs text-[#607487] text-center sm:text-left">
