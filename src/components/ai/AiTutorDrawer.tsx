@@ -50,12 +50,6 @@ interface AiTutorDrawerProps {
   initialStudentName?: string;
 }
 
-const QUICK_STARTER_PROMPTS = [
-  "Explain SN1 vs SN2",
-  "Derive lens formula",
-  "Solve ∫ x² dx",
-  "Compare mitosis and meiosis"
-];
 
 export default function AiTutorDrawer({
   isOpen,
@@ -863,33 +857,6 @@ export default function AiTutorDrawer({
                   </div>
                 ))
               )}
-            </div>
-
-            {/* Section: Quick Prompts (Static/Reusable) */}
-            <div className="space-y-2 pt-2 border-t border-red-950/40 shrink-0">
-              <div className="flex items-center justify-between text-[10px] font-bold tracking-wider text-slate-500 px-1 uppercase">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-red-400" />
-                  <span>Quick Prompts</span>
-                </span>
-                <ChevronRight className="w-3 h-3 text-slate-700" />
-              </div>
-
-              <div className="space-y-1">
-                {QUICK_STARTER_PROMPTS.map((promptText, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => {
-                      setIsMobileSidebarOpen(false);
-                      handleSendMessage(promptText);
-                    }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg bg-[#120406]/80 hover:bg-[#1c070c] border border-red-950/60 hover:border-red-500/30 text-xs text-slate-300 hover:text-white transition cursor-pointer truncate"
-                  >
-                    {promptText}
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
 
