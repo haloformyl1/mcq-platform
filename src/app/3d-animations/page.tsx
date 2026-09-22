@@ -1,0 +1,528 @@
+"use client";
+
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { 
+  Search, SlidersHorizontal, Sparkles, Atom, Play, ArrowLeft, 
+  CheckCircle2, Layers, Compass, Crown, RotateCcw, Filter, ArrowRight
+} from "lucide-react";
+import PiechemLogo from "@/components/PiechemLogo";
+import MolecularOrbitalCanvas from "@/components/3d/MolecularOrbitalCanvas";
+import AnimationCatalogCard from "@/components/3d/AnimationCatalogCard";
+import PremiumUpgradeModal from "@/components/3d/PremiumUpgradeModal";
+
+function ThreeDAnimationsContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [animations, setAnimations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isGold, setIsGold] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("ALL");
+  const [accessFilter, setAccessFilter] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
+  const [sortBy, setSortBy] = useState<"featured" | "az" | "newest">("featured");
+
+  // Upgrade Modal states
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [selectedLockedItem, setSelectedLockedItem] = useState<any | null>(null);
+
+  // Initialize filters from search parameters if provided (e.g. ?category=Chemical+Bonding)
+  useEffect(() => {
+    const topicParam = searchParams.get("topic") || searchParams.get("category");
+    if (topicParam) {
+      const lower = topicParam.toLowerCase();
+      if (lower.includes("bond")) {
+        setActiveCategory("BONDING");
+      } else if (lower.includes("solid")) {
+        setActiveCategory("SOLID_STATE");
+      } else if (lower.includes("physical")) {
+        setActiveCategory("PHYSICAL");
+      } else if (lower.includes("inorganic")) {
+        setActiveCategory("INORGANIC");
+      }
+    }
+  }, [searchParams]);
+
+  // Check initial Gold status from localStorage for instantaneous zero-flicker UI
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const cachedGold = localStorage.getItem("piechem_is_gold") === "true";
+      setIsGold(cachedGold);
+    }
+  }, []);
+
+  // Fetch verified student and study materials data from backend
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadData() {
+      try {
+        const [dashRes, matRes] = await Promise.all([
+          fetch("/api/student/dashboard").catch(() => null),
+          fetch("/api/student/study-materials").catch(() => null)
+        ]);
+
+        if (dashRes && dashRes.ok) {
+          const dashData = await dashRes.json();
+          if (dashData?.student && mounted) {
+            const isComp = dashData.student.subscriptionStatus === "COMPLIMENTARY";
+            const isPaid = 
+              dashData.student.subscriptionStatus === "PAID" && 
+              (!dashData.student.subscriptionExpiresAt || new Date(dashData.student.subscriptionExpiresAt).getTime() > Date.now());
+            setIsGold(isComp || isPaid);
+          }
+        }
+
+        if (matRes && matRes.ok) {
+          const mats = await matRes.json();
+          if (Array.isArray(mats) && mounted) {
+            // Filter strictly for 3D simulation experiences
+            const sims = mats.filter((m: any) => {
+              const lower = (m.title || "").toLowerCase();
+              return (
+                m.type === "LINK" || 
+                m.category === "3D animations" || 
+                (m.url && m.url.includes("lab-viewer")) ||
+                lower.includes("3d") ||
+                lower.includes("solid state") ||
+                lower.includes("bonding")
+              );
+            });
+            setAnimations(sims);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading 3D animations catalog:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    loadData();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Fallback default simulations if DB is being seeded or offline
+  const effectiveAnimations = useMemo(() => {
+    if (animations.length > 0) return animations;
+    if (loading) return [];
+    return [
+      {
+        id: "fff042ca-a686-4e84-a35b-271fac192ad9",
+        title: "SOLID STATE CHEMISTRY (Interactive 3D models)",
+        description: "Explore, visualize, and calculate 3D crystal structures, voids, packing efficiency, and point defects in a premium interactive laboratory.",
+        type: "LINK",
+        isPremium: false,
+        discipline: "PHYSICAL",
+        category: "3D animations"
+      },
+      {
+        id: "5f10cd48-de6c-4dfc-8d0c-56b157708208",
+        title: "CHEMICAL BONDING (Bonding visualised)",
+        description: "From atomic trends to orbital shapes—see, manipulate and test every core idea behind chemical bonding.",
+        type: "LINK",
+        isPremium: true,
+        discipline: "INORGANIC",
+        category: "3D animations"
+      }
+    ];
+  }, [animations, loading]);
+
+  // Filtering & Search
+  const filteredAnimations = useMemo(() => {
+    return effectiveAnimations.filter((item) => {
+      const titleLower = (item.title || "").toLowerCase();
+      const descLower = (item.description || "").toLowerCase();
+      const discLower = (item.discipline || "").toLowerCase();
+      const query = searchQuery.trim().toLowerCase();
+
+      // Search query check
+      if (query) {
+        const matchesQuery = 
+          titleLower.includes(query) || 
+          descLower.includes(query) || 
+          discLower.includes(query);
+        if (!matchesQuery) return false;
+      }
+
+      // Access Filter check (Strictly based on backend isPremium state)
+      if (accessFilter === "FREE" && item.isPremium) return false;
+      if (accessFilter === "PREMIUM" && !item.isPremium) return false;
+
+      // Category filter check
+      if (activeCategory === "PHYSICAL") {
+        return item.discipline === "PHYSICAL" || titleLower.includes("solid") || titleLower.includes("thermo");
+      }
+      if (activeCategory === "INORGANIC") {
+        return item.discipline === "INORGANIC" || titleLower.includes("bond") || titleLower.includes("block");
+      }
+      if (activeCategory === "SOLID_STATE") {
+        return titleLower.includes("solid") || titleLower.includes("lattice") || titleLower.includes("void");
+      }
+      if (activeCategory === "BONDING") {
+        return titleLower.includes("bond") || titleLower.includes("orbital") || titleLower.includes("hybrid");
+      }
+
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === "az") {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortBy === "newest") {
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      }
+      // "featured": prioritize solid state & chemical bonding
+      return (b.isPremium ? 1 : 0) - (a.isPremium ? 1 : 0);
+    });
+  }, [effectiveAnimations, searchQuery, activeCategory, accessFilter, sortBy]);
+
+  // Handle click on locked premium card
+  const handleLockedClick = (item: any) => {
+    setSelectedLockedItem(item);
+    setUpgradeModalOpen(true);
+  };
+
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setActiveCategory("ALL");
+    setAccessFilter("ALL");
+    setSortBy("featured");
+  };
+
+  return (
+    <div className="min-h-screen bg-[#02070c] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+      
+      {/* ========================================================= */}
+      {/* 1. TOP NAVIGATION BAR                                     */}
+      {/* ========================================================= */}
+      <header className="sticky top-0 z-40 w-full border-b border-cyan-500/15 bg-[#02070c]/85 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+          
+          {/* Brand Logo & Breadcrumb */}
+          <div className="flex items-center gap-3 sm:gap-6">
+            <PiechemLogo href="/dashboard" size="sm" isGoldMember={isGold} />
+
+            <div className="hidden md:flex items-center gap-2 text-xs font-mono">
+              <span className="text-slate-600">/</span>
+              <span className="px-2.5 py-1 rounded-md bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-bold tracking-wider uppercase text-[10px]">
+                3D EXPERIENCES
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Nav Links */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Back to</span> Dashboard
+            </Link>
+
+            <Link
+              href="/dashboard#materials"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition"
+            >
+              <Layers className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Study Vault</span>
+            </Link>
+
+            {isGold ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300">
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span>GOLD MEMBER</span>
+              </span>
+            ) : (
+              <Link
+                href="/dashboard/account"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/40 text-amber-300 hover:border-amber-400 transition"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>UPGRADE</span>
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* ========================================================= */}
+      {/* 2. HERO SECTION WITH MOLECULAR ORBITAL CANVAS             */}
+      {/* ========================================================= */}
+      <section className="relative w-full pt-10 sm:pt-16 pb-14 sm:pb-20 overflow-hidden border-b border-cyan-500/15 bg-gradient-to-b from-[#040e1a] via-[#02070e] to-[#02070c]">
+        
+        {/* Background 2D Native Canvas */}
+        <MolecularOrbitalCanvas className="absolute inset-0 pointer-events-none" density="normal" />
+
+        {/* Ambient Radial Lights */}
+        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-cyan-500/10 blur-[120px] rounded-full" />
+        <div className="pointer-events-none absolute top-1/2 right-10 w-[400px] h-[250px] bg-indigo-500/10 blur-[100px] rounded-full" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-6">
+          
+          {/* Scientific Eyebrow Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-400/35 text-cyan-300 text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(0,217,255,0.15)]">
+            <Atom className="w-4 h-4 text-cyan-400 animate-spin-slow" />
+            <span>PIECHEM VIRTUAL MOLECULAR LAB</span>
+          </div>
+
+          {/* Flagship Headline */}
+          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+              Interactive Chemistry, <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00F2FE] via-[#38BDF8] to-[#818CF8] drop-shadow-[0_4px_24px_rgba(0,242,254,0.3)]">
+                in Three Dimensions
+              </span>
+            </h1>
+          </div>
+
+          {/* Supporting Copy */}
+          <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-300/90 font-light leading-relaxed">
+            Explore real-time 3D simulations of solid state crystal lattices, atomic voids, and spatial chemical bonding directly in your browser. Visualise complex VSEPR geometries, hybridisation orbitals, and unit cell structures with interactive rotation and slicing.
+          </p>
+
+          {/* High-Level Feature Badges */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-mono">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>WebGL 2.0 Spatial Engine</span>
+            </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>NCERT • JEE • NEET Aligned</span>
+            </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Full Interactive Controls</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ========================================================= */}
+      {/* 3. MAIN CATALOG SHELF & DISCOVERY SECTION                 */}
+      {/* ========================================================= */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+        
+        {/* Section Title & Metrics */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800/80 pb-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Compass className="w-4 h-4 text-cyan-400" />
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-cyan-400">
+                CURATED SIMULATION SHELF
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              Virtual Laboratory Catalog
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400">
+              Select any virtual lab below to inspect interactive lattice models, electron clouds, and atomic geometry.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="px-3 py-1 rounded-lg bg-[#061524] border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold">
+              {filteredAnimations.length} {filteredAnimations.length === 1 ? "Experience" : "Experiences"} Available
+            </span>
+          </div>
+        </div>
+
+        {/* Discovery & Filter Bar */}
+        <div className="bg-[#050e18]/90 border border-white/[0.08] rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg backdrop-blur-md">
+          
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            
+            {/* Realtime Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search simulations (e.g. Solid State, Hybridization, Voids, Carbon)..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 focus:border-cyan-400 text-white placeholder-slate-500 text-xs sm:text-sm transition focus:outline-none focus:ring-1 focus:ring-cyan-400"
+              />
+            </div>
+
+            {/* Access Tier Toggle Chips */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-slate-800/90 shrink-0">
+              <button
+                type="button"
+                onClick={() => setAccessFilter("ALL")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                  accessFilter === "ALL" 
+                    ? "bg-slate-800 text-white shadow-sm" 
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                All Access
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccessFilter("FREE")}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                  accessFilter === "FREE" 
+                    ? "bg-emerald-950/80 border border-emerald-400/40 text-emerald-300 shadow-sm" 
+                    : "text-slate-400 hover:text-emerald-300"
+                }`}
+              >
+                <span>✓ FREE</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccessFilter("PREMIUM")}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                  accessFilter === "PREMIUM" 
+                    ? "bg-amber-950/80 border border-amber-400/50 text-amber-300 shadow-sm" 
+                    : "text-slate-400 hover:text-amber-300"
+                }`}
+              >
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>✦ PREMIUM</span>
+              </button>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-mono text-slate-400 hidden sm:inline">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e: any) => setSortBy(e.target.value)}
+                className="py-2.5 px-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono font-semibold text-slate-300 focus:outline-none focus:border-cyan-400 cursor-pointer"
+              >
+                <option value="featured">Featured First</option>
+                <option value="az">Title (A – Z)</option>
+                <option value="newest">Recently Added</option>
+              </select>
+            </div>
+
+          </div>
+
+          {/* Category Filter Chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            {[
+              { id: "ALL", label: "All Experiences" },
+              { id: "PHYSICAL", label: "Physical Chemistry" },
+              { id: "INORGANIC", label: "Inorganic Chemistry" },
+              { id: "SOLID_STATE", label: "Solid State Lattices" },
+              { id: "BONDING", label: "Chemical Bonding & VSEPR" }
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition border ${
+                  activeCategory === cat.id
+                    ? "bg-cyan-950 border-cyan-400/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(0,217,255,0.15)]"
+                    : "bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+        </div>
+
+        {/* ========================================================= */}
+        {/* 4. ANIMATION CATALOG GRID                                 */}
+        {/* ========================================================= */}
+        {loading ? (
+          /* Skeletons matching exact card structure */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                className="rounded-2xl border border-slate-800/80 bg-[#060e1a]/60 overflow-hidden flex flex-col justify-between animate-pulse"
+              >
+                <div className="w-full h-48 bg-slate-900/80 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-slate-800/60" />
+                </div>
+                <div className="p-5 space-y-3">
+                  <div className="h-3 w-20 bg-slate-800 rounded" />
+                  <div className="h-5 w-4/5 bg-slate-800 rounded" />
+                  <div className="h-3 w-full bg-slate-800/60 rounded" />
+                  <div className="h-3 w-2/3 bg-slate-800/60 rounded" />
+                  <div className="pt-3 border-t border-slate-800/60 flex gap-2">
+                    <div className="h-9 w-full bg-slate-800/80 rounded-xl" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredAnimations.length > 0 ? (
+          /* Main 3-Column Responsive Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAnimations.map((sim, idx) => (
+              <AnimationCatalogCard
+                key={sim.id}
+                item={sim}
+                isGoldMember={isGold}
+                onLockedClick={handleLockedClick}
+                featured={idx === 0}
+              />
+            ))}
+          </div>
+        ) : (
+          /* Scientific Empty State */
+          <div className="rounded-3xl border border-cyan-500/20 bg-gradient-to-b from-[#05101c] to-[#02070e] p-10 sm:p-14 text-center space-y-4 max-w-xl mx-auto shadow-2xl">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(0,217,255,0.2)]">
+              <Atom className="w-8 h-8 animate-pulse" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-xl font-bold text-white">
+                No 3D Experiences Found
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+                No virtual simulation matched your search query or filter selection. Try adjusting your search term or exploring all categories.
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-950 hover:bg-cyan-900 border border-cyan-400/40 text-cyan-300 font-bold text-xs transition cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset Filters & Show All</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* ========================================================= */}
+      {/* 5. PREMIUM UPGRADE MODAL                                  */}
+      {/* ========================================================= */}
+      <PremiumUpgradeModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+        animationTitle={selectedLockedItem?.title?.replace(/\(.*?\)/g, "").trim()}
+      />
+
+    </div>
+  );
+}
+
+export default function ThreeDAnimationsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#02070c] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
+      </div>
+    }>
+      <ThreeDAnimationsContent />
+    </Suspense>
+  );
+}

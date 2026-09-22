@@ -30,7 +30,6 @@ export default function StudentDashboard() {
   const [updatingCurriculum, setUpdatingCurriculum] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "tests" | "materials" | "leaderboard" | "performance">("overview");
   const [mobileCurriculumOpen, setMobileCurriculumOpen] = useState(false);
-  const [isExploreShelfOpen, setIsExploreShelfOpen] = useState(false);
 
   // 3D WebGL animations & interactive simulation models
   const threeDMaterials = useMemo(() => {
@@ -805,50 +804,40 @@ export default function StudentDashboard() {
             {/* Divider Line (Image 2 structure) */}
             <div className="w-full border-t border-slate-800/80 my-4 sm:my-5" />
 
-            {/* Actions Row: Explore Shelf + Direct Lab Launch Buttons */}
+            {/* Actions Row: Explore Shelf + Gateway Navigation CTA Buttons */}
             <div className="dashboard-hero-actions flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
               
-              {/* Primary Action Button (Explore Shelf with ChevronRight) */}
-              <button
-                type="button"
-                onClick={() => setIsExploreShelfOpen(true)}
+              {/* Primary Action Link (Explore Shelf navigating to /3d-animations) */}
+              <Link
+                href="/3d-animations"
                 className="group/shelf inline-flex items-center justify-between sm:justify-start gap-2 text-xs sm:text-sm font-bold text-sky-300 hover:text-white transition-colors cursor-pointer py-1"
               >
                 <span className="group-hover/shelf:underline underline-offset-4">Explore Shelf</span>
                 <ChevronRight className="w-4 h-4 transition-transform group-hover/shelf:translate-x-1" />
-              </button>
+              </Link>
 
-              {/* Direct Quick-Launch CTA Buttons */}
+              {/* Gateway Navigation CTA Buttons */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                {threeDMaterials.length > 0 ? (
-                  threeDMaterials.map((lab: any) => (
-                    <Link
-                      key={lab.id}
-                      href={`/dashboard/lab-viewer/${lab.id}`}
-                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-sm transition duration-200 shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 whitespace-nowrap"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current text-black shrink-0" />
-                      <span>{lab.title.replace(/\(.*?\)/g, "").trim() || "Launch 3D Lab"}</span>
-                    </Link>
-                  ))
-                ) : (
-                  <>
-                    <Link
-                      href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
-                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-sm transition duration-200 shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 whitespace-nowrap"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current text-black shrink-0" />
-                      <span>Solid State 3D</span>
-                    </Link>
-                    <Link
-                      href="/dashboard/lab-viewer/5f10cd48-de6c-4dfc-8d0c-56b157708208"
-                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-sky-950/60 hover:bg-sky-900/80 border border-sky-500/30 text-sky-300 hover:text-white font-bold text-xs sm:text-sm backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
-                    >
-                      <Atom className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                      <span>Chemical Bonding 3D</span>
-                    </Link>
-                  </>
-                )}
+                <Link
+                  href="/3d-animations?topic=solid-state"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-xs sm:text-sm transition duration-200 shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 whitespace-nowrap"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current text-black shrink-0" />
+                  <span>SOLID STATE CHEMISTRY</span>
+                </Link>
+                <Link
+                  href="/3d-animations?topic=bonding"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-sky-950/70 hover:bg-sky-900/90 border border-sky-500/40 text-sky-300 hover:text-white font-bold text-xs sm:text-sm backdrop-blur-md transition duration-200 active:scale-95 whitespace-nowrap"
+                >
+                  <Atom className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                  <span>CHEMICAL BONDING</span>
+                </Link>
+                <Link
+                  href="/3d-animations"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition duration-200 shadow-[0_0_15px_rgba(56,189,248,0.3)] active:scale-95 whitespace-nowrap"
+                >
+                  <span>Explore All Animations →</span>
+                </Link>
               </div>
 
             </div>
@@ -1206,96 +1195,6 @@ export default function StudentDashboard() {
           targetTopic={adaptiveDrillTopic}
         />
       
-      {/* ============================================================ */}
-      {/* 3D ANIMATIONS SHELF MODAL                                     */}
-      {/* ============================================================ */}
-      {isExploreShelfOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#091522] border border-sky-500/40 rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-7 shadow-2xl shadow-sky-950/80 space-y-5 relative animate-in fade-in zoom-in-95 duration-200">
-            <button
-              type="button"
-              onClick={() => setIsExploreShelfOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded text-[11px] font-black uppercase bg-sky-950 text-sky-300 border border-sky-500/40">
-                  3D ANIMATIONS SHELF
-                </span>
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950/70 text-emerald-300 border border-emerald-500/30">
-                  {threeDMaterials.length || 2} Interactive Simulations
-                </span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white leading-snug font-serif">
-                WebGL Molecular Simulations &amp; Visualizers
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed">
-                Fully interactive 3D chemistry environments. Rotate crystal structures, inspect lattice parameters, examine voids, and visualize orbital geometries in real time.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              {(threeDMaterials.length > 0 ? threeDMaterials : [
-                {
-                  id: "fff042ca-a686-4e84-a35b-271fac192ad9",
-                  title: "SOLID STATE CHEMISTRY",
-                  description: "Explore FCC, BCC, and HCP unit cells, coordination numbers, packing efficiency, and octahedral/tetrahedral voids in real-time WebGL 3D.",
-                  discipline: "PHYSICAL"
-                },
-                {
-                  id: "5f10cd48-de6c-4dfc-8d0c-56b157708208",
-                  title: "CHEMICAL BONDING & MOLECULAR GEOMETRY",
-                  description: "Visualize VSEPR geometries, bond angles, hybridization orbitals (sp, sp², sp³), and sigma/pi electron densities interactively.",
-                  discipline: "INORGANIC"
-                }
-              ]).map((sim: any) => (
-                <div
-                  key={sim.id}
-                  className="bg-[#050f1a] border border-sky-500/25 hover:border-sky-400/50 rounded-2xl p-4 flex flex-col justify-between gap-3 group transition"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="p-2 rounded-xl bg-sky-950/70 border border-sky-500/30 text-sky-400">
-                        <Atom className="w-4 h-4" />
-                      </div>
-                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-sky-950/60 text-sky-300 border border-sky-500/30">
-                        WebGL 3D
-                      </span>
-                    </div>
-                    <h4 className="text-sm font-bold text-white group-hover:text-sky-300 transition">
-                      {sim.title.replace(/\(.*?\)/g, "").trim()}
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
-                      {sim.description || "Interactive WebGL molecular structures & reaction mechanics."}
-                    </p>
-                  </div>
-
-                  <Link
-                    href={`/dashboard/lab-viewer/${sim.id}`}
-                    className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-[0_0_12px_rgba(56,189,248,0.25)]"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>Launch Simulation</span>
-                  </Link>
-                </div>
-              ))}
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsExploreShelfOpen(false)}
-                className="py-2 px-5 rounded-xl text-xs font-mono text-slate-300 bg-slate-800 hover:bg-slate-700 transition cursor-pointer"
-              >
-                Close Shelf
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 </main>
     </div>
   );
