@@ -778,18 +778,10 @@ export default function StudentDashboard() {
         <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between min-h-0 sm:min-h-[300px]">
           
           <div className="space-y-4 max-w-3xl">
-            {/* Top Row: Icon and Status Pill */}
-            <div className="flex items-start justify-between gap-3">
+            {/* Top Row: Icon */}
+            <div className="flex items-start">
               <div className="p-3 sm:p-3.5 rounded-2xl border border-sky-500/30 bg-black text-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.2)] flex items-center justify-center">
                 <Atom className="w-6 h-6 sm:w-7 sm:h-7 text-sky-400 animate-spin [animation-duration:15s]" />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="px-3.5 py-1 rounded-full text-xs font-black font-mono border bg-sky-500/10 text-sky-300 border-sky-500/30 flex items-center gap-2 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                  <span>{threeDMaterials.length || 2}</span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider font-sans">LIVE</span>
-                </span>
               </div>
             </div>
 
