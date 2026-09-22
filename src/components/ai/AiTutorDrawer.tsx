@@ -598,16 +598,17 @@ export default function AiTutorDrawer({
           </button>
 
           <div className="flex items-center gap-2.5">
-            <PiechemAiLogo size="sm" animated />
+            <div className="relative">
+              <div className="absolute inset-0 rounded-xl bg-red-600/20 blur-sm animate-pulse" />
+              <div className="relative p-1.5 rounded-xl bg-gradient-to-b from-[#1c070c] to-[#0d0305] border border-red-500/40 shadow-md shadow-red-950/60 flex items-center justify-center">
+                <PiechemAiLogo size="xs" animated />
+              </div>
+            </div>
             <div className="flex items-baseline gap-1.5">
               <span className="font-serif font-bold tracking-wide text-white text-base md:text-lg">PIECHEM</span>
               <span className="font-bold text-red-500 text-sm tracking-widest">AI</span>
             </div>
           </div>
-
-          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-red-950/50 text-red-300 border border-red-800/40">
-            STEM TUTOR
-          </span>
 
           {/* Daily Usage Indicator */}
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#120406] border border-red-900/40 text-[11px] font-medium text-slate-300 shadow-sm">
@@ -907,10 +908,6 @@ export default function AiTutorDrawer({
                   <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">
                     PIECHEM <span className="text-red-500">AI</span>
                   </h1>
-
-                  <p className="text-sm font-medium text-rose-300/80 mt-1 mb-2 tracking-wide uppercase">
-                    Your STEM Learning Assistant
-                  </p>
 
                   <p className="text-xs md:text-sm text-slate-400 max-w-lg leading-relaxed mb-8">
                     Ask questions, explore concepts, derive equations, and practice problems across Physics, Chemistry, Mathematics, and Biology.
