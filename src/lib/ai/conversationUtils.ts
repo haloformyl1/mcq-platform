@@ -34,7 +34,7 @@ export interface AiConversationMeta {
   messageCount?: number;
 }
 
-export type DateGroupKey = 'TODAY' | 'YESTERDAY' | 'PREVIOUS 7 DAYS' | 'PREVIOUS 30 DAYS' | 'OLDER';
+export type DateGroupKey = 'CONVERSATION HISTORY' | 'TODAY' | 'YESTERDAY' | 'PREVIOUS 7 DAYS' | 'PREVIOUS 30 DAYS' | 'OLDER';
 
 /**
  * Generates a clean, academic 2-7 word title from the first user prompt.
@@ -116,6 +116,7 @@ export function groupConversationsByDate(conversations: AiConversationMeta[]): {
   const startOf30Days = startOfToday - 30 * oneDayMs;
 
   const groups: Record<DateGroupKey, AiConversationMeta[]> = {
+    'CONVERSATION HISTORY': [],
     'TODAY': [],
     'YESTERDAY': [],
     'PREVIOUS 7 DAYS': [],
@@ -126,12 +127,12 @@ export function groupConversationsByDate(conversations: AiConversationMeta[]): {
   conversations.forEach(conv => {
     const time = new Date(conv.updatedAt).getTime();
     if (isNaN(time)) {
-      groups['TODAY'].push(conv);
+      groups['CONVERSATION HISTORY'].push(conv);
       return;
     }
 
     if (time >= startOfToday) {
-      groups['TODAY'].push(conv);
+      groups['CONVERSATION HISTORY'].push(conv);
     } else if (time >= startOfYesterday) {
       groups['YESTERDAY'].push(conv);
     } else if (time >= startOf7Days) {
@@ -143,7 +144,7 @@ export function groupConversationsByDate(conversations: AiConversationMeta[]): {
     }
   });
 
-  const orderedKeys: DateGroupKey[] = ['TODAY', 'YESTERDAY', 'PREVIOUS 7 DAYS', 'PREVIOUS 30 DAYS', 'OLDER'];
+  const orderedKeys: DateGroupKey[] = ['CONVERSATION HISTORY', 'YESTERDAY', 'PREVIOUS 7 DAYS', 'PREVIOUS 30 DAYS', 'OLDER'];
 
   // Return groups that have items, but if completely empty, return TODAY with empty array
   const activeGroups = orderedKeys
@@ -154,7 +155,7 @@ export function groupConversationsByDate(conversations: AiConversationMeta[]): {
     }));
 
   if (activeGroups.length === 0) {
-    return [{ group: 'TODAY', items: [] }];
+    return [{ group: 'CONVERSATION HISTORY', items: [] }];
   }
 
   return activeGroups;

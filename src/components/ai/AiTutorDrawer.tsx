@@ -779,7 +779,7 @@ export default function AiTutorDrawer({
                 dateGroups.map(({ group, items }) => (
                   <div key={group} className="space-y-1">
                     <div className="flex items-center justify-between text-[10px] font-bold tracking-wider text-slate-500 px-1 uppercase">
-                      <span>{group}</span>
+                      <span>{group === 'TODAY' ? 'CONVERSATION HISTORY' : group}</span>
                       <ChevronRight className="w-3 h-3 text-slate-700" />
                     </div>
 
