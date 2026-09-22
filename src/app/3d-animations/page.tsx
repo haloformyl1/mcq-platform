@@ -7,7 +7,7 @@ import {
   Search, SlidersHorizontal, Sparkles, Atom, Play, ArrowLeft, 
   CheckCircle2, Layers, Compass, Crown, RotateCcw, Filter, ArrowRight
 } from "lucide-react";
-import PiechemLogo from "@/components/PiechemLogo";
+import GlobalHeader from "@/components/GlobalHeader";
 import MolecularOrbitalCanvas from "@/components/3d/MolecularOrbitalCanvas";
 import AnimationCatalogCard from "@/components/3d/AnimationCatalogCard";
 import PremiumUpgradeModal from "@/components/3d/PremiumUpgradeModal";
@@ -155,17 +155,17 @@ function ThreeDAnimationsContent() {
       if (accessFilter === "PREMIUM" && !item.isPremium) return false;
 
       // Category filter check
+      if (activeCategory === "BONDING") {
+        return titleLower.includes("bond") || titleLower.includes("orbital") || titleLower.includes("hybrid");
+      }
+      if (activeCategory === "SOLID_STATE") {
+        return titleLower.includes("solid") || titleLower.includes("lattice") || titleLower.includes("void");
+      }
       if (activeCategory === "PHYSICAL") {
         return item.discipline === "PHYSICAL" || titleLower.includes("solid") || titleLower.includes("thermo");
       }
       if (activeCategory === "INORGANIC") {
         return item.discipline === "INORGANIC" || titleLower.includes("bond") || titleLower.includes("block");
-      }
-      if (activeCategory === "SOLID_STATE") {
-        return titleLower.includes("solid") || titleLower.includes("lattice") || titleLower.includes("void");
-      }
-      if (activeCategory === "BONDING") {
-        return titleLower.includes("bond") || titleLower.includes("orbital") || titleLower.includes("hybrid");
       }
 
       return true;
@@ -199,25 +199,21 @@ function ThreeDAnimationsContent() {
     <div className="min-h-screen bg-[#02070c] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       
       {/* ========================================================= */}
-      {/* 1. TOP NAVIGATION BAR                                     */}
+      {/* 1. GLOBAL UNIFIED HEADER (PERMANENTLY ANCHORED LEFT LOGO) */}
       {/* ========================================================= */}
-      <header className="sticky top-0 z-40 w-full border-b border-cyan-500/15 bg-[#02070c]/85 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
-          
-          {/* Brand Logo & Breadcrumb */}
-          <div className="flex items-center gap-3 sm:gap-6">
-            <PiechemLogo href="/dashboard" size="sm" isGoldMember={isGold} />
-
-            <div className="hidden md:flex items-center gap-2 text-xs font-mono">
-              <span className="text-slate-600">/</span>
-              <span className="px-2.5 py-1 rounded-md bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 font-bold tracking-wider uppercase text-[10px]">
-                3D EXPERIENCES
-              </span>
-            </div>
+      <GlobalHeader
+        isGoldMember={isGold}
+        logoHref="/dashboard"
+        contextBadge={
+          <div className="hidden sm:flex items-center gap-2 text-xs font-mono">
+            <span className="text-slate-600">/</span>
+            <span className="px-2.5 py-1 rounded-md bg-cyan-950/70 border border-cyan-500/35 text-cyan-300 font-bold tracking-wider uppercase text-[10px]">
+              3D EXPERIENCES
+            </span>
           </div>
-
-          {/* Quick Nav Links */}
-          <div className="flex items-center gap-3 sm:gap-4">
+        }
+        actions={
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition"
@@ -237,7 +233,7 @@ function ThreeDAnimationsContent() {
             {isGold ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300">
                 <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span>GOLD MEMBER</span>
+                <span className="hidden xs:inline">GOLD</span>
               </span>
             ) : (
               <Link
@@ -249,8 +245,8 @@ function ThreeDAnimationsContent() {
               </Link>
             )}
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* ========================================================= */}
       {/* 2. HERO SECTION WITH MOLECULAR ORBITAL CANVAS             */}
@@ -406,20 +402,20 @@ function ThreeDAnimationsContent() {
 
           </div>
 
-          {/* Category Filter Chips */}
+          {/* Category Filter Chips: Featuring Chemical Bonding & Solid State naturally in the catalog */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
             {[
               { id: "ALL", label: "All Experiences" },
-              { id: "PHYSICAL", label: "Physical Chemistry" },
-              { id: "INORGANIC", label: "Inorganic Chemistry" },
+              { id: "BONDING", label: "Chemical Bonding & VSEPR" },
               { id: "SOLID_STATE", label: "Solid State Lattices" },
-              { id: "BONDING", label: "Chemical Bonding & VSEPR" }
+              { id: "PHYSICAL", label: "Physical Chemistry" },
+              { id: "INORGANIC", label: "Inorganic Chemistry" }
             ].map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition border ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition border ${
                   activeCategory === cat.id
                     ? "bg-cyan-950 border-cyan-400/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(0,217,255,0.15)]"
                     : "bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
@@ -465,7 +461,7 @@ function ThreeDAnimationsContent() {
               <AnimationCatalogCard
                 key={sim.id}
                 item={sim}
-                isGoldMember={isGold}
+                isGold={isGold}
                 onLockedClick={handleLockedClick}
                 featured={idx === 0}
               />

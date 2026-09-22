@@ -76,10 +76,11 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-[#02060c] text-slate-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-200">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-[#040a12]/90 backdrop-blur-md border-b border-white/[0.08] px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      <header className="dashboard-header sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+        <div className="site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="flex items-center gap-2 group">
-            <PiechemLogo />
+            <PiechemLogo size="md" href="/dashboard" />
           </Link>
           <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-white/10 text-[11px] font-mono text-cyan-400">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
@@ -89,7 +90,7 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
 
         <div className="flex items-center gap-2.5">
           <Link
-            href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+            href="/3d-animations"
             className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 hover:text-white hover:bg-emerald-900/60 text-xs font-mono transition-all"
           >
             <Atom className="w-3.5 h-3.5 text-emerald-400" />
@@ -103,6 +104,7 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
             <LayoutDashboard className="w-3.5 h-3.5" />
             <span>Dashboard</span>
           </Link>
+        </div>
         </div>
       </header>
 
