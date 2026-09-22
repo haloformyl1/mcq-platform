@@ -9,23 +9,23 @@ export default function GlobalBackground() {
       aria-hidden="true" 
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-black select-none"
     >
-      {/* 1. Subtle Native Molecular Orbital Canvas Animation */}
+      {/* 1. Subtle Native Molecular Orbital Canvas Animation spanning full screen */}
       <MolecularOrbitalCanvas 
-        className="absolute inset-0 pointer-events-none opacity-45" 
+        className="absolute inset-0 pointer-events-none opacity-50" 
         density="subtle" 
       />
 
-      {/* 2. Ambient Lighting & Chemistry Radial Glow with OLED Black Falloff */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_75%_25%,rgba(0,195,255,0.12),transparent_70%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_15%_75%,rgba(0,195,255,0.05),transparent_65%)]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+      {/* 2. Superb Chemistry Ambient Lighting & Radial Glow with OLED Black Falloff */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_75%_35%,rgba(0,195,255,0.15),transparent_75%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_15%_75%,rgba(0,195,255,0.08),transparent_65%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(99,102,241,0.06),transparent_70%)]" />
 
       {/* 3. Faint Orbital Curves & Scientific Geometry */}
-      <div className="absolute -right-16 -top-16 w-[480px] sm:w-[680px] h-[480px] sm:h-[680px] border border-cyan-500/12 rounded-full blur-[0.5px]" />
-      <div className="absolute -right-32 -top-32 w-[680px] sm:w-[920px] h-[680px] sm:h-[920px] border border-cyan-500/6 rounded-full" />
-      <div className="absolute right-24 top-24 w-[320px] sm:w-[480px] h-[320px] sm:h-[480px] border border-indigo-500/8 rounded-full" />
+      <div className="absolute -right-12 top-24 w-72 sm:w-[480px] h-72 sm:h-[480px] border border-cyan-500/14 rounded-full blur-[0.5px]" />
+      <div className="absolute -right-24 top-12 w-96 sm:w-[640px] h-96 sm:h-[640px] border border-cyan-500/8 rounded-full" />
+      <div className="absolute right-28 top-44 w-48 sm:w-80 h-48 sm:h-80 border border-indigo-500/10 rounded-full" />
       
-      {/* Bottom subtle orbital curve for depth */}
+      {/* Bottom subtle orbital curve for depth across the page */}
       <div className="absolute -left-20 bottom-24 w-[420px] sm:w-[580px] h-[420px] sm:h-[580px] border border-cyan-500/6 rounded-full" />
     </div>
   );

@@ -761,19 +761,7 @@ export default function StudentDashboard() {
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* Full Free Space Utilization - No Enclosing Box           */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-black py-8 sm:py-14 transition-all duration-300 group">
-        
-        {/* Subtle Native Molecular Orbital Background Animation spanning full free space */}
-        <MolecularOrbitalCanvas className="absolute inset-0 pointer-events-none opacity-50 group-hover:opacity-75 transition-opacity duration-700" density="subtle" />
-
-        {/* Ambient Lighting & Abstract Chemistry Backdrop with OLED Black Falloff */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_75%_35%,rgba(0,195,255,0.14),transparent_75%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-        
-        {/* Faint Orbital Curves & Scientific Geometry */}
-        <div className="absolute -right-12 -bottom-12 w-72 sm:w-[460px] h-72 sm:h-[460px] border border-cyan-500/15 rounded-full pointer-events-none blur-[0.5px]" />
-        <div className="absolute -right-24 -bottom-24 w-96 sm:w-[620px] h-96 sm:h-[620px] border border-cyan-500/8 rounded-full pointer-events-none" />
-        <div className="absolute right-28 bottom-14 w-48 sm:w-80 h-48 sm:h-80 border border-indigo-500/10 rounded-full pointer-events-none" />
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-8 sm:py-14 transition-all duration-300 group">
 
         {/* Content Container - Utilizing Full Available Space */}
         <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between min-h-0 sm:min-h-[300px]">

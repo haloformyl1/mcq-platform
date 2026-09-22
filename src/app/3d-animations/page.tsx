@@ -283,10 +283,7 @@ function ThreeDAnimationsContent() {
       {/* ========================================================= */}
       {/* 2. HERO SECTION WITH MOLECULAR ORBITAL CANVAS             */}
       {/* ========================================================= */}
-      <section className="relative w-full pt-10 sm:pt-16 pb-14 sm:pb-20 overflow-hidden bg-gradient-to-b from-[#040e1a] via-[#02070e] to-[#02070c]">
-        
-        {/* Background 2D Native Canvas */}
-        <MolecularOrbitalCanvas className="absolute inset-0 pointer-events-none" density="normal" />
+      <section className="relative w-full pt-10 sm:pt-16 pb-14 sm:pb-20 overflow-hidden bg-transparent">
 
         {/* Ambient Radial Lights */}
         <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-cyan-500/10 blur-[120px] rounded-full" />
