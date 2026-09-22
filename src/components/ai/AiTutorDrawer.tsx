@@ -5,7 +5,7 @@ import FormattedAiMessage from "./FormattedAiMessage";
 import PiechemAiLogo from "./PiechemAiLogo";
 import { 
   X, Send, User, ArrowRight, 
-  Atom, CheckCircle2, BookOpen, 
+  Atom, CheckCircle2, BookOpen, Dna, 
   Languages, GraduationCap, Copy, Check, 
   Lightbulb, Globe, Activity, Volume2, VolumeX,
   ThumbsUp, ThumbsDown, RotateCcw,
@@ -14,6 +14,8 @@ import {
 
 interface Message {
   id: string;
+  isOutOfScope?: boolean;
+  detectedSubject?: string;
   role: 'user' | 'assistant';
   content: string;
   groundedInPiechem?: boolean;
@@ -46,31 +48,39 @@ interface AiTutorDrawerProps {
 const PROMPT_STARTERS = [
   {
     icon: Atom,
-    color: "from-red-600/20 to-rose-950/20 border-red-500/30 text-rose-300",
+    color: "from-red-950/40 via-red-950/20 to-black/60 border-red-500/30 text-rose-300 hover:border-red-500/60",
+    badgeColor: "bg-red-950/80 text-rose-300 border-red-500/40",
     subject: "Chemistry",
     title: "Chirality & Stereochemistry",
+    description: "Explore stereochemistry with 3D intuition.",
     prompt: "Explain chirality, asymmetric carbon, and enantiomers with 3D intuition and exam examples."
   },
   {
     icon: Compass,
-    color: "from-rose-600/20 to-purple-950/20 border-rose-500/30 text-rose-300",
+    color: "from-sky-950/40 via-sky-950/20 to-black/60 border-sky-500/30 text-sky-300 hover:border-sky-500/60",
+    badgeColor: "bg-sky-950/80 text-sky-300 border-sky-500/40",
     subject: "Physics",
     title: "Electromagnetic Induction",
+    description: "Understand Faraday's law step by step.",
     prompt: "Explain Faraday's Law & Lenz's Law with step-by-step physical intuition."
   },
   {
     icon: Calculator,
-    color: "from-emerald-600/20 to-teal-950/20 border-emerald-500/30 text-emerald-300",
+    color: "from-teal-950/40 via-teal-950/20 to-black/60 border-teal-500/30 text-teal-300 hover:border-teal-500/60",
+    badgeColor: "bg-teal-950/80 text-teal-300 border-teal-500/40",
     subject: "Mathematics",
     title: "Integration by Parts",
+    description: "Build the derivation from first principles.",
     prompt: "Derive the Integration by Parts formula with a clear step-by-step worked example."
   },
   {
-    icon: CheckCircle2,
-    color: "from-amber-600/20 to-orange-950/20 border-amber-500/30 text-amber-300",
-    subject: "Exam Practice",
-    title: "Adaptive 3-MCQ Drill",
-    prompt: "Quiz me on my syllabus with 3 challenging practice MCQs with options A-D."
+    icon: Dna,
+    color: "from-emerald-950/40 via-emerald-950/20 to-black/60 border-emerald-500/30 text-emerald-300 hover:border-emerald-500/60",
+    badgeColor: "bg-emerald-950/80 text-emerald-300 border-emerald-500/40",
+    subject: "Biology",
+    title: "Genetics & Inheritance",
+    description: "Explore Mendelian inheritance and DNA replication.",
+    prompt: "Explain Mendelian inheritance, monohybrid cross, and the mechanism of DNA replication with key takeaways."
   }
 ];
 
@@ -82,6 +92,60 @@ export default function AiTutorDrawer({
   initialStudentName
 }: AiTutorDrawerProps) {
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
+  const [selectedSubject, setSelectedSubject] = useState<'All' | 'Chemistry' | 'Physics' | 'Mathematics' | 'Biology'>('All');
+
+  const SUBJECT_QUICK_PROMPTS: Record<string, string[]> = {
+    All: [
+      "Explain SN1 vs SN2 reaction mechanism",
+      "Solve this projectile motion problem",
+      "Derive integration by parts formula",
+      "Explain DNA replication step by step"
+    ],
+    Chemistry: [
+      "Explain SN1 vs SN2 reaction mechanism",
+      "Calculate pH of an acidic buffer solution",
+      "What is hybridization in SF₆ molecule?",
+      "Explain Le Chatelier's principle with examples"
+    ],
+    Physics: [
+      "Explain Newton's second law and derive F = ma",
+      "Derive the thin lens formula 1/f = 1/v - 1/u",
+      "Explain electromagnetic induction and Lenz's Law",
+      "Calculate current and power in a bridge circuit"
+    ],
+    Mathematics: [
+      "Derive the integration by parts formula",
+      "Solve quadratic equation 2x² - 5x + 3 = 0",
+      "Prove trigonometric identity sin²θ + cos²θ = 1",
+      "Find derivative of f(x) = x·ln(x)"
+    ],
+    Biology: [
+      "Explain DNA replication step by step",
+      "Compare mitosis and meiosis with a table",
+      "Explain photosynthesis light and dark reactions",
+      "Explain Mendelian inheritance and monohybrid cross"
+    ]
+  };
+
+  const getPlaceholder = () => {
+    if (language === 'bn') {
+      switch (selectedSubject) {
+        case 'Chemistry': return "রসায়নের বিক্রিয়া, কৌশল, সাম্যাবস্থা বা জৈব রসায়ন সম্পর্কিত প্রশ্ন জিজ্ঞাসা করুন...";
+        case 'Physics': return "পদার্থবিদ্যার গতিসূত্র, বলবিদ্যা, তড়িৎ বা আলো সম্পর্কিত প্রশ্ন জিজ্ঞাসা করুন...";
+        case 'Mathematics': return "গণিতের সমাকলন, বীজগণিত, ত্রিকোণমিতি বা জ্যামিতি সম্পর্কিত প্রশ্ন জিজ্ঞাসা করুন...";
+        case 'Biology': return "জীববিদ্যার জিনতত্ত্ব, কোষ, মানব শারীরস্থান বা বাস্তুতন্ত্র সম্পর্কিত প্রশ্ন জিজ্ঞাসা করুন...";
+        default: return "পদার্থবিদ্যা, রসায়ন, গণিত বা জীববিদ্যা সম্পর্কিত যেকোনো প্রশ্ন জিজ্ঞাসা করুন...";
+      }
+    }
+    switch (selectedSubject) {
+      case 'Chemistry': return "Ask about reactions, mechanisms, equilibrium, organic chemistry...";
+      case 'Physics': return "Ask about mechanics, electricity, optics, thermodynamics...";
+      case 'Mathematics': return "Ask about algebra, calculus, geometry, trigonometry...";
+      case 'Biology': return "Ask about genetics, cells, human physiology, ecology...";
+      default: return "Ask a question in Physics, Chemistry, Mathematics, or Biology...";
+    }
+  };
+
   const [language, setLanguage] = useState<'en' | 'bn'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('piechem_ai_lang') as 'en' | 'bn') || 'en';
@@ -266,7 +330,8 @@ export default function AiTutorDrawer({
           level,
           language,
           context: {
-            ...context
+            ...context,
+            subject: selectedSubject !== 'All' ? selectedSubject : context.subject
           },
           history
         })
@@ -309,6 +374,8 @@ export default function AiTutorDrawer({
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.reply || data.answer,
+        isOutOfScope: Boolean(data.isOutOfScope),
+        detectedSubject: data.detectedSubject,
         groundedInPiechem: data.groundedInPiechem,
         sourceCategory: data.sourceCategory || (data.groundedInPiechem ? 'PIECHEM_MATERIAL' : 'GENERAL_ACADEMIC'),
         citations: data.sources || [],
@@ -538,39 +605,52 @@ export default function AiTutorDrawer({
                 <PiechemAiLogo size="md" animated />
               </div>
 
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/60 border border-red-500/30 text-[11px] font-bold text-rose-300 tracking-wider uppercase mb-2 shadow-sm">
+                <span>✦</span>
+                <span>PIECHEM AI</span>
+                <span className="text-red-500">•</span>
+                <span>STEM TUTOR</span>
+              </div>
+
               <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 {language === 'bn' 
-                  ? `নমস্কার, ${studentName && studentName !== 'Scholar' ? studentName : 'শিক্ষার্থী'}` 
-                  : `Hello, ${studentName || 'Scholar'}`}
+                  ? "আপনার ব্যক্তিগত STEM টিউটর" 
+                  : "Your personal STEM tutor."}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto mt-1.5 sm:mt-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto mt-1.5 sm:mt-2 leading-relaxed">
                 {language === 'bn'
-                  ? "আজ কোন বিষয়টি আয়ত্ত করবেন? রসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো একাডেমিক প্রশ্ন, প্রতিপাদন বা সংশয় জিজ্ঞাসা করুন।"
-                  : "What concept shall we master today? Ask any academic question, derivation, or doubt in Chemistry, Physics, and Math."}
+                  ? "পদার্থবিদ্যা, রসায়ন, গণিত ও জীববিদ্যার প্রশ্ন জিজ্ঞাসা করুন, সমস্যা সমাধান করুন এবং গভীর উপলব্ধি অর্জন করুন।"
+                  : "Ask questions, solve problems, understand concepts, and prepare for Physics, Chemistry, Mathematics and Biology."}
               </p>
 
-              {/* Quick Starter Cards */}
-              <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 max-w-2xl mx-auto">
+              {/* 4 Core STEM Domain Learning Experience Cards */}
+              <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 max-w-2xl mx-auto text-left">
                 {PROMPT_STARTERS.map((card, idx) => {
                   const Icon = card.icon;
                   return (
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => handleSendMessage(card.prompt)}
-                      className={`group relative p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br ${card.color} border hover:border-red-500/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
+                      onClick={() => {
+                        setSelectedSubject(card.subject as any);
+                        handleSendMessage(card.prompt);
+                      }}
+                      className={`group relative p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br ${card.color} border hover:scale-[1.01] transition-all duration-200 cursor-pointer shadow-sm text-left`}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md border ${(card as any).badgeColor || 'bg-red-950/60 text-rose-300 border-red-500/30'}`}>
                           {card.subject}
                         </span>
-                        <Icon className="h-4 w-4 opacity-80 group-hover:opacity-100 transition-opacity" />
+                        <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <Icon className="h-3.5 w-3.5" />
+                          <ArrowRight className="h-3 w-3 -translate-x-0.5 group-hover:translate-x-0.5 transition-transform" />
+                        </div>
                       </div>
-                      <h4 className="text-xs sm:text-sm font-semibold text-white group-hover:text-red-200 transition-colors">
+                      <h4 className="text-xs sm:text-sm font-semibold text-white group-hover:text-red-100 transition-colors">
                         {card.title}
                       </h4>
-                      <p className="text-[11px] text-slate-400 line-clamp-2 mt-0.5 sm:mt-1 leading-normal">
-                        {card.prompt}
+                      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1 leading-normal">
+                        {(card as any).description || card.prompt}
                       </p>
                     </button>
                   );
@@ -630,10 +710,55 @@ export default function AiTutorDrawer({
                     </div>
                   )}
 
-                  {/* Render Message Body */}
+                  {/* Render Message Body: Academic Panel or Dedicated Out-of-Scope Card */}
                   {isUser ? (
                     <div className="whitespace-pre-wrap break-words font-sans text-white text-[14px]">
                       {m.content}
+                    </div>
+                  ) : m.isOutOfScope ? (
+                    <div className="p-4 rounded-xl bg-gradient-to-b from-[#180508] to-[#0d0204] border border-red-500/30 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-400">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                        <span>PIECHEM Academic Scope</span>
+                      </div>
+                      <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                        {m.content}
+                      </p>
+                      <div className="pt-2 border-t border-red-950/60">
+                        <span className="text-[11px] text-slate-400 block mb-2 font-medium">
+                          Try asking an academic question from one of our four supported domains:
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedSubject('Chemistry'); handleSendMessage("Explain SN1 vs SN2 reaction mechanism"); }}
+                            className="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900/60 border border-red-500/30 text-rose-200 text-xs font-medium transition-all cursor-pointer"
+                          >
+                            ⚛ Chemistry
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedSubject('Physics'); handleSendMessage("Explain Newton's second law and derive F = ma"); }}
+                            className="px-2.5 py-1 rounded-lg bg-sky-950/60 hover:bg-sky-900/60 border border-sky-500/30 text-sky-200 text-xs font-medium transition-all cursor-pointer"
+                          >
+                            ◉ Physics
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedSubject('Mathematics'); handleSendMessage("Derive the integration by parts formula"); }}
+                            className="px-2.5 py-1 rounded-lg bg-teal-950/60 hover:bg-teal-900/60 border border-teal-500/30 text-teal-200 text-xs font-medium transition-all cursor-pointer"
+                          >
+                            ∑ Mathematics
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedSubject('Biology'); handleSendMessage("Explain DNA replication process step by step"); }}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/30 text-emerald-200 text-xs font-medium transition-all cursor-pointer"
+                          >
+                            🧬 Biology
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <FormattedAiMessage content={m.content} />
@@ -672,6 +797,30 @@ export default function AiTutorDrawer({
                       </span>
 
                       <div className="flex items-center gap-1">
+                        {/* Pedagogical Quick Refinements */}
+                        {!m.isOutOfScope && (
+                          <div className="hidden sm:flex items-center gap-1 mr-1">
+                            <button
+                              type="button"
+                              onClick={() => handleSendMessage("Please explain your previous answer in simpler, more foundational terms for a beginner.")}
+                              disabled={loading}
+                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/[0.04] hover:bg-white/[0.09] hover:text-white text-slate-400 border border-white/[0.06] transition-colors cursor-pointer disabled:opacity-40"
+                              title="Explain in simpler terms"
+                            >
+                              Explain simpler
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSendMessage("Please explain your previous answer with advanced mathematical depth, derivations, and mechanisms.")}
+                              disabled={loading}
+                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/[0.04] hover:bg-white/[0.09] hover:text-white text-slate-400 border border-white/[0.06] transition-colors cursor-pointer disabled:opacity-40"
+                              title="Explain with advanced depth"
+                            >
+                              Explain deeper
+                            </button>
+                          </div>
+                        )}
+
                         {/* Copy Button */}
                         <button
                           type="button"
@@ -807,23 +956,60 @@ export default function AiTutorDrawer({
       {/* Bottom Pinned Action Area - Always Anchored at the Bottom */}
       <footer className="relative z-30 shrink-0 border-t border-red-950/80 bg-[#090203]/95 px-3 sm:px-8 py-2 sm:py-3 backdrop-blur-xl">
         <div className="max-w-4xl lg:max-w-5xl mx-auto w-full space-y-2">
-          {/* Pill Follow-Up Suggestions */}
-          {dynamicSuggestions.length > 0 && (
+          {/* Domain Selector & Dynamic Quick Prompts */}
+          <div className="space-y-1.5">
+            {/* Subject Selector Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-              {dynamicSuggestions.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSendMessage(prompt)}
-                  disabled={loading}
-                  className="whitespace-nowrap rounded-full border border-red-950 bg-[#140507] hover:bg-[#1f090d] hover:border-red-500/40 px-3 py-1.5 text-xs text-slate-300 hover:text-white transition-all shrink-0 cursor-pointer disabled:opacity-40 flex items-center gap-1.5 shadow-sm"
-                >
-                  <Sparkles className="h-3 w-3 text-red-400" />
-                  <span>{prompt}</span>
-                </button>
-              ))}
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden sm:inline mr-1">
+                Domain:
+              </span>
+              {(['All', 'Chemistry', 'Physics', 'Mathematics', 'Biology'] as const).map((subj) => {
+                const isSelected = selectedSubject === subj;
+                const labels: Record<string, string> = {
+                  All: '✦ All STEM',
+                  Chemistry: '⚛ Chemistry',
+                  Physics: '◉ Physics',
+                  Mathematics: '∑ Mathematics',
+                  Biology: '🧬 Biology'
+                };
+                return (
+                  <button
+                    key={subj}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSubject(subj);
+                      setDynamicSuggestions(SUBJECT_QUICK_PROMPTS[subj] || SUBJECT_QUICK_PROMPTS.All);
+                    }}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer border ${
+                      isSelected
+                        ? 'bg-red-950/90 text-rose-200 border-red-500/60 shadow-[0_0_12px_rgba(239,68,68,0.25)] font-semibold'
+                        : 'bg-[#120406]/70 text-slate-400 border-red-950/70 hover:text-slate-200 hover:border-red-900/50'
+                    }`}
+                  >
+                    {labels[subj]}
+                  </button>
+                );
+              })}
             </div>
-          )}
+
+            {/* Pill Follow-Up Suggestions */}
+            {dynamicSuggestions.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                {dynamicSuggestions.map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSendMessage(prompt)}
+                    disabled={loading}
+                    className="whitespace-nowrap rounded-full border border-red-950/80 bg-[#120406]/90 hover:bg-[#1f090d] hover:border-red-500/40 px-3 py-1 text-xs text-slate-300 hover:text-white transition-all shrink-0 cursor-pointer disabled:opacity-40 flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Sparkles className="h-3 w-3 text-red-400" />
+                    <span>{prompt}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Floating Prompt Capsule */}
           {quota && !quota.isUnlimited && quota.remaining === 0 && (
@@ -861,11 +1047,7 @@ export default function AiTutorDrawer({
                 }
               }}
               rows={1}
-              placeholder={
-                language === 'bn'
-                  ? "রসায়ন, পদার্থবিদ্যা বা গণিতের যেকোনো প্রশ্ন বা সংশয় জিজ্ঞাসা করুন..."
-                  : "Ask anything in Chemistry, Physics, Math, or request a drill..."
-              }
+              placeholder={getPlaceholder()}
               className="w-full resize-none bg-transparent px-3 py-1 text-sm text-white placeholder-slate-500 focus:outline-none leading-relaxed no-scrollbar"
               style={{ minHeight: "38px", maxHeight: "120px", scrollbarWidth: "none", msOverflowStyle: "none" }}
             />

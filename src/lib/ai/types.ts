@@ -161,6 +161,8 @@ export interface AiChatMessage {
 }
 
 export interface TutorResponse {
+  isOutOfScope?: boolean;
+  detectedSubject?: string;
   answer: string;
   model: string;
   sources: string[];

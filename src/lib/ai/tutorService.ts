@@ -6,6 +6,7 @@
 
 import { AiMode, AcademicLevel, Language, StudentContext, AiChatMessage, SourceCategory, TutorResponse, WebCitation } from "./types";
 import { buildOpenEndedTutorPrompt } from "./prompts";
+import { classifySubjectScope } from "./subjectGate";
 import { callGemini, fetchLiveWebResearch } from "./geminiClient";
 import { retrieveRelevantPiechemMaterials } from "./materialRetriever";
 import { computeStudentLearningProfile } from "./weaknessDetector";
@@ -341,18 +342,44 @@ export async function askEducationalTutor(params: {
   }
 
   // --------------------------------------------------------------------------
-  // STEP 2: EDUCATIONAL SCOPE & INTENT DETECTION
+  // STEP 2: STRICT SUBJECT GATE & SCOPE DETECTION (Physics, Chemistry, Math, Biology)
   // --------------------------------------------------------------------------
+  const gateResult = classifySubjectScope(prompt);
   const analysis = detectEducationalIntent(prompt, history);
   const activeLanguage = analysis.detectedLanguage || language;
-  const isBengali = activeLanguage === 'bn';
+  const isBengali = activeLanguage === 'bn' || /[\u0980-\u09FF]/.test(prompt);
   const activeLevel = analysis.detectedLevel || level;
 
+  // STRICT OUT-OF-SCOPE ENFORCEMENT: Reject any non-STEM requests immediately
+  if (!gateResult.allowed) {
+    const scopeMessage = isBengali ? gateResult.scopeMessageBn : gateResult.scopeMessageEn;
+    return {
+      answer: scopeMessage,
+      model: "PIECHEM Subject Scope Guard",
+      sources: [],
+      sourceCategory: 'GENERAL_ACADEMIC',
+      groundedInPiechem: false,
+      isOutOfScope: true,
+      suggestedFollowUps: isBengali ? [
+        "নিউটনের গতিসূত্র ব্যাখ্যা কর",
+        "SN2 বিক্রিয়ার কৌশল দেখাও",
+        "অন্তরকলন সূত্র সমাধান কর",
+        "ডিএনএ অনুলিপন প্রক্রিয়া ব্যাখ্যা কর"
+      ] : [
+        "Explain Newton's second law",
+        "Explain SN2 reaction mechanism",
+        "Solve ∫x² dx",
+        "Explain DNA replication"
+      ],
+      language: isBengali ? 'bn' : 'en'
+    };
+  }
+
   // FAREWELL: Warm, polite send-off
-  if (analysis.intent === 'FAREWELL') {
+  if (analysis.intent === 'FAREWELL' || gateResult.isFarewell) {
     const farewell = isBengali
-      ? "বিদায়! আপনার পড়াশোনার জন্য শুভকামনা রইল। পদার্থবিদ্যা, রসায়ন বা গণিতের যেকোনো প্রয়োজনে আমি সবসময় এখানেই প্রস্তুত থাকব। ভালো থাকবেন!"
-      : "Goodbye! Wishing you all the best with your studies. Whenever you are ready to tackle Physics, Chemistry, Mathematics, or Biology again, I'll be right here to help. Have a great day!";
+      ? "বিদায়! আপনার পড়াশোনার জন্য শুভকামনা রইল। পদার্থবিদ্যা, রসায়ন, গণিত বা জীববিদ্যার যেকোনো প্রয়োজনে আমি সবসময় এখানেই প্রস্তুত থাকব। ভালো থাকবেন!"
+      : "Goodbye! Wishing you all the best with your studies. Whenever you are ready to explore Physics, Chemistry, Mathematics, or Biology again, I'll be right here to help. Have a great day!";
     return {
       answer: farewell,
       model: "PIECHEM AI",
@@ -366,11 +393,11 @@ export async function askEducationalTutor(params: {
     };
   }
 
-  // CASUAL GREETING: Fast, warm, natural conversational reply (no academic reports)
-  if (analysis.isGreeting) {
+  // CASUAL GREETING: Fast, warm, natural conversational reply
+  if (analysis.isGreeting || gateResult.isGreeting) {
     const greeting = isBengali
-      ? "নমস্কার! আমি আপনার **PIECHEM এআই টিউটর**। পদার্থবিদ্যা, রসায়ন, গণিত ও জীববিদ্যার যেকোনো প্রশ্ন, গাণিতিক সমস্যা বা পরীক্ষার প্রস্তুতিতে আমি সাহায্য করতে পারি। আপনি আজ কী নিয়ে জানতে বা শিখতে চান?"
-      : "Hi! I'm your **PIECHEM AI Tutor**. I'm here to help you understand and master concepts across Physics, Chemistry, Mathematics, and Biology, solve step-by-step problems, and prepare for your exams. What would you like to explore today?";
+      ? "নমস্কার! আমি আপনার **PIECHEM এআই টিউটর**। পদার্থবিদ্যা (Physics), রসায়ন (Chemistry), গণিত (Mathematics) ও জীববিদ্যা (Biology)-র যেকোনো প্রশ্ন, গাণিতিক সমস্যা বা পরীক্ষার প্রস্তুতিতে আমি সাহায্য করতে পারি। আপনি আজ কী নিয়ে জানতে বা শিখতে চান?"
+      : "Hi! I'm your **PIECHEM AI Tutor**. I'm here to help you understand and master concepts across **Physics, Chemistry, Mathematics, and Biology**, solve step-by-step problems, and prepare for your exams. What would you like to explore today?";
     return {
       answer: greeting,
       model: "PIECHEM Conversational Assistant",
@@ -378,29 +405,8 @@ export async function askEducationalTutor(params: {
       sourceCategory: 'GENERAL_ACADEMIC',
       groundedInPiechem: false,
       suggestedFollowUps: isBengali 
-        ? ["আয়নীকরণ শক্তি কী?", "নিউটনের দ্বিতীয় গতিসূত্র ব্যাখ্যা কর", "2x + 5 = 15 সমাধান কর"]
-        : ["What is ionisation energy?", "Explain Newton's second law", "Solve 2x + 5 = 15", "Quiz me on my weak topics"],
-      language: activeLanguage
-    };
-  }
-
-  // NON-EDUCATIONAL REDIRECT: Polite redirection back to STEM education
-  if (!analysis.isEducational) {
-    const redirection = isBengali
-      ? "আমি মূলত পদার্থবিদ্যা (Physics), রসায়ন (Chemistry), গণিত (Mathematics), জীববিদ্যা (Biology) এবং একাডেমিক পরীক্ষার প্রস্তুতিতে সহায়তা করার জন্য প্রস্তুত। অনুগ্রহ করে আপনার পড়াশোনা বা কোনো বিজ্ঞান/গণিত বিষয়ক প্রশ্ন করুন, আমি সানন্দে সাহায্য করব!"
-      : "I'm focused on helping with **Physics, Chemistry, Mathematics, Biology**, and academic exam preparation. Ask me any STEM concept, problem, or study question, and I'll be glad to help!";
-    return {
-      answer: redirection,
-      model: "PIECHEM Educational Guard",
-      sources: [],
-      sourceCategory: 'GENERAL_ACADEMIC',
-      groundedInPiechem: false,
-      suggestedFollowUps: [
-        "Explain Newton's second law",
-        "What is ionisation energy?",
-        "Solve 2x + 5 = 15",
-        "Explain photosynthesis"
-      ],
+        ? ["আয়নীকরণ শক্তি কী?", "নিউটনের দ্বিতীয় গতিসূত্র ব্যাখ্যা কর", "2x + 5 = 15 সমাধান কর", "সালোকসংশ্লেষ ব্যাখ্যা কর"]
+        : ["What is ionisation energy?", "Explain Newton's second law", "Solve 2x + 5 = 15", "Explain DNA replication"],
       language: activeLanguage
     };
   }
@@ -546,7 +552,8 @@ export async function askEducationalTutor(params: {
     groundedMaterials: explicitlyRequestsNotes || hasPiechemMaterials ? groundedMaterials : [],
     studentProfileSummary,
     detectedIntent: analysis.intent,
-    activeTopic
+    activeTopic,
+    subjectScope: gateResult.subject
   });
 
   const trimmedHistory = history.slice(-8);
