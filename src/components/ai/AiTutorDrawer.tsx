@@ -598,15 +598,16 @@ export default function AiTutorDrawer({
           </button>
 
           <div className="flex items-center gap-2.5">
+            {/* Header Brand Logo matching Image 1 exactly */}
             <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-red-600/20 blur-sm animate-pulse" />
-              <div className="relative p-1.5 rounded-xl bg-gradient-to-b from-[#1c070c] to-[#0d0305] border border-red-500/40 shadow-md shadow-red-950/60 flex items-center justify-center">
-                <PiechemAiLogo size="xs" animated />
+              <div className="absolute inset-0 rounded-2xl bg-red-600/25 blur-md animate-pulse" />
+              <div className="relative p-2 rounded-2xl bg-gradient-to-b from-[#1c070c] to-[#0d0305] border border-red-500/30 shadow-lg shadow-red-950/60 flex items-center justify-center">
+                <PiechemAiLogo size="sm" animated />
               </div>
             </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-serif font-bold tracking-wide text-white text-base md:text-lg">PIECHEM</span>
-              <span className="font-bold text-red-500 text-sm tracking-widest">AI</span>
+            <div className="font-serif font-bold text-base md:text-lg text-white tracking-tight flex items-baseline gap-1">
+              <span>PIECHEM</span>
+              <span className="text-red-500">AI</span>
             </div>
           </div>
 
