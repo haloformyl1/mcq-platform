@@ -1134,22 +1134,7 @@ export default function StudentDashboard() {
           )}
         </section>
 
-        {/* Bottom Page Footer with Logout */}
-        <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-8 pb-16 border-t border-cyan-500/15 flex flex-col items-center justify-center gap-4 text-center">
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2.5 px-7 py-3 rounded-2xl bg-gradient-to-r from-red-950/60 via-red-900/40 to-red-950/60 hover:from-red-900/80 hover:to-red-800/80 border border-red-500/40 hover:border-red-400 text-red-200 hover:text-white font-extrabold text-sm transition-all shadow-[0_0_30px_rgba(239,68,68,0.25)] hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <LogOut className="w-4 h-4 text-red-400" />
-            <span>Log out from Piechem</span>
-          </button>
-          <p className="text-xs text-slate-500">
-            PIECHEM Smart Learning Platform • Administrator Helpline:{" "}
-            <a href="tel:9830507435" className="text-cyan-400 hover:underline font-mono">
-              9830507435
-            </a>
-          </p>
-        </footer>
+        
 
         {/* AI Floating Summon Button for Mobile & Desktop */}
         <div className="fixed bottom-5 right-5 z-40">

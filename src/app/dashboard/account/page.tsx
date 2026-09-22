@@ -2883,14 +2883,7 @@ export default function StudentAccountPage() {
       )}
 
       {/* Footer Support */}
-      <footer className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-center text-xs text-slate-500 border-t border-cyan-500/15 mt-12">
-        <p>
-          Need assistance with your PIECHEM account? Contact Administrator Arghyadeep Roy:{" "}
-          <a href="tel:9830507435" className="font-bold text-cyan-400 hover:underline font-mono">
-            9830507435
-          </a>
-        </p>
-      </footer>
+      
     </div>
   );
 }

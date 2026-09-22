@@ -131,9 +131,7 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] bg-[#02060b] py-6 px-4 text-center text-xs text-slate-500 font-mono">
-        <p>PIECHEM ARCHIVE · SECURE DIGITAL STUDY REPOSITORY · ALL RIGHTS RESERVED</p>
-      </footer>
+      
     </div>
   );
 }
