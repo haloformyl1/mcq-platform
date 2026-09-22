@@ -23,7 +23,7 @@ export default function GlobalHeader({
   children
 }: GlobalHeaderProps) {
   return (
-    <header className={`dashboard-header sticky top-0 z-50 w-full bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)] ${className}`}>
+    <header className={`dashboard-header sticky top-0 z-50 w-full bg-black/90 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)] ${className}`}>
       <div className="site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
         {children ? (
           children

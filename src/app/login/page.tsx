@@ -278,13 +278,13 @@ export default function StudentLogin() {
   );
 
   return (
-    <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Landing intro is rendered on root / and redirects here */}
       
       {/* ========================================================= */}
       {/* 1. UPPER SIDE (HERO SECTION - NETFLIX INSPIRATION)       */}
       {/* ========================================================= */}
-      <section className="relative min-h-[90vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#051829] via-[#030e18] to-[#030910]">
+      <section className="relative min-h-[90vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-transparent">
         
         {/* Ambient Glows & Chemical Grid Texture */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(0,210,255,0.22),transparent_70%)] pointer-events-none" />

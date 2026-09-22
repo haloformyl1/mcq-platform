@@ -105,7 +105,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black relative font-sans text-white flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-transparent relative font-sans text-white flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8">
       {/* Header with PIECHEM logo */}
       <header className="w-full max-w-5xl mx-auto flex items-center justify-between z-10">
         <PiechemLogo size="lg" isGoldMember={false} />

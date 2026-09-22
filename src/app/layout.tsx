@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import GlobalFooter from "@/components/GlobalFooter";
+import GlobalBackground from "@/components/GlobalBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,10 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-black`}
     >
-      <body className="dark min-h-full flex flex-col bg-[#030811] text-slate-100">
-        {children}
+      <body className="dark min-h-full flex flex-col bg-black text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200">
+        <GlobalBackground />
+        <div className="relative z-10 flex flex-col flex-1 min-h-full">
+          {children}
+        </div>
         <GlobalFooter />
       </body>
     </html>

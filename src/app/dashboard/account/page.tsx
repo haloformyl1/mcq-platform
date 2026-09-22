@@ -764,7 +764,7 @@ export default function StudentAccountPage() {
                     rawPayerUpi.toLowerCase().endsWith("@axl");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#07131e] via-[#040911] to-black text-white font-sans selection:bg-cyan-500 selection:text-black pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500 selection:text-black pb-24 overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={student} />
       <GoldUpgradeCelebrationModal student={student} />

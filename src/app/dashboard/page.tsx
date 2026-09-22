@@ -298,7 +298,7 @@ export default function StudentDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[#030910] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 pb-20 overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={data?.student} />
       <GoldUpgradeCelebrationModal student={student || data?.student} />
@@ -306,7 +306,7 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
-      <header className="dashboard-header sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+      <header className="dashboard-header sticky top-0 z-50 bg-black/90 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
         <div className="dashboard-header-inner site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
           <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-4">
             

@@ -228,7 +228,7 @@ function ThreeDAnimationsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#02070c] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       
       {/* ========================================================= */}
       {/* 1. GLOBAL UNIFIED HEADER (PERMANENTLY ANCHORED LEFT LOGO) */}
@@ -545,7 +545,7 @@ function ThreeDAnimationsContent() {
 export default function ThreeDAnimationsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#02070c] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
       </div>
     }>
