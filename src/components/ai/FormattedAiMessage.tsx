@@ -70,7 +70,28 @@ export const FormattedAiMessage = memo(function FormattedAiMessage({
   const processed = preprocessContent(content);
 
   return (
-    <div className={`formatted-ai-content font-sans text-sm leading-relaxed ${className}`}>
+    <div className={`formatted-ai-content font-sans text-sm leading-relaxed text-slate-200 ${className}`}>
+      {/* KaTeX Display Equation Dark Red Glass Card Styling */}
+      <style jsx global>{`
+        .formatted-ai-content .katex-display {
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          margin: 1.25rem 0 !important;
+          padding: 1rem 1.5rem !important;
+          background: rgba(14, 4, 7, 0.85) !important;
+          border: 1px solid rgba(220, 38, 38, 0.28) !important;
+          border-radius: 0.875rem !important;
+          box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(220, 38, 38, 0.06) !important;
+          overflow-x: auto !important;
+          color: #ffffff !important;
+        }
+        .formatted-ai-content .katex {
+          font-size: 1.05em !important;
+          color: #f1f5f9 !important;
+        }
+      `}</style>
+
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[
@@ -85,49 +106,49 @@ export const FormattedAiMessage = memo(function FormattedAiMessage({
         ]}
         components={{
           h1: ({ node, ...props }) => (
-            <h1 className="text-xl font-bold text-cyan-300 mt-5 mb-2.5 pb-1 border-b border-cyan-500/25 tracking-wide" {...props} />
+            <h1 className="text-xl sm:text-2xl font-serif font-bold text-white mt-4 mb-2 pb-1 border-b border-red-950 tracking-tight" {...props} />
           ),
           h2: ({ node, ...props }) => (
-            <h2 className="text-lg font-bold text-cyan-300 mt-4 mb-2 tracking-wide flex items-center gap-2" {...props} />
+            <h2 className="text-lg sm:text-xl font-serif font-bold text-white mt-3.5 mb-2 tracking-tight flex items-center gap-2" {...props} />
           ),
           h3: ({ node, ...props }) => (
-            <h3 className="text-base font-semibold text-cyan-200 mt-3.5 mb-1.5" {...props} />
+            <h3 className="text-base font-semibold text-rose-200 mt-3 mb-1.5" {...props} />
           ),
           h4: ({ node, ...props }) => (
-            <h4 className="text-sm font-semibold text-cyan-100 mt-2.5 mb-1" {...props} />
+            <h4 className="text-sm font-semibold text-slate-200 mt-2.5 mb-1" {...props} />
           ),
           p: ({ node, ...props }) => (
-            <p className="mb-3 leading-relaxed text-slate-100 last:mb-0" {...props} />
+            <p className="mb-3 leading-relaxed text-slate-200 last:mb-0 text-[13.5px] sm:text-[14px]" {...props} />
           ),
           strong: ({ node, ...props }) => (
-            <strong className="font-semibold text-white tracking-wide" {...props} />
+            <strong className="font-bold text-white tracking-wide" {...props} />
           ),
           em: ({ node, ...props }) => (
-            <em className="italic text-slate-200" {...props} />
+            <em className="italic text-rose-200/90" {...props} />
           ),
           ul: ({ node, ...props }) => (
-            <ul className="list-disc pl-5 mb-3 space-y-1 text-slate-100" {...props} />
+            <ul className="list-disc pl-5 mb-3 space-y-1.5 text-slate-200 text-[13.5px]" {...props} />
           ),
           ol: ({ node, ...props }) => (
-            <ol className="list-decimal pl-5 mb-3 space-y-1 text-slate-100" {...props} />
+            <ol className="list-decimal pl-5 mb-3 space-y-1.5 text-slate-200 text-[13.5px]" {...props} />
           ),
           li: ({ node, ...props }) => (
             <li className="leading-relaxed" {...props} />
           ),
           blockquote: ({ node, ...props }) => (
-            <blockquote className="border-l-4 border-cyan-500/60 bg-cyan-950/30 pl-3.5 py-1.5 my-3 rounded-r text-slate-200 italic" {...props} />
+            <blockquote className="border-l-3 border-red-500/60 bg-[#140508]/60 pl-3.5 py-1.5 my-3 rounded-r text-slate-300 italic" {...props} />
           ),
           code: ({ node, inline, className: codeClass, children, ...props }: any) => {
             const isInline = !codeClass && !String(children).includes("\n");
             if (isInline) {
               return (
-                <code className="bg-slate-900/90 text-cyan-200 border border-cyan-500/30 rounded px-1.5 py-0.5 font-mono text-xs" {...props}>
+                <code className="bg-[#180509] text-rose-200 border border-red-500/30 rounded px-1.5 py-0.5 font-mono text-xs" {...props}>
                   {children}
                 </code>
               );
             }
             return (
-              <pre className="bg-[#040e17] border border-cyan-500/30 rounded-lg p-3 my-3 overflow-x-auto font-mono text-xs text-cyan-100 shadow-inner max-w-full">
+              <pre className="bg-[#090204] border border-red-950/80 rounded-xl p-3 my-3 overflow-x-auto font-mono text-xs text-rose-100 shadow-inner max-w-full">
                 <code {...props}>{children}</code>
               </pre>
             );
@@ -139,7 +160,7 @@ export const FormattedAiMessage = memo(function FormattedAiMessage({
                 href={safeHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cyan-400 underline decoration-cyan-500/50 underline-offset-2 hover:text-cyan-300 hover:decoration-cyan-400 transition-colors"
+                className="text-rose-400 underline decoration-rose-500/40 underline-offset-2 hover:text-rose-300 transition-colors"
                 {...props}
               >
                 {children}
@@ -147,18 +168,18 @@ export const FormattedAiMessage = memo(function FormattedAiMessage({
             );
           },
           table: ({ node, ...props }) => (
-            <div className="overflow-x-auto my-3 rounded border border-cyan-500/25">
+            <div className="overflow-x-auto my-3 rounded-xl border border-red-950/80">
               <table className="w-full text-xs text-left border-collapse" {...props} />
             </div>
           ),
           th: ({ node, ...props }) => (
-            <th className="bg-cyan-950/70 text-cyan-300 border border-cyan-500/20 px-3 py-2 font-semibold" {...props} />
+            <th className="bg-[#180509] text-rose-200 border border-red-950/60 px-3 py-2 font-semibold" {...props} />
           ),
           td: ({ node, ...props }) => (
-            <td className="border border-cyan-500/10 px-3 py-1.5 text-slate-200" {...props} />
+            <td className="border border-red-950/40 px-3 py-1.5 text-slate-300" {...props} />
           ),
           hr: ({ node, ...props }) => (
-            <hr className="my-4 border-cyan-500/20" {...props} />
+            <hr className="my-4 border-red-950/60" {...props} />
           )
         }}
       >
