@@ -733,13 +733,11 @@ export default function StudentDashboard() {
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="mcq-shell space-y-6 sm:space-y-10 pt-4 sm:pt-6">
-
-        {/* ========================================================= */}
-        {/* 2. UPCOMING TEST MARQUEE ALERT BANNER                    */}
-        {/* ========================================================= */}
-        {bannerItems.length > 0 && (
+      {/* ========================================================= */}
+      {/* 2. UPCOMING TEST MARQUEE ALERT BANNER                    */}
+      {/* ========================================================= */}
+      {bannerItems.length > 0 && (
+        <div className="w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-3 pb-1">
           <div className="bg-gradient-to-r from-amber-950/80 via-[#1a140d]/90 to-amber-950/80 border border-amber-500/40 rounded-2xl overflow-hidden py-2.5 px-4 shadow-lg shadow-amber-950/30">
             <div className="flex items-center gap-3 overflow-hidden">
               <span className="shrink-0 text-[11px] font-extrabold bg-amber-500 text-black px-2.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
@@ -755,78 +753,82 @@ export default function StudentDashboard() {
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ========================================================= */}
-        {/* ========================================================= */}
-        {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
-        {/* ========================================================= */}
-        <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-black py-7 sm:py-10 px-4 sm:px-8 rounded-2xl sm:rounded-3xl transition-all duration-300 group">
+      {/* ========================================================= */}
+      {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
+      {/* Full Free Space Utilization - No Enclosing Box           */}
+      {/* ========================================================= */}
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-black py-8 sm:py-14 border-b border-cyan-500/20 transition-all duration-300 group">
+        
+        {/* Subtle Native Molecular Orbital Background Animation spanning full free space */}
+        <MolecularOrbitalCanvas className="absolute inset-0 pointer-events-none opacity-50 group-hover:opacity-75 transition-opacity duration-700" density="subtle" />
+
+        {/* Ambient Lighting & Abstract Chemistry Backdrop with OLED Black Falloff */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_75%_35%,rgba(0,195,255,0.14),transparent_75%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
+        
+        {/* Faint Orbital Curves & Scientific Geometry */}
+        <div className="absolute -right-12 -bottom-12 w-72 sm:w-[460px] h-72 sm:h-[460px] border border-cyan-500/15 rounded-full pointer-events-none blur-[0.5px]" />
+        <div className="absolute -right-24 -bottom-24 w-96 sm:w-[620px] h-96 sm:h-[620px] border border-cyan-500/8 rounded-full pointer-events-none" />
+        <div className="absolute right-28 bottom-14 w-48 sm:w-80 h-48 sm:h-80 border border-indigo-500/10 rounded-full pointer-events-none" />
+
+        {/* Content Container - Utilizing Full Available Space */}
+        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between min-h-0 sm:min-h-[300px]">
           
-          {/* Subtle Native Molecular Orbital Background Animation */}
-          <MolecularOrbitalCanvas className="absolute inset-0 pointer-events-none opacity-50 group-hover:opacity-75 transition-opacity duration-700" density="subtle" />
-
-          {/* Ambient Lighting & Abstract Chemistry Backdrop with OLED Black Falloff */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_75%_35%,rgba(0,195,255,0.14),transparent_75%)] pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-          
-          {/* Faint Orbital Curves & Scientific Geometry */}
-          <div className="absolute -right-12 -bottom-12 w-72 sm:w-[420px] h-72 sm:h-[420px] border border-cyan-500/15 rounded-full pointer-events-none blur-[0.5px]" />
-          <div className="absolute -right-24 -bottom-24 w-96 sm:w-[560px] h-96 sm:h-[560px] border border-cyan-500/8 rounded-full pointer-events-none" />
-          <div className="absolute right-28 bottom-14 w-48 sm:w-72 h-48 sm:h-72 border border-indigo-500/10 rounded-full pointer-events-none" />
-
-          {/* Billboard Content - Utilising full selected space */}
-          <div className="relative z-10 w-full flex flex-col justify-between min-h-0 sm:min-h-[300px]">
-            
-            <div className="space-y-4 max-w-3xl">
-              {/* Top Row: Icon and Status Pill */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="p-3 sm:p-3.5 rounded-2xl border border-sky-500/30 bg-black text-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.2)] flex items-center justify-center">
-                  <Atom className="w-6 h-6 sm:w-7 sm:h-7 text-sky-400 animate-spin [animation-duration:15s]" />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="px-3.5 py-1 rounded-full text-xs font-black font-mono border bg-sky-500/10 text-sky-300 border-sky-500/30 flex items-center gap-2 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                    <span>{threeDMaterials.length || 2}</span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider font-sans">LIVE</span>
-                  </span>
-                </div>
+          <div className="space-y-4 max-w-3xl">
+            {/* Top Row: Icon and Status Pill */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="p-3 sm:p-3.5 rounded-2xl border border-sky-500/30 bg-black text-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.2)] flex items-center justify-center">
+                <Atom className="w-6 h-6 sm:w-7 sm:h-7 text-sky-400 animate-spin [animation-duration:15s]" />
               </div>
 
-              {/* Title (Dominant Serif Heading) */}
-              <div className="space-y-2 pt-1">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif">
-                  3D animations
-                </h1>
-
-                {/* Subtitle */}
-                <p className="text-base sm:text-xl text-slate-200/95 font-semibold leading-relaxed drop-shadow">
-                  Interactive WebGL molecular structures &amp; reaction mechanics
-                </p>
-
-                {/* Description */}
-                <p className="text-xs sm:text-sm text-slate-400/90 font-light max-w-2xl leading-relaxed pt-0.5">
-                  Explore real-time 3D simulations of solid state crystal lattices, atomic voids, and spatial chemical bonding directly in your browser.
-                </p>
-              </div>
-
-              {/* Far-Left Positioned OLED Black Button with Animated Arrow - Directly below description */}
-              <div className="pt-3 sm:pt-4 flex items-center justify-start">
-                <Link
-                  href="/3d-animations"
-                  className="group/cta inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 rounded-xl bg-black hover:bg-neutral-950 border border-cyan-500/50 hover:border-cyan-400 text-white hover:text-cyan-300 font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-[0_0_20px_rgba(0,217,255,0.18)] hover:shadow-[0_0_30px_rgba(0,217,255,0.35)] active:scale-95 whitespace-nowrap"
-                >
-                  <span>Explore All Animations</span>
-                  <span className="inline-flex items-center justify-center animate-arrow-glide">
-                    <ArrowRight className="w-4 h-4 text-cyan-400 shrink-0" />
-                  </span>
-                </Link>
+              <div className="flex items-center gap-2">
+                <span className="px-3.5 py-1 rounded-full text-xs font-black font-mono border bg-sky-500/10 text-sky-300 border-sky-500/30 flex items-center gap-2 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  <span>{threeDMaterials.length || 2}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider font-sans">LIVE</span>
+                </span>
               </div>
             </div>
 
+            {/* Title (Dominant Serif Heading) */}
+            <div className="space-y-2 pt-1">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif">
+                3D animations
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-base sm:text-xl text-slate-200/95 font-semibold leading-relaxed drop-shadow">
+                Interactive WebGL molecular structures &amp; reaction mechanics
+              </p>
+
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-slate-400/90 font-light max-w-2xl leading-relaxed pt-0.5">
+                Explore real-time 3D simulations of solid state crystal lattices, atomic voids, and spatial chemical bonding directly in your browser.
+              </p>
+            </div>
+
+            {/* Far-Left Positioned OLED Black Button with Animated Arrow - Directly below description */}
+            <div className="pt-3 sm:pt-4 flex items-center justify-start">
+              <Link
+                href="/3d-animations"
+                className="group/cta inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 rounded-xl bg-black hover:bg-neutral-950 border border-cyan-500/50 hover:border-cyan-400 text-white hover:text-cyan-300 font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-[0_0_20px_rgba(0,217,255,0.18)] hover:shadow-[0_0_30px_rgba(0,217,255,0.35)] active:scale-95 whitespace-nowrap"
+              >
+                <span>Explore All Animations</span>
+                <span className="inline-flex items-center justify-center animate-arrow-glide">
+                  <ArrowRight className="w-4 h-4 text-cyan-400 shrink-0" />
+                </span>
+              </Link>
+            </div>
           </div>
-        </section>
+
+        </div>
+      </section>
+
+      {/* Main Container */}
+      <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10">
 
         {/* ========================================================= */}
         {/* 4. CONTENT ROW 1: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}

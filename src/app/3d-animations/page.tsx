@@ -33,14 +33,12 @@ function ThreeDAnimationsContent() {
     const topicParam = searchParams.get("topic") || searchParams.get("category");
     if (topicParam) {
       const lower = topicParam.toLowerCase();
-      if (lower.includes("bond")) {
-        setActiveCategory("BONDING");
-      } else if (lower.includes("solid")) {
-        setActiveCategory("SOLID_STATE");
-      } else if (lower.includes("physical")) {
-        setActiveCategory("PHYSICAL");
-      } else if (lower.includes("inorganic")) {
+      if (lower.includes("organic") && !lower.includes("inorganic")) {
+        setActiveCategory("ORGANIC");
+      } else if (lower.includes("inorganic") || lower.includes("bond")) {
         setActiveCategory("INORGANIC");
+      } else if (lower.includes("physical") || lower.includes("solid")) {
+        setActiveCategory("PHYSICAL");
       }
     }
   }, [searchParams]);
@@ -129,6 +127,15 @@ function ThreeDAnimationsContent() {
         isPremium: true,
         discipline: "INORGANIC",
         category: "3D animations"
+      },
+      {
+        id: "7a82bc19-f431-4b3d-9d7a-12e0947b1928",
+        title: "ORGANIC STEREOCHEMISTRY & MOLECULAR GEOMETRY",
+        description: "Interactive 3D conformations, chirality, Newman projections, and reaction intermediates visualized in real-time.",
+        type: "LINK",
+        isPremium: false,
+        discipline: "ORGANIC",
+        category: "3D animations"
       }
     ];
   }, [animations, loading]);
@@ -155,17 +162,42 @@ function ThreeDAnimationsContent() {
       if (accessFilter === "PREMIUM" && !item.isPremium) return false;
 
       // Category filter check
-      if (activeCategory === "BONDING") {
-        return titleLower.includes("bond") || titleLower.includes("orbital") || titleLower.includes("hybrid");
-      }
-      if (activeCategory === "SOLID_STATE") {
-        return titleLower.includes("solid") || titleLower.includes("lattice") || titleLower.includes("void");
-      }
-      if (activeCategory === "PHYSICAL") {
-        return item.discipline === "PHYSICAL" || titleLower.includes("solid") || titleLower.includes("thermo");
+      if (activeCategory === "ORGANIC") {
+        return (
+          item.discipline === "ORGANIC" ||
+          (discLower.includes("organic") && !discLower.includes("inorganic")) ||
+          titleLower.includes("organic") ||
+          titleLower.includes("hydrocarbon") ||
+          titleLower.includes("isomer") ||
+          titleLower.includes("reaction mechanism")
+        );
       }
       if (activeCategory === "INORGANIC") {
-        return item.discipline === "INORGANIC" || titleLower.includes("bond") || titleLower.includes("block");
+        return (
+          item.discipline === "INORGANIC" ||
+          discLower.includes("inorganic") ||
+          titleLower.includes("inorganic") ||
+          titleLower.includes("bond") ||
+          titleLower.includes("orbital") ||
+          titleLower.includes("hybrid") ||
+          titleLower.includes("block") ||
+          titleLower.includes("coordination") ||
+          titleLower.includes("periodic")
+        );
+      }
+      if (activeCategory === "PHYSICAL") {
+        return (
+          item.discipline === "PHYSICAL" ||
+          discLower.includes("physical") ||
+          titleLower.includes("physical") ||
+          titleLower.includes("solid") ||
+          titleLower.includes("lattice") ||
+          titleLower.includes("void") ||
+          titleLower.includes("thermo") ||
+          titleLower.includes("kinetics") ||
+          titleLower.includes("electro") ||
+          titleLower.includes("equilibrium")
+        );
       }
 
       return true;
@@ -402,14 +434,13 @@ function ThreeDAnimationsContent() {
 
           </div>
 
-          {/* Category Filter Chips: Featuring Chemical Bonding & Solid State naturally in the catalog */}
+          {/* Category Filter Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
             {[
               { id: "ALL", label: "All Experiences" },
-              { id: "BONDING", label: "Chemical Bonding & VSEPR" },
-              { id: "SOLID_STATE", label: "Solid State Lattices" },
-              { id: "PHYSICAL", label: "Physical Chemistry" },
-              { id: "INORGANIC", label: "Inorganic Chemistry" }
+              { id: "ORGANIC", label: "Organic" },
+              { id: "INORGANIC", label: "Inorganic" },
+              { id: "PHYSICAL", label: "Physical" }
             ].map((cat) => (
               <button
                 key={cat.id}
