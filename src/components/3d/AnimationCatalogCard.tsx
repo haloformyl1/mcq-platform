@@ -45,7 +45,7 @@ export default function AnimationCatalogCard({
   return (
     <article 
       className={`group relative rounded-2xl overflow-hidden flex flex-col justify-between
-        bg-gradient-to-b from-[#060e1a] via-[#030a14] to-[#02070c]
+        bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm
         border transition-all duration-300 ease-out
         ${item.isPremium 
             ? "border-amber-500/25 hover:border-amber-400/60 hover:shadow-[0_16px_40px_rgba(245,158,11,0.12)]" 

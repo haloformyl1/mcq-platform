@@ -119,20 +119,20 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   let selectedTitle = "Available Tests";
   let selectedIcon = "📂";
   let selectedBadgeColor = "bg-green-950 text-green-400 border-green-700";
-  let selectedHeaderBg = "border-green-500/40 bg-[#0f1f17]/80";
+  let selectedHeaderBg = "border-green-500/40 bg-white/[0.02] backdrop-blur-sm";
   let displayTests: any[] = [];
 
   if (categoryKey === "upcoming") {
     selectedTitle = "Upcoming / Scheduled Tests";
     selectedIcon = "📁";
     selectedBadgeColor = "bg-amber-950 text-amber-300 border-amber-700";
-    selectedHeaderBg = "border-amber-500/40 bg-[#1a1610]/80";
+    selectedHeaderBg = "border-amber-500/40 bg-white/[0.02] backdrop-blur-sm";
     displayTests = upcomingTests;
   } else if (categoryKey === "expired") {
     selectedTitle = "Expired Tests";
     selectedIcon = "🗂️";
     selectedBadgeColor = "bg-red-950 text-red-400 border-red-800";
-    selectedHeaderBg = "border-red-900/50 bg-[#1f1012]/80";
+    selectedHeaderBg = "border-red-900/50 bg-white/[0.02] backdrop-blur-sm";
     displayTests = expiredTests;
   } else {
     // default to available tests
@@ -156,7 +156,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
     return (
       <div 
         key={test.id}
-        className={`bg-[#161616]/90 rounded-xl border ${
+        className={`bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm rounded-xl border ${
           isLiveStage ? 'border-green-500/40 hover:border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.15)]' :
           isUpcomingStage ? 'border-amber-500/40' :
           isHoldingStage ? 'border-orange-500/40' : 'border-red-900/40 opacity-85'
@@ -208,7 +208,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
           
           {/* Status Banner */}
-          <div className="mt-3 text-xs bg-[#111111]/80 p-2.5 rounded border border-[#333333] overflow-hidden">
+          <div className="mt-3 text-xs bg-white/[0.02] p-2.5 rounded border border-white/10 backdrop-blur-sm overflow-hidden">
             {isUpcomingStage && test.unlockDate && (
               <div className="text-amber-300 font-medium truncate">
                 <span>🔒 Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
@@ -245,7 +245,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
         </div>
 
-        <div className="p-4 bg-[#111111] border-t border-[#333333]">
+        <div className="p-4 bg-white/[0.02] border-t border-white/10 backdrop-blur-sm">
           {isUpcomingStage ? (
             <button disabled className="w-full text-center py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow">
               🎯 Best of Luck!

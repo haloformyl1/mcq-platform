@@ -739,7 +739,7 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {bannerItems.length > 0 && (
         <div className="w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-3 pb-1">
-          <div className="bg-gradient-to-r from-amber-950/80 via-[#1a140d]/90 to-amber-950/80 border border-amber-500/40 rounded-2xl overflow-hidden py-2.5 px-4 shadow-lg shadow-amber-950/30">
+          <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl overflow-hidden py-2.5 px-4 backdrop-blur-sm shadow-lg">
             <div className="flex items-center gap-3 overflow-hidden">
               <span className="shrink-0 text-[11px] font-extrabold bg-amber-500 text-black px-2.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow">
                 <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
@@ -837,7 +837,7 @@ export default function StudentDashboard() {
             {/* Live Tests Card */}
             <Link
               href="/dashboard/category/available"
-              className="bg-gradient-to-b from-[#0e241b]/90 to-[#07130e]/90 border border-green-500/40 hover:border-green-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[160px]"
+              className="bg-white/[0.02] hover:bg-white/[0.05] border border-green-500/30 hover:border-green-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm shadow-lg group flex flex-col justify-between min-h-[160px]"
             >
               <div className="flex justify-between items-start">
                 <div className="p-3 rounded-xl bg-green-950 border border-green-600/50 shadow group-hover:scale-110 transition-transform">
@@ -865,7 +865,7 @@ export default function StudentDashboard() {
             {/* Upcoming Tests Card */}
             <Link
               href="/dashboard/category/upcoming"
-              className="bg-gradient-to-b from-[#241a0e]/90 to-[#130e07]/90 border border-amber-500/40 hover:border-amber-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[160px]"
+              className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/30 hover:border-amber-400 p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm shadow-lg group flex flex-col justify-between min-h-[160px]"
             >
               <div className="flex justify-between items-start">
                 <div className="p-3 rounded-xl bg-amber-950 border border-amber-600/50 shadow group-hover:scale-110 transition-transform">
@@ -887,7 +887,7 @@ export default function StudentDashboard() {
             {/* Expired Tests Card */}
             <Link
               href="/dashboard/category/expired"
-              className="bg-gradient-to-b from-[#240e11]/90 to-[#130708]/90 border border-red-500/40 hover:border-red-400 p-4 sm:p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shadow-xl group flex flex-col justify-between min-h-[130px] sm:min-h-[160px]"
+              className="bg-white/[0.02] hover:bg-white/[0.05] border border-red-500/30 hover:border-red-400 p-4 sm:p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm shadow-lg group flex flex-col justify-between min-h-[130px] sm:min-h-[160px]"
             >
               <div className="flex justify-between items-start">
                 <div className="p-3 rounded-xl bg-red-950 border border-red-600/50 shadow group-hover:scale-110 transition-transform">
@@ -938,8 +938,8 @@ export default function StudentDashboard() {
                   key={st.rank}
                   className={`p-5 rounded-2xl border flex items-center justify-between gap-4 transition-all shadow-xl ${
                     st.rank === 1
-                      ? "bg-gradient-to-r from-[#241a0c] via-[#140e06] to-[#0c0803] border-amber-500/50 shadow-amber-950/20"
-                      : "bg-gradient-to-r from-[#141b24] via-[#0b1016] to-[#070a0e] border-slate-400/40"
+                      ? "bg-amber-950/20 border-amber-500/30 backdrop-blur-sm shadow-lg"
+                      : "bg-white/[0.02] border-white/10 backdrop-blur-sm shadow-lg"
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
@@ -998,7 +998,7 @@ export default function StudentDashboard() {
 
           {testsTaken === 0 ? (
             /* Empty State Banner (Image 1) */
-            <div className="bg-gradient-to-r from-[#061524] via-[#040e18] to-[#02070c] border border-cyan-500/30 p-8 sm:p-12 rounded-3xl text-center shadow-xl space-y-4 relative overflow-hidden">
+            <div className="bg-transparent text-center space-y-4 py-8 sm:py-14 max-w-2xl mx-auto">
               <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(0,195,255,0.25)]">
                 <Medal className="w-8 h-8 text-cyan-300 animate-pulse" />
               </div>
@@ -1020,28 +1020,28 @@ export default function StudentDashboard() {
               
               {/* 4 Summary Stat Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                <div className="bg-white/[0.02] border border-white/10 backdrop-blur-sm p-4 sm:p-5 rounded-2xl flex items-center gap-3">
                   <div className="p-2.5 bg-blue-900/30 rounded-xl text-blue-400"><BookOpen className="w-5 h-5" /></div>
                   <div>
                     <p className="text-xs text-slate-400">Tests Taken</p>
                     <p className="text-xl sm:text-2xl font-black text-white">{testsTaken}</p>
                   </div>
                 </div>
-                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                <div className="bg-white/[0.02] border border-white/10 backdrop-blur-sm p-4 sm:p-5 rounded-2xl flex items-center gap-3">
                   <div className="p-2.5 bg-green-900/30 rounded-xl text-green-400"><TrendingUp className="w-5 h-5" /></div>
                   <div>
                     <p className="text-xs text-slate-400">Average Score</p>
                     <p className="text-xl sm:text-2xl font-black text-white">{avgScore}%</p>
                   </div>
                 </div>
-                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                <div className="bg-white/[0.02] border border-white/10 backdrop-blur-sm p-4 sm:p-5 rounded-2xl flex items-center gap-3">
                   <div className="p-2.5 bg-purple-900/30 rounded-xl text-purple-400"><Trophy className="w-5 h-5" /></div>
                   <div>
                     <p className="text-xs text-slate-400">Best Score</p>
                     <p className="text-xl sm:text-2xl font-black text-white">{bestScore}%</p>
                   </div>
                 </div>
-                <div className="bg-[#07131f]/90 border border-cyan-500/20 p-4 sm:p-5 rounded-2xl flex items-center gap-3">
+                <div className="bg-white/[0.02] border border-white/10 backdrop-blur-sm p-4 sm:p-5 rounded-2xl flex items-center gap-3">
                   <div className="p-2.5 bg-amber-900/30 rounded-xl text-amber-400"><Target className="w-5 h-5" /></div>
                   <div>
                     <p className="text-xs text-slate-400">Avg. Accuracy</p>
@@ -1051,7 +1051,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Performance Line Chart */}
-              <div className="bg-[#061421]/90 border border-cyan-500/25 rounded-2xl p-6 shadow-xl">
+              <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 backdrop-blur-sm shadow-xl">
                 <h3 className="text-base sm:text-lg font-bold text-white mb-4">Score Trajectory Across Tests</h3>
                 <div className="h-[260px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -1070,7 +1070,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Results Table */}
-              <div className="bg-[#061421]/90 border border-cyan-500/25 rounded-2xl overflow-hidden shadow-xl">
+              <div className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm shadow-xl">
                 <div className="p-4 sm:p-5 flex justify-between items-center">
                   <h3 className="text-base sm:text-lg font-bold text-white">Recent Test Records</h3>
                   <span className="text-xs text-slate-400">Last {last25Attempts.length} tests</span>
@@ -1078,7 +1078,7 @@ export default function StudentDashboard() {
 
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-slate-800">
-                    <thead className="bg-[#030910]">
+                    <thead className="bg-transparent border-b border-white/10">
                       <tr>
                         <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">Test Title</th>
                         <th className="px-5 py-3 text-left text-xs font-bold text-slate-400 uppercase">Date</th>
@@ -1088,7 +1088,7 @@ export default function StudentDashboard() {
                         <th className="px-5 py-3 text-right text-xs font-bold text-slate-400 uppercase">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 bg-[#040e17]/50 text-xs sm:text-sm">
+                    <tbody className="divide-y divide-white/5 bg-transparent text-xs sm:text-sm">
                       {last25Attempts.map((attempt: any) => (
                         <tr key={attempt.id} className="hover:bg-cyan-950/20 transition">
                           <td className="px-5 py-3.5 font-semibold text-white whitespace-nowrap">{attempt.test.title}</td>
