@@ -34,6 +34,15 @@ interface Message {
   feedback?: 'like' | 'dislike' | null;
 }
 
+
+export type PiechemAiModel = 'PIECHEM AI' | 'PIECHEM AI PRO' | 'PIECHEM AI MAX';
+
+const PIECHEM_AI_MODELS: { id: PiechemAiModel; name: string; badge?: string }[] = [
+  { id: 'PIECHEM AI', name: 'PIECHEM AI' },
+  { id: 'PIECHEM AI PRO', name: 'PIECHEM AI PRO', badge: 'PRO' },
+  { id: 'PIECHEM AI MAX', name: 'PIECHEM AI MAX', badge: 'MAX' },
+];
+
 interface AcademicContext {
   subject: string;
   className?: string;
@@ -63,6 +72,8 @@ export default function AiTutorDrawer({
   const [selectedSubject, setSelectedSubject] = useState<'stem' | 'Physics' | 'Chemistry' | 'Mathematics' | 'Biology'>('Chemistry');
   const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate');
   const [showSubjectMenu, setShowSubjectMenu] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<PiechemAiModel>('PIECHEM AI');
+  const [showModelMenu, setShowModelMenu] = useState(false);
   const [showLevelMenu, setShowLevelMenu] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -428,6 +439,7 @@ export default function AiTutorDrawer({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           query: queryText,
+          model: selectedModel,
           subject: selectedSubject,
           level: level,
           language: language,
@@ -1163,34 +1175,41 @@ export default function AiTutorDrawer({
                 
                 {/* Embedded Context Pills (Subject & Difficulty) */}
                 <div className="flex items-center gap-2 mb-1.5 px-1">
-                  {/* Subject Selector Pill */}
+                  {/* Model Selector Pill (PIECHEM AI, PIECHEM AI PRO, PIECHEM AI MAX) */}
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setShowSubjectMenu(prev => !prev)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#160508] hover:bg-[#20070b] border border-red-900/40 text-[11px] font-semibold text-slate-300 transition cursor-pointer"
+                      onClick={() => setShowModelMenu(prev => !prev)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#160508] hover:bg-[#20070b] border border-red-900/40 text-[11px] font-semibold text-slate-200 transition cursor-pointer"
                     >
-                      <Atom className="w-3 h-3 text-red-400" />
-                      <span>{selectedSubject === 'stem' ? 'All STEM' : selectedSubject}</span>
+                      <Sparkles className="w-3 h-3 text-red-400" />
+                      <span>{selectedModel}</span>
                       <ChevronDown className="w-2.5 h-2.5 text-slate-500" />
                     </button>
 
-                    {showSubjectMenu && (
-                      <div className="absolute left-0 bottom-full mb-1.5 w-36 rounded-xl bg-[#140507] border border-red-900/60 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-bottom-1">
-                        {(['Chemistry', 'Physics', 'Mathematics', 'Biology'] as const).map(subj => (
+                    {showModelMenu && (
+                      <div className="absolute left-0 bottom-full mb-1.5 w-44 rounded-xl bg-[#140507] border border-red-900/60 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-bottom-1">
+                        {PIECHEM_AI_MODELS.map(m => (
                           <button
-                            key={subj}
+                            key={m.id}
                             type="button"
                             onClick={() => {
-                              setSelectedSubject(subj);
-                              setShowSubjectMenu(false);
+                              setSelectedModel(m.id);
+                              setShowModelMenu(false);
                             }}
                             className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between ${
-                              selectedSubject === subj ? 'bg-red-500/20 text-rose-300 font-bold' : 'text-slate-300 hover:bg-white/5'
+                              selectedModel === m.id ? 'bg-red-500/20 text-rose-300 font-bold' : 'text-slate-300 hover:bg-white/5'
                             }`}
                           >
-                            <span>{subj}</span>
-                            {selectedSubject === subj && <Check className="w-3 h-3 text-red-400" />}
+                            <div className="flex items-center gap-2">
+                              <span>{m.name}</span>
+                              {m.badge && (
+                                <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase bg-red-950/80 text-rose-300 border border-red-800/40">
+                                  {m.badge}
+                                </span>
+                              )}
+                            </div>
+                            {selectedModel === m.id && <Check className="w-3 h-3 text-red-400" />}
                           </button>
                         ))}
                       </div>
@@ -1232,7 +1251,7 @@ export default function AiTutorDrawer({
                     >
                       <RotateCcw className="w-3 h-3" />
                     </button>
-                    <span className="capitalize">{selectedSubject} • {level}</span>
+                    <span>{selectedModel} • <span className="capitalize">{level}</span></span>
                   </div>
 
                   <div className="flex items-center gap-2">
