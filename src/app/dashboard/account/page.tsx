@@ -770,7 +770,7 @@ export default function StudentAccountPage() {
       <GoldUpgradeCelebrationModal student={student} />
 
       {/* 1. TOP NAVBAR (ELECTRIC BLACKISH-BLUE THEME) */}
-      <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+      <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
         <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           
           {/* Left: Brand Identity & Designer Attribution */}
@@ -816,7 +816,7 @@ export default function StudentAccountPage() {
             {/* Profile Dropdown Menu */}
             {profileDropdownOpen && (
               <div className="absolute right-0 top-12 w-64 bg-[#061421]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-cyan-500/30 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-3 border-b border-cyan-500/15">
+                <div className="px-4 py-3 ">
                   <p className="text-sm font-bold text-white truncate">{student.name || "Student"}</p>
                   <p className="text-xs text-slate-400 truncate mt-0.5 font-mono">{student.email}</p>
                   <div className="mt-2">
@@ -1255,7 +1255,7 @@ export default function StudentAccountPage() {
                 
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
-                  <div className="border-b border-cyan-500/15 pb-4">
+                  <div className=" pb-4">
                     <h2 className="text-xl font-bold text-white">Security & Password</h2>
                     <p className="text-xs text-slate-400 mt-1">
                       Update your account credentials to protect your proctored exam history.
@@ -1405,7 +1405,7 @@ export default function StudentAccountPage() {
                 
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
-                  <div className="border-b border-cyan-500/15 pb-4">
+                  <div className=" pb-4">
                     <h2 className="text-xl font-bold text-white">Student & Academic Profile</h2>
                     <p className="text-xs text-slate-400 mt-1">
                       Customize your display avatar and update your board details to receive personalized exam recommendations.
@@ -2009,7 +2009,7 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
             <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
               
               {/* Left: Brand Identity & Designer Attribution */}
@@ -2477,7 +2477,7 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-[60] bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
             <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
               
               {/* Left: Brand Identity & Designer Attribution */}
@@ -2588,7 +2588,7 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
             <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
               
               {/* Left: Brand Identity & Designer Attribution */}
@@ -2687,7 +2687,7 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
             <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
               
               {/* Left: Brand Identity & Designer Attribution */}
@@ -2726,7 +2726,7 @@ export default function StudentAccountPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
                   <thead>
-                    <tr className="border-b border-cyan-500/20 text-slate-400 text-xs uppercase tracking-wider">
+                    <tr className="text-slate-400 text-xs uppercase tracking-wider">
                       <th className="pb-3 px-3">Date</th>
                       <th className="pb-3 px-3">Description</th>
                       <th className="pb-3 px-3">Payer UPI ID</th>
@@ -2784,7 +2784,7 @@ export default function StudentAccountPage() {
         <div className="fixed inset-0 z-50 bg-[#030811] text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
             <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
               
               {/* Left: Brand Identity & Designer Attribution */}

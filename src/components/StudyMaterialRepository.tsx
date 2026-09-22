@@ -575,7 +575,7 @@ export default function StudyMaterialRepository({
         <section className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 animate-in fade-in zoom-in-98 duration-400">
           
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
             <div>
               <span className="text-xs font-mono tracking-widest text-cyan-400 uppercase">
                 Step 2 · Academic Level
@@ -854,7 +854,7 @@ export default function StudyMaterialRepository({
         <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 animate-in fade-in duration-300">
           
           {/* Header & Back Link */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
             <div>
               <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 uppercase tracking-wider">
                 <span>{selectedBoard}</span>

@@ -98,7 +98,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
       onContextMenu={(e) => e.preventDefault()}
     >
       {/* 1. TOP NAVIGATION & INTERACTIVE TOOLBAR */}
-      <header className="h-14 sm:h-16 px-3 sm:px-6 bg-[#040e1b]/95 border-b border-cyan-500/20 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 z-30 shrink-0 shadow-lg shadow-black/40">
+      <header className="h-14 sm:h-16 px-3 sm:px-6 bg-[#040e1b]/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 z-30 shrink-0 shadow-lg shadow-black/40">
         {/* Left: Logo & Material Title */}
         <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
           <div className="shrink-0 flex items-center pr-1.5 sm:pr-2.5 border-r border-slate-800/80">

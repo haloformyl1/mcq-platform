@@ -330,7 +330,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
     <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white">
       <AdminPreviewBanner />
 
-      <header className="border-b border-cyan-500/20 bg-[#08131e]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+      <header className="bg-[#08131e]/90 backdrop-blur-xl sticky top-0 z-40 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="w-full py-2.5 sm:py-3 px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center gap-2 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">

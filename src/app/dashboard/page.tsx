@@ -307,7 +307,7 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
-      <header className="dashboard-header sticky top-0 z-50 bg-black/90 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+      <header className="dashboard-header sticky top-0 z-50 bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
         <div className="dashboard-header-inner site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
           <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-4">
             
@@ -674,7 +674,7 @@ export default function StudentDashboard() {
           )}
 
           {/* Mobile / Tablet Dedicated Navigation Rail (Zero Scrollbar) */}
-          <div className="lg:hidden w-full pt-1.5 mt-1.5 border-t border-cyan-500/15 overflow-x-auto no-scrollbar flex items-center gap-1.5 px-0.5 pr-6 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
+          <div className="lg:hidden w-full pt-1.5 mt-1.5 overflow-x-auto no-scrollbar flex items-center gap-1.5 px-0.5 pr-6 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
             <a 
               href="#overview" 
               onClick={() => setActiveTab("overview")}
@@ -761,7 +761,7 @@ export default function StudentDashboard() {
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* Full Free Space Utilization - No Enclosing Box           */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-black py-8 sm:py-14 border-b border-cyan-500/20 transition-all duration-300 group">
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-black py-8 sm:py-14 transition-all duration-300 group">
         
         {/* Subtle Native Molecular Orbital Background Animation spanning full free space */}
         <MolecularOrbitalCanvas className="absolute inset-0 pointer-events-none opacity-50 group-hover:opacity-75 transition-opacity duration-700" density="subtle" />
@@ -827,7 +827,7 @@ export default function StudentDashboard() {
         {/* 4. CONTENT ROW 1: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
         {/* ========================================================= */}
         <section id="tests" className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                 <span>Available Tests & Exam Series</span>
@@ -931,7 +931,7 @@ export default function StudentDashboard() {
         {/* ========================================================= */}
         {lastExamTopStudents && lastExamTopStudents.length > 0 && (
           <section id="leaderboard" className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
               <div>
                 <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                   <Trophy className="w-6 h-6 text-amber-400 animate-pulse" />
@@ -998,7 +998,7 @@ export default function StudentDashboard() {
         {/* 7. CONTENT ROW 4: PERFORMANCE JOURNEY & RESULT TRACKER    */}
         {/* ========================================================= */}
         <section id="performance" className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-500/20 pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-cyan-400" />
@@ -1083,7 +1083,7 @@ export default function StudentDashboard() {
 
               {/* Results Table */}
               <div className="bg-[#061421]/90 border border-cyan-500/25 rounded-2xl overflow-hidden shadow-xl">
-                <div className="p-4 sm:p-5 border-b border-cyan-500/20 flex justify-between items-center">
+                <div className="p-4 sm:p-5 flex justify-between items-center">
                   <h3 className="text-base sm:text-lg font-bold text-white">Recent Test Records</h3>
                   <span className="text-xs text-slate-400">Last {last25Attempts.length} tests</span>
                 </div>

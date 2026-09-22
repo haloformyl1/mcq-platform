@@ -76,7 +76,7 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-transparent text-slate-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-200">
       {/* Top Header */}
-      <header className="dashboard-header sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl border-b border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+      <header className="dashboard-header sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
         <div className="site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="flex items-center gap-2 group">
