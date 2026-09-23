@@ -11,7 +11,8 @@ import {
   Sparkle, 
   Check, 
   FolderOpen
-} from "lucide-react";
+,
+  ArrowRight} from "lucide-react";
 import { 
   StudyMaterialItem, 
   RESOURCE_CATEGORIES, 
@@ -224,13 +225,28 @@ export default function CurriculumCategoryPage({
               return (
                 <div
                   key={item.id}
-                  className="rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/40 p-5 flex flex-col justify-between transition-all duration-300 shadow-sm"
+                  className={`rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border p-5 flex flex-col justify-between transition-all duration-300 shadow-sm ${
+                    isLevelRestricted 
+                      ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]" 
+                      : "border-white/[0.08] hover:border-cyan-500/40"
+                  }`}
                 >
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/30 text-cyan-300">
-                        Chapter {String(item.chapterNumber).padStart(2, "0")} · {item.discipline}
-                      </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/30 text-cyan-300">
+                          Chapter {String(item.chapterNumber).padStart(2, "0")} · {item.discipline}
+                        </span>
+                        {isLevelRestricted && (
+                          <span 
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/90 border border-rose-500/50 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.25)]"
+                            title={restrictionReason}
+                          >
+                            <Lock className="w-2.5 h-2.5 text-rose-300 shrink-0" />
+                            <span>{badgeLabel}</span>
+                          </span>
+                        )}
+                      </div>
                       {item.isPremium ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300">
                           <Sparkle className="w-2.5 h-2.5" />
@@ -245,7 +261,16 @@ export default function CurriculumCategoryPage({
                     </div>
 
                     <div>
-                      <h4 className="text-base font-bold text-white leading-snug line-clamp-2">
+                      <h4 
+                        onClick={() => {
+                          if (isLevelRestricted) {
+                            setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
+                          } else if (!canAccess) {
+                            setUpgradeItem(item);
+                          }
+                        }}
+                        className={`text-base font-bold text-white leading-snug line-clamp-2 ${!canAccess ? "cursor-pointer hover:text-rose-200" : ""}`}
+                      >
                         {item.title}
                       </h4>
                       <p className="text-[11px] font-mono text-slate-400 mt-1">
@@ -289,10 +314,11 @@ export default function CurriculumCategoryPage({
                         <button
                           type="button"
                           onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote })}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm group/btn"
                         >
                           <Lock className="w-3.5 h-3.5 text-rose-400" />
                           <span>{buttonLabel}</span>
+                          <ArrowRight className="w-3 h-3 text-rose-400/80 transition-transform group-hover/btn:translate-x-0.5" />
                         </button>
                       ) : (
                         <button

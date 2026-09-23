@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
+import UpgradeModal from "./curriculum/UpgradeModal";
 import { 
   BookOpen, 
   FileText, 
@@ -210,11 +211,19 @@ export default function StudyMaterialRepository({
           url: mat.url,
           fileSize: mat.fileSize || "Official PDF",
           isPremium: Boolean(mat.isPremium),
+          isLevelRestricted: Boolean(mat.isLevelRestricted),
+          restrictionReason: mat.restrictionReason,
+          badgeLabel: mat.badgeLabel,
+          buttonLabel: mat.buttonLabel,
+          targetLabel: mat.targetLabel,
+          policyTitle: mat.policyTitle,
+          policyNote: mat.policyNote,
           category,
           discipline,
           chapterNumber,
           chapterTitle,
           section: mat.section || "ALL",
+          classSem: mat.classSem || "ALL",
           createdAt: mat.createdAt
         };
       });
@@ -1113,7 +1122,11 @@ export default function StudyMaterialRepository({
                 return (
                   <div
                     key={item.id}
-                    className="group relative rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] hover:border-cyan-500/40 p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,217,255,0.1)] shadow-sm"
+                    className={`group relative rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm ${
+                      isLevelRestricted
+                        ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]"
+                        : "border-white/[0.08] hover:border-cyan-500/40 hover:shadow-[0_10px_25px_rgba(0,217,255,0.1)]"
+                    }`}
                   >
                     <div className="space-y-3">
                       {/* Top Badges: Category + Premium / Free */}
@@ -1148,7 +1161,18 @@ export default function StudyMaterialRepository({
 
                       {/* Title (Dominant Element) */}
                       <div>
-                        <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug">
+                        <h3 
+                          onClick={() => {
+                            if (isLevelRestricted) {
+                              setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
+                            } else if (!canAccess) {
+                              setUpgradeItem(item);
+                            }
+                          }}
+                          className={`text-base sm:text-lg font-bold text-white transition-colors leading-snug ${
+                            !canAccess ? "cursor-pointer hover:text-rose-200" : "group-hover:text-cyan-300"
+                          }`}
+                        >
                           {item.title}
                         </h3>
                         <p className="text-[11px] font-mono text-slate-400 mt-1">
@@ -1192,6 +1216,16 @@ export default function StudyMaterialRepository({
                             </a>
                           )}
                         </div>
+                      ) : isLevelRestricted ? (
+                        <button
+                          type="button"
+                          onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote })}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm group/btn"
+                        >
+                          <Lock className="w-3.5 h-3.5 text-rose-400" />
+                          <span>{buttonLabel}</span>
+                          <ArrowRight className="w-3 h-3 text-rose-400/80 transition-transform group-hover/btn:translate-x-0.5" />
+                        </button>
                       ) : (
                         <button
                           type="button"
@@ -1237,86 +1271,7 @@ export default function StudyMaterialRepository({
       {/* ============================================================ */}
       {/* PREVIEW & UPGRADE MODAL                                      */}
       {/* ============================================================ */}
-      {upgradeItem && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          {upgradeItem.isLevelRestricted ? (
-            <div className="max-w-md w-full rounded-2xl bg-gradient-to-b from-[#140b15] via-[#0f0913] to-[#060408] border border-rose-500/40 p-6 space-y-4 text-center shadow-2xl">
-              <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(244,63,94,0.25)]">
-                <ShieldAlert className="w-6 h-6 text-rose-400" />
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-mono tracking-widest text-rose-400 uppercase font-bold">
-                  CURRICULUM ACCESS RESTRICTED
-                </span>
-                <h3 className="text-xl font-bold text-white leading-snug">
-                  {upgradeItem.title}
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed font-light">
-                  {upgradeItem.restrictionReason || "This study material is reserved for students enrolled in another semester or academic level."}
-                </p>
-              </div>
-
-              <div className="bg-[#09050d] p-3.5 rounded-xl border border-rose-950/80 text-left space-y-1 text-xs text-slate-300">
-                <p><strong className="text-white">Assigned Audience:</strong> <span className="text-cyan-300">{upgradeItem.targetLabel || upgradeItem.classSem || "Specific Curriculum"}</span></p>
-                <p className="text-[11px] text-slate-400">{upgradeItem.policyNote || "If your current class/semester profile is incorrect, you can update it directly in your Account settings."}</p>
-              </div>
-
-              <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setUpgradeItem(null)}
-                  className="w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-mono text-slate-300 transition-colors"
-                >
-                  Close
-                </button>
-                <Link
-                  href="/dashboard/account"
-                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
-                >
-                  <GraduationCap className="w-3.5 h-3.5" />
-                  <span>Update Profile</span>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-md w-full rounded-2xl bg-gradient-to-b from-[#0c1b2c] to-[#040d16] border border-amber-500/40 p-6 space-y-4 text-center shadow-2xl">
-              <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center mx-auto">
-                <Lock className="w-6 h-6" />
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-mono tracking-widest text-amber-400 uppercase font-bold">
-                  PREMIUM ACADEMIC RESOURCE
-                </span>
-                <h3 className="text-xl font-bold text-white leading-snug">
-                  {upgradeItem.title}
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed font-light">
-                  This chapter resource is reserved for enrolled Piechem Gold / Paid students. Upgrade your subscription or request complimentary batch access.
-                </p>
-              </div>
-
-              <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
-                <button
-                  onClick={() => setUpgradeItem(null)}
-                  className="w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-mono text-slate-300 transition-colors"
-                >
-                  Close
-                </button>
-                <Link
-                  href="/dashboard/account"
-                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-black font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Request Gold Access</span>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
+      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
     </div>
   );
 }
