@@ -407,7 +407,7 @@ export default function StudyMaterialRepository({
       {/* ============================================================ */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-serif flex items-center gap-2">
             <span 
               onClick={selectedBoard ? handleResetBoard : undefined}
               className={selectedBoard ? "cursor-pointer hover:text-cyan-300 transition-colors" : ""}
@@ -491,10 +491,7 @@ export default function StudyMaterialRepository({
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono tracking-widest text-cyan-300/80 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30">
-                      NATIONAL SYLLABUS
-                    </span>
+                  <div className="flex items-center justify-end">
                     <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00D9FF]" />
                   </div>
 
@@ -529,10 +526,7 @@ export default function StudyMaterialRepository({
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono tracking-widest text-amber-300/80 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/30">
-                      COUNCIL SYLLABUS
-                    </span>
+                  <div className="flex items-center justify-end">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B]" />
                   </div>
 
@@ -567,10 +561,7 @@ export default function StudyMaterialRepository({
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono tracking-widest text-emerald-300/80 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30">
-                      SEMESTER SYSTEM (NEW)
-                    </span>
+                  <div className="flex items-center justify-end">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981]" />
                   </div>
 
@@ -605,10 +596,7 @@ export default function StudyMaterialRepository({
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono tracking-widest text-rose-300/80 px-2.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/30">
-                      COMPETITIVE ENTRANCE
-                    </span>
+                  <div className="flex items-center justify-end">
                     <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_#F43F5E]" />
                   </div>
 

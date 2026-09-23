@@ -7,7 +7,7 @@ import {
   FileCheck, 
   Award, 
   Layers, 
-  Sparkles, 
+   
   FileText, 
   Flame, 
   ArrowLeft, 
@@ -298,44 +298,6 @@ export default function EntranceCurriculumPage({
             </div>
           </Link>
 
-        </div>
-      </div>
-
-      {/* Competitive Entrance Pillars */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h3 className="text-xs font-mono tracking-[0.2em] text-slate-400 uppercase mb-4">
-          Competitive Capabilities
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-rose-950/80 border border-rose-500/30 flex items-center justify-center text-rose-300">
-              <Trophy className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">34-Year Solved PYQ Archive</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Chapter-wise solved questions from 1990 to 2024 with detailed analytical explanations and shortcut tricks.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-rose-950/80 border border-rose-500/30 flex items-center justify-center text-rose-300">
-              <Flame className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">Daily Practice Problem (DPP) Drills</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Graded daily sets calibrated from baseline conceptual to advanced multi-step numerical levels.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-rose-950/80 border border-rose-500/30 flex items-center justify-center text-rose-300">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">NCERT Booster Formula Digests</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              High-yield summary formulas, reaction sheets, and exception cheat-sheets designed for rapid score boosting.
-            </p>
-          </div>
         </div>
       </div>
 

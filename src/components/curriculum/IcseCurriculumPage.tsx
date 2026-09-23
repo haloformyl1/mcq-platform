@@ -3,9 +3,9 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { 
-  BookOpen, 
+   
   FileCheck, 
-  Award, 
+   
   Layers, 
   Sparkles, 
   FileText, 
@@ -237,44 +237,6 @@ export default function IcseCurriculumPage({
             </div>
           </Link>
 
-        </div>
-      </div>
-
-      {/* ICSE Academic Capabilities */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h3 className="text-xs font-mono tracking-[0.2em] text-slate-400 uppercase mb-4">
-          Council Academic Capabilities
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-950/80 border border-amber-500/30 flex items-center justify-center text-amber-300">
-              <TestTube2 className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">Laboratory Guides & Practical Blueprints</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Formal practical manuals covering salt analysis, redox titrations, and organic functional group identification tests.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-950/80 border border-amber-500/30 flex items-center justify-center text-amber-300">
-              <Award className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">Council Specimen Papers</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              CISCE specimen papers solved with strict marking scheme criteria and examiner commentary.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-950/80 border border-amber-500/30 flex items-center justify-center text-amber-300">
-              <BookOpen className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">Reaction Mechanisms</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Complete step-by-step electron arrow-pushing mechanisms tailored for ISC answer presentations.
-            </p>
-          </div>
         </div>
       </div>
 

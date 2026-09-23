@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { 
   BookOpen, 
-  FileCheck, 
+   
   Award, 
   Layers, 
   Sparkles, 
@@ -312,44 +312,6 @@ export default function WbchseCurriculumPage({
             </div>
           </Link>
 
-        </div>
-      </div>
-
-      {/* WBCHSE Academic Capabilities */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h3 className="text-xs font-mono tracking-[0.2em] text-slate-400 uppercase mb-4">
-          WBCHSE Academic Capabilities
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-300">
-              <Globe2 className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">Bilingual English & Bengali Notes</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Clear Bengali definitions, terminology glossaries, and English standard formats for bilingual comfort.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-300">
-              <Zap className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">WBJEE High-Frequency Problem Vault</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              High-yield problem patterns from the last 20 years of WBJEE integrated directly with semester topics.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-300">
-              <FileCheck className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">Semester System Question Blueprints</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-light">
-              Calibrated mock question sets aligned with the council's newest semester exam guidelines.
-            </p>
-          </div>
         </div>
       </div>
 
