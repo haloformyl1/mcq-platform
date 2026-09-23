@@ -350,6 +350,17 @@ export default function StudentDashboard() {
                   Overview
                 </a>
                 <a 
+                  href="#materials" 
+                  onClick={() => setActiveTab("materials")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === "materials" 
+                      ? "bg-white text-black shadow-md shadow-white/10" 
+                      : "text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  Study Materials
+                </a>
+                <a 
                   href="#tests" 
                   onClick={() => setActiveTab("tests")}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
@@ -361,17 +372,6 @@ export default function StudentDashboard() {
                   Available Tests
                 </a>
                 <a 
-                  href="#materials" 
-                  onClick={() => setActiveTab("materials")}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "materials" 
-                      ? "bg-white text-black shadow-md shadow-white/10" 
-                      : "text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Study Materials
-                </a>
-                                <a 
                   href="#leaderboard" 
                   onClick={() => setActiveTab("leaderboard")}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
@@ -391,7 +391,7 @@ export default function StudentDashboard() {
                       : "text-slate-300 hover:text-white hover:bg-white/10"
                   }`}
                 >
-                  My Tracker
+                  Performance Analytics
                 </a>
               </nav>
             </div>
@@ -625,8 +625,8 @@ export default function StudentDashboard() {
                     </div>
                     {[
                       { id: 'overview', label: 'Overview' },
-                      { id: 'tests', label: 'Tests' },
                       { id: 'materials', label: 'Study Materials' },
+                      { id: 'tests', label: 'Tests' },
                       { id: 'leaderboard', label: 'Ranks' },
                       { id: 'performance', label: 'Tracker' }
                     ].map((item) => {
@@ -687,17 +687,6 @@ export default function StudentDashboard() {
               Overview
             </a>
             <a 
-              href="#tests" 
-              onClick={() => setActiveTab("tests")}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
-                activeTab === "tests" 
-                  ? "bg-white text-black shadow-sm" 
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Available Tests
-            </a>
-            <a 
               href="#materials" 
               onClick={() => setActiveTab("materials")}
               className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
@@ -708,6 +697,18 @@ export default function StudentDashboard() {
             >
               Study Materials
             </a>
+            <a 
+              href="#tests" 
+              onClick={() => setActiveTab("tests")}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
+                activeTab === "tests" 
+                  ? "bg-white text-black shadow-sm" 
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              Available Tests
+            </a>
+            
                         <a 
               href="#leaderboard" 
               onClick={() => setActiveTab("leaderboard")}
@@ -812,7 +813,12 @@ export default function StudentDashboard() {
       <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10 flex-1">
 
         {/* ========================================================= */}
-        {/* 4. CONTENT ROW 1: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
+        {/* 4. CONTENT ROW 1: CHEMISTRY DIGITAL LIBRARY & 3D VAULT    */}
+        {/* ========================================================= */}
+        <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
+
+        {/* ========================================================= */}
+        {/* 5. CONTENT ROW 2: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
         {/* ========================================================= */}
         <section id="tests" className="space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
@@ -908,11 +914,6 @@ export default function StudentDashboard() {
 
           </div>
         </section>
-
-        {/* ========================================================= */}
-        {/* 5. CONTENT ROW 2: CHEMISTRY DIGITAL LIBRARY & 3D VAULT    */}
-        {/* ========================================================= */}
-        <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
 
         {/* ========================================================= */}
         {/* 6. CONTENT ROW 3: HALL OF FAME / TOP PERFORMERS          */}
