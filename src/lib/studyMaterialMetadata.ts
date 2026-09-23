@@ -99,7 +99,7 @@ export function parseMaterialMetadata(
     if (s.includes('class 12') || s.includes('class xii') || s.includes('xii') || s.includes('12th')) {
       return '12';
     }
-    if (currentSec === 'WBCHSE') {
+    if (currentSec === 'WBCHSE' || currentSec === 'ALL') {
       return 'SEM-I';
     }
     if (currentSec === 'CBSE' || currentSec === 'ICSE') {

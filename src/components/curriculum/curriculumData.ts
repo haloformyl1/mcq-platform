@@ -214,16 +214,28 @@ export function filterMaterialsForContext(
     if (level) {
       const lvl = level.toUpperCase().replace("-", "_");
       if (lvl === "CLASS_XI" || lvl === "11") {
-        if (item.classSem && item.classSem !== "ALL" && item.classSem !== "11") return false;
+        if (item.classSem && item.classSem !== "ALL") {
+          // If CBSE/ICSE Class 11 (or general Class 11): SEM-I & SEM-II under All Curriculums or 11 are allowed
+          const isAllowedForClass11 = item.classSem === "11" || item.classSem === "SEM-I" || item.classSem === "SEM-II";
+          if (!isAllowedForClass11) return false;
+        }
       } else if (lvl === "CLASS_XII" || lvl === "12") {
-        if (item.classSem && item.classSem !== "ALL" && item.classSem !== "12") return false;
+        if (item.classSem && item.classSem !== "ALL") {
+          // If CBSE/ICSE Class 12 (or general Class 12): SEM-III & SEM-IV under All Curriculums or 12 are allowed
+          const isAllowedForClass12 = item.classSem === "12" || item.classSem === "SEM-III" || item.classSem === "SEM-IV";
+          if (!isAllowedForClass12) return false;
+        }
       } else if (lvl === "SEM_1" || lvl === "SEM_I") {
+        // In case of WBCHSE, SEM I means ONLY SEM I will be able to access these contents
         if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-I") return false;
       } else if (lvl === "SEM_2" || lvl === "SEM_II") {
+        // In case of WBCHSE, SEM II means ONLY SEM II will be able to access these contents
         if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-II") return false;
       } else if (lvl === "SEM_3" || lvl === "SEM_III") {
+        // In case of WBCHSE, SEM III means ONLY SEM III will be able to access these contents
         if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-III") return false;
       } else if (lvl === "SEM_4" || lvl === "SEM_IV") {
+        // In case of WBCHSE, SEM IV means ONLY SEM IV will be able to access these contents
         if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-IV") return false;
       }
     }

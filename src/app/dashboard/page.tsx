@@ -889,15 +889,15 @@ export default function StudentDashboard() {
               </div>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-white">Start Your Performance Journey</h3>
               <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
-                You haven't completed any tests yet. Take your first exam from <strong className="text-cyan-300">Available Tests</strong> to unlock real-time accuracy, score graphs, and leaderboard insights!
+                You haven't completed any tests yet. Take your first exam from <Link href="/dashboard/category/available" className="text-cyan-300 font-bold hover:underline">Available Tests</Link> to unlock real-time accuracy, score graphs, and leaderboard insights!
               </p>
-              <a
-                href="#tests"
+              <Link
+                href="/dashboard/category/available"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm transition shadow-lg shadow-cyan-950/50"
               >
                 <span>View Available Tests</span>
                 <ChevronRight className="w-4 h-4" />
-              </a>
+              </Link>
             </div>
           ) : (
             /* Active Analytics & Graph View */

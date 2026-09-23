@@ -94,7 +94,17 @@ export async function GET(req: Request) {
     // Filter tests by target audience (Board and Class/Semester eligibility)
     const eligibleTests = availableTests.filter(t => {
       const matchesBoard = !t.targetBoard || t.targetBoard === "ALL" || t.targetBoard === student.board;
-      const matchesLevel = !t.targetAcademicLevel || t.targetAcademicLevel === "ALL" || t.targetAcademicLevel === student.academicLevel;
+      let matchesLevel = !t.targetAcademicLevel || t.targetAcademicLevel === "ALL" || t.targetAcademicLevel === student.academicLevel;
+      if (!matchesLevel && student.board && student.academicLevel && t.targetAcademicLevel) {
+        const isCbseOrIcse = student.board === "CBSE" || student.board === "ICSE";
+        if (isCbseOrIcse) {
+          if (student.academicLevel === "11" && (t.targetAcademicLevel === "SEM-I" || t.targetAcademicLevel === "SEM-II")) {
+            matchesLevel = true;
+          } else if (student.academicLevel === "12" && (t.targetAcademicLevel === "SEM-III" || t.targetAcademicLevel === "SEM-IV")) {
+            matchesLevel = true;
+          }
+        }
+      }
       return matchesBoard && matchesLevel;
     });
 

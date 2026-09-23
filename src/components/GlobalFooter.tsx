@@ -21,7 +21,7 @@ const NAVIGATION_GROUPS: FooterSection[] = [
     title: "Explore",
     links: [
       { label: "Dashboard", href: "/dashboard" },
-      { label: "Available Tests", href: "/dashboard#tests" },
+      { label: "Available Tests", href: "/dashboard/category/available" },
       { label: "Exam Series", href: "/dashboard#tests" },
       { label: "My Tracker", href: "/dashboard#performance" },
     ],

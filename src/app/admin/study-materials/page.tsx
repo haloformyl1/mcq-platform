@@ -67,7 +67,7 @@ export default function AdminStudyMaterials() {
     category: "3D animations" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
     section: "ALL" as CurriculumSectionType,
-    classSem: "11" as ClassSemType,
+    classSem: "SEM-I" as ClassSemType,
     url: "",
     isPremium: false,
   });
@@ -480,7 +480,7 @@ export default function AdminStudyMaterials() {
           category: "Chapter wise PDF Notes",
           discipline: "GENERAL",
           section: "ALL",
-          classSem: "11",
+          classSem: "SEM-I",
           url: "",
           isPremium: false
         });
@@ -586,14 +586,33 @@ export default function AdminStudyMaterials() {
   const handleUpdateSection = async (id: string, newSection: string) => {
     setUpdatingId(id);
     try {
+      const currentItem = materials.find(m => m.id === id);
+      let updatedClassSem = currentItem?.classSem;
+      if (newSection === "ALL" && !["SEM-I", "SEM-II", "SEM-III", "SEM-IV"].includes(updatedClassSem || "")) {
+        updatedClassSem = "SEM-I" as ClassSemType;
+      } else if (newSection === "WBCHSE" && !updatedClassSem?.startsWith("SEM-")) {
+        updatedClassSem = "SEM-I" as ClassSemType;
+      } else if ((newSection === "CBSE" || newSection === "ICSE") && updatedClassSem?.startsWith("SEM-")) {
+        updatedClassSem = (updatedClassSem === "SEM-III" || updatedClassSem === "SEM-IV") ? "12" : "11" as ClassSemType;
+      }
+
+      const bodyPayload: any = { id, section: newSection };
+      if (updatedClassSem && updatedClassSem !== currentItem?.classSem) {
+        bodyPayload.classSem = updatedClassSem;
+      }
+
       const res = await fetch("/api/admin/study-materials", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, section: newSection })
+        body: JSON.stringify(bodyPayload)
       });
       if (res.ok) {
         setMaterials(prev =>
-          prev.map(m => (m.id === id ? { ...m, section: newSection as CurriculumSectionType } : m))
+          prev.map(m => (m.id === id ? { 
+            ...m, 
+            section: newSection as CurriculumSectionType,
+            ...(updatedClassSem ? { classSem: updatedClassSem } : {})
+          } : m))
         );
       } else {
         alert("Failed to update section");
@@ -783,10 +802,12 @@ export default function AdminStudyMaterials() {
                           onChange={e => {
                             const newSec = e.target.value as CurriculumSectionType;
                             let newSem = form.classSem;
-                            if (newSec === "WBCHSE" && !newSem.startsWith("SEM-")) {
+                            if (newSec === "ALL" && !["SEM-I", "SEM-II", "SEM-III", "SEM-IV"].includes(newSem)) {
+                              newSem = "SEM-I";
+                            } else if (newSec === "WBCHSE" && !newSem.startsWith("SEM-")) {
                               newSem = "SEM-I";
                             } else if ((newSec === "CBSE" || newSec === "ICSE") && newSem.startsWith("SEM-")) {
-                              newSem = "11";
+                              newSem = (newSem === "SEM-III" || newSem === "SEM-IV") ? "12" : "11";
                             }
                             setForm({ ...form, section: newSec, classSem: newSem });
                           }}
@@ -813,7 +834,14 @@ export default function AdminStudyMaterials() {
                           required
                           className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer font-medium"
                         >
-                          {form.section === "WBCHSE" ? (
+                          {form.section === "ALL" ? (
+                            <>
+                              <option value="SEM-I">SEM-I (Semester I / Class 11)</option>
+                              <option value="SEM-II">SEM-II (Semester II / Class 11)</option>
+                              <option value="SEM-III">SEM-III (Semester III / Class 12)</option>
+                              <option value="SEM-IV">SEM-IV (Semester IV / Class 12)</option>
+                            </>
+                          ) : form.section === "WBCHSE" ? (
                             <>
                               <option value="SEM-I">Semester I (Class 11 Term 1)</option>
                               <option value="SEM-II">Semester II (Class 11 Term 2)</option>
@@ -831,11 +859,7 @@ export default function AdminStudyMaterials() {
                             <>
                               <option value="11">Class 11 (Foundation)</option>
                               <option value="12">Class 12 (Target)</option>
-                              <option value="SEM-I">SEM-I</option>
-                              <option value="SEM-II">SEM-II</option>
-                              <option value="SEM-III">SEM-III</option>
-                              <option value="SEM-IV">SEM-IV</option>
-                              <option value="ALL">All Classes / Sems</option>
+                              <option value="ALL">Both Classes (11 & 12)</option>
                             </>
                           )}
                         </select>
@@ -1303,7 +1327,14 @@ export default function AdminStudyMaterials() {
                             disabled={isDone || isUploading}
                             className="w-full bg-[#121212] border border-cyan-500/30 text-cyan-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
                           >
-                            {item.section === "WBCHSE" ? (
+                            {item.section === "ALL" || !item.section ? (
+                              <>
+                                <option value="SEM-I">SEM-I</option>
+                                <option value="SEM-II">SEM-II</option>
+                                <option value="SEM-III">SEM-III</option>
+                                <option value="SEM-IV">SEM-IV</option>
+                              </>
+                            ) : item.section === "WBCHSE" ? (
                               <>
                                 <option value="SEM-I">SEM-I</option>
                                 <option value="SEM-II">SEM-II</option>
@@ -1321,11 +1352,7 @@ export default function AdminStudyMaterials() {
                               <>
                                 <option value="11">Class 11</option>
                                 <option value="12">Class 12</option>
-                                <option value="SEM-I">SEM-I</option>
-                                <option value="SEM-II">SEM-II</option>
-                                <option value="SEM-III">SEM-III</option>
-                                <option value="SEM-IV">SEM-IV</option>
-                                <option value="ALL">All</option>
+                                <option value="ALL">Both 11 & 12</option>
                               </>
                             )}
                           </select>
@@ -1653,7 +1680,14 @@ export default function AdminStudyMaterials() {
                           disabled={isUpdatingThis}
                           className="bg-[#1a1a1a] border border-[#333] text-cyan-300 rounded px-2 py-1 text-[11px] focus:outline-none cursor-pointer font-medium w-full sm:w-auto max-w-full sm:max-w-[190px]"
                         >
-                          {item.section === "WBCHSE" ? (
+                          {item.section === "ALL" || !item.section ? (
+                            <>
+                              <option value="SEM-I">SEM-I</option>
+                              <option value="SEM-II">SEM-II</option>
+                              <option value="SEM-III">SEM-III</option>
+                              <option value="SEM-IV">SEM-IV</option>
+                            </>
+                          ) : item.section === "WBCHSE" ? (
                             <>
                               <option value="SEM-I">SEM-I</option>
                               <option value="SEM-II">SEM-II</option>
@@ -1671,11 +1705,7 @@ export default function AdminStudyMaterials() {
                             <>
                               <option value="11">Class 11</option>
                               <option value="12">Class 12</option>
-                              <option value="SEM-I">SEM-I</option>
-                              <option value="SEM-II">SEM-II</option>
-                              <option value="SEM-III">SEM-III</option>
-                              <option value="SEM-IV">SEM-IV</option>
-                              <option value="ALL">All Classes / Sems</option>
+                              <option value="ALL">Both 11 & 12</option>
                             </>
                           )}
                         </select>
@@ -1831,10 +1861,12 @@ export default function AdminStudyMaterials() {
                     onChange={e => {
                       const newSec = e.target.value as CurriculumSectionType;
                       let newSem = editForm.classSem;
-                      if (newSec === "WBCHSE" && !newSem.startsWith("SEM-")) {
+                      if (newSec === "ALL" && !["SEM-I", "SEM-II", "SEM-III", "SEM-IV"].includes(newSem)) {
+                        newSem = "SEM-I";
+                      } else if (newSec === "WBCHSE" && !newSem.startsWith("SEM-")) {
                         newSem = "SEM-I";
                       } else if ((newSec === "CBSE" || newSec === "ICSE") && newSem.startsWith("SEM-")) {
-                        newSem = "11";
+                        newSem = (newSem === "SEM-III" || newSem === "SEM-IV") ? "12" : "11";
                       }
                       setEditForm({ ...editForm, section: newSec, classSem: newSem });
                     }}
@@ -1858,7 +1890,14 @@ export default function AdminStudyMaterials() {
                     onChange={e => setEditForm({ ...editForm, classSem: e.target.value as ClassSemType })}
                     className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
                   >
-                    {editForm.section === "WBCHSE" ? (
+                    {editForm.section === "ALL" ? (
+                      <>
+                        <option value="SEM-I">SEM-I (Semester I / Class 11)</option>
+                        <option value="SEM-II">SEM-II (Semester II / Class 11)</option>
+                        <option value="SEM-III">SEM-III (Semester III / Class 12)</option>
+                        <option value="SEM-IV">SEM-IV (Semester IV / Class 12)</option>
+                      </>
+                    ) : editForm.section === "WBCHSE" ? (
                       <>
                         <option value="SEM-I">Semester I (Class 11 Term 1)</option>
                         <option value="SEM-II">Semester II (Class 11 Term 2)</option>
@@ -1876,11 +1915,7 @@ export default function AdminStudyMaterials() {
                       <>
                         <option value="11">Class 11</option>
                         <option value="12">Class 12</option>
-                        <option value="SEM-I">SEM-I</option>
-                        <option value="SEM-II">SEM-II</option>
-                        <option value="SEM-III">SEM-III</option>
-                        <option value="SEM-IV">SEM-IV</option>
-                        <option value="ALL">All Classes / Sems</option>
+                        <option value="ALL">Both (11 & 12)</option>
                       </>
                     )}
                   </select>

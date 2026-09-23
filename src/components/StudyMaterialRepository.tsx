@@ -228,9 +228,11 @@ export default function StudyMaterialRepository({
       // 2. Class / Semester filtering
       if (selectedLevel) {
         if (selectedLevel === "CLASS_XI") {
-          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "11") return false;
+          const isAllowedForClass11 = item.classSem === "11" || item.classSem === "SEM-I" || item.classSem === "SEM-II" || item.classSem === "ALL";
+          if (item.classSem && !isAllowedForClass11) return false;
         } else if (selectedLevel === "CLASS_XII") {
-          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "12") return false;
+          const isAllowedForClass12 = item.classSem === "12" || item.classSem === "SEM-III" || item.classSem === "SEM-IV" || item.classSem === "ALL";
+          if (item.classSem && !isAllowedForClass12) return false;
         } else if (selectedLevel === "SEM_1") {
           if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-I") return false;
         } else if (selectedLevel === "SEM_2") {
