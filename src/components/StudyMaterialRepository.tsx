@@ -31,12 +31,13 @@ import {
   Sparkle
 } from "lucide-react";
 
-export type BoardType = "CBSE" | "ICSE" | "WBCHSE";
+export type BoardType = "CBSE" | "ICSE" | "WBCHSE" | "ENTRANCE";
 export type AcademicClassType = "CLASS_XI" | "CLASS_XII";
 export type SemesterType = "SEM_1" | "SEM_2" | "SEM_3" | "SEM_4";
 
 export interface StudyMaterialItem {
   id: string;
+  section?: string;
   title: string;
   description?: string;
   type: string;
@@ -106,10 +107,10 @@ export default function StudyMaterialRepository({
   const [selectedBoard, setSelectedBoard] = useState<BoardType | null>(() => {
     if (initialBoard) {
       const b = initialBoard.toUpperCase();
-      if (b === "CBSE" || b === "ICSE" || b === "WBCHSE") return b as BoardType;
+      if (b === "CBSE" || b === "ICSE" || b === "WBCHSE" || b === "ENTRANCE") return b as BoardType; if (b.includes("NEET") || b.includes("JEE") || b === "COMPETITIVE") return "ENTRANCE";
     }
     const qBoard = searchParams?.get("board")?.toUpperCase();
-    if (qBoard === "CBSE" || qBoard === "ICSE" || qBoard === "WBCHSE") return qBoard as BoardType;
+    if (qBoard === "CBSE" || qBoard === "ICSE" || qBoard === "WBCHSE" || qBoard === "ENTRANCE") return qBoard as BoardType; if (qBoard && (qBoard.includes("NEET") || qBoard.includes("JEE") || qBoard === "COMPETITIVE")) return "ENTRANCE";
     return null;
   });
 
@@ -203,6 +204,7 @@ export default function StudyMaterialRepository({
           discipline,
           chapterNumber,
           chapterTitle,
+          section: mat.section || "ALL",
           createdAt: mat.createdAt
         };
       });
@@ -332,6 +334,12 @@ export default function StudyMaterialRepository({
   }, [activeCategoryObject, contextMaterials, searchQuery, activeDiscipline, sortBy]);
 
   // Format Level Label for Display
+  const getBoardLabel = (board: string | null) => {
+    if (!board) return "";
+    if (board === "ENTRANCE") return "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS";
+    return board;
+  };
+
   const getLevelLabel = (level: string | null) => {
     if (!level) return "";
     switch (level) {
@@ -341,6 +349,10 @@ export default function StudyMaterialRepository({
       case "SEM_2": return "Semester II";
       case "SEM_3": return "Semester III";
       case "SEM_4": return "Semester IV";
+      case "NEET": return "NEET UG";
+      case "JEE": return "JEE Mains & Adv.";
+      case "WBJEE": return "WBJEE Target";
+      case "CUET": return "CUET & Other Exams";
       default: return level.replace("_", " ");
     }
   };
@@ -448,7 +460,7 @@ export default function StudyMaterialRepository({
             </h2>
 
             {/* 3 Large Academic Portal Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
               
               {/* 1. CBSE */}
               <div 
@@ -564,6 +576,44 @@ export default function StudyMaterialRepository({
                 </div>
               </div>
 
+              {/* 4. NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS */}
+              <div 
+                onClick={() => setSelectedBoard("ENTRANCE")}
+                className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono tracking-widest text-rose-300/80 px-2.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/30">
+                      COMPETITIVE ENTRANCE
+                    </span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_#F43F5E]" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-sans tracking-tight group-hover:text-rose-300 transition-colors leading-tight">
+                      NEET / JEE / WBJEE / CUET
+                    </h3>
+                    <p className="text-xs text-slate-400 font-medium">
+                      & Other Entrance Exams
+                    </p>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed font-light">
+                    34-Year chapter-wise solved PYQ archives, high-yield DPP drill banks, NCERT booster formula digests, and national mock papers.
+                  </p>
+                </div>
+
+                <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between">
+                  <span className="text-xs font-mono text-slate-400 font-semibold tracking-wider">
+                    NEET · JEE · WBJEE · CUET
+                  </span>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-400 group-hover:text-rose-300 transition-colors">
+                    <span>Explore Chemistry</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -583,10 +633,10 @@ export default function StudyMaterialRepository({
                 Step 2 · Academic Level
               </span>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-white font-serif tracking-tight mt-1">
-                {selectedBoard === "WBCHSE" ? "Select your semester" : "Select your class"}
+                {selectedBoard === "WBCHSE" ? "Select your semester" : selectedBoard === "ENTRANCE" ? "Select your target examination" : "Select your class"}
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 font-light mt-1">
-                Curriculum: <strong className="text-white uppercase">{selectedBoard}</strong>
+                Curriculum: <strong className="text-white uppercase">{getBoardLabel(selectedBoard)}</strong>
               </p>
             </div>
 
@@ -747,6 +797,101 @@ export default function StudyMaterialRepository({
             </div>
           )}
 
+          {/* If ENTRANCE: Show 4 Examination Tracks */}
+          {selectedBoard === "ENTRANCE" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              
+              {/* 1. NEET UG */}
+              <div
+                onClick={() => setSelectedLevel("NEET")}
+                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(244,63,94,0.15)] shadow-md"
+              >
+                <div>
+                  <span className="text-xs font-mono text-rose-300/80 px-2.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/30">
+                    MEDICAL ENTRANCE
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-white font-sans mt-3 group-hover:text-rose-300 transition-colors">
+                    NEET UG Chemistry
+                  </h3>
+                  <p className="text-xs text-slate-300/80 font-light mt-2 leading-relaxed">
+                    NCERT line-by-line master drills, 34-year AIPMT/NEET solved sets, high-speed bio-chem revisions.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-rose-400">
+                  <span>Open NEET Portal</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+
+              {/* 2. JEE MAINS & ADVANCED */}
+              <div
+                onClick={() => setSelectedLevel("JEE")}
+                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,217,255,0.15)] shadow-md"
+              >
+                <div>
+                  <span className="text-xs font-mono text-cyan-300/80 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30">
+                    ENGINEERING ENTRANCE
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-white font-sans mt-3 group-hover:text-cyan-300 transition-colors">
+                    JEE Mains & Adv.
+                  </h3>
+                  <p className="text-xs text-slate-300/80 font-light mt-2 leading-relaxed">
+                    Multi-concept physical chemistry derivations, organic mechanism pathways, and NTA question banks.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-cyan-400">
+                  <span>Open JEE Portal</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+
+              {/* 3. WBJEE */}
+              <div
+                onClick={() => setSelectedLevel("WBJEE")}
+                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(16,185,129,0.15)] shadow-md"
+              >
+                <div>
+                  <span className="text-xs font-mono text-emerald-300/80 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30">
+                    STATE ENGINEERING
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-white font-sans mt-3 group-hover:text-emerald-300 transition-colors">
+                    WBJEE Target
+                  </h3>
+                  <p className="text-xs text-slate-300/80 font-light mt-2 leading-relaxed">
+                    High-frequency calculation drills, category I, II, III previous year questions and speed shortcuts.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-emerald-400">
+                  <span>Open WBJEE Portal</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+
+              {/* 4. CUET & OTHER ENTRANCES */}
+              <div
+                onClick={() => setSelectedLevel("CUET")}
+                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(245,158,11,0.15)] shadow-md"
+              >
+                <div>
+                  <span className="text-xs font-mono text-amber-300/80 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/30">
+                    ALL ENTRANCE EXAMS
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-white font-sans mt-3 group-hover:text-amber-300 transition-colors">
+                    CUET & Others
+                  </h3>
+                  <p className="text-xs text-slate-300/80 font-light mt-2 leading-relaxed">
+                    Central university entrance papers, state entrance sets, and complete formula bibles.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs font-bold text-amber-400">
+                  <span>Open CUET Portal</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+
+            </div>
+          )}
+
         </section>
       )}
 
@@ -761,7 +906,7 @@ export default function StudyMaterialRepository({
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-wider">
-                  {selectedBoard} · {getLevelLabel(selectedLevel)}
+                  {selectedBoard === "ENTRANCE" ? "ENTRANCE EXAMS" : selectedBoard} · {getLevelLabel(selectedLevel)}
                 </span>
                 <span className="text-xs text-slate-400 hidden sm:inline">•</span>
                 <span className="text-xs font-mono text-slate-300">Chemistry Academic Repository</span>
@@ -782,7 +927,7 @@ export default function StudyMaterialRepository({
                 className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-xs font-mono text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Switch {selectedBoard === "WBCHSE" ? "Semester" : "Class"}</span>
+                <span>Switch {selectedBoard === "WBCHSE" ? "Semester" : selectedBoard === "ENTRANCE" ? "Exam" : "Class"}</span>
               </button>
             </div>
           </div>
@@ -859,7 +1004,7 @@ export default function StudyMaterialRepository({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
             <div>
               <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 uppercase tracking-wider">
-                <span>{selectedBoard}</span>
+                <span>{selectedBoard === "ENTRANCE" ? "ENTRANCE EXAMS" : selectedBoard}</span>
                 <span>•</span>
                 <span>{getLevelLabel(selectedLevel)}</span>
                 <span>•</span>

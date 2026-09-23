@@ -5,7 +5,7 @@ import {
   Upload, FileText, Image as ImageIcon, Link as LinkIcon, Trash2, 
   Plus, ExternalLink, Download, File, CheckCircle2, BookOpen, 
   Atom, CheckSquare, Flame, Award, GraduationCap, FileCheck, 
-  Search, Filter, Sparkles, Eye, Tag, CloudUpload, Pencil, X, FolderUp, Folders, CheckCheck, Loader2, FileStack
+  Search, Filter, Sparkles, Layers, Eye, Tag, CloudUpload, Pencil, X, FolderUp, Folders, CheckCheck, Loader2, FileStack
 } from "lucide-react";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import { 
@@ -13,6 +13,8 @@ import {
   LibraryCategoryType,
   SUBJECT_DISCIPLINES,
   SubjectDisciplineType,
+  CURRICULUM_SECTIONS,
+  CurriculumSectionType,
   parseMaterialMetadata
 } from "@/lib/studyMaterialMetadata";
 
@@ -62,6 +64,7 @@ export default function AdminStudyMaterials() {
     type: "PDF",
     category: "3D animations" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
+    section: "ALL" as CurriculumSectionType,
     url: "",
     isPremium: false,
   });
@@ -70,6 +73,7 @@ export default function AdminStudyMaterials() {
   
   // Catalog Filter States
   const [filterCategory, setFilterCategory] = useState<string>("ALL");
+  const [filterSection, setFilterSection] = useState<string>("ALL");
   const [filterTier, setFilterTier] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -82,6 +86,7 @@ export default function AdminStudyMaterials() {
     title: string;
     category: LibraryCategoryType;
     discipline: SubjectDisciplineType;
+    section: CurriculumSectionType;
     isPremium: boolean;
     sizeFormatted: string;
     status: "pending" | "uploading" | "done" | "error";
@@ -96,6 +101,7 @@ export default function AdminStudyMaterials() {
   });
   const [bulkCategory, setBulkCategory] = useState<LibraryCategoryType>("Chapter wise PDF Notes");
   const [bulkDiscipline, setBulkDiscipline] = useState<SubjectDisciplineType>("GENERAL");
+  const [bulkSection, setBulkSection] = useState<CurriculumSectionType>("ALL");
 
   const handleFolderSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawFiles = Array.from(e.target.files || []);
@@ -131,6 +137,7 @@ export default function AdminStudyMaterials() {
         title: cleanTitle,
         category: meta.category,
         discipline: meta.discipline,
+        section: (meta.section || "ALL") as CurriculumSectionType,
         isPremium: false,
         sizeFormatted: sizeMB + " MB",
         status: "pending" as const,
@@ -216,6 +223,7 @@ export default function AdminStudyMaterials() {
             type: item.file.name.toLowerCase().endsWith(".pdf") ? "PDF" : "IMAGE",
             category: item.category,
             discipline: item.discipline,
+            section: item.section,
             isPremium: item.isPremium,
             url: presignData.publicUrl,
             fileSize: item.sizeFormatted,
@@ -256,6 +264,7 @@ export default function AdminStudyMaterials() {
     type: "PDF",
     category: "Chapter wise PDF Notes" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
+    section: "ALL" as CurriculumSectionType,
     url: "",
     isPremium: false,
   });
@@ -276,6 +285,7 @@ export default function AdminStudyMaterials() {
       type: item.type || "PDF",
       category: item.category || "Chapter wise PDF Notes",
       discipline: item.discipline || "GENERAL",
+      section: (item.section || "ALL") as CurriculumSectionType,
       url: item.url || "",
       isPremium: Boolean(item.isPremium),
     });
@@ -339,6 +349,7 @@ export default function AdminStudyMaterials() {
           type: editForm.type,
           category: editForm.category,
           discipline: editForm.discipline,
+          section: editForm.section,
           isPremium: editForm.isPremium,
           url: finalUrl,
           fileSize: fileSizeFormatted,
@@ -440,6 +451,7 @@ export default function AdminStudyMaterials() {
           type: form.type,
           category: form.category,
           discipline: form.discipline,
+          section: form.section,
           isPremium: form.isPremium,
           url: finalUrl,
           fileSize: fileSizeFormatted,
@@ -455,6 +467,7 @@ export default function AdminStudyMaterials() {
           type: "PDF",
           category: "Chapter wise PDF Notes",
           discipline: "GENERAL",
+          section: "ALL",
           url: "",
           isPremium: false
         });
@@ -535,6 +548,28 @@ export default function AdminStudyMaterials() {
     }
   };
 
+  const handleUpdateSection = async (id: string, newSection: string) => {
+    setUpdatingId(id);
+    try {
+      const res = await fetch("/api/admin/study-materials", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, section: newSection })
+      });
+      if (res.ok) {
+        setMaterials(prev =>
+          prev.map(m => (m.id === id ? { ...m, section: newSection as CurriculumSectionType } : m))
+        );
+      } else {
+        alert("Failed to update section");
+      }
+    } catch {
+      alert("Error updating section");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const handleUpdateDiscipline = async (id: string, newDiscipline: string) => {
     setUpdatingId(id);
     try {
@@ -558,6 +593,7 @@ export default function AdminStudyMaterials() {
   // Filter materials for catalog display
   const filteredMaterials = materials.filter((item: any) => {
     if (filterCategory !== "ALL" && item.category !== filterCategory) return false;
+    if (filterSection !== "ALL" && (item.section || "ALL") !== filterSection) return false;
     if (filterTier === "FREE" && item.isPremium) return false;
     if (filterTier === "PREMIUM" && !item.isPremium) return false;
     if (searchQuery.trim()) {
@@ -565,7 +601,8 @@ export default function AdminStudyMaterials() {
       const matchTitle = item.title?.toLowerCase().includes(q);
       const matchDesc = (item.cleanDescription || item.description)?.toLowerCase().includes(q);
       const matchCat = item.category?.toLowerCase().includes(q);
-      if (!matchTitle && !matchDesc && !matchCat) return false;
+      const matchSec = item.section?.toLowerCase().includes(q);
+      if (!matchTitle && !matchDesc && !matchCat && !matchSec) return false;
     }
     return true;
   });
@@ -696,6 +733,26 @@ export default function AdminStudyMaterials() {
                           ))}
                         </select>
                         <p className="text-[11px] text-gray-500">Determines which tab this material appears under in the student vault.</p>
+                      </div>
+
+                      {/* Curriculum Section Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-purple-300 uppercase tracking-wide flex items-center gap-1.5">
+                          <Layers className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Curriculum / Section <span className="text-red-400">*</span></span>
+                        </label>
+                        <select
+                          value={form.section}
+                          onChange={e => setForm({ ...form, section: e.target.value as CurriculumSectionType })}
+                          className="w-full bg-[#181818] border border-purple-500/40 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition cursor-pointer font-medium"
+                        >
+                          <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE & Entrance)</option>
+                          <option value="CBSE">CBSE (Class XI & XII)</option>
+                          <option value="ICSE">ICSE / ISC</option>
+                          <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
+                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS</option>
+                        </select>
+                        <p className="text-[11px] text-gray-500">Assign this content to a specific board or competitive entrance exam.</p>
                       </div>
           
                       {/* Chemistry Branch / Discipline Selector */}
@@ -930,6 +987,30 @@ export default function AdminStudyMaterials() {
                       </button>
                     </div>
 
+                    {/* Bulk Section */}
+                    <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
+                      <span className="text-purple-300 text-[11px] pl-1 font-semibold">Section:</span>
+                      <select
+                        value={bulkSection}
+                        onChange={e => setBulkSection(e.target.value as CurriculumSectionType)}
+                        className="bg-[#111] border border-[#444] text-purple-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
+                      >
+                        <option value="ALL">All Curriculums</option>
+                        <option value="CBSE">CBSE</option>
+                        <option value="ICSE">ICSE / ISC</option>
+                        <option value="WBCHSE">WBCHSE</option>
+                        <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => setStagedFiles(prev => prev.map(s => ({ ...s, section: bulkSection })))}
+                        disabled={batchUploading}
+                        className="px-2.5 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded-lg text-xs font-bold transition cursor-pointer"
+                      >
+                        Apply to All
+                      </button>
+                    </div>
+
                     {/* Bulk Discipline */}
                     <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
                       <span className="text-gray-400 text-[11px] pl-1 font-semibold">Branch:</span>
@@ -1070,6 +1151,25 @@ export default function AdminStudyMaterials() {
                             {SUBJECT_DISCIPLINES.map(d => (
                               <option key={d} value={d}>{d}</option>
                             ))}
+                          </select>
+                        </div>
+
+                        {/* Curriculum Section Dropdown */}
+                        <div className="w-full md:w-44 shrink-0">
+                          <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider block mb-1">
+                            Curriculum Section
+                          </span>
+                          <select
+                            value={item.section}
+                            onChange={e => handleUpdateStaged(item.id, { section: e.target.value as CurriculumSectionType })}
+                            disabled={isDone || isUploading}
+                            className="w-full bg-[#121212] border border-purple-500/30 text-purple-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-purple-400 cursor-pointer font-medium"
+                          >
+                            <option value="ALL">All Curriculums</option>
+                            <option value="CBSE">CBSE</option>
+                            <option value="ICSE">ICSE / ISC</option>
+                            <option value="WBCHSE">WBCHSE</option>
+                            <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
                           </select>
                         </div>
 
@@ -1223,6 +1323,44 @@ export default function AdminStudyMaterials() {
           </div>
         </div>
 
+        {/* Curriculum Section Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+          <span className="text-[11px] text-gray-400 font-bold uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+            <Layers className="w-3.5 h-3.5 text-purple-400" />
+            Curriculum:
+          </span>
+          {[
+            { id: "ALL", label: "All Curriculums" },
+            { id: "CBSE", label: "CBSE" },
+            { id: "ICSE", label: "ICSE / ISC" },
+            { id: "WBCHSE", label: "WBCHSE" },
+            { id: "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS", label: "NEET / JEE & Entrance" },
+          ].map(sec => {
+            const isSecActive = filterSection === sec.id;
+            const count = sec.id === "ALL" 
+              ? materials.length 
+              : materials.filter((m: any) => (m.section || "ALL") === sec.id).length;
+            return (
+              <button
+                key={sec.id}
+                type="button"
+                onClick={() => setFilterSection(sec.id)}
+                className={
+                  "px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap shrink-0 border transition cursor-pointer flex items-center gap-1.5 " +
+                  (isSecActive
+                    ? "bg-purple-950 text-purple-300 border-purple-500 shadow"
+                    : "bg-[#141414] text-gray-400 border-[#2a2a2a] hover:text-white hover:border-[#3a3a3a]")
+                }
+              >
+                <span>{sec.label}</span>
+                <span className={"text-[10px] px-1.5 py-0.2 rounded-full font-mono " + (isSecActive ? "bg-purple-800 text-white" : "bg-[#222] text-gray-400")}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Shelf Category Tabs Filter */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
           <button
@@ -1283,6 +1421,11 @@ export default function AdminStudyMaterials() {
                         <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-cyan-950 text-cyan-300 border border-cyan-500/40">
                           {item.category || "3D animations"}
                         </span>
+                        {item.section && item.section !== "ALL" && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-950 text-purple-300 border border-purple-500/40">
+                            {item.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? "NEET / JEE & ENTRANCE" : item.section}
+                          </span>
+                        )}
                         {item.discipline && item.discipline !== "GENERAL" && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#222] text-gray-300 border border-[#333]">
                             {item.discipline}
@@ -1319,8 +1462,25 @@ export default function AdminStudyMaterials() {
                       })()}
                     </div>
 
-                    {/* Quick Category / Branch Changer */}
+                    {/* Quick Category / Branch / Section Changer */}
                     <div className="p-2.5 rounded-xl bg-[#0c0c0c] border border-[#222] space-y-2 text-xs">
+                      {/* Section Quick Changer */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <span className="text-[10px] text-purple-300 font-bold uppercase shrink-0">Section:</span>
+                        <select
+                          value={item.section || "ALL"}
+                          onChange={e => handleUpdateSection(item.id, e.target.value)}
+                          disabled={isUpdatingThis}
+                          className="bg-[#1a1a1a] border border-[#333] text-purple-300 rounded px-2 py-1 text-[11px] focus:outline-none cursor-pointer font-medium w-full sm:w-auto max-w-full sm:max-w-[190px]"
+                        >
+                          <option value="ALL">All Curriculums</option>
+                          <option value="CBSE">CBSE</option>
+                          <option value="ICSE">ICSE / ISC</option>
+                          <option value="WBCHSE">WBCHSE</option>
+                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                        </select>
+                      </div>
+
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <span className="text-[10px] text-gray-400 font-bold uppercase shrink-0">Change Shelf:</span>
                         <select
@@ -1458,6 +1618,24 @@ export default function AdminStudyMaterials() {
                         {cat}
                       </option>
                     ))}
+                  </select>
+                </div>
+
+                {/* Curriculum / Section */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-purple-300 uppercase tracking-wide">
+                    Curriculum / Section <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={editForm.section}
+                    onChange={e => setEditForm({ ...editForm, section: e.target.value as CurriculumSectionType })}
+                    className="w-full bg-[#181818] border border-purple-500/40 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
+                  >
+                    <option value="ALL">All Curriculums (Universal)</option>
+                    <option value="CBSE">CBSE</option>
+                    <option value="ICSE">ICSE / ISC</option>
+                    <option value="WBCHSE">WBCHSE</option>
+                    <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS</option>
                   </select>
                 </div>
 

@@ -32,14 +32,14 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
 
   if (slug.length > 0 && !initialBoard) {
     const rawBoard = slug[0].toUpperCase();
-    if (["CBSE", "ICSE", "WBCHSE"].includes(rawBoard)) {
+    if (["CBSE", "ICSE", "WBCHSE", "ENTRANCE", "COMPETITIVE", "NEET-JEE", "NEET"].includes(rawBoard)) { initialBoard = ["ENTRANCE", "COMPETITIVE", "NEET-JEE", "NEET"].includes(rawBoard) ? "ENTRANCE" : rawBoard; } else if (false) {
       initialBoard = rawBoard;
     }
   }
 
   if (slug.length > 1 && !initialLevel) {
     const rawLevel = slug[1].toLowerCase().replace("-", "_");
-    if (["class_xi", "class_xii", "sem_1", "sem_2", "sem_3", "sem_4"].includes(rawLevel)) {
+    if (["class_xi", "class_xii", "sem_1", "sem_2", "sem_3", "sem_4", "neet", "jee", "wbjee", "cuet"].includes(rawLevel)) {
       initialLevel = rawLevel.toUpperCase();
     }
   }

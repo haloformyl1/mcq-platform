@@ -22,6 +22,7 @@ export async function GET() {
         ...m,
         category: meta.category,
         discipline: meta.discipline,
+        section: meta.section,
         cleanDescription: meta.cleanDescription
       };
     });
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
     let fileSizeFormatted: string | null = null;
     let category = "Chapter wise PDF Notes";
     let discipline = "GENERAL";
+    let section = "ALL";
 
     if (contentType.includes("application/json")) {
       const body = await req.json();
@@ -54,6 +56,7 @@ export async function POST(req: Request) {
       fileSizeFormatted = body.fileSize || null;
       category = body.category || "Chapter wise PDF Notes";
       discipline = body.discipline || "GENERAL";
+      section = body.section || "ALL";
     } else {
       const formData = await req.formData();
       title = (formData.get("title") as string)?.trim() || "";
@@ -64,6 +67,7 @@ export async function POST(req: Request) {
       const file = formData.get("file") as Blob | null;
       category = (formData.get("category") as string) || "Chapter wise PDF Notes";
       discipline = (formData.get("discipline") as string) || "GENERAL";
+      section = (formData.get("section") as string) || "ALL";
 
       if (file && typeof (file as any).arrayBuffer === "function") {
         const bytes = await (file as any).arrayBuffer();
@@ -93,7 +97,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "A valid file upload or URL is required" }, { status: 400 });
     }
 
-    const encodedDescription = encodeMaterialMetadata(rawDescription, category, discipline);
+    const encodedDescription = encodeMaterialMetadata(rawDescription, category, discipline, section);
 
     const material = await prisma.studyMaterial.create({
       data: {
@@ -114,6 +118,7 @@ export async function POST(req: Request) {
         ...material,
         category: meta.category,
         discipline: meta.discipline,
+        section: meta.section,
         cleanDescription: meta.cleanDescription
       }
     });
@@ -169,7 +174,7 @@ export async function DELETE(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const body = await req.json();
-    const { id, title, description, isPremium, category, discipline, type, url, fileSize } = body;
+    const { id, title, description, isPremium, category, discipline, section, type, url, fileSize } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Material ID is required" }, { status: 400 });
@@ -208,10 +213,11 @@ export async function PATCH(req: Request) {
     const currentMeta = parseMaterialMetadata(existing.description, existing.title, existing.type);
     const newCategory = category || currentMeta.category;
     const newDiscipline = discipline || currentMeta.discipline;
+    const newSection = section !== undefined ? section : currentMeta.section;
     const cleanDesc = typeof description === "string" ? description.trim() : currentMeta.cleanDescription;
 
-    if (category || discipline || typeof description === "string") {
-      updateData.description = encodeMaterialMetadata(cleanDesc, newCategory, newDiscipline);
+    if (category || discipline || section !== undefined || typeof description === "string") {
+      updateData.description = encodeMaterialMetadata(cleanDesc, newCategory, newDiscipline, newSection);
     }
 
     const updated = await prisma.studyMaterial.update({
@@ -227,6 +233,7 @@ export async function PATCH(req: Request) {
         ...updated,
         category: meta.category,
         discipline: meta.discipline,
+        section: meta.section,
         cleanDescription: meta.cleanDescription
       }
     });

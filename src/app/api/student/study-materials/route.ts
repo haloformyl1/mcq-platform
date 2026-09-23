@@ -53,6 +53,7 @@ export async function GET(req: Request) {
         isLocked,
         category: meta.category,
         discipline: meta.discipline,
+        section: meta.section,
         description: meta.cleanDescription
       };
     });
