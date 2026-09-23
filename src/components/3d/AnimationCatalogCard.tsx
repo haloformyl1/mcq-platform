@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { Play, Sparkles, Check, Lock, Box, ArrowRight } from "lucide-react";
+import { Play, Sparkles, Check, Lock, Box, ArrowRight, ShieldAlert } from "lucide-react";
+import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 
 interface AnimationCatalogCardProps {
   item: {
@@ -11,12 +12,18 @@ interface AnimationCatalogCardProps {
     description: string | null;
     isPremium: boolean;
     isLocked?: boolean;
+    isLevelRestricted?: boolean;
+    restrictionReason?: string;
+    targetLabel?: string;
+    section?: string;
+    classSem?: string;
     discipline?: string;
     category?: string;
     url?: string;
   };
   isGold?: boolean;
   isGoldMember?: boolean;
+  student?: any;
   onLockedClick: (item: any) => void;
   featured?: boolean;
 }
@@ -25,12 +32,16 @@ export default function AnimationCatalogCard({
   item,
   isGold,
   isGoldMember,
+  student,
   onLockedClick,
   featured = false
 }: AnimationCatalogCardProps) {
   const hasGold = Boolean(isGold ?? isGoldMember);
-  // Authorization check: if animation is premium and student is not Gold
-  const canAccess = !item.isPremium || hasGold;
+  const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
+  const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
+  const restrictionReason = eligibility.reason || item.restrictionReason;
+  const targetLabel = eligibility.targetLabel || item.targetLabel;
+  const canAccess = !isLevelRestricted && (!item.isPremium || hasGold);
   const cleanTitle = item.title.replace(/\(.*?\)/g, "").trim();
 
   // Determine scientific theme based on title / discipline
@@ -147,6 +158,16 @@ export default function AnimationCatalogCard({
         {/* Badges Overlay */}
         <div className="absolute top-3.5 inset-x-3.5 z-20 flex items-center justify-between gap-2">
           
+          {isLevelRestricted && (
+            <span 
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-950/90 border border-rose-500/50 text-rose-300 text-[10px] sm:text-[11px] font-mono font-bold tracking-wider shadow-[0_0_12px_rgba(244,63,94,0.25)]"
+              title={restrictionReason}
+            >
+              <Lock className="w-3 h-3 text-rose-300 shrink-0" />
+              <span>{item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`}</span>
+            </span>
+          )}
+
           {/* Admin-Driven FREE vs PREMIUM Badge */}
           {item.isPremium ? (
             <span 
@@ -232,6 +253,16 @@ export default function AnimationCatalogCard({
               <span>Launch 3D Lab</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
             </Link>
+          ) : isLevelRestricted ? (
+            <button
+              type="button"
+              onClick={() => onLockedClick({ ...item, isLevelRestricted: true, restrictionReason, targetLabel })}
+              className="w-full py-2.5 px-4 rounded-xl bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/60 text-rose-300 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-[0_0_14px_rgba(244,63,94,0.15)] group/btn cursor-pointer"
+            >
+              <Lock className="w-3.5 h-3.5 text-rose-400" />
+              <span>Restricted ({item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})</span>
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
+            </button>
           ) : (
             <button
               type="button"

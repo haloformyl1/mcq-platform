@@ -193,3 +193,172 @@ export function parseMaterialMetadata(
 
   return { category, discipline, section, classSem, cleanDescription: cleanDescription.trim() };
 }
+
+export interface StudentAcademicProfile {
+  board?: string | null;
+  academicLevel?: string | null;
+}
+
+export interface MaterialEligibilityResult {
+  eligible: boolean;
+  reason?: string;
+  targetLabel?: string;
+}
+
+export function normalizeAcademicLevel(level?: string | null): string {
+  const s = (level || "").toUpperCase().trim().replace(/_/g, "-").replace(/\s+/g, "-");
+  if (s.includes("SEM-4") || s.includes("SEM-IV") || s === "IV") return "SEM-IV";
+  if (s.includes("SEM-3") || s.includes("SEM-III") || s === "III") return "SEM-III";
+  if (s.includes("SEM-2") || s.includes("SEM-II") || s === "II") return "SEM-II";
+  if (s.includes("SEM-1") || s.includes("SEM-I") || s === "I") return "SEM-I";
+  if (s.includes("12") || s.includes("XII")) return "12";
+  if (s.includes("11") || s.includes("XI")) return "11";
+  return s;
+}
+
+export function formatTargetLabel(section: string = "ALL", classSem: string = "ALL"): string {
+  const sec = (section || "ALL").toUpperCase().trim();
+  const sem = (classSem || "ALL").toUpperCase().trim();
+  const normSem = normalizeAcademicLevel(sem);
+
+  if (sec === "ALL" || sec === "ALL CURRICULUMS") {
+    if (normSem === "SEM-I") return "WBCHSE SEM-I & Class 11 (CBSE/ICSE)";
+    if (normSem === "SEM-II") return "WBCHSE SEM-II & Class 11 (CBSE/ICSE)";
+    if (normSem === "SEM-III") return "WBCHSE SEM-III & Class 12 (CBSE/ICSE)";
+    if (normSem === "SEM-IV") return "WBCHSE SEM-IV & Class 12 (CBSE/ICSE)";
+    if (normSem === "11") return "Class 11 / SEM-I & II";
+    if (normSem === "12") return "Class 12 / SEM-III & IV";
+    return "All Curriculums";
+  }
+
+  if (sec === "WBCHSE") {
+    return normSem === "ALL" ? "WBCHSE (All Semesters)" : `WBCHSE ${normSem}`;
+  }
+
+  if (sec === "CBSE") {
+    return normSem === "ALL" ? "CBSE (Class 11 & 12)" : `CBSE Class ${normSem}`;
+  }
+
+  if (sec === "ICSE" || sec === "ISC") {
+    return normSem === "ALL" ? "ICSE/ISC (Class 11 & 12)" : `ICSE Class ${normSem}`;
+  }
+
+  return `${sec} (${sem})`;
+}
+
+export function isStudentEligibleForMaterial(
+  student?: StudentAcademicProfile | null,
+  materialSection?: string | null,
+  materialClassSem?: string | null
+): MaterialEligibilityResult {
+  const targetLabel = formatTargetLabel(materialSection || "ALL", materialClassSem || "ALL");
+
+  if (!student || !student.board || !student.academicLevel) {
+    return { 
+      eligible: false, 
+      reason: "Please sign in or complete profile onboarding to access this curriculum material.",
+      targetLabel
+    };
+  }
+
+  const studentBoard = (student.board || "").toUpperCase().trim();
+  const studentLevel = (student.academicLevel || "").toUpperCase().trim();
+
+  const isWbchseStudent = studentBoard === "WBCHSE";
+  const isCbseStudent = studentBoard === "CBSE";
+  const isIcseStudent = studentBoard === "ICSE" || studentBoard === "ISC";
+
+  const normStudentLevel = normalizeAcademicLevel(studentLevel);
+
+  const rawSec = (materialSection || "ALL").toUpperCase().trim();
+  const isAllSec = rawSec === "ALL" || rawSec === "ALL CURRICULUMS";
+  const isEntranceSec = rawSec.includes("NEET") || rawSec.includes("JEE") || rawSec.includes("ENTRANCE");
+  const isWbchseSec = rawSec === "WBCHSE";
+  const isCbseSec = rawSec === "CBSE";
+  const isIcseSec = rawSec === "ICSE" || rawSec === "ISC";
+
+  if (!isAllSec && !isEntranceSec) {
+    if (isWbchseSec && !isWbchseStudent) {
+      return { 
+        eligible: false, 
+        reason: `Exclusive to WBCHSE curriculum (Your profile: ${studentBoard})`,
+        targetLabel
+      };
+    }
+    if (isCbseSec && !isCbseStudent) {
+      return { 
+        eligible: false, 
+        reason: `Exclusive to CBSE curriculum (Your profile: ${studentBoard})`,
+        targetLabel
+      };
+    }
+    if (isIcseSec && !isIcseStudent) {
+      return { 
+        eligible: false, 
+        reason: `Exclusive to ICSE curriculum (Your profile: ${studentBoard})`,
+        targetLabel
+      };
+    }
+  }
+
+  const rawClassSem = (materialClassSem || "ALL").toUpperCase().trim();
+  const normClassSem = normalizeAcademicLevel(rawClassSem);
+
+  if (rawClassSem === "ALL" || normClassSem === "ALL") {
+    return { eligible: true, targetLabel };
+  }
+
+  // WBCHSE Student checks
+  if (isWbchseStudent) {
+    if (normClassSem === "SEM-I" && normStudentLevel === "SEM-I") return { eligible: true, targetLabel };
+    if (normClassSem === "SEM-II" && normStudentLevel === "SEM-II") return { eligible: true, targetLabel };
+    if (normClassSem === "SEM-III" && normStudentLevel === "SEM-III") return { eligible: true, targetLabel };
+    if (normClassSem === "SEM-IV" && normStudentLevel === "SEM-IV") return { eligible: true, targetLabel };
+
+    if (normClassSem === "11" && (normStudentLevel === "SEM-I" || normStudentLevel === "SEM-II" || normStudentLevel === "11")) return { eligible: true, targetLabel };
+    if (normClassSem === "12" && (normStudentLevel === "SEM-III" || normStudentLevel === "SEM-IV" || normStudentLevel === "12")) return { eligible: true, targetLabel };
+
+    return { 
+      eligible: false, 
+      reason: `Reserved for ${targetLabel} (Your semester: ${studentLevel})`,
+      targetLabel
+    };
+  }
+
+  // CBSE & ICSE Student checks
+  if (isCbseStudent || isIcseStudent) {
+    const isClass11Student = normStudentLevel === "11" || normStudentLevel === "SEM-I" || normStudentLevel === "SEM-II";
+    const isClass12Student = normStudentLevel === "12" || normStudentLevel === "SEM-III" || normStudentLevel === "SEM-IV";
+
+    if (normClassSem === "SEM-I" || normClassSem === "SEM-II" || normClassSem === "11") {
+      if (isClass11Student) return { eligible: true, targetLabel };
+      return { 
+        eligible: false, 
+        reason: `Reserved for Class 11 (${rawClassSem}) students (Your profile: Class 12)`,
+        targetLabel
+      };
+    }
+
+    if (normClassSem === "SEM-III" || normClassSem === "SEM-IV" || normClassSem === "12") {
+      if (isClass12Student) return { eligible: true, targetLabel };
+      return { 
+        eligible: false, 
+        reason: `Reserved for Class 12 (${rawClassSem}) students (Your profile: Class 11)`,
+        targetLabel
+      };
+    }
+
+    return { 
+      eligible: false, 
+      reason: `Not available for Class ${normStudentLevel} (Target: ${targetLabel})`,
+      targetLabel
+    };
+  }
+
+  if (normClassSem === normStudentLevel) return { eligible: true, targetLabel };
+  return { 
+    eligible: false, 
+    reason: `Material is restricted to ${targetLabel}`,
+    targetLabel
+  };
+}

@@ -26,6 +26,9 @@ export interface StudyMaterialItem {
   url: string;
   fileSize?: string;
   isPremium?: boolean;
+  isLevelRestricted?: boolean;
+  restrictionReason?: string;
+  targetLabel?: string;
   category: string;
   discipline: "PHYSICAL" | "INORGANIC" | "ORGANIC" | "GENERAL";
   chapterNumber?: number;
@@ -179,6 +182,9 @@ export function sanitizeMaterials(rawMaterials: any[] = []): StudyMaterialItem[]
         url: mat.url || "",
         fileSize: mat.fileSize || "Official PDF",
         isPremium: Boolean(mat.isPremium),
+        isLevelRestricted: Boolean(mat.isLevelRestricted),
+        restrictionReason: mat.restrictionReason,
+        targetLabel: mat.targetLabel,
         category,
         discipline,
         chapterNumber,

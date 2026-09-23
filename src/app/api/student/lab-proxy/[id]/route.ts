@@ -4,8 +4,9 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import { hasPremiumAccess } from "@/lib/subscription";
 import { validateStudentSession } from "@/lib/sessionService";
+import { parseMaterialMetadata, isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -75,7 +76,15 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
 
     const student = await prisma.student.findUnique({
       where: { id: payload.id },
-      select: { id: true, email: true, name: true, subscriptionStatus: true, subscriptionExpiresAt: true }
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        subscriptionStatus: true, 
+        subscriptionExpiresAt: true,
+        board: true,
+        academicLevel: true
+      }
     });
 
     if (!student) {
@@ -88,6 +97,39 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
 
     if (!material) {
       return new NextResponse("Study material or 3D Lab simulation not found", { status: 404 });
+    }
+
+    // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)
+    const meta = parseMaterialMetadata(material.description, material.title, material.type);
+    const eligibility = isStudentEligibleForMaterial(student, meta.section, meta.classSem);
+    if (!eligibility.eligible) {
+      return new NextResponse(
+        `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Curriculum Access Restricted</title>
+  <style>
+    body { background: #040b12; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+    .card { background: #081420; border: 1px solid rgba(244, 63, 94, 0.4); padding: 36px 30px; border-radius: 20px; max-width: 440px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    .badge { display: inline-block; padding: 4px 12px; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 9999px; color: #fda4af; font-size: 11px; font-family: monospace; font-weight: 700; margin-bottom: 12px; }
+    h2 { color: #fb7185; margin: 0 0 12px 0; font-size: 20px; font-weight: 800; }
+    p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0; }
+    a { display: inline-block; background: #1e293b; color: #38bdf8; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 700; border: 1px solid #334155; }
+    a:hover { background: #334155; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">CURRICULUM RESTRICTED</div>
+    <h2>Access Not Permitted</h2>
+    <p>${eligibility.reason || "This 3D Interactive Lab is designated for a different class or semester."}</p>
+    <a href="/dashboard" target="_top">Return to Dashboard</a>
+  </div>
+</body>
+</html>`,
+        { status: 403, headers: { "Content-Type": "text/html; charset=utf-8" } }
+      );
     }
 
     // Enforce subscription verification for premium labs

@@ -22,6 +22,7 @@ import {
   BoardType
 } from "./curriculumData";
 import UpgradeModal from "./UpgradeModal";
+import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 
 interface CurriculumLevelPageProps {
   board: string;
@@ -281,7 +282,11 @@ export default function CurriculumLevelPage({
         {filteredList.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredList.map(item => {
-              const canAccess = !item.isPremium || isGold;
+              const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
+              const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
+              const restrictionReason = eligibility.reason || item.restrictionReason;
+              const targetLabel = eligibility.targetLabel || item.targetLabel;
+              const canAccess = !isLevelRestricted && (!item.isPremium || isGold);
               return (
                 <div
                   key={item.id}
@@ -328,7 +333,7 @@ export default function CurriculumLevelPage({
                           <Eye className="w-3.5 h-3.5" />
                           <span>Read</span>
                         </Link>
-                        {item.url && (
+                        {item.url && item.url !== "#locked" && (
                           <a
                             href={item.url}
                             download
@@ -341,16 +346,25 @@ export default function CurriculumLevelPage({
                           </a>
                         )}
                       </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setUpgradeItem(item)}
+                    ) : isLevelRestricted ? (
+                        <button
+                          type="button"
+                          onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, targetLabel })}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm"
+                        >
+                          <Lock className="w-3.5 h-3.5 text-rose-400" />
+                          <span>Restricted</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setUpgradeItem(item)}
                         className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-colors"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>Unlock</span>
                       </button>
-                    )}
+                      )}
                   </div>
                 </div>
               );

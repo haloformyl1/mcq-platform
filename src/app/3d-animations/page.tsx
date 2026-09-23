@@ -19,6 +19,7 @@ function ThreeDAnimationsContent() {
   const [animations, setAnimations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isGold, setIsGold] = useState(false);
+  const [student, setStudent] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
   const [accessFilter, setAccessFilter] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
@@ -65,6 +66,7 @@ function ThreeDAnimationsContent() {
         if (dashRes && dashRes.ok) {
           const dashData = await dashRes.json();
           if (dashData?.student && mounted) {
+            setStudent(dashData.student);
             const isComp = dashData.student.subscriptionStatus === "COMPLIMENTARY";
             const isPaid = 
               dashData.student.subscriptionStatus === "PAID" && 
@@ -490,6 +492,7 @@ function ThreeDAnimationsContent() {
                 key={sim.id}
                 item={sim}
                 isGold={isGold}
+                student={student}
                 onLockedClick={handleLockedClick}
                 featured={idx === 0}
               />
@@ -533,6 +536,7 @@ function ThreeDAnimationsContent() {
         isOpen={upgradeModalOpen}
         onClose={() => setUpgradeModalOpen(false)}
         animationTitle={selectedLockedItem?.title?.replace(/\(.*?\)/g, "").trim()}
+        lockedItem={selectedLockedItem}
       />
 
       {/* Global Footer */}
