@@ -486,8 +486,8 @@ export default function StudyMaterialRepository({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
               
               {/* 1. CBSE */}
-              <div 
-                onClick={() => setSelectedBoard("CBSE")}
+              <Link 
+                href="/study-material/cbse"
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div className="space-y-4">
@@ -521,11 +521,11 @@ export default function StudyMaterialRepository({
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* 2. ICSE / ISC */}
-              <div 
-                onClick={() => setSelectedBoard("ICSE")}
+              <Link 
+                href="/study-material/icse"
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
               >
                 <div className="space-y-4">
@@ -559,11 +559,11 @@ export default function StudyMaterialRepository({
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* 3. WBCHSE */}
-              <div 
-                onClick={() => setSelectedBoard("WBCHSE")}
+              <Link 
+                href="/study-material/wbchse"
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
               >
                 <div className="space-y-4">
@@ -597,11 +597,11 @@ export default function StudyMaterialRepository({
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* 4. NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS */}
-              <div 
-                onClick={() => setSelectedBoard("ENTRANCE")}
+              <Link 
+                href="/study-material/entrance"
                 className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
               >
                 <div className="space-y-4">
@@ -635,7 +635,7 @@ export default function StudyMaterialRepository({
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
-              </div>
+              </Link>
 
             </div>
           </div>
