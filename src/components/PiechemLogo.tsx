@@ -287,26 +287,16 @@ export default function PiechemLogo({
             )}
           </div>
           
-          {/* Subtitle with VIP Gold Badge */}
-          {isGold ? (
-            <div className="flex items-center gap-1 sm:gap-1.5 text-[7.5px] sm:text-[9.5px] tracking-[0.12em] sm:tracking-[0.18em] font-extrabold uppercase mt-0.5 sm:mt-1">
-              <span className="text-cyan-400/90 font-bold hidden sm:inline">{subtitle ? subtitle.toUpperCase() : "LEARNING PLATFORM"}</span>
-              <span className="text-amber-400 hidden sm:inline">•</span>
-              <span className="inline-flex items-center gap-0.5 px-1 sm:px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-cyan-500/20 border border-amber-500/40 text-amber-300 text-[7px] sm:text-[8px] font-black tracking-wider shadow-sm">
-                <span>⭐</span> GOLD
-              </span>
-            </div>
-          ) : (
-            <div
-              className={
-                "text-[7.5px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.25em] font-semibold uppercase mt-0.5 sm:mt-1 " +
-                (theme === 'light' ? 'text-cyan-700 font-bold' : 'text-cyan-300/70')
-              }
-            >
-              <span className="hidden sm:inline">{subtitle || "Learning Platform"}</span>
-              <span className="sm:hidden">{subtitle ? subtitle.split(' ')[0] : "Learn"}</span>
-            </div>
-          )}
+          {/* Subtitle */}
+          <div
+            className={
+              "text-[7.5px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.25em] font-semibold uppercase mt-0.5 sm:mt-1 " +
+              (theme === 'light' ? 'text-cyan-700 font-bold' : 'text-cyan-300/70')
+            }
+          >
+            <span className="hidden sm:inline">{subtitle || "Learning Platform"}</span>
+            <span className="sm:hidden">{subtitle ? subtitle.split(' ')[0] : "Learn"}</span>
+          </div>
         </div>
       )}
     </div>

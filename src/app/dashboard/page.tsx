@@ -336,64 +336,7 @@ export default function StudentDashboard() {
                 </div>
               </div>
 
-              {/* Netflix-Style Nav Tabs (Desktop - directly adjacent to logo) */}
-              <nav className="hidden lg:flex items-center gap-1.5 shrink-0">
-                <a 
-                  href="#overview" 
-                  onClick={() => setActiveTab("overview")}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "overview" 
-                      ? "bg-white text-black shadow-md shadow-white/10" 
-                      : "text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Overview
-                </a>
-                <a 
-                  href="#materials" 
-                  onClick={() => setActiveTab("materials")}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "materials" 
-                      ? "bg-white text-black shadow-md shadow-white/10" 
-                      : "text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Study Materials
-                </a>
-                <a 
-                  href="#tests" 
-                  onClick={() => setActiveTab("tests")}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "tests" 
-                      ? "bg-white text-black shadow-md shadow-white/10" 
-                      : "text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Available Tests
-                </a>
-                <a 
-                  href="#leaderboard" 
-                  onClick={() => setActiveTab("leaderboard")}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "leaderboard" 
-                      ? "bg-white text-black shadow-md shadow-white/10" 
-                      : "text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Top Performers
-                </a>
-                <a 
-                  href="#performance" 
-                  onClick={() => setActiveTab("performance")}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "performance" 
-                      ? "bg-white text-black shadow-md shadow-white/10" 
-                      : "text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  Performance Analytics
-                </a>
-              </nav>
+              
             </div>
 
             {/* Right Group: Curriculum Switcher + Account Profile */}
@@ -673,66 +616,7 @@ export default function StudentDashboard() {
             </>
           )}
 
-          {/* Mobile / Tablet Dedicated Navigation Rail (Zero Scrollbar) */}
-          <div className="lg:hidden w-full pt-1.5 mt-1.5 overflow-x-auto no-scrollbar flex items-center gap-1.5 px-0.5 pr-6 scroll-smooth" style={{ WebkitOverflowScrolling: "touch" }}>
-            <a 
-              href="#overview" 
-              onClick={() => setActiveTab("overview")}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
-                activeTab === "overview" 
-                  ? "bg-white text-black shadow-sm" 
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Overview
-            </a>
-            <a 
-              href="#materials" 
-              onClick={() => setActiveTab("materials")}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
-                activeTab === "materials" 
-                  ? "bg-white text-black shadow-sm" 
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Study Materials
-            </a>
-            <a 
-              href="#tests" 
-              onClick={() => setActiveTab("tests")}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
-                activeTab === "tests" 
-                  ? "bg-white text-black shadow-sm" 
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Available Tests
-            </a>
-            
-                        <a 
-              href="#leaderboard" 
-              onClick={() => setActiveTab("leaderboard")}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
-                activeTab === "leaderboard" 
-                  ? "bg-white text-black shadow-sm" 
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Top Performers
-            </a>
-            <a 
-              href="#performance" 
-              onClick={() => setActiveTab("performance")}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all whitespace-nowrap shrink-0 ${
-                activeTab === "performance" 
-                  ? "bg-white text-black shadow-sm" 
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              My Tracker
-            </a>
           </div>
-        </div>
       </header>
 
       {/* ========================================================= */}
