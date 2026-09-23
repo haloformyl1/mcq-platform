@@ -15,6 +15,8 @@ import {
   SubjectDisciplineType,
   CURRICULUM_SECTIONS,
   CurriculumSectionType,
+  CLASS_SEM_OPTIONS,
+  ClassSemType,
   parseMaterialMetadata
 } from "@/lib/studyMaterialMetadata";
 
@@ -65,6 +67,7 @@ export default function AdminStudyMaterials() {
     category: "3D animations" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
     section: "ALL" as CurriculumSectionType,
+    classSem: "11" as ClassSemType,
     url: "",
     isPremium: false,
   });
@@ -74,6 +77,7 @@ export default function AdminStudyMaterials() {
   // Catalog Filter States
   const [filterCategory, setFilterCategory] = useState<string>("ALL");
   const [filterSection, setFilterSection] = useState<string>("ALL");
+  const [filterClassSem, setFilterClassSem] = useState<string>("ALL");
   const [filterTier, setFilterTier] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -87,6 +91,7 @@ export default function AdminStudyMaterials() {
     category: LibraryCategoryType;
     discipline: SubjectDisciplineType;
     section: CurriculumSectionType;
+    classSem: ClassSemType;
     isPremium: boolean;
     sizeFormatted: string;
     status: "pending" | "uploading" | "done" | "error";
@@ -102,6 +107,7 @@ export default function AdminStudyMaterials() {
   const [bulkCategory, setBulkCategory] = useState<LibraryCategoryType>("Chapter wise PDF Notes");
   const [bulkDiscipline, setBulkDiscipline] = useState<SubjectDisciplineType>("GENERAL");
   const [bulkSection, setBulkSection] = useState<CurriculumSectionType>("ALL");
+  const [bulkClassSem, setBulkClassSem] = useState<ClassSemType>("11");
 
   const handleFolderSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawFiles = Array.from(e.target.files || []);
@@ -138,6 +144,7 @@ export default function AdminStudyMaterials() {
         category: meta.category,
         discipline: meta.discipline,
         section: (meta.section || "ALL") as CurriculumSectionType,
+        classSem: (meta.classSem || (meta.section === "WBCHSE" ? "SEM-I" : "11")) as ClassSemType,
         isPremium: false,
         sizeFormatted: sizeMB + " MB",
         status: "pending" as const,
@@ -224,6 +231,7 @@ export default function AdminStudyMaterials() {
             category: item.category,
             discipline: item.discipline,
             section: item.section,
+            classSem: item.classSem,
             isPremium: item.isPremium,
             url: presignData.publicUrl,
             fileSize: item.sizeFormatted,
@@ -265,6 +273,7 @@ export default function AdminStudyMaterials() {
     category: "Chapter wise PDF Notes" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
     section: "ALL" as CurriculumSectionType,
+    classSem: "11" as ClassSemType,
     url: "",
     isPremium: false,
   });
@@ -286,6 +295,7 @@ export default function AdminStudyMaterials() {
       category: item.category || "Chapter wise PDF Notes",
       discipline: item.discipline || "GENERAL",
       section: (item.section || "ALL") as CurriculumSectionType,
+      classSem: (item.classSem || (item.section === "WBCHSE" ? "SEM-I" : "11")) as ClassSemType,
       url: item.url || "",
       isPremium: Boolean(item.isPremium),
     });
@@ -350,6 +360,7 @@ export default function AdminStudyMaterials() {
           category: editForm.category,
           discipline: editForm.discipline,
           section: editForm.section,
+          classSem: editForm.classSem,
           isPremium: editForm.isPremium,
           url: finalUrl,
           fileSize: fileSizeFormatted,
@@ -452,6 +463,7 @@ export default function AdminStudyMaterials() {
           category: form.category,
           discipline: form.discipline,
           section: form.section,
+          classSem: form.classSem,
           isPremium: form.isPremium,
           url: finalUrl,
           fileSize: fileSizeFormatted,
@@ -468,6 +480,7 @@ export default function AdminStudyMaterials() {
           category: "Chapter wise PDF Notes",
           discipline: "GENERAL",
           section: "ALL",
+          classSem: "11",
           url: "",
           isPremium: false
         });
@@ -548,6 +561,28 @@ export default function AdminStudyMaterials() {
     }
   };
 
+  const handleUpdateClassSem = async (id: string, newClassSem: string) => {
+    setUpdatingId(id);
+    try {
+      const res = await fetch("/api/admin/study-materials", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, classSem: newClassSem })
+      });
+      if (res.ok) {
+        setMaterials(prev =>
+          prev.map(m => (m.id === id ? { ...m, classSem: newClassSem as ClassSemType } : m))
+        );
+      } else {
+        alert("Failed to update class/semester");
+      }
+    } catch {
+      alert("Error updating class/semester");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const handleUpdateSection = async (id: string, newSection: string) => {
     setUpdatingId(id);
     try {
@@ -594,6 +629,7 @@ export default function AdminStudyMaterials() {
   const filteredMaterials = materials.filter((item: any) => {
     if (filterCategory !== "ALL" && item.category !== filterCategory) return false;
     if (filterSection !== "ALL" && (item.section || "ALL") !== filterSection) return false;
+    if (filterClassSem !== "ALL" && (item.classSem || "ALL") !== filterClassSem) return false;
     if (filterTier === "FREE" && item.isPremium) return false;
     if (filterTier === "PREMIUM" && !item.isPremium) return false;
     if (searchQuery.trim()) {
@@ -602,7 +638,8 @@ export default function AdminStudyMaterials() {
       const matchDesc = (item.cleanDescription || item.description)?.toLowerCase().includes(q);
       const matchCat = item.category?.toLowerCase().includes(q);
       const matchSec = item.section?.toLowerCase().includes(q);
-      if (!matchTitle && !matchDesc && !matchCat && !matchSec) return false;
+      const matchSem = item.classSem?.toLowerCase().includes(q);
+      if (!matchTitle && !matchDesc && !matchCat && !matchSec && !matchSem) return false;
     }
     return true;
   });
@@ -743,7 +780,16 @@ export default function AdminStudyMaterials() {
                         </label>
                         <select
                           value={form.section}
-                          onChange={e => setForm({ ...form, section: e.target.value as CurriculumSectionType })}
+                          onChange={e => {
+                            const newSec = e.target.value as CurriculumSectionType;
+                            let newSem = form.classSem;
+                            if (newSec === "WBCHSE" && !newSem.startsWith("SEM-")) {
+                              newSem = "SEM-I";
+                            } else if ((newSec === "CBSE" || newSec === "ICSE") && newSem.startsWith("SEM-")) {
+                              newSem = "11";
+                            }
+                            setForm({ ...form, section: newSec, classSem: newSem });
+                          }}
                           className="w-full bg-[#181818] border border-purple-500/40 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition cursor-pointer font-medium"
                         >
                           <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE & Entrance)</option>
@@ -753,6 +799,53 @@ export default function AdminStudyMaterials() {
                           <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS</option>
                         </select>
                         <p className="text-[11px] text-gray-500">Assign this content to a specific board or competitive entrance exam.</p>
+                      </div>
+
+                      {/* Class / Semester Selector (Mandatory) */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide flex items-center gap-1.5">
+                          <GraduationCap className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>Class / Semester <span className="text-red-400">* (Mandatory)</span></span>
+                        </label>
+                        <select
+                          value={form.classSem}
+                          onChange={e => setForm({ ...form, classSem: e.target.value as ClassSemType })}
+                          required
+                          className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer font-medium"
+                        >
+                          {form.section === "WBCHSE" ? (
+                            <>
+                              <option value="SEM-I">Semester I (Class 11 Term 1)</option>
+                              <option value="SEM-II">Semester II (Class 11 Term 2)</option>
+                              <option value="SEM-III">Semester III (Class 12 Term 1)</option>
+                              <option value="SEM-IV">Semester IV (Class 12 Term 2)</option>
+                              <option value="ALL">All Semesters (General WBCHSE)</option>
+                            </>
+                          ) : form.section === "CBSE" || form.section === "ICSE" ? (
+                            <>
+                              <option value="11">Class 11</option>
+                              <option value="12">Class 12</option>
+                              <option value="ALL">Both Classes (11 & 12)</option>
+                            </>
+                          ) : (
+                            <>
+                              <option value="11">Class 11 (Foundation)</option>
+                              <option value="12">Class 12 (Target)</option>
+                              <option value="SEM-I">SEM-I</option>
+                              <option value="SEM-II">SEM-II</option>
+                              <option value="SEM-III">SEM-III</option>
+                              <option value="SEM-IV">SEM-IV</option>
+                              <option value="ALL">All Classes / Sems</option>
+                            </>
+                          )}
+                        </select>
+                        <p className="text-[11px] text-gray-500">
+                          {form.section === "WBCHSE"
+                            ? "For WBCHSE, select Semester I, II, III or IV."
+                            : form.section === "CBSE" || form.section === "ICSE"
+                            ? "For CBSE / ICSE, select Class 11 or 12."
+                            : "Specify target class or semester."}
+                        </p>
                       </div>
           
                       {/* Chemistry Branch / Discipline Selector */}
@@ -1011,6 +1104,32 @@ export default function AdminStudyMaterials() {
                       </button>
                     </div>
 
+                    {/* Bulk Class/Sem */}
+                    <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
+                      <span className="text-cyan-300 text-[11px] pl-1 font-semibold">Class/Sem:</span>
+                      <select
+                        value={bulkClassSem}
+                        onChange={e => setBulkClassSem(e.target.value as ClassSemType)}
+                        className="bg-[#111] border border-[#444] text-cyan-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
+                      >
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                        <option value="SEM-I">SEM-I</option>
+                        <option value="SEM-II">SEM-II</option>
+                        <option value="SEM-III">SEM-III</option>
+                        <option value="SEM-IV">SEM-IV</option>
+                        <option value="ALL">All Levels</option>
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => setStagedFiles(prev => prev.map(s => ({ ...s, classSem: bulkClassSem })))}
+                        disabled={batchUploading}
+                        className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded-lg text-xs font-bold transition cursor-pointer"
+                      >
+                        Apply to All
+                      </button>
+                    </div>
+
                     {/* Bulk Discipline */}
                     <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
                       <span className="text-gray-400 text-[11px] pl-1 font-semibold">Branch:</span>
@@ -1170,6 +1289,45 @@ export default function AdminStudyMaterials() {
                             <option value="ICSE">ICSE / ISC</option>
                             <option value="WBCHSE">WBCHSE</option>
                             <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                          </select>
+                        </div>
+
+                        {/* Class / Sem Dropdown */}
+                        <div className="w-full md:w-36 shrink-0">
+                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                            Class / Sem *
+                          </span>
+                          <select
+                            value={item.classSem}
+                            onChange={e => handleUpdateStaged(item.id, { classSem: e.target.value as ClassSemType })}
+                            disabled={isDone || isUploading}
+                            className="w-full bg-[#121212] border border-cyan-500/30 text-cyan-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
+                          >
+                            {item.section === "WBCHSE" ? (
+                              <>
+                                <option value="SEM-I">SEM-I</option>
+                                <option value="SEM-II">SEM-II</option>
+                                <option value="SEM-III">SEM-III</option>
+                                <option value="SEM-IV">SEM-IV</option>
+                                <option value="ALL">All Sems</option>
+                              </>
+                            ) : item.section === "CBSE" || item.section === "ICSE" ? (
+                              <>
+                                <option value="11">Class 11</option>
+                                <option value="12">Class 12</option>
+                                <option value="ALL">Both 11 & 12</option>
+                              </>
+                            ) : (
+                              <>
+                                <option value="11">Class 11</option>
+                                <option value="12">Class 12</option>
+                                <option value="SEM-I">SEM-I</option>
+                                <option value="SEM-II">SEM-II</option>
+                                <option value="SEM-III">SEM-III</option>
+                                <option value="SEM-IV">SEM-IV</option>
+                                <option value="ALL">All</option>
+                              </>
+                            )}
                           </select>
                         </div>
 
@@ -1426,6 +1584,11 @@ export default function AdminStudyMaterials() {
                             {item.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? "NEET / JEE & ENTRANCE" : item.section}
                           </span>
                         )}
+                        {item.classSem && item.classSem !== "ALL" && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-blue-950 text-blue-300 border border-blue-500/40">
+                            {item.classSem === "11" ? "CLASS 11" : item.classSem === "12" ? "CLASS 12" : item.classSem}
+                          </span>
+                        )}
                         {item.discipline && item.discipline !== "GENERAL" && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#222] text-gray-300 border border-[#333]">
                             {item.discipline}
@@ -1478,6 +1641,43 @@ export default function AdminStudyMaterials() {
                           <option value="ICSE">ICSE / ISC</option>
                           <option value="WBCHSE">WBCHSE</option>
                           <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                        </select>
+                      </div>
+
+                      {/* Class / Sem Quick Shortcut */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <span className="text-[10px] text-cyan-300 font-bold uppercase shrink-0">Class/Sem:</span>
+                        <select
+                          value={item.classSem || (item.section === "WBCHSE" ? "SEM-I" : "11")}
+                          onChange={e => handleUpdateClassSem(item.id, e.target.value)}
+                          disabled={isUpdatingThis}
+                          className="bg-[#1a1a1a] border border-[#333] text-cyan-300 rounded px-2 py-1 text-[11px] focus:outline-none cursor-pointer font-medium w-full sm:w-auto max-w-full sm:max-w-[190px]"
+                        >
+                          {item.section === "WBCHSE" ? (
+                            <>
+                              <option value="SEM-I">SEM-I</option>
+                              <option value="SEM-II">SEM-II</option>
+                              <option value="SEM-III">SEM-III</option>
+                              <option value="SEM-IV">SEM-IV</option>
+                              <option value="ALL">All Semesters</option>
+                            </>
+                          ) : item.section === "CBSE" || item.section === "ICSE" ? (
+                            <>
+                              <option value="11">Class 11</option>
+                              <option value="12">Class 12</option>
+                              <option value="ALL">Both 11 & 12</option>
+                            </>
+                          ) : (
+                            <>
+                              <option value="11">Class 11</option>
+                              <option value="12">Class 12</option>
+                              <option value="SEM-I">SEM-I</option>
+                              <option value="SEM-II">SEM-II</option>
+                              <option value="SEM-III">SEM-III</option>
+                              <option value="SEM-IV">SEM-IV</option>
+                              <option value="ALL">All Classes / Sems</option>
+                            </>
+                          )}
                         </select>
                       </div>
 
@@ -1628,7 +1828,16 @@ export default function AdminStudyMaterials() {
                   </label>
                   <select
                     value={editForm.section}
-                    onChange={e => setEditForm({ ...editForm, section: e.target.value as CurriculumSectionType })}
+                    onChange={e => {
+                      const newSec = e.target.value as CurriculumSectionType;
+                      let newSem = editForm.classSem;
+                      if (newSec === "WBCHSE" && !newSem.startsWith("SEM-")) {
+                        newSem = "SEM-I";
+                      } else if ((newSec === "CBSE" || newSec === "ICSE") && newSem.startsWith("SEM-")) {
+                        newSem = "11";
+                      }
+                      setEditForm({ ...editForm, section: newSec, classSem: newSem });
+                    }}
                     className="w-full bg-[#181818] border border-purple-500/40 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
                   >
                     <option value="ALL">All Curriculums (Universal)</option>
@@ -1636,6 +1845,44 @@ export default function AdminStudyMaterials() {
                     <option value="ICSE">ICSE / ISC</option>
                     <option value="WBCHSE">WBCHSE</option>
                     <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS</option>
+                  </select>
+                </div>
+
+                {/* Class / Semester */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide">
+                    Class / Semester <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={editForm.classSem}
+                    onChange={e => setEditForm({ ...editForm, classSem: e.target.value as ClassSemType })}
+                    className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
+                  >
+                    {editForm.section === "WBCHSE" ? (
+                      <>
+                        <option value="SEM-I">Semester I (Class 11 Term 1)</option>
+                        <option value="SEM-II">Semester II (Class 11 Term 2)</option>
+                        <option value="SEM-III">Semester III (Class 12 Term 1)</option>
+                        <option value="SEM-IV">Semester IV (Class 12 Term 2)</option>
+                        <option value="ALL">All Semesters</option>
+                      </>
+                    ) : editForm.section === "CBSE" || editForm.section === "ICSE" ? (
+                      <>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                        <option value="ALL">Both (11 & 12)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                        <option value="SEM-I">SEM-I</option>
+                        <option value="SEM-II">SEM-II</option>
+                        <option value="SEM-III">SEM-III</option>
+                        <option value="SEM-IV">SEM-IV</option>
+                        <option value="ALL">All Classes / Sems</option>
+                      </>
+                    )}
                   </select>
                 </div>
 

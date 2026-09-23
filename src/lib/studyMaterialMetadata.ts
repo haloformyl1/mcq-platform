@@ -29,10 +29,23 @@ export const CURRICULUM_SECTIONS = [
 
 export type CurriculumSectionType = typeof CURRICULUM_SECTIONS[number];
 
+export const CLASS_SEM_OPTIONS = [
+  '11',
+  '12',
+  'SEM-I',
+  'SEM-II',
+  'SEM-III',
+  'SEM-IV',
+  'ALL'
+] as const;
+
+export type ClassSemType = typeof CLASS_SEM_OPTIONS[number];
+
 export interface ParsedMaterialMeta {
   category: LibraryCategoryType;
   discipline: SubjectDisciplineType;
   section: CurriculumSectionType;
+  classSem: ClassSemType;
   cleanDescription: string;
 }
 
@@ -42,11 +55,12 @@ export function encodeMaterialMetadata(
   description: string = '',
   category: string = 'Chapter wise PDF Notes',
   discipline: string = 'GENERAL',
-  section: string = 'ALL'
+  section: string = 'ALL',
+  classSem: string = 'ALL'
 ): string {
   // Strip any existing meta tag first
   const clean = description.replace(META_TAG_REGEX, '').trim();
-  const metaObj = { category, discipline, section };
+  const metaObj = { category, discipline, section, classSem };
   const tag = `<!-- piechem-meta: ${JSON.stringify(metaObj)} -->`;
   return clean ? `${tag}\n${clean}` : tag;
 }
@@ -62,7 +76,37 @@ export function parseMaterialMetadata(
   let category: LibraryCategoryType = 'Chapter wise PDF Notes';
   let discipline: SubjectDisciplineType = 'GENERAL';
   let section: CurriculumSectionType = 'ALL';
+  let classSem: ClassSemType = 'ALL';
   let cleanDescription = text;
+
+  const detectClassSem = (str: string, currentSec: CurriculumSectionType): ClassSemType => {
+    const s = str.toLowerCase();
+    if (s.includes('sem-1') || s.includes('sem 1') || s.includes('sem-i') || s.includes('sem i') || s.includes('semester 1') || s.includes('term 1')) {
+      return 'SEM-I';
+    }
+    if (s.includes('sem-2') || s.includes('sem 2') || s.includes('sem-ii') || s.includes('sem ii') || s.includes('semester 2') || s.includes('term 2')) {
+      return 'SEM-II';
+    }
+    if (s.includes('sem-3') || s.includes('sem 3') || s.includes('sem-iii') || s.includes('sem iii') || s.includes('semester 3') || s.includes('term 3')) {
+      return 'SEM-III';
+    }
+    if (s.includes('sem-4') || s.includes('sem 4') || s.includes('sem-iv') || s.includes('sem iv') || s.includes('semester 4') || s.includes('term 4')) {
+      return 'SEM-IV';
+    }
+    if (s.includes('class 11') || s.includes('class xi') || s.includes('xi') || s.includes('11th')) {
+      return '11';
+    }
+    if (s.includes('class 12') || s.includes('class xii') || s.includes('xii') || s.includes('12th')) {
+      return '12';
+    }
+    if (currentSec === 'WBCHSE') {
+      return 'SEM-I';
+    }
+    if (currentSec === 'CBSE' || currentSec === 'ICSE') {
+      return '11';
+    }
+    return 'ALL';
+  };
 
   if (match) {
     try {
@@ -99,7 +143,13 @@ export function parseMaterialMetadata(
         }
       }
 
-      return { category, discipline, section, cleanDescription };
+      if (parsed.classSem && (CLASS_SEM_OPTIONS as readonly string[]).includes(parsed.classSem)) {
+        classSem = parsed.classSem;
+      } else {
+        classSem = detectClassSem(`${title} ${cleanDescription}`, section);
+      }
+
+      return { category, discipline, section, classSem, cleanDescription };
     } catch {}
   }
 
@@ -139,5 +189,7 @@ export function parseMaterialMetadata(
     section = 'CBSE';
   }
 
-  return { category, discipline, section, cleanDescription: cleanDescription.trim() };
+  classSem = detectClassSem(`${title} ${cleanDescription}`, section);
+
+  return { category, discipline, section, classSem, cleanDescription: cleanDescription.trim() };
 }

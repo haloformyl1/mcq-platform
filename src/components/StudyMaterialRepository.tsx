@@ -38,6 +38,7 @@ export type SemesterType = "SEM_1" | "SEM_2" | "SEM_3" | "SEM_4";
 export interface StudyMaterialItem {
   id: string;
   section?: string;
+  classSem?: string;
   title: string;
   description?: string;
   type: string;
@@ -213,15 +214,37 @@ export default function StudyMaterialRepository({
   // Filter materials based on current Board + Class/Semester context
   const contextMaterials = useMemo(() => {
     return sanitizedMaterials.filter(item => {
-      // If WBCHSE is selected, include WBCHSE specific items or general curriculum items
+      // 1. Board / Curriculum filtering
       if (selectedBoard === "WBCHSE") {
-        const isWbBangla = item.title.includes("WBCHSE") || item.title.includes("BANGLA") || item.title.includes("নমুনা") || item.title.includes("মৌল");
-        return true; // Chemistry syllabus overlap applies broadly across competitive boards
+        if (item.section && item.section !== "ALL" && item.section !== "WBCHSE") return false;
+      } else if (selectedBoard === "CBSE") {
+        if (item.section && item.section !== "ALL" && item.section !== "CBSE") return false;
+      } else if (selectedBoard === "ICSE") {
+        if (item.section && item.section !== "ALL" && item.section !== "ICSE") return false;
+      } else if (selectedBoard === "ENTRANCE") {
+        if (item.section && item.section !== "ALL" && item.section !== "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS") return false;
       }
+
+      // 2. Class / Semester filtering
+      if (selectedLevel) {
+        if (selectedLevel === "CLASS_XI") {
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "11") return false;
+        } else if (selectedLevel === "CLASS_XII") {
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "12") return false;
+        } else if (selectedLevel === "SEM_1") {
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-I") return false;
+        } else if (selectedLevel === "SEM_2") {
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-II") return false;
+        } else if (selectedLevel === "SEM_3") {
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-III") return false;
+        } else if (selectedLevel === "SEM_4") {
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-IV") return false;
+        }
+      }
+
       return true;
     });
   }, [sanitizedMaterials, selectedBoard, selectedLevel]);
-
   // Categories with live count for active context
   const resourceCategories = useMemo(() => {
     const cats = [

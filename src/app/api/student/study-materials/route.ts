@@ -54,6 +54,7 @@ export async function GET(req: Request) {
         category: meta.category,
         discipline: meta.discipline,
         section: meta.section,
+        classSem: meta.classSem,
         description: meta.cleanDescription
       };
     });
