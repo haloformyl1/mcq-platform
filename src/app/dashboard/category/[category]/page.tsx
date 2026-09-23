@@ -377,89 +377,46 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
 
-          {/* Announcement Ticker Banner */}
+          {/* Announcement Ticker Banner - ONLY for upcoming tests */}
           {(() => {
+            // Completely scrap notification from Available Tests section and any non-upcoming category
+            if (categoryKey !== "upcoming") return null;
+
             const rawItems: any[] = [];
 
-            if (categoryKey === "available") {
-              (availableTests || []).forEach((t: any) => {
-                const lock = t.lockAt ? new Date(t.lockAt) : null;
-                if (t.status === "SCHEDULE_EXPIRED" || lock) {
-                  if (!lock || now < lock) {
-                    rawItems.push({
-                      type: "SCHEDULE_EXPIRED_LIVE",
-                      test: t,
-                      message: `🔥 Scheduled Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is NOW LIVE! Last day to take test: <strong class="text-amber-300 font-mono">${lock ? formatDateTime(lock) : "N/A"}</strong>.`
-                    });
-                  }
-                } else if (t.status === "LIVE" || t.status === "PUBLISHED") {
+            (availableTests || []).forEach((t: any) => {
+              if (t.status === "UPCOMING") {
+                const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
+
+                // ONLY show for tests that are scheduled to go live in the future
+                // Never show for tests scheduled to expire, recently expired, or currently live
+                if (unlock && now < unlock) {
                   rawItems.push({
-                    type: "LIVE_NOW",
+                    type: "UPCOMING",
                     test: t,
-                    message: `🔥 Live Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is NOW LIVE and available to attempt!`
+                    message: `⏰ Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
                   });
                 }
-              });
-            } else if (categoryKey === "upcoming") {
-              (availableTests || []).forEach((t: any) => {
-                if (t.status === "UPCOMING") {
-                  const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
-                  const lock = t.lockAt ? new Date(t.lockAt) : null;
+              }
+            });
 
-                  if (unlock && now < unlock) {
-                    rawItems.push({
-                      type: "UPCOMING",
-                      test: t,
-                      message: `📢 Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
-                    });
-                  } else if (!lock || now < lock) {
-                    rawItems.push({
-                      type: "UPCOMING",
-                      test: t,
-                      message: `🔥 Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `It will conclude on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
-                    });
-                  } else {
-                    // State 2: Concluded (live window passed)
-                    // Show notification for next 72 hours from the time it concluded; after that stop the notification.
-                    const concludedAt = lock;
-                    const msSinceConclusion = concludedAt ? now.getTime() - concludedAt.getTime() : Infinity;
-                    const maxHoldMs = 72 * 60 * 60 * 1000; // 72 hours
+            if (rawItems.length === 0) return null;
 
-                    if (concludedAt && msSinceConclusion >= 0 && msSinceConclusion <= maxHoldMs) {
-                      rawItems.push({
-                        type: "UPCOMING",
-                        test: t,
-                        message: `⌛ Upcoming Test <strong class="text-white bg-red-950 px-2 py-0.5 rounded border border-red-600/60">${t.title}</strong> concluded at <strong class="text-red-300 font-mono">${formatDateTime(lock)}</strong>. Students who missed this test may request the Admin to unlock access.`
-                      });
-                    }
-                  }
-                }
-              });
-            }
-
-            const cfg = data.testAlertSettings || {
-              badgeText: categoryKey === "upcoming" ? "TEST ALERT" : "IMPORTANT",
+            const cfg = data?.testAlertSettings || {
+              badgeText: "TEST ALERT",
               bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
               badgeColor: "bg-amber-500 text-black",
               textColor: "text-amber-200",
-              marqueeSpeed: "normal",
-              customNotice: ""
+              marqueeSpeed: "normal"
             };
             const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-            const hasContent = rawItems.length > 0 || (categoryKey === "available" && cfg.customNotice && cfg.customNotice.trim().length > 0);
-            if (!hasContent) return null;
-
-            const isUpcomingCategory = categoryKey === "upcoming";
-            const badgeLabel = isUpcomingCategory ? "TEST ALERT" : "IMPORTANT";
-            const badgeStyle = isUpcomingCategory ? "bg-amber-500 text-black" : "bg-cyan-500 text-black";
 
             return (
               <div className={`flex-1 min-w-0 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2 px-3 sm:py-2.5 sm:px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
                 <div className="flex items-center gap-2 sm:gap-3 overflow-hidden w-full min-w-0">
-                  <span className={`shrink-0 text-xs font-bold ${badgeStyle} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
+                  <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
                     <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                    {badgeLabel}
+                    {cfg.badgeText || "TEST ALERT"}
                   </span>
                   <div className="flex-1 min-w-0 overflow-hidden relative">
                     <div 
@@ -473,11 +430,6 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                           dangerouslySetInnerHTML={{ __html: item.message }}
                         />
                       ))}
-                      {categoryKey === "available" && cfg.customNotice && (
-                        <span className="mr-16">
-                          📢 <strong>Notice:</strong> {cfg.customNotice}
-                        </span>
-                      )}
                     </div>
                   </div>
                 </div>

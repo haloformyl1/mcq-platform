@@ -275,26 +275,18 @@ export default function StudentDashboard() {
 
 
 
-  // Upcoming Alert Banner Items
+  // Upcoming Alert Banner Items - ONLY for tests scheduled to go live in the future
   const bannerItems: any[] = [];
   (availableTests || []).forEach((t: any) => {
     const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
-    const lock = t.lockAt ? new Date(t.lockAt) : null;
 
-    if (t.status === "UPCOMING") {
-      if (unlock && now < unlock) {
-        bannerItems.push({
-          type: "UPCOMING",
-          test: t,
-          message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt!`
-        });
-      } else if (!lock || now < lock) {
-        bannerItems.push({
-          type: "UPCOMING",
-          test: t,
-          message: `Upcoming Test <strong class="text-white bg-green-950 px-2 py-0.5 rounded border border-green-600/60">${t.title}</strong> is currently live! ${lock ? `Concludes on <strong class="text-green-300 font-mono">${formatDateTime(lock)}</strong>.` : 'Available for all students.'}`
-        });
-      }
+    // Only show for future upcoming tests. Do not show for tests scheduled to expire, recently expired, or live.
+    if (t.status === "UPCOMING" && unlock && now < unlock) {
+      bannerItems.push({
+        type: "UPCOMING",
+        test: t,
+        message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt!`
+      });
     }
   });
 
