@@ -14,7 +14,11 @@ interface AnimationCatalogCardProps {
     isLocked?: boolean;
     isLevelRestricted?: boolean;
     restrictionReason?: string;
+    badgeLabel?: string;
+    buttonLabel?: string;
     targetLabel?: string;
+    policyTitle?: string;
+    policyNote?: string;
     section?: string;
     classSem?: string;
     discipline?: string;
@@ -40,7 +44,11 @@ export default function AnimationCatalogCard({
   const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
   const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
   const restrictionReason = eligibility.reason || item.restrictionReason;
+  const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
+  const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
   const targetLabel = eligibility.targetLabel || item.targetLabel;
+  const policyTitle = eligibility.policyTitle || item.policyTitle;
+  const policyNote = eligibility.policyNote || item.policyNote;
   const canAccess = !isLevelRestricted && (!item.isPremium || hasGold);
   const cleanTitle = item.title.replace(/\(.*?\)/g, "").trim();
 
@@ -164,7 +172,7 @@ export default function AnimationCatalogCard({
               title={restrictionReason}
             >
               <Lock className="w-3 h-3 text-rose-300 shrink-0" />
-              <span>{item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`}</span>
+              <span>{badgeLabel}</span>
             </span>
           )}
 
@@ -256,11 +264,20 @@ export default function AnimationCatalogCard({
           ) : isLevelRestricted ? (
             <button
               type="button"
-              onClick={() => onLockedClick({ ...item, isLevelRestricted: true, restrictionReason, targetLabel })}
+              onClick={() => onLockedClick({ 
+                ...item, 
+                isLevelRestricted: true, 
+                restrictionReason, 
+                badgeLabel,
+                buttonLabel,
+                targetLabel,
+                policyTitle,
+                policyNote
+              })}
               className="w-full py-2.5 px-4 rounded-xl bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/60 text-rose-300 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-[0_0_14px_rgba(244,63,94,0.15)] group/btn cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5 text-rose-400" />
-              <span>Restricted ({item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})</span>
+              <span>{buttonLabel}</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
             </button>
           ) : (

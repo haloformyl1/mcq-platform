@@ -85,14 +85,18 @@ export default async function PdfViewerPage({
 
           <div className="bg-[#050e18] p-4 rounded-2xl border border-slate-800 text-left space-y-2">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Access Requirements:</p>
-            <ul className="text-xs text-slate-300 space-y-1.5">
-              <li className="flex items-center gap-2">
+            <ul className="text-xs text-slate-300 space-y-2">
+              <li className="flex items-start gap-2">
                 <span className="text-cyan-400 font-bold">•</span>
                 <span>Designated Audience: <strong className="text-white">{eligibility.targetLabel}</strong></span>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-start gap-2">
                 <span className="text-rose-400 font-bold">•</span>
-                <span>Your Enrolled Profile: <strong className="text-rose-300">{student.board || 'Unset'} · {student.academicLevel || 'Unset'}</strong></span>
+                <span>{eligibility.policyTitle || "Curriculum Policy"}: <span className="text-slate-300">{eligibility.policyNote}</span></span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">•</span>
+                <span>Your Enrolled Profile: <strong className="text-amber-300">{student.board || 'Unset'} · {student.academicLevel?.startsWith("SEM-") ? student.academicLevel : `Class ${student.academicLevel || 'Unset'}`}</strong></span>
               </li>
             </ul>
           </div>

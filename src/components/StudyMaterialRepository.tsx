@@ -49,7 +49,11 @@ export interface StudyMaterialItem {
   isPremium?: boolean;
   isLevelRestricted?: boolean;
   restrictionReason?: string;
+  badgeLabel?: string;
+  buttonLabel?: string;
   targetLabel?: string;
+  policyTitle?: string;
+  policyNote?: string;
   category: string;
   discipline: "PHYSICAL" | "INORGANIC" | "ORGANIC" | "GENERAL";
   chapterNumber?: number;
@@ -1099,7 +1103,11 @@ export default function StudyMaterialRepository({
                 const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
                 const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
                 const restrictionReason = eligibility.reason || item.restrictionReason;
+                const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
+                const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
                 const targetLabel = eligibility.targetLabel || item.targetLabel;
+                const policyTitle = eligibility.policyTitle || item.policyTitle;
+                const policyNote = eligibility.policyNote || item.policyNote;
                 const canAccess = !isLevelRestricted && (!item.isPremium || isGold);
 
                 return (
@@ -1120,7 +1128,7 @@ export default function StudyMaterialRepository({
                               title={restrictionReason}
                             >
                               <Lock className="w-2.5 h-2.5 text-rose-400" />
-                              <span>{item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`}</span>
+                              <span>{badgeLabel}</span>
                             </span>
                           )}
                         </div>
@@ -1251,7 +1259,7 @@ export default function StudyMaterialRepository({
 
               <div className="bg-[#09050d] p-3.5 rounded-xl border border-rose-950/80 text-left space-y-1 text-xs text-slate-300">
                 <p><strong className="text-white">Assigned Audience:</strong> <span className="text-cyan-300">{upgradeItem.targetLabel || upgradeItem.classSem || "Specific Curriculum"}</span></p>
-                <p className="text-[11px] text-slate-400">If your current class/semester profile is incorrect, you can update it directly in your Account settings.</p>
+                <p className="text-[11px] text-slate-400">{upgradeItem.policyNote || "If your current class/semester profile is incorrect, you can update it directly in your Account settings."}</p>
               </div>
 
               <div className="pt-2 flex flex-col sm:flex-row gap-2.5">

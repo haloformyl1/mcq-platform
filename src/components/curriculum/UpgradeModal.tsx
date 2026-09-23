@@ -37,7 +37,7 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
 
           <div className="bg-[#09050d] p-3.5 rounded-xl border border-rose-950/80 text-left space-y-1.5 text-xs text-slate-300">
             <p><strong className="text-white">Assigned Audience:</strong> <span className="text-cyan-300">{item.targetLabel || item.classSem || "Specific Curriculum"}</span></p>
-            <p className="text-[11px] text-slate-400">If your current class/semester profile is incorrect, you can update it directly in your Account settings.</p>
+            <p className="text-[11px] text-slate-400">{item.policyNote || "If your current class/semester profile is incorrect, you can update it directly in your Account settings."}</p>
           </div>
 
           <div className="pt-2 flex flex-col sm:flex-row gap-2.5">

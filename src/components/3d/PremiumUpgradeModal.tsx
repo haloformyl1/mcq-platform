@@ -73,7 +73,7 @@ export default function PremiumUpgradeModal({
                 </li>
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Semester Segregation:</strong> In accordance with syllabus guidelines, materials assigned for SEM-II are exclusive to SEM-II WBCHSE & Class 11 CBSE/ICSE.</span>
+                  <span><strong className="text-white">{lockedItem?.policyTitle || "Curriculum Policy"}:</strong> {lockedItem?.policyNote || "In accordance with academic regulations, this content is mapped specifically to this cohort."}</span>
                 </li>
               </ul>
             </div>

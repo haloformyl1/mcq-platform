@@ -28,7 +28,11 @@ export interface StudyMaterialItem {
   isPremium?: boolean;
   isLevelRestricted?: boolean;
   restrictionReason?: string;
+  badgeLabel?: string;
+  buttonLabel?: string;
   targetLabel?: string;
+  policyTitle?: string;
+  policyNote?: string;
   category: string;
   discipline: "PHYSICAL" | "INORGANIC" | "ORGANIC" | "GENERAL";
   chapterNumber?: number;
@@ -184,7 +188,11 @@ export function sanitizeMaterials(rawMaterials: any[] = []): StudyMaterialItem[]
         isPremium: Boolean(mat.isPremium),
         isLevelRestricted: Boolean(mat.isLevelRestricted),
         restrictionReason: mat.restrictionReason,
+        badgeLabel: mat.badgeLabel,
+        buttonLabel: mat.buttonLabel,
         targetLabel: mat.targetLabel,
+        policyTitle: mat.policyTitle,
+        policyNote: mat.policyNote,
         category,
         discipline,
         chapterNumber,

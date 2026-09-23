@@ -285,7 +285,11 @@ export default function CurriculumLevelPage({
               const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
               const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
               const restrictionReason = eligibility.reason || item.restrictionReason;
+              const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
+              const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
               const targetLabel = eligibility.targetLabel || item.targetLabel;
+              const policyTitle = eligibility.policyTitle || item.policyTitle;
+              const policyNote = eligibility.policyNote || item.policyNote;
               const canAccess = !isLevelRestricted && (!item.isPremium || isGold);
               return (
                 <div
@@ -349,11 +353,11 @@ export default function CurriculumLevelPage({
                     ) : isLevelRestricted ? (
                         <button
                           type="button"
-                          onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, targetLabel })}
+                          onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote })}
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm"
                         >
                           <Lock className="w-3.5 h-3.5 text-rose-400" />
-                          <span>Restricted</span>
+                          <span>{buttonLabel}</span>
                         </button>
                       ) : (
                         <button
