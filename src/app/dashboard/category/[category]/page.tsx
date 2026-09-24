@@ -80,9 +80,13 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
     if (test.status === "LIVE" || test.status === "PUBLISHED") {
       currentAvailableTests.push({ ...test, category: "LIVE", lockState: "PUBLISHED_ALWAYS", lockDate });
     } 
-    // 2. EXPIRED: Concluded -> Expired Tests category
-    else if (test.status === "EXPIRED") {
-      expiredTests.push({ ...test, category: "EXPIRED", lockState: "ADMIN_EXPIRED", lockDate });
+    // 2. EXPIRED / CLOSED / LOCKED: Concluded -> Expired Tests category (unless student has individual access)
+    else if (test.status === "EXPIRED" || test.status === "CLOSED" || test.status === "LOCKED") {
+      if (test.hasIndividualAccess) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED", lockDate });
+      } else {
+        expiredTests.push({ ...test, category: "EXPIRED", lockState: "ADMIN_EXPIRED", lockDate });
+      }
     } 
     // 3. OVERRIDDEN: Student-specific lock overrides
     else if (test.status === "OVERRIDDEN") {
@@ -91,8 +95,18 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
       } else {
         expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_AFTER_LOCK", lockDate });
       }
-    } 
-    // 4. UPCOMING: In Upcoming category until re-locked AND post-lock holding period expires -> then Available Tests category
+    }
+    // 4. SCHEDULE_EXPIRED: LIVE until Future Expiry Date
+    else if (test.status === "SCHEDULE_EXPIRED") {
+      if (!lockDate || now < lockDate) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "SCHEDULED_OPEN", lockDate });
+      } else if (test.hasIndividualAccess) {
+        currentAvailableTests.push({ ...test, category: "LIVE", lockState: "INDIVIDUAL_ACCESS_GRANTED", lockDate });
+      } else {
+        expiredTests.push({ ...test, category: "EXPIRED", lockState: "EXPIRED_STATUS", lockDate });
+      }
+    }
+    // 5. UPCOMING: In Upcoming category until re-locked AND post-lock holding period expires -> then Available Tests category
     else if (test.status === "UPCOMING") {
       const holdMinutes = test.postLockHoldMinutes ?? 0;
       const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
