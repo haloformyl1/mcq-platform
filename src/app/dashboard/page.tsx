@@ -112,6 +112,13 @@ export default function StudentDashboard() {
   }, [router]);
 
   const handleCurriculumChange = async (newBoard: string, newLevel: string) => {
+    if (student?.isGuest) {
+      setData((prev: any) => ({
+        ...prev,
+        student: { ...prev.student, board: newBoard, academicLevel: newLevel }
+      }));
+      return;
+    }
     setUpdatingCurriculum(true);
     try {
       const res = await fetch("/api/student/profile", {

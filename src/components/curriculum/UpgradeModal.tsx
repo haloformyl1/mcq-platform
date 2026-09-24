@@ -78,14 +78,25 @@ export default function UpgradeModal({ item, onClose, student }: UpgradeModalPro
 
             {/* CTA Actions */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-              <Link
-                href="/dashboard/account"
+              {student && !student.isGuest ? (
+                <Link
+                  href="/dashboard/account"
                 className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 transition shadow-lg shadow-rose-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
               >
                 <GraduationCap className="w-4 h-4 shrink-0" />
                 <span>Switch Curriculum in Profile</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 transition shadow-lg shadow-rose-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
+                >
+                  <Lock className="w-4 h-4 shrink-0" />
+                  <span>Log in first to continue</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              )}
 
               <button
                 type="button"
@@ -167,7 +178,7 @@ export default function UpgradeModal({ item, onClose, student }: UpgradeModalPro
 
           {/* CTA Actions */}
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-            {student ? (
+            {student && !student.isGuest ? (
               <Link
                 href="/dashboard/account"
                 className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
@@ -182,7 +193,7 @@ export default function UpgradeModal({ item, onClose, student }: UpgradeModalPro
                 className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
               >
                 <Lock className="w-4 h-4 shrink-0" />
-                <span>Log In to Unlock Gold ✦</span>
+                <span>Log in first to continue</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             )}

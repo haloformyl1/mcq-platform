@@ -20,52 +20,70 @@ export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value;
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await decrypt(session);
-    
-    if (!payload || !payload.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const payload = session ? await decrypt(session) : null;
+    const isGuest = !payload || !payload.id;
 
-    const studentId = payload.id;
-    const { deviceId, isRevoked } = await touchOrCreateStudentSession(studentId, req, cookieStore);
-    if (isRevoked) {
-      cookieStore.delete('session');
-      return NextResponse.json({ error: "Session has been revoked" }, { status: 401 });
-    }
-    cookieStore.set('session', session, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 400,
-      path: '/',
-    });
-    await autoExpireSubscriptions();
+    let student: any = null;
+    let studentId: string | null = null;
 
-    // Recalculate all submitted attempts for this student to guarantee latest scores
-    await recalculateStudentAttempts(studentId);
-
-    const student = await prisma.student.update({
-      where: { id: studentId },
-      data: { lastLogin: new Date() },
-      select: { 
-        id: true, 
-        email: true, 
-        name: true, 
-        phone: true, 
-        gender: true, 
-        dob: true, 
-        board: true, 
-        academicLevel: true, 
-        status: true,
-        subscriptionStatus: true,
-        subscriptionStartedAt: true,
-        subscriptionExpiresAt: true,
-        avatarUrl: true,
-        createdAt: true 
+    if (isGuest) {
+      student = {
+        id: "guest",
+        email: "guest@piechem.internal",
+        name: "Guest Student",
+        phone: null,
+        gender: null,
+        dob: null,
+        board: null,
+        academicLevel: null,
+        status: "ACTIVE",
+        subscriptionStatus: "FREE",
+        subscriptionStartedAt: null,
+        subscriptionExpiresAt: null,
+        avatarUrl: null,
+        createdAt: new Date(),
+        isGuest: true
+      };
+    } else {
+      studentId = payload.id as string;
+      const { deviceId, isRevoked } = await touchOrCreateStudentSession(studentId, req, cookieStore);
+      if (isRevoked) {
+        cookieStore.delete('session');
+        return NextResponse.json({ error: "Session has been revoked", code: "CONCURRENT_DEVICE" }, { status: 401 });
       }
-    });
+      cookieStore.set('session', session!, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 400,
+        path: '/',
+      });
+      await autoExpireSubscriptions();
+
+      // Recalculate all submitted attempts for this student to guarantee latest scores
+      await recalculateStudentAttempts(studentId);
+
+      const dbStudent = await prisma.student.update({
+        where: { id: studentId },
+        data: { lastLogin: new Date() },
+        select: { 
+          id: true, 
+          email: true, 
+          name: true, 
+          phone: true, 
+          gender: true, 
+          dob: true, 
+          board: true, 
+          academicLevel: true, 
+          status: true,
+          subscriptionStatus: true,
+          subscriptionStartedAt: true,
+          subscriptionExpiresAt: true,
+          avatarUrl: true,
+          createdAt: true 
+        }
+      });
+      student = { ...dbStudent, isGuest: false };
+    }
 
     const availableTests = await prisma.test.findMany({
       where: { 
@@ -92,7 +110,11 @@ export async function GET(req: Request) {
     });
 
     // Filter tests by target audience (Board and Class/Semester eligibility)
+    // If guest or student has no board/academicLevel, they can freely explore all tests!
     const eligibleTests = availableTests.filter(t => {
+      if (isGuest || (!student.board && !student.academicLevel)) {
+        return true;
+      }
       const matchesBoard = !t.targetBoard || t.targetBoard === "ALL" || t.targetBoard === student.board;
       let matchesLevel = !t.targetAcademicLevel || t.targetAcademicLevel === "ALL" || t.targetAcademicLevel === student.academicLevel;
       if (!matchesLevel && student.board && student.academicLevel && t.targetAcademicLevel) {
@@ -109,14 +131,14 @@ export async function GET(req: Request) {
     });
 
     // Apply per-student overrides: prefer any StudentTestOverride for this student & test
-    const overrides = await prisma.studentTestOverride.findMany({ where: { studentId } });
+    const overrides = (studentId && !isGuest) ? await prisma.studentTestOverride.findMany({ where: { studentId } }) : [];
     const overridesMap: Record<string, any> = {};
     overrides.forEach(o => {
       overridesMap[o.testId] = o;
     });
 
     // Fetch access requests made by this student
-    const requests = await prisma.testAccessRequest.findMany({ where: { studentId } });
+    const requests = (studentId && !isGuest) ? await prisma.testAccessRequest.findMany({ where: { studentId } }) : [];
     const requestsMap: Record<string, any> = {};
     requests.forEach(r => {
       requestsMap[r.testId] = r;
@@ -137,7 +159,7 @@ export async function GET(req: Request) {
       };
     });
 
-    const allAttempts = await prisma.testAttempt.findMany({
+    const allAttempts = (studentId && !isGuest) ? await prisma.testAttempt.findMany({
       where: { studentId },
       include: {
         test: {
@@ -145,7 +167,7 @@ export async function GET(req: Request) {
         }
       },
       orderBy: { startedAt: 'desc' }
-    });
+    }) : [];
 
     // Fetch Top 2 Students of the Last Submitted Exam (Excluding Admin Test Student)
     let lastExamTopStudents: any[] = [];
