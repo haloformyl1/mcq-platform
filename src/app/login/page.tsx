@@ -87,6 +87,8 @@ export default function StudentLogin() {
       })
       .then((data) => {
         if (data && data.student && !data.error) {
+          // If guest, do not redirect! User is visiting login page.
+          if (data.student.isGuest) return;
           if (data.student.board && data.student.academicLevel) {
             router.replace("/dashboard");
           } else {
@@ -405,7 +407,12 @@ export default function StudentLogin() {
                 {/* Try without login button under Get Started */}
                 <div className="mt-3.5 sm:mt-4 flex justify-center">
                   <Link
-                    href="/dashboard"
+                    href="/dashboard?guest=true"
+                    onClick={() => {
+                      try {
+                        sessionStorage.setItem("piechem_guest_mode", "true");
+                      } catch {}
+                    }}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-cyan-300 hover:text-white bg-[#061826]/80 hover:bg-[#09253b] border border-cyan-500/35 hover:border-cyan-400 transition-all duration-200 shadow-md backdrop-blur-md group"
                   >
                     <span>Try without login (limited features)</span>

@@ -27,6 +27,9 @@ export default function OnboardingPage() {
       })
       .then((data) => {
         if (data.student) {
+          if (data.student.isGuest) {
+            return router.replace("/dashboard?guest=true");
+          }
           if (data.student.board && data.student.academicLevel) {
             return router.replace("/dashboard");
           }

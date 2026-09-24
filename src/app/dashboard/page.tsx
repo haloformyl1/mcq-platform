@@ -83,22 +83,57 @@ export default function StudentDashboard() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/student/dashboard")
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const isGuestQuery = params?.get("guest") === "true";
+    const apiUrl = isGuestQuery ? "/api/student/dashboard?guest=true" : "/api/student/dashboard";
+
+    fetch(apiUrl)
       .then(res => res.json())
       .then(data => {
         if (data.error) {
           if (data.error.includes("revoked") || data.code === "CONCURRENT_DEVICE") {
             router.push("/login?reason=concurrent_device");
-          } else {
-            router.push("/");
+            return;
           }
+          setData({
+            student: {
+              id: "guest",
+              email: "guest@piechem.internal",
+              name: "Guest Student",
+              isGuest: true,
+              subscriptionStatus: "FREE",
+              board: null,
+              academicLevel: null
+            },
+            availableTests: [],
+            testAlertSettings: null,
+            allAttempts: [],
+            lastExamTopStudents: [],
+            lastExamTitle: ""
+          });
+          setLoading(false);
           return;
         }
         setData(data);
-
         setLoading(false);
       })
       .catch(() => {
+        setData({
+          student: {
+            id: "guest",
+            email: "guest@piechem.internal",
+            name: "Guest Student",
+            isGuest: true,
+            subscriptionStatus: "FREE",
+            board: null,
+            academicLevel: null
+          },
+          availableTests: [],
+          testAlertSettings: null,
+          allAttempts: [],
+          lastExamTopStudents: [],
+          lastExamTitle: ""
+        });
         setLoading(false);
       });
 
