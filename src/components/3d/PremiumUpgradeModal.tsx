@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Crown, Sparkles, X, CheckCircle2, ArrowRight, ShieldAlert, BookOpen, GraduationCap } from "lucide-react";
+import { Crown, Sparkles, X, CheckCircle2, ArrowRight, ShieldAlert, BookOpen, GraduationCap, Lock } from "lucide-react";
 
 interface PremiumUpgradeModalProps {
   isOpen: boolean;

@@ -2,12 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { Sparkles, Crown, CheckCircle2, ArrowRight, X, ShieldAlert, GraduationCap } from "lucide-react";
+import { Sparkles, Crown, CheckCircle2, ArrowRight, X, ShieldAlert, GraduationCap, Lock } from "lucide-react";
 import { StudyMaterialItem } from "./curriculumData";
 
 interface UpgradeModalProps {
   item: StudyMaterialItem | any | null;
   onClose: () => void;
+  student?: any;
 }
 
 export default function UpgradeModal({ item, onClose, student }: UpgradeModalProps) {
