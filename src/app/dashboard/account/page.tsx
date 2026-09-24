@@ -951,167 +951,261 @@ export default function StudentAccountPage() {
           </p>
         </div>
 
-            {/* VIEW A: OVERVIEW TAB */}
+            {/* VIEW A: OVERVIEW TAB (Ultra-Premium Luxury Suite) */}
             {activeTab === "overview" && (
               <div className="space-y-8 animate-in fade-in duration-200">
                 
-                {/* 1. The Iconic Netflix Membership Box (Electric Blue Style) */}
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-[0_0_40px_rgba(6,182,212,0.12)] p-6 sm:p-7 relative overflow-hidden transition hover:border-cyan-500/50">
-                  
-                  {/* Member Since Badge */}
-                  <div className="inline-flex items-center px-3.5 py-1 rounded-full bg-gradient-to-r from-[#221f52] via-[#4a1236] to-[#6d132c] border border-purple-500/40 text-white text-xs font-semibold shadow-md mb-4">
-                    Member since {memberSinceFormatted}
-                  </div>
+                {/* 1. Ultra-Luxury VIP Membership Passport Card */}
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c1c2e]/95 via-[#071320]/95 to-[#02070d]/98 border border-cyan-500/30 hover:border-cyan-400/60 p-7 sm:p-9 shadow-[0_0_50px_rgba(6,182,212,0.14)] transition-all duration-300 backdrop-blur-2xl group">
+                  {/* Ambient card top border highlight */}
+                  <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent group-hover:via-cyan-400/80 transition-all" />
 
-                  {/* Plan Name & Type */}
-                  <div className="space-y-1">
-                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                      {isGold ? "Premium plan" : "Basic Student Plan"}
-                    </h2>
-                    <p className="text-xs sm:text-sm font-semibold text-cyan-400">
-                      {!isGold
-                        ? "Free Tier"
-                        : is30Day
-                        ? "30-Day Premium Access"
-                        : "Complimentary"}
-                    </p>
-                  </div>
+                  {/* Decorative subtle orbital circle in background */}
+                  <div className="absolute -right-16 -top-16 w-64 h-64 border border-cyan-500/10 rounded-full pointer-events-none group-hover:border-cyan-500/20 transition-colors" />
+                  <div className="absolute -right-24 -top-24 w-80 h-80 border border-indigo-500/10 rounded-full pointer-events-none" />
 
-                  {/* Payment / Renewal Info - Only for 30-Day Premium Access */}
-                  {is30Day && (
-                    <div className="pt-2 text-sm text-slate-300 font-medium space-y-2">
-                      <p>
-                        <span className="text-slate-400">Next renewal: </span>
-                        <span className="font-bold text-amber-300 font-mono">{nextPaymentFormatted}</span>
-                      </p>
+                  <div className="relative z-10 space-y-6">
+                    {/* Top Meta: Member Since Pill + VIP Status Badge */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#221f52] via-[#4a1236] to-[#6d132c] border border-purple-500/40 text-purple-200 text-xs font-mono font-semibold shadow-md">
+                        <Sparkles className="w-3.5 h-3.5 text-pink-300 shrink-0" />
+                        <span>Member since {memberSinceFormatted}</span>
+                      </div>
 
-                      {/* Netflix-style UPI handle without payee name */}
-                      <div className="flex items-center gap-2 pt-0.5">
-                        {isPhonePe ? (
-                          <div className="w-5 h-5 rounded bg-[#5f259f] flex items-center justify-center text-white text-[11px] font-bold shadow-sm select-none shrink-0">
-                            पे
-                          </div>
-                        ) : (
-                          <div className="px-1.5 py-0.5 rounded bg-[#061421] border border-cyan-500/30 text-[10px] font-bold text-cyan-400 font-mono shrink-0">
-                            UPI
-                          </div>
-                        )}
-                        <span className="text-xs sm:text-sm font-medium text-slate-200 font-mono">
-                          {displayUpiId}
+                      {isGold ? (
+                        <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          <span>ACTIVE ACCESS</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">
+                          <span>STANDARD ACCESS</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Plan Name & VIP Perks Header */}
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-baseline gap-3">
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black text-white tracking-tight">
+                          {isGold ? "Premium plan" : "Basic Student Plan"}
+                        </h2>
+                        <span className="text-xs sm:text-sm font-bold text-cyan-300 px-3 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 font-mono tracking-wide">
+                          {!isGold ? "Free Tier" : is30Day ? "30-Day Premium Access" : "Complimentary"}
                         </span>
                       </div>
-                    </div>
-                  )}
 
-                  {/* Divider & Manage Membership Link Row */}
-                  <div className="pt-5 mt-5 border-t border-cyan-500/15 flex items-center justify-between">
-                    <button
-                      onClick={() => navigateToTab("membership")}
-                      className="w-full flex items-center justify-between text-sm font-bold text-white hover:text-cyan-300 transition group cursor-pointer text-left py-1"
-                    >
-                      <span>Manage membership</span>
-                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
+                      <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-xl leading-relaxed">
+                        {isGold 
+                          ? "Full VIP entitlement to chemistry exam series, 3D molecular simulations, comprehensive study material repositories, and instant proctored analytics."
+                          : "Standard access to open practice tests and fundamental chemistry modules."}
+                      </p>
+                    </div>
+
+                    {/* Plan Perks Showcase Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                      <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-slate-200">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>All Live Examination Series & Speed Tests</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-slate-200">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Interactive 3D Chemistry Simulations</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-slate-200">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Curriculum Notes, DPPs & Suggestion Sets</span>
+                      </div>
+                      <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-slate-200">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Real-Time State Percentiles & Accuracy</span>
+                      </div>
+                    </div>
+
+                    {/* 30-Day Renewal & UPI Details */}
+                    {is30Day && (
+                      <div className="pt-3 text-xs sm:text-sm text-slate-300 font-medium space-y-2 border-t border-white/[0.08]">
+                        <p>
+                          <span className="text-slate-400">Next renewal: </span>
+                          <span className="font-bold text-amber-300 font-mono">{nextPaymentFormatted}</span>
+                        </p>
+                        <div className="flex items-center gap-2 pt-0.5">
+                          {isPhonePe ? (
+                            <div className="w-5 h-5 rounded bg-[#5f259f] flex items-center justify-center text-white text-[11px] font-bold shadow-sm select-none shrink-0">
+                              पे
+                            </div>
+                          ) : (
+                            <div className="px-1.5 py-0.5 rounded bg-[#061421] border border-cyan-500/30 text-[10px] font-bold text-cyan-400 font-mono shrink-0">
+                              UPI
+                            </div>
+                          )}
+                          <span className="text-xs sm:text-sm font-medium text-slate-200 font-mono">
+                            {displayUpiId}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Divider & Manage Membership Link Row */}
+                    <div className="pt-4 border-t border-cyan-500/20 flex items-center justify-between">
+                      <button
+                        onClick={() => navigateToTab("membership")}
+                        className="w-full flex items-center justify-between text-sm font-bold text-white hover:text-cyan-300 transition group cursor-pointer text-left py-1"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                          <span>Manage membership details & subscriptions</span>
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-                {/* 2. Quick Links Card (Electric Blue Style) */}
-                <div className="space-y-3">
-                  <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                    Quick links
-                  </h3>
 
-                  <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl divide-y divide-cyan-500/15 overflow-hidden">
-                    
-                    {/* Change Plan */}
+                {/* 2. State-of-the-Art Luxury Quick Action Bento Grid */}
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                      <span>Quick links</span>
+                    </h3>
+                    <span className="text-xs font-mono text-slate-400">Instant Access Controls</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* 1. Change Plan */}
                     <button
                       onClick={handleChangePlanClick}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
+                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] hover:from-purple-950/30 hover:to-white/[0.03] border border-purple-500/20 hover:border-purple-400/60 p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(168,85,247,0.18)] group cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
                     >
-                      <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="p-3 rounded-2xl bg-purple-950/80 border border-purple-500/30 text-purple-400 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(168,85,247,0.25)]">
                           <Layers className="w-5 h-5" />
                         </div>
-                        <div>
-                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
-                            Change plan
-                          </span>
-                          <span className="text-xs text-slate-400 font-normal">
-                            {isAtHighestPlan 
-                              ? "You are currently enrolled in the highest possible plan on PieChem"
-                              : "Explore available plans and upgrade to Premium Pass"}
-                          </span>
-                        </div>
+                        <span className="text-[10px] font-mono tracking-wider font-bold text-purple-300 px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/40">
+                          {isAtHighestPlan ? "MAX TIER" : "UPGRADE"}
+                        </span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
+
+                      <div className="pt-3">
+                        <div className="flex items-center justify-between text-base font-bold text-white group-hover:text-purple-300 transition">
+                          <span>Change plan</span>
+                          <ChevronRight className="w-4 h-4 text-purple-400/80 group-hover:text-purple-300 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <p className="text-xs text-slate-400 font-light mt-1 line-clamp-2">
+                          {isAtHighestPlan 
+                            ? "You are currently enrolled in the highest possible plan on PieChem"
+                            : "Explore available plans and upgrade to Premium Pass"}
+                        </p>
+                      </div>
                     </button>
 
-                    
-
-                    {/* Manage Access and Devices */}
+                    {/* 2. Manage Access and Devices */}
                     <button
                       onClick={() => navigateToTab("devices")}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
+                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] hover:from-cyan-950/30 hover:to-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/60 p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(6,182,212,0.18)] group cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
                     >
-                      <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="p-3 rounded-2xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(6,182,212,0.25)]">
                           <MonitorSmartphone className="w-5 h-5" />
                         </div>
-                        <div>
-                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
-                            Manage access and devices
-                          </span>
-                          <span className="text-xs text-slate-400 font-normal">
-                            View active sessions, proctoring security status & signed-in browsers
-                          </span>
-                        </div>
+                        <span className="text-[10px] font-mono tracking-wider font-bold text-cyan-300 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/40">
+                          1 DEVICE ACTIVE
+                        </span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
+
+                      <div className="pt-3">
+                        <div className="flex items-center justify-between text-base font-bold text-white group-hover:text-cyan-300 transition">
+                          <span>Manage access and devices</span>
+                          <ChevronRight className="w-4 h-4 text-cyan-400/80 group-hover:text-cyan-300 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <p className="text-xs text-slate-400 font-light mt-1 line-clamp-2">
+                          View active sessions, proctoring security status & signed-in browsers
+                        </p>
+                      </div>
                     </button>
 
-                    {/* Edit Student Profile & Curriculum */}
+                    {/* 3. Edit Student Profile & Curriculum */}
                     <button
                       onClick={() => navigateToTab("profiles")}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
+                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] hover:from-emerald-950/30 hover:to-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/60 p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(16,185,129,0.18)] group cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
                     >
-                      <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="p-3 rounded-2xl bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.25)]">
                           <User className="w-5 h-5" />
                         </div>
-                        <div>
-                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
-                            Edit student & academic profile
-                          </span>
-                          <span className="text-xs text-slate-400 font-normal">
-                            Change avatar, update student name, phone, CBSE / ICSE / WBCHSE board
-                          </span>
-                        </div>
+                        <span className="text-[10px] font-mono tracking-wider font-bold text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 uppercase">
+                          {student.board || "CBSE"} • {student.academicLevel || "11"}
+                        </span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
+
+                      <div className="pt-3">
+                        <div className="flex items-center justify-between text-base font-bold text-white group-hover:text-emerald-300 transition">
+                          <span>Edit student & academic profile</span>
+                          <ChevronRight className="w-4 h-4 text-emerald-400/80 group-hover:text-emerald-300 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <p className="text-xs text-slate-400 font-light mt-1 line-clamp-2">
+                          Change avatar, update student name, phone, CBSE / ICSE / WBCHSE board
+                        </p>
+                      </div>
                     </button>
 
-                    {/* Update Password & Security */}
+                    {/* 4. Update Password & Security */}
                     <button
                       onClick={() => navigateToTab("security")}
-                      className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-cyan-950/40 transition cursor-pointer group"
+                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] hover:from-amber-950/30 hover:to-white/[0.03] border border-amber-500/20 hover:border-amber-400/60 p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(245,158,11,0.18)] group cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
                     >
-                      <div className="flex items-center gap-3.5">
-                        <div className="p-2 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 transition">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="p-3 rounded-2xl bg-amber-950/80 border border-amber-500/30 text-amber-400 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(245,158,11,0.25)]">
                           <KeyRound className="w-5 h-5" />
                         </div>
-                        <div>
-                          <span className="text-sm font-bold text-white group-hover:text-cyan-300 transition block">
-                            Update password & credentials
-                          </span>
-                          <span className="text-xs text-slate-400 font-normal">
-                            Send verification OTP to email and set a new strong password
-                          </span>
-                        </div>
+                        <span className="text-[10px] font-mono tracking-wider font-bold text-amber-300 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/40">
+                          CREDENTIALS SECURE
+                        </span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-cyan-500/70 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-transform" />
+
+                      <div className="pt-3">
+                        <div className="flex items-center justify-between text-base font-bold text-white group-hover:text-amber-300 transition">
+                          <span>Security & credentials</span>
+                          <ChevronRight className="w-4 h-4 text-amber-400/80 group-hover:text-amber-300 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <p className="text-xs text-slate-400 font-light mt-1 line-clamp-2">
+                          Send verification OTP to email and set a new strong password
+                        </p>
+                      </div>
                     </button>
                   </div>
                 </div>
 
+                {/* 3. Academic & System Telemetry Capsule Card */}
+                <div className="rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.08] p-5 sm:p-6 backdrop-blur-xl flex flex-wrap items-center justify-between gap-4 shadow-lg">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-950/70 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                      <Shield className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white flex items-center gap-2">
+                        <span>Proctoring Security Shield Active</span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-light mt-0.5">
+                        Single-device exam lock active. Registered email: <strong className="text-slate-300 font-mono">{student.email}</strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-xs font-mono">
+                    <div className="text-right hidden sm:block">
+                      <span className="text-slate-500 block text-[10px]">EXAMS ATTEMPTED</span>
+                      <span className="font-bold text-white">{completedAttempts.length} Completed</span>
+                    </div>
+                    <Link
+                      href="/dashboard"
+                      className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-cyan-300 hover:text-white font-semibold text-xs transition active:scale-95"
+                    >
+                      Dashboard Analytics →
+                    </Link>
+                  </div>
+                </div>
 
               </div>
             )}
