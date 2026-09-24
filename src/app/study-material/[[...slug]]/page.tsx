@@ -13,7 +13,7 @@ import EntranceCurriculumPage from "@/components/curriculum/EntranceCurriculumPa
 import CurriculumLevelPage from "@/components/curriculum/CurriculumLevelPage";
 import CurriculumCategoryPage from "@/components/curriculum/CurriculumCategoryPage";
 import { sanitizeMaterials, StudyMaterialItem } from "@/components/curriculum/curriculumData";
-import { Atom, LayoutDashboard, Sparkles, BookOpen } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 interface PageProps {
   params: Promise<{
@@ -156,36 +156,26 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
             <Link href="/dashboard" className="flex items-center gap-2 group">
               <PiechemLogo size="md" href="/dashboard" />
             </Link>
-            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-white/10 text-[11px] font-mono text-cyan-400">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span>ACADEMIC STUDY REPOSITORY</span>
-            </div>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Link
-              href="/study-material"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">All Curriculums</span>
-            </Link>
-
-            <Link
-              href="/3d-animations"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 hover:text-white hover:bg-emerald-900/60 text-xs font-mono transition-all"
-            >
-              <Atom className="w-3.5 h-3.5 text-emerald-400" />
-              <span>3D Molecular Lab</span>
-            </Link>
-
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-slate-300 hover:text-white text-xs font-medium transition-all"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
+            {slug.length > 0 ? (
+              <Link
+                href="/study-material"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+                <span>All Curriculums</span>
+              </Link>
+            ) : (
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+                <span>Back to Dashboard</span>
+              </Link>
+            )}
           </div>
         </div>
       </header>

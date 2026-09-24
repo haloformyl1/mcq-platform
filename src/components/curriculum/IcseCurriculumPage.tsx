@@ -50,33 +50,6 @@ export default function IcseCurriculumPage({
 
   return (
     <div className="w-full text-slate-100 font-sans selection:bg-amber-500/20 selection:text-amber-200">
-      
-      {/* Top Breadcrumb & Switcher Strip */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-slate-400">
-            <Link href="/study-material" className="hover:text-amber-300 text-amber-400 transition-colors flex items-center gap-1">
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>All Curriculums</span>
-            </Link>
-            <span className="text-slate-600">/</span>
-            <span className="text-amber-300 font-bold uppercase tracking-wider">ICSE / ISC Council Archive</span>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 hidden sm:inline">Switch Curriculum:</span>
-            <Link href="/study-material/cbse" className="px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-cyan-500/10 text-slate-400 hover:text-cyan-300 border border-white/[0.06] transition-colors text-[11px]">
-              CBSE
-            </Link>
-            <Link href="/study-material/wbchse" className="px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-300 border border-white/[0.06] transition-colors text-[11px]">
-              WBCHSE
-            </Link>
-            <Link href="/study-material/entrance" className="px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-rose-500/10 text-slate-400 hover:text-rose-300 border border-white/[0.06] transition-colors text-[11px]">
-              NEET / JEE
-            </Link>
-          </div>
-        </div>
-      </div>
 
       {/* Hero Banner: ICSE / ISC Imperial Gold / Amber Theme */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

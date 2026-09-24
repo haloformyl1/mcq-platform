@@ -238,48 +238,6 @@ function ThreeDAnimationsContent() {
       <GlobalHeader
         isGoldMember={isGold}
         logoHref="/dashboard"
-        contextBadge={
-          <div className="hidden sm:flex items-center gap-2 text-xs font-mono">
-            <span className="text-slate-600">/</span>
-            <span className="px-2.5 py-1 rounded-md bg-cyan-950/70 border border-cyan-500/35 text-cyan-300 font-bold tracking-wider uppercase text-[10px]">
-              3D EXPERIENCES
-            </span>
-          </div>
-        }
-        actions={
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Back to</span> Dashboard
-            </Link>
-
-            <Link
-              href="/dashboard#materials"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition"
-            >
-              <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Study Vault</span>
-            </Link>
-
-            {isGold ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300">
-                <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden xs:inline">GOLD</span>
-              </span>
-            ) : (
-              <Link
-                href="/dashboard/account"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/40 text-amber-300 hover:border-amber-400 transition"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>UPGRADE</span>
-              </Link>
-            )}
-          </div>
-        }
       />
 
       {/* ========================================================= */}
