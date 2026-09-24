@@ -128,7 +128,7 @@ export default function GlobalFooter() {
           
           {/* Brand Column (Left Anchor) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col items-start">
-            <PiechemLogo size="md" href="/dashboard" subtitle="Smart Learning Platform" />
+            <PiechemLogo size="md" href="/dashboard" isGoldMember={false} subtitle="Smart Learning Platform" />
             <p className="mt-2 text-xs sm:text-[12.5px] text-[#91A5B8] leading-normal max-w-xs sm:max-w-sm">
               Interactive learning for the sciences.
             </p>

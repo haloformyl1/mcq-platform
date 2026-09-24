@@ -427,7 +427,7 @@ export default function LandingIntroScreen() {
       >
         {/* Far Left: PIECHEM Clean Wordmark */}
         <div className="flex items-center gap-3">
-          <PiechemLogo size="md" subtitle="Learning Platform" />
+          <PiechemLogo size="md" isGoldMember={false} subtitle="Learning Platform" />
         </div>
 
         {/* Far Right: Precision Scientific Instrumentation Status */}

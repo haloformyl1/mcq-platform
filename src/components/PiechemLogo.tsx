@@ -18,81 +18,13 @@ export default function PiechemLogo({
   showText = true,
   className = "",
   href,
-  isGoldMember,
+  isGoldMember = false,
   theme = 'dark',
   subtitle
 }: PiechemLogoProps) {
-  const [isGold, setIsGold] = useState<boolean>(isGoldMember ?? false);
-
-  useEffect(() => {
-    if (isGoldMember !== undefined) {
-      setIsGold(isGoldMember);
-      return;
-    }
-
-    const checkGoldStatus = () => {
-      try {
-        if (typeof window !== "undefined") {
-          const path = window.location.pathname || "";
-          // Never show gold on admin portal or public authentication pages
-          if (path.startsWith("/admin") || path === "/login" || path === "/onboarding") {
-            setIsGold(false);
-            return;
-          }
-        }
-
-        const stored = localStorage.getItem("piechem_is_gold");
-        if (stored !== "true") {
-          setIsGold(false);
-          return;
-        }
-
-        const isComplimentary = localStorage.getItem("piechem_is_complimentary") === "true";
-        if (isComplimentary) {
-          setIsGold(true);
-          return;
-        }
-
-        const expiresAt = localStorage.getItem("piechem_gold_expires_at");
-        if (expiresAt) {
-          const expiryMs = new Date(expiresAt).getTime();
-          if (!isNaN(expiryMs)) {
-            if (Date.now() >= expiryMs) {
-              // Instantly revert to original logo when expired and clear storage
-              localStorage.removeItem("piechem_is_gold");
-              localStorage.removeItem("piechem_gold_expires_at");
-              localStorage.removeItem("piechem_is_complimentary");
-              setIsGold(false);
-              window.dispatchEvent(new Event("piechem_gold_status_changed"));
-              return;
-            }
-            setIsGold(true);
-            return;
-          }
-        }
-
-        // Legacy or unverified flag without expiration metadata: clean up and show original logo
-        localStorage.removeItem("piechem_is_gold");
-        setIsGold(false);
-      } catch {
-        setIsGold(false);
-      }
-    };
-
-    checkGoldStatus();
-
-    // 1-second interval to guarantee instant logo reversal the moment subscription expires
-    const interval = setInterval(checkGoldStatus, 1000);
-
-    window.addEventListener("piechem_gold_status_changed", checkGoldStatus);
-    window.addEventListener("storage", checkGoldStatus);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener("piechem_gold_status_changed", checkGoldStatus);
-      window.removeEventListener("storage", checkGoldStatus);
-    };
-  }, [isGoldMember]);
+  // STRICT RULE: Golden logo ONLY renders when explicitly verified as a logged-in Gold/Complimentary subscriber.
+  // Everywhere else (landing, public intro screen, login, free students, etc.) shows standard cyan/white logo.
+  const isGold = Boolean(isGoldMember);
 
   const dimensions = {
     sm: { icon: 24, text: "text-sm sm:text-lg", gap: "gap-1.5 sm:gap-2" },

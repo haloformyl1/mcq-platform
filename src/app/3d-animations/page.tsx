@@ -44,13 +44,6 @@ function ThreeDAnimationsContent() {
     }
   }, [searchParams]);
 
-  // Check initial Gold status from localStorage for instantaneous zero-flicker UI
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const cachedGold = localStorage.getItem("piechem_is_gold") === "true";
-      setIsGold(cachedGold);
-    }
-  }, []);
 
   // Fetch verified student and study materials data from backend
   useEffect(() => {

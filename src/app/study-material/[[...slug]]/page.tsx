@@ -154,7 +154,14 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
         <div className="site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="flex items-center gap-2 group">
-              <PiechemLogo size="md" href="/dashboard" />
+              <PiechemLogo 
+                size="md" 
+                href="/dashboard" 
+                isGoldMember={
+                  student?.subscriptionStatus === "COMPLIMENTARY" || 
+                  (student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > Date.now()))
+                }
+              />
             </Link>
           </div>
 
