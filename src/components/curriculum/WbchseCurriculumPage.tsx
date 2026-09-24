@@ -29,8 +29,6 @@ import {
   RESOURCE_CATEGORIES, 
   filterMaterialsForContext 
 } from "./curriculumData";
-import UpgradeModal from "./UpgradeModal";
-import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 
 interface WbchseCurriculumPageProps {
   materials: StudyMaterialItem[];
@@ -43,46 +41,10 @@ export default function WbchseCurriculumPage({
   student,
   basePath = "/study-material"
 }: WbchseCurriculumPageProps) {
-  const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [disciplineFilter, setDisciplineFilter] = useState<"ALL" | "PHYSICAL" | "INORGANIC" | "ORGANIC">("ALL");
-  const [bilingualFilter, setBilingualFilter] = useState<"ALL" | "BENGALI" | "ENGLISH">("ALL");
-
-  const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
-  const isPaid = student?.subscriptionStatus === "PAID" && (
-    !student?.subscriptionExpiresAt || new Date(student?.subscriptionExpiresAt).getTime() > Date.now()
-  );
-  const isGold = isComp || isPaid;
-
-  const wbMaterials = useMemo(() => {
-    return filterMaterialsForContext(materials, "WBCHSE");
-  }, [materials]);
-
   const sem1Materials = useMemo(() => filterMaterialsForContext(materials, "WBCHSE", "SEM_1"), [materials]);
   const sem2Materials = useMemo(() => filterMaterialsForContext(materials, "WBCHSE", "SEM_2"), [materials]);
   const sem3Materials = useMemo(() => filterMaterialsForContext(materials, "WBCHSE", "SEM_3"), [materials]);
   const sem4Materials = useMemo(() => filterMaterialsForContext(materials, "WBCHSE", "SEM_4"), [materials]);
-
-  const filteredList = useMemo(() => {
-    return wbMaterials.filter(item => {
-      if (disciplineFilter !== "ALL" && item.discipline !== disciplineFilter) return false;
-      
-      const titleLower = item.title.toLowerCase();
-      const descLower = (item.description || "").toLowerCase();
-      const hasBengali = /[\u0980-\u09FF]/.test(item.title) || titleLower.includes("bangla") || descLower.includes("bangla") || titleLower.includes("bengali");
-      
-      if (bilingualFilter === "BENGALI" && !hasBengali) return false;
-      if (bilingualFilter === "ENGLISH" && hasBengali) return false;
-
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        return titleLower.includes(q) || 
-               descLower.includes(q) ||
-               (item.chapterTitle && item.chapterTitle.toLowerCase().includes(q));
-      }
-      return true;
-    });
-  }, [wbMaterials, disciplineFilter, bilingualFilter, searchQuery]);
 
   return (
     <div className="w-full text-slate-100 font-sans selection:bg-emerald-500/20 selection:text-emerald-200">
@@ -316,189 +278,6 @@ export default function WbchseCurriculumPage({
         </div>
       </div>
 
-      {/* Materials List */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.06]">
-          <div>
-            <h3 className="text-lg font-bold text-white">
-              WBCHSE Chemistry Repository ({filteredList.length} Items)
-            </h3>
-            <p className="text-xs text-slate-400 font-light">
-              Explore semester notes, bilingual study guides, and WBJEE problems.
-            </p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search WBCHSE notes..."
-                className="pl-8 pr-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-400 w-48 sm:w-64"
-              />
-            </div>
-
-            {/* Bilingual Filter */}
-            <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/10 text-[11px] font-mono">
-              <button
-                onClick={() => setBilingualFilter("ALL")}
-                className={`px-2 py-0.5 rounded ${bilingualFilter === "ALL" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400"}`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setBilingualFilter("BENGALI")}
-                className={`px-2 py-0.5 rounded ${bilingualFilter === "BENGALI" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400"}`}
-              >
-                বাংলা (Bengali)
-              </button>
-              <button
-                onClick={() => setBilingualFilter("ENGLISH")}
-                className={`px-2 py-0.5 rounded ${bilingualFilter === "ENGLISH" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400"}`}
-              >
-                English
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {filteredList.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredList.slice(0, 9).map(item => {
-              const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
-              const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
-              const restrictionReason = eligibility.reason || item.restrictionReason;
-              const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
-              const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
-              const targetLabel = eligibility.targetLabel || item.targetLabel;
-              const policyTitle = eligibility.policyTitle || item.policyTitle;
-              const policyNote = eligibility.policyNote || item.policyNote;
-              const canAccess = !isLevelRestricted && (!item.isPremium || isGold);
-              const isBengali = /[\u0980-\u09FF]/.test(item.title) || item.title.toLowerCase().includes("bangla");
-
-              return (
-                <div
-                  key={item.id}
-                  className={`rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border p-5 flex flex-col justify-between transition-all duration-300 shadow-sm ${
-                    isLevelRestricted 
-                      ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]" 
-                      : "border-white/[0.08] hover:border-emerald-500/40"
-                  }`}
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-emerald-300">
-                          Chapter {String(item.chapterNumber).padStart(2, "0")} · {item.discipline}
-                        </span>
-                        {isBengali && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
-                            বাংলা
-                          </span>
-                        )}
-                        {isLevelRestricted && (
-                          <span 
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950/90 border border-rose-500/50 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.25)]"
-                            title={restrictionReason}
-                          >
-                            <Lock className="w-2.5 h-2.5 text-rose-300 shrink-0" />
-                            <span>{badgeLabel}</span>
-                          </span>
-                        )}
-                      </div>
-                      {item.isPremium ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300">
-                          <Sparkle className="w-2.5 h-2.5" />
-                          <span>PREMIUM</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
-                          <Check className="w-2.5 h-2.5" />
-                          <span>FREE</span>
-                        </span>
-                      )}
-                    </div>
-
-                    <h4 
-                      onClick={() => {
-                        if (isLevelRestricted) {
-                          setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
-                        } else if (!canAccess) {
-                          setUpgradeItem(item);
-                        }
-                      }}
-                      className={`text-base font-bold text-white leading-snug line-clamp-2 ${!canAccess ? "cursor-pointer hover:text-rose-200" : ""}`}
-                    >
-                      {item.title}
-                    </h4>
-
-                    <p className="text-xs text-slate-300/80 font-light line-clamp-2">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {item.category}
-                    </span>
-
-                    {canAccess ? (
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-colors"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Read</span>
-                        </Link>
-                        {item.url && item.url !== "#locked" && (
-                          <a
-                            href={item.url}
-                            download
-                            target="_blank"
-                            rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors"
-                            title="Download PDF"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    ) : isLevelRestricted ? (
-                        <button
-                          type="button"
-                          onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote })}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm group/btn"
-                        >
-                          <Lock className="w-3.5 h-3.5 text-rose-400" />
-                          <span>{buttonLabel}</span>
-                          <ArrowRight className="w-3 h-3 text-rose-400/80 transition-transform group-hover/btn:translate-x-0.5" />
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setUpgradeItem(item)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-colors"
-                      >
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>Unlock</span>
-                      </button>
-                      )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="py-12 text-center text-slate-400 font-mono text-xs">
-            No WBCHSE materials match your filter criteria.
-          </div>
-        )}
-      </div>
-
-      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
-    </div>
   );
 }

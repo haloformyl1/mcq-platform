@@ -124,6 +124,7 @@ export default function CurriculumLevelPage({
   }, [levelMaterials, disciplineFilter, searchQuery]);
 
   const levelFormatted = formatLevelLabel(level);
+  const isEntranceExam = board === "ENTRANCE" || ["neet", "jee", "wbjee", "cuet"].includes(level.toLowerCase());
 
   return (
     <div className="w-full text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-200">
@@ -179,7 +180,8 @@ export default function CurriculumLevelPage({
         </div>
       </div>
 
-      {/* Categories Grid (Direct Click to Dedicated Category Pages!) */}
+      {/* Categories Grid (Hidden for Entrance: NEET/JEE/WBJEE/CUET show contents directly) */}
+      {!isEntranceExam && (
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -240,6 +242,7 @@ export default function CurriculumLevelPage({
           })}
         </div>
       </div>
+      )}
 
       {/* Quick Search & Materials Preview for this Level */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
