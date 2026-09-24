@@ -1271,7 +1271,7 @@ export default function StudyMaterialRepository({
       {/* ============================================================ */}
       {/* PREVIEW & UPGRADE MODAL                                      */}
       {/* ============================================================ */}
-      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
+      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} student={student} />
     </div>
   );
 }

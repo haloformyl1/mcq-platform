@@ -409,7 +409,7 @@ export default function CurriculumLevelPage({
         )}
       </div>
 
-      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
+      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} student={student} />
     </div>
   );
 }

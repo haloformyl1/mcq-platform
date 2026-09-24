@@ -350,26 +350,6 @@ export default function StudentLogin() {
             </span>
           </h1>
 
-          {/* Academic Target Badges Row */}
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mb-4 max-w-2xl">
-            {[
-              { label: "WBCHSE", sub: "SEM 1–4", color: "border-emerald-500/40 text-emerald-300 bg-emerald-950/50" },
-              { label: "CBSE", sub: "CLASS 11 & 12", color: "border-cyan-500/40 text-cyan-300 bg-cyan-950/50" },
-              { label: "ISC", sub: "CLASS 11 & 12", color: "border-amber-500/40 text-amber-300 bg-amber-950/50" },
-              { label: "JEE", sub: "MAINS & ADV", color: "border-blue-500/40 text-blue-300 bg-blue-950/50" },
-              { label: "NEET", sub: "UG MEDICINE", color: "border-rose-500/40 text-rose-300 bg-rose-950/50" }
-            ].map((b) => (
-              <span 
-                key={b.label}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-mono font-bold tracking-wider backdrop-blur-md ${b.color} shadow-sm transition-transform hover:-translate-y-0.5`}
-              >
-                <span>{b.label}</span>
-                <span className="opacity-50 text-[9px]">/</span>
-                <span className="font-normal opacity-85 text-[10px]">{b.sub}</span>
-              </span>
-            ))}
-          </div>
-
           <p className="text-xs sm:text-base text-slate-300/90 mb-8 max-w-xl mx-auto font-light leading-relaxed">
             Ready to test your knowledge? Enter your student email to access or initialize your examination portal.
           </p>
@@ -870,7 +850,7 @@ export default function StudentLogin() {
 
             <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between">
               <Link
-                href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9"
+                href="/3d-animations"
                 className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-300 hover:text-white transition-colors"
               >
                 <span>Explore 3D Lab</span>
@@ -931,7 +911,7 @@ export default function StudentLogin() {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00F2FE]" />
                 <span className="text-xs font-mono text-slate-300">
-                  Admissions & Technical Guidance:
+                  Questions?
                 </span>
               </div>
               <a
@@ -972,7 +952,7 @@ export default function StudentLogin() {
                 Curriculum Archive
               </Link>
               <span>•</span>
-              <Link href="/dashboard/lab-viewer/fff042ca-a686-4e84-a35b-271fac192ad9" className="hover:text-cyan-300 transition-colors">
+              <Link href="/3d-animations" className="hover:text-cyan-300 transition-colors">
                 3D Molecular Lab
               </Link>
               <span>•</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Atom, ShieldAlert } from "lucide-react";
 
 interface LabViewerClientProps {
@@ -19,7 +20,7 @@ interface LabViewerClientProps {
   };
 }
 
-export default function LabViewerClient({ material }: LabViewerClientProps) {
+export default function LabViewerClient({ material, student }: LabViewerClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeKey] = useState(0);
@@ -225,6 +226,31 @@ export default function LabViewerClient({ material }: LabViewerClientProps) {
           </div>
         </div>
       )}
+
+      {/* Floating Top Control Bar */}
+      <div className="absolute top-3 inset-x-3 sm:inset-x-4 z-30 pointer-events-auto flex items-center justify-between">
+        <Link
+          href="/3d-animations"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#030911]/90 hover:bg-[#081524] border border-cyan-500/40 hover:border-cyan-300 text-cyan-300 hover:text-white text-xs font-mono font-bold transition shadow-xl backdrop-blur-md"
+        >
+          <span>← 3D Simulations</span>
+        </Link>
+
+        {student ? (
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#030911]/85 border border-white/10 text-slate-300 text-[11px] font-mono shadow-md backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="truncate max-w-[150px]">{student.email}</span>
+          </span>
+        ) : (
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-cyan-950/90 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white text-xs font-mono font-bold transition shadow-xl backdrop-blur-md"
+          >
+            <span>Student Login</span>
+            <span>→</span>
+          </Link>
+        )}
+      </div>
 
       {/* The 100% Fullscreen Clean In-App Iframe */}
       {frameSrc && !isConcurrentRevoked && (

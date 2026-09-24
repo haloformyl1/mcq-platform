@@ -10,7 +10,7 @@ interface UpgradeModalProps {
   onClose: () => void;
 }
 
-export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
+export default function UpgradeModal({ item, onClose, student }: UpgradeModalProps) {
   if (!item) return null;
 
   const isRestricted = Boolean(item.isLevelRestricted);
@@ -166,14 +166,25 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
 
           {/* CTA Actions */}
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-            <Link
-              href="/dashboard/account"
-              className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
-            >
-              <Sparkles className="w-4 h-4 shrink-0" />
-              <span>Upgrade to Gold Now</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            {student ? (
+              <Link
+                href="/dashboard/account"
+                className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
+              >
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <span>Upgrade to Gold Now</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            ) : (
+              <Link
+                href={`/login?redirect=${encodeURIComponent(item?.id ? `/dashboard/pdf-viewer/${item.id.replace('db-', '')}` : '/study-material')}`}
+                className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
+              >
+                <Lock className="w-4 h-4 shrink-0" />
+                <span>Log In to Unlock Gold ✦</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            )}
 
             <button
               type="button"

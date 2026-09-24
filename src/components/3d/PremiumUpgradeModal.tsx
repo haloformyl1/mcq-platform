@@ -9,13 +9,15 @@ interface PremiumUpgradeModalProps {
   onClose: () => void;
   animationTitle?: string;
   lockedItem?: any;
+  student?: any;
 }
 
 export default function PremiumUpgradeModal({
   isOpen,
   onClose,
   animationTitle,
-  lockedItem
+  lockedItem,
+  student
 }: PremiumUpgradeModalProps) {
   if (!isOpen) return null;
 
@@ -166,14 +168,25 @@ export default function PremiumUpgradeModal({
 
           {/* CTA Actions */}
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-            <Link
-              href="/dashboard/account"
-              className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
-            >
-              <Sparkles className="w-4 h-4 shrink-0" />
-              <span>Upgrade to Gold Now</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            {student ? (
+              <Link
+                href="/dashboard/account"
+                className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
+              >
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <span>Upgrade to Gold Now</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            ) : (
+              <Link
+                href={`/login?redirect=${encodeURIComponent(lockedItem?.id ? `/dashboard/lab-viewer/${lockedItem.id}` : '/3d-animations')}`}
+                className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition shadow-lg shadow-cyan-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
+              >
+                <Lock className="w-4 h-4 shrink-0" />
+                <span>Log In to Unlock Gold ✦</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            )}
 
             <button
               type="button"
