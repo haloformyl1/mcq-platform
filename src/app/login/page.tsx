@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import PiechemLogo from "@/components/PiechemLogo";
+import GlobalFooter from "@/components/GlobalFooter";
 import {
   Atom,
   ChevronRight, 
@@ -274,34 +275,26 @@ export default function StudentLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020712] text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 flex flex-col justify-between overflow-x-hidden">
       
       {/* ========================================================= */}
-      {/* 1. UPPER HERO SECTION WITH DEEP COSMIC CHEMISTRY LIGHTING */}
+      {/* 1. UPPER SIDE (HERO SECTION - PREVIOUS THEME / IMAGE 2)  */}
       {/* ========================================================= */}
-      <section className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden">
+      <section className="relative min-h-[90vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-transparent">
         
-        {/* Layered High-Tech Chemistry Radial Glows */}
-        <div className="absolute top-0 inset-x-0 h-[650px] bg-[radial-gradient(ellipse_75%_55%_at_50%_-10%,rgba(0,242,254,0.18),transparent_75%)] pointer-events-none" />
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(37,99,235,0.12),transparent_70%)] pointer-events-none" />
-        <div className="absolute top-1/3 -left-32 w-96 h-96 bg-[radial-gradient(circle,rgba(16,185,129,0.08),transparent_65%)] pointer-events-none" />
-        <div className="absolute top-1/3 -right-32 w-96 h-96 bg-[radial-gradient(circle,rgba(139,92,246,0.08),transparent_65%)] pointer-events-none" />
+        {/* Ambient Glows & Chemical Grid Texture */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(0,210,255,0.22),transparent_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_40%,rgba(0,140,255,0.08),transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_40%,rgba(147,51,234,0.06),transparent_50%)] pointer-events-none" />
         
-        {/* Isometric Scientific Grid Backdrop */}
+        {/* Subtle grid pattern for exam/tech feel */}
         <div 
-          className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+          className="absolute inset-0 opacity-[0.03] pointer-events-none" 
           style={{
-            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.6) 1px, transparent 1px)",
-            backgroundSize: "32px 32px"
+            backgroundImage: "radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)",
+            backgroundSize: "28px 28px"
           }} 
         />
-
-        {/* Dynamic Orbital Geometry Lines (Bohr / Quantum Rings) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] pointer-events-none opacity-25">
-          <div className="w-full h-full rounded-full border border-cyan-500/20 [animation:spin_60s_linear_infinite]" />
-          <div className="absolute inset-16 rounded-full border border-blue-500/20 [animation:spin_45s_linear_infinite_reverse]" />
-          <div className="absolute inset-32 rounded-full border border-teal-500/15 [animation:spin_30s_linear_infinite]" />
-        </div>
 
         {/* --- Top Navigation Header --- */}
         <header className="relative z-20 w-full px-4 sm:px-8 lg:px-12 py-4 sm:py-6 flex items-center justify-between gap-4">
@@ -806,12 +799,39 @@ export default function StudentLogin() {
           </div>
         </div>
 
+        {/* --- SIGNATURE CURVED GLOWING ARC DIVIDER (Image 2) --- */}
+        <div className="relative w-full overflow-hidden leading-none z-10 -mb-[1px] mt-8">
+          <div className="w-full h-12 sm:h-20 relative flex items-center justify-center">
+            {/* Ambient backlight glow behind curve apex */}
+            <div className="absolute -top-4 sm:-top-8 left-1/2 -translate-x-1/2 w-3/4 sm:w-2/3 h-10 sm:h-16 bg-gradient-to-r from-cyan-500/20 via-sky-400/30 to-blue-500/20 blur-2xl rounded-full pointer-events-none" />
+            
+            {/* Curved SVG Arch */}
+            <svg
+              viewBox="0 0 1440 100"
+              fill="none"
+              preserveAspectRatio="none"
+              className="w-full h-full text-[#030910]"
+            >
+              <path d="M0,100 Q720,-20 1440,100 L1440,100 L0,100 Z" fill="#030910" />
+              <path d="M0,100 Q720,-20 1440,100" stroke="url(#arcCyanGlow)" strokeWidth="2.5" fill="none" />
+              <defs>
+                <linearGradient id="arcCyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#00e5ff" stopOpacity="0" />
+                  <stop offset="25%" stopColor="#00e5ff" stopOpacity="0.8" />
+                  <stop offset="50%" stopColor="#38bdf8" stopOpacity="1" />
+                  <stop offset="75%" stopColor="#00e5ff" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#00e5ff" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
       </section>
 
       {/* ========================================================= */}
       {/* 2. MORE REASONS TO JOIN - LUXURY BENTO GRID SHOWCASE      */}
       {/* ========================================================= */}
-      <section className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-16 sm:py-24 border-t border-white/[0.08]">
+      <section className="relative z-10 bg-[#030910] w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-10 sm:py-16">
         
         {/* Ambient background glows for bento */}
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -980,68 +1000,9 @@ export default function StudentLogin() {
       {/* ========================================================= */}
       {/* 3. ULTRA-LUXE SCIENTIFIC FOOTER                           */}
       {/* ========================================================= */}
-      <footer className="w-full bg-[#01040a]/95 border-t border-white/[0.08] backdrop-blur-2xl py-8 sm:py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
-          
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
-            {/* Left: Designer Attribution & Hotline */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00F2FE]" />
-                <span className="text-xs font-mono text-slate-300">
-                  Questions?
-                </span>
-              </div>
-              <a
-                href="tel:9830507435"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-300 transition-all font-mono text-xs font-semibold shadow-sm"
-              >
-                <Phone className="w-3 h-3 fill-current text-cyan-400" />
-                <span>9830507435</span>
-                <span className="text-cyan-500/60 font-normal">(Arghyadeep Roy)</span>
-              </a>
-            </div>
-
-            {/* Right: Security & Compliance Badges */}
-            <div className="flex items-center gap-4 text-[11px] font-mono text-slate-400">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                <span>AI-Proctored</span>
-              </span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5 text-purple-400" />
-                <span>Single-Device Lock</span>
-              </span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <Atom className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Piechem Engine</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
-            <div>
-              © 2026 PIE CHEM Platform. Precision Chemistry Learning Ecosystem.
-            </div>
-            <div className="flex items-center gap-5 text-slate-400">
-              <Link href="/study-material" className="hover:text-cyan-300 transition-colors">
-                Curriculum Archive
-              </Link>
-              <span>•</span>
-              <Link href="/3d-animations" className="hover:text-cyan-300 transition-colors">
-                3D Molecular Lab
-              </Link>
-              <span>•</span>
-              <Link href="/admin" className="hover:text-cyan-300 transition-colors">
-                Faculty Portal
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </footer>
+      {/* 3. PIECHEM ORIGINAL GLOBAL FOOTER                         */}
+      {/* ========================================================= */}
+      <GlobalFooter />
 
     </div>
   );
