@@ -210,6 +210,11 @@ function ThreeDAnimationsContent() {
 
   // Handle click on locked premium card
   const handleLockedClick = (item: any) => {
+    const isGuest = !student || student.isGuest || (!student.board && !student.academicLevel);
+    if (isGuest) {
+      router.push(`/login?redirect=${encodeURIComponent(`/dashboard/lab-viewer/${item.id}`)}`);
+      return;
+    }
     setSelectedLockedItem(item);
     setUpgradeModalOpen(true);
   };
