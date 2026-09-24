@@ -424,6 +424,84 @@ export default function StudentLogin() {
                     <span>100% NCERT & Board Calibrated</span>
                   </span>
                 </div>
+
+                {/* Divider / Try without login option */}
+                <div className="relative my-7 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/[0.08]" />
+                  </div>
+                  <span className="relative px-3.5 bg-[#020710] text-[10.5px] font-mono uppercase tracking-widest text-slate-400 font-semibold">
+                    or try without login (limited features)
+                  </span>
+                </div>
+
+                {/* Try Without Login (Limited Features) Card */}
+                <div className="relative rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-[#061c28]/85 via-[#03131d]/85 to-[#020e17]/90 border border-teal-500/35 hover:border-teal-400/60 shadow-[0_12px_36px_rgba(0,0,0,0.65),0_0_20px_rgba(20,184,166,0.15)] transition-all duration-300 backdrop-blur-xl group text-left">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-center sm:text-left space-y-1">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-950/90 border border-teal-500/40 text-teal-300 uppercase">
+                          <Check className="w-2.5 h-2.5" />
+                          <span>No Account Required</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          (Limited Features)
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white group-hover:text-teal-200 transition-colors">
+                        Try Without Login
+                      </h4>
+                      <p className="text-xs text-slate-300/85 font-light leading-relaxed max-w-md">
+                        Access all free CBSE, WBCHSE, ICSE, and NEET/JEE chapter notes, DPPs, and 3D molecular labs randomly without creating an account.
+                      </p>
+                    </div>
+
+                    <Link
+                      href="/study-material"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400 hover:from-teal-300 hover:to-sky-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-teal-500/20 transition-all hover:scale-105 shrink-0"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Explore Free Stuff</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </div>
+
+                  {/* Fast curriculum selector chips */}
+                  <div className="mt-3.5 pt-3 border-t border-white/[0.08] flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2 text-[11px] font-mono">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mr-1">Free Curricula:</span>
+                    <Link
+                      href="/study-material/cbse"
+                      className="px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-white transition-colors"
+                    >
+                      CBSE (All Classes)
+                    </Link>
+                    <Link
+                      href="/study-material/wbchse"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 hover:border-emerald-400 text-emerald-300 hover:text-white transition-colors"
+                    >
+                      WBCHSE (All Semesters)
+                    </Link>
+                    <Link
+                      href="/study-material/icse"
+                      className="px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 hover:border-amber-400 text-amber-300 hover:text-white transition-colors"
+                    >
+                      ICSE / ISC (All Classes)
+                    </Link>
+                    <Link
+                      href="/study-material/entrance"
+                      className="px-2.5 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/30 hover:border-rose-400 text-rose-300 hover:text-white transition-colors"
+                    >
+                      NEET & JEE
+                    </Link>
+                    <Link
+                      href="/3d-animations"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-950/60 hover:bg-teal-900/80 border border-teal-500/30 hover:border-teal-400 text-teal-300 hover:text-white transition-colors"
+                    >
+                      <Atom className="w-3 h-3 text-teal-400 animate-spin [animation-duration:10s]" />
+                      <span>Free 3D Labs</span>
+                    </Link>
+                  </div>
+                </div>
               </div>
             ) : (
               /* Elevated Obsidian Vault Card for Subsequent Auth Steps */
