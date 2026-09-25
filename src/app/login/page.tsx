@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import PiechemLogo from "@/components/PiechemLogo";
 import GlobalFooter from "@/components/GlobalFooter";
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import {
   Atom,
   ChevronRight, 
@@ -36,8 +34,7 @@ type LoginState =
   | "OTP_VERIFICATION"
   | "PASSWORD_CREATION"
   | "PASSWORD_RESET_OTP"
-  | "PASSWORD_RESET_CREATION"
-  | "PHONE_OTP_VERIFICATION";
+  | "PASSWORD_RESET_CREATION";
 
 export default function StudentLogin() {
   const router = useRouter();
@@ -54,11 +51,6 @@ export default function StudentLogin() {
   const [successMsg, setSuccessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [identifier, setIdentifier] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneOtp, setPhoneOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-  const [isNewPhoneUser, setIsNewPhoneUser] = useState(false);
 
   // If user visits /login directly without viewing the landing intro first, redirect to landing page
   useEffect(() => {
@@ -107,7 +99,7 @@ export default function StudentLogin() {
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("piechem_student_email");
-    if (savedEmail) { setEmail(savedEmail); setIdentifier(savedEmail); }
+    if (savedEmail) setEmail(savedEmail);
   }, []);
 
   useEffect(() => {
@@ -122,180 +114,36 @@ export default function StudentLogin() {
 
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const raw = (identifier || email).trim();
-    if (!raw) {
-      setError("Please enter your student email or 10-digit mobile number.");
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
       return;
     }
-
+    
     setLoading(true);
     setError("");
     setSuccessMsg("");
+    localStorage.setItem("piechem_student_email", email);
 
-    const isEmail = raw.includes("@");
-
-    if (isEmail) {
-      if (!validateEmail(raw)) {
-        setError("Please enter a valid email address.");
-        setLoading(false);
-        return;
-      }
-      setEmail(raw.toLowerCase());
-      localStorage.setItem("piechem_student_email", raw.toLowerCase());
-
-      try {
-        const res = await fetch("/api/auth/student/identify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifier: raw.toLowerCase() }),
-        });
-        const data = await res.json();
-        
-        if (!res.ok) throw new Error(data.error);
-
-        if (data.accountStatus === "ACTIVE") {
-          setStep("EXISTING_PASSWORD_LOGIN");
-        } else if (data.accountStatus === "UNVERIFIED") {
-          setStep("EXISTING_ACCOUNT_OTP_SETUP");
-          if (data.name) setName(data.name);
-        } else {
-          setStep("NEW_ACCOUNT_DETAILS");
-        }
-      } catch (err: any) {
-        setError(err.message || "Failed to identify account");
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Mobile Number Flow (Firebase Phone OTP)
-      const phoneDigits = raw.replace(/\D/g, "");
-      if (phoneDigits.length < 10) {
-        setError("Please enter a valid 10-digit mobile number.");
-        setLoading(false);
-        return;
-      }
-
-      const local10 = phoneDigits.slice(-10);
-      const formattedPhone = `+91${local10}`;
-      setPhone(formattedPhone);
-      localStorage.setItem("piechem_student_email", formattedPhone);
-
-      try {
-        // Step 1: Check account status in database
-        const res = await fetch("/api/auth/student/identify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifier: formattedPhone }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to verify phone number.");
-
-        if (data.accountStatus === "PHONE_NEW") {
-          setIsNewPhoneUser(true);
-        } else {
-          setIsNewPhoneUser(false);
-          if (data.name && data.name !== "Student") {
-            setName(data.name);
-          }
-        }
-
-        // Step 2: Trigger Firebase Phone Authentication
-        if (typeof window !== "undefined") {
-          if ((window as any).recaptchaVerifier) {
-            try { (window as any).recaptchaVerifier.clear(); } catch {}
-          }
-          const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-            size: "invisible",
-          });
-          (window as any).recaptchaVerifier = verifier;
-
-          const confirmation = await signInWithPhoneNumber(auth, formattedPhone, verifier);
-          setConfirmationResult(confirmation);
-          setStep("PHONE_OTP_VERIFICATION");
-          setResendCooldown(30);
-          setSuccessMsg(`6-digit SMS OTP sent to ${formattedPhone}`);
-        }
-      } catch (fbErr: any) {
-        console.error("Firebase Phone Auth error:", fbErr);
-        if (fbErr.code === "auth/invalid-phone-number") {
-          setError("The phone number is invalid. Please check and retry.");
-        } else if (fbErr.code === "auth/quota-exceeded") {
-          setError("SMS quota reached for today. Please sign in via email or contact admin.");
-        } else {
-          setError(fbErr.message || "Failed to dispatch SMS verification. Please check console or try email.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phoneOtp.length !== 6) {
-      setError("Please enter the complete 6-digit SMS code.");
-      return;
-    }
-    if (isNewPhoneUser && !name.trim()) {
-      setError("Please provide your full student name to proceed.");
-      return;
-    }
-    setLoading(true);
-    setError("");
     try {
-      if (!confirmationResult) {
-        throw new Error("SMS verification session expired. Please request a new code.");
-      }
-      await confirmationResult.confirm(phoneOtp);
-
-      const res = await fetch("/api/auth/student/phone-login", {
+      const res = await fetch("/api/auth/student/identify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, name: name.trim() || undefined }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to log in.");
+      
+      if (!res.ok) throw new Error(data.error);
 
-      if (data.isOnboarded) {
-        router.push("/dashboard");
+      if (data.accountStatus === "ACTIVE") {
+        setStep("EXISTING_PASSWORD_LOGIN");
+      } else if (data.accountStatus === "UNVERIFIED") {
+        setStep("EXISTING_ACCOUNT_OTP_SETUP");
+        if (data.name) setName(data.name);
       } else {
-        router.push("/onboarding");
+        setStep("NEW_ACCOUNT_DETAILS");
       }
     } catch (err: any) {
-      console.error("Phone Verify Error:", err);
-      if (err.code === "auth/invalid-verification-code") {
-        setError("Incorrect SMS verification code. Please check and retry.");
-      } else if (err.code === "auth/code-expired") {
-        setError("SMS OTP has expired. Please click Resend SMS OTP.");
-      } else {
-        setError(err.message || "Failed to authenticate phone OTP.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendPhoneOtp = async () => {
-    if (resendCooldown > 0) return;
-    setLoading(true);
-    setError("");
-    setSuccessMsg("");
-    try {
-      if (typeof window !== "undefined") {
-        if ((window as any).recaptchaVerifier) {
-          try { (window as any).recaptchaVerifier.clear(); } catch {}
-        }
-        const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-          size: "invisible",
-        });
-        (window as any).recaptchaVerifier = verifier;
-        const confirmation = await signInWithPhoneNumber(auth, phone, verifier);
-        setConfirmationResult(confirmation);
-        setResendCooldown(30);
-        setSuccessMsg(`Fresh 6-digit SMS OTP dispatched to ${phone}`);
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to resend SMS OTP.");
+      setError(err.message || "Failed to identify account");
     } finally {
       setLoading(false);
     }
@@ -496,7 +344,7 @@ export default function StudentLogin() {
           </h1>
 
           <p className="text-xs sm:text-base text-slate-300/90 mb-8 max-w-xl mx-auto font-light leading-relaxed">
-            Ready to test your knowledge? Enter your student email or 10-digit mobile number to access or initialize your examination portal.
+            Ready to test your knowledge? Enter your student email to access or initialize your examination portal.
           </p>
 
           {/* Interactive Login Flows */}
@@ -514,21 +362,20 @@ export default function StudentLogin() {
                   <div className="flex flex-col sm:flex-row items-stretch gap-2">
                     <div className="relative flex-1">
                       <input
-                        id="student-identifier"
-                        type="text"
+                        id="student-email"
+                        type="email"
                         required
                         placeholder=" "
                         className="peer w-full h-12 sm:h-14 bg-white/[0.03] text-white border border-transparent focus:border-cyan-500/40 rounded-xl px-4 pt-4 pb-1 text-sm sm:text-base outline-none transition font-sans placeholder-transparent focus:bg-white/[0.05]"
-                        value={identifier || email}
-                        onChange={(e) => { setIdentifier(e.target.value); setEmail(e.target.value); }}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                       <label
-                        htmlFor="student-identifier"
+                        htmlFor="student-email"
                         className="absolute left-4 top-1.5 text-[10px] sm:text-[11px] text-cyan-300 font-mono font-semibold tracking-wider transition-all peer-placeholder-shown:top-3.5 sm:peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm sm:peer-placeholder-shown:text-base peer-placeholder-shown:font-normal peer-placeholder-shown:text-slate-400 peer-focus:top-1.5 peer-focus:text-[10px] sm:peer-focus:text-[11px] peer-focus:font-semibold peer-focus:text-cyan-300 pointer-events-none"
                       >
-                        Student Email or 10-Digit Mobile
+                        Student Email Address
                       </label>
-                      <div id="recaptcha-container"></div>
                     </div>
                     
                     <button
@@ -587,96 +434,6 @@ export default function StudentLogin() {
                   <div className="mb-5 bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 px-4 py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2.5">
                     <Sparkle className="w-4 h-4 shrink-0 text-emerald-400" />
                     <span>{successMsg}</span>
-                  </div>
-                )}
-
-                                {step === "PHONE_OTP_VERIFICATION" && (
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white font-serif">Verify Mobile OTP</h2>
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-[10px] font-mono text-cyan-300 font-bold uppercase">SMS OTP</span>
-                    </div>
-                    <p className="text-slate-400 text-xs sm:text-sm mb-4">
-                      Enter the 6-digit verification code sent via SMS to:
-                    </p>
-                    <div className="mb-5 p-2 rounded-xl bg-white/[0.04] border border-cyan-500/30 text-xs sm:text-sm font-mono text-cyan-300 font-bold break-all text-center flex items-center justify-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>{phone}</span>
-                    </div>
-
-                    <form onSubmit={handleVerifyPhoneOtp} className="space-y-4">
-                      {isNewPhoneUser && (
-                        <div className="relative">
-                          <input
-                            id="phone-name"
-                            type="text"
-                            required
-                            placeholder=" "
-                            className="peer w-full bg-[#040e1b] text-white border border-cyan-500/30 focus:border-cyan-400 rounded-xl pt-5 pb-2 px-4 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition text-sm sm:text-base font-sans"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                          />
-                          <label 
-                            htmlFor="phone-name" 
-                            className="absolute left-4 top-1.5 text-[10px] sm:text-[11px] text-cyan-300 font-mono font-semibold tracking-wider transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-slate-400 peer-focus:top-1.5 peer-focus:text-[11px] peer-focus:text-cyan-300 pointer-events-none"
-                          >
-                            Full Student Name
-                          </label>
-                        </div>
-                      )}
-
-                      <div className="relative">
-                        <input
-                          id="phone-otp"
-                          type="text"
-                          maxLength={6}
-                          required
-                          autoFocus
-                          placeholder=" "
-                          className="peer w-full bg-[#040e1b] text-white border border-cyan-500/30 focus:border-cyan-400 rounded-xl pt-5 pb-2 px-4 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition text-center tracking-[0.4em] text-xl font-mono font-bold"
-                          value={phoneOtp}
-                          onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, ''))}
-                        />
-                        <label 
-                          htmlFor="phone-otp" 
-                          className="absolute left-4 top-1.5 text-[10px] sm:text-[11px] text-cyan-300 font-mono font-semibold tracking-wider transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-slate-400 peer-focus:top-1.5 peer-focus:text-[11px] peer-focus:text-cyan-300 pointer-events-none"
-                        >
-                          6-Digit SMS Verification Code
-                        </label>
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={loading || phoneOtp.length !== 6 || (isNewPhoneUser && !name.trim())}
-                        className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black py-3.5 px-4 rounded-xl transition duration-200 mt-2 disabled:opacity-70 shadow-lg uppercase tracking-wider text-sm flex items-center justify-center gap-2"
-                      >
-                        <span>{loading ? "Verifying Code..." : "Verify & Sign In"}</span>
-                        <ArrowRight className="w-4 h-4 text-slate-950" />
-                      </button>
-
-                      <div className="flex items-center justify-between pt-2 text-xs font-mono">
-                        <button
-                          type="button"
-                          onClick={handleResendPhoneOtp}
-                          disabled={resendCooldown > 0 || loading}
-                          className="text-cyan-400 hover:text-cyan-300 disabled:text-slate-500 disabled:cursor-not-allowed transition"
-                        >
-                          {resendCooldown > 0 ? `Resend SMS in ${resendCooldown}s` : "Resend SMS OTP"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setStep("EMAIL_ENTRY");
-                            setError("");
-                            setSuccessMsg("");
-                            setPhoneOtp("");
-                          }}
-                          className="text-slate-400 hover:text-white transition"
-                        >
-                          Use another mobile / email
-                        </button>
-                      </div>
-                    </form>
                   </div>
                 )}
 
