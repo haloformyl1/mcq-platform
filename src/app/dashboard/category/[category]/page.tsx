@@ -197,19 +197,19 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
     return (
       <div 
         key={test.id}
-        className="group relative rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#07131e]/90 via-[#040c14]/90 to-black/95 hover:from-[#0a1b2a]/95 border border-white/10 hover:border-cyan-400/50 backdrop-blur-xl p-6 transition-all duration-300 hover:-translate-y-1.5 shadow-xl hover:shadow-[0_20px_45px_rgba(6,182,212,0.18)] flex flex-col justify-between overflow-hidden"
+        className="group relative rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#07131e]/90 via-[#040c14]/90 to-black/95 hover:from-[#0a1b2a]/95 border border-white/10 hover:border-cyan-400/50 backdrop-blur-xl p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1.5 shadow-xl hover:shadow-[0_20px_45px_rgba(6,182,212,0.18)] flex flex-col justify-between overflow-hidden"
       >
         {/* Ambient card top border highlight */}
         <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent group-hover:via-cyan-400/60 transition-all" />
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Top row: Discipline Chip + Status Badge */}
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <span className="text-xs font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
                 {test.discipline || "CHEMISTRY"}
               </span>
-              <h3 className="font-serif text-lg sm:text-xl font-bold text-white group-hover:text-cyan-200 transition-colors line-clamp-2 leading-snug">
+              <h3 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-cyan-200 transition-colors line-clamp-2 leading-snug">
                 {test.title}
               </h3>
             </div>
@@ -239,19 +239,19 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
           
           {/* Stats Badges Grid */}
-          <div className="grid grid-cols-2 gap-2 text-base font-mono">
+          <div className="grid grid-cols-2 gap-2 text-sm font-mono">
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <span className="font-bold text-white text-base">{test.totalQuestions}</span>
+              <span className="font-bold text-white">{test.totalQuestions}</span>
               <span className="text-slate-300 text-sm">Questions</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
               <Clock className="w-4 h-4 text-cyan-400" />
-              <span className="font-bold text-white text-base">{test.durationMinutes}</span>
+              <span className="font-bold text-white">{test.durationMinutes}</span>
               <span className="text-slate-300 text-sm">mins</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
               <Award className="w-4 h-4 text-amber-400" />
-              <span className="font-bold text-white text-base">{test.totalQuestions * test.marksPerQuestion}</span>
+              <span className="font-bold text-white">{test.totalQuestions * test.marksPerQuestion}</span>
               <span className="text-slate-300 text-sm">Marks</span>
             </div>
             {test.negativeMarking ? (
@@ -266,7 +266,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
           
           {/* Status & Timing Capsule */}
-          <div className="text-base bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
+          <div className="text-sm bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
             {isUpcomingStage && test.unlockDate && (
               <div className="text-amber-300 font-medium truncate flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0" />
