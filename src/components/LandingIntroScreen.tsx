@@ -427,7 +427,7 @@ export default function LandingIntroScreen() {
       >
         {/* Far Left: PIECHEM Clean Wordmark */}
         <div className="flex items-center gap-3">
-          <PiechemLogo size="md" isGoldMember={false} subtitle="Learning Platform" />
+          <PiechemLogo size="md" isGoldMember={false}  />
         </div>
 
         {/* Far Right: Precision Scientific Instrumentation Status */}
@@ -435,7 +435,6 @@ export default function LandingIntroScreen() {
           <span className="w-1.5 h-1.5 rounded-full bg-[#5DE6FF] shadow-[0_0_8px_#5DE6FF] animate-pulse" />
           <span className="text-white/40 hidden sm:inline">SYSTEM 01</span>
           <span className="text-white/20 hidden sm:inline">•</span>
-          <span className="text-slate-200">SMART LEARNING PLATFORM</span>
         </div>
       </header>
 
@@ -453,10 +452,7 @@ export default function LandingIntroScreen() {
               isPhase1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
             }`}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.02] border border-white/[0.08] text-[#9298A3] text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase backdrop-blur-sm">
-              <span className="w-1 h-1 rounded-full bg-[#5DE6FF]" />
-              <span>AN INITIATIVE BY <strong className="text-[#F5F5F2] font-medium tracking-wider">ARGHYADEEP ROY</strong></span>
-            </div>
+
           </div>
 
           {/* Primary Statement: "Chemistry, reimagined." */}

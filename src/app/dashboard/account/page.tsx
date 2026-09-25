@@ -776,20 +776,6 @@ export default function StudentAccountPage() {
           {/* Left: Brand Identity & Designer Attribution */}
           <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
             <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-            
-            <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-              <span className="text-slate-400">Designed by</span>
-              <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-              <span className="text-cyan-500/60">•</span>
-              <a 
-                href="tel:9830507435" 
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                title="Call Arghyadeep Roy"
-              >
-                <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
-                <span>9830507435</span>
-              </a>
-            </div>
           </div>
 
           {/* Right: Netflix-Style Profile Dropdown Trigger */}
@@ -2109,20 +2095,6 @@ export default function StudentAccountPage() {
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-                
-                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-                  <span className="text-slate-400">Designed by</span>
-                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60"> </span>
-                  <a 
-                    href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                    title="Call Arghyadeep Roy"
-                  >
-                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
-                    <span>9830507435</span>
-                  </a>
-                </div>
               </div>
 
               {/* Right: Instant UPI Badge */}
@@ -2577,20 +2549,6 @@ export default function StudentAccountPage() {
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-                
-                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-                  <span className="text-slate-400">Designed by</span>
-                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60"> </span>
-                  <a 
-                    href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                    title="Call Arghyadeep Roy"
-                  >
-                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
-                    <span>9830507435</span>
-                  </a>
-                </div>
               </div>
 
               {/* Right: Payment Recorded Status */}
@@ -2688,20 +2646,6 @@ export default function StudentAccountPage() {
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-                
-                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-                  <span className="text-slate-400">Designed by</span>
-                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60"> </span>
-                  <a 
-                    href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                    title="Call Arghyadeep Roy"
-                  >
-                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
-                    <span>9830507435</span>
-                  </a>
-                </div>
               </div>
 
               {/* Right: Promo Voucher Badge */}
@@ -2787,20 +2731,6 @@ export default function StudentAccountPage() {
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-                
-                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-                  <span className="text-slate-400">Designed by</span>
-                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60"> </span>
-                  <a 
-                    href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                    title="Call Arghyadeep Roy"
-                  >
-                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
-                    <span>9830507435</span>
-                  </a>
-                </div>
               </div>
 
               {/* Right: Payment History Badge */}
@@ -2884,20 +2814,6 @@ export default function StudentAccountPage() {
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-                
-                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-                  <span className="text-slate-400">Designed by</span>
-                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60"> </span>
-                  <a 
-                    href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                    title="Call Arghyadeep Roy"
-                  >
-                    <Phone className="w-2.5 h-2.5 text-cyan-400 fill-current" />
-                    <span>9830507435</span>
-                  </a>
-                </div>
               </div>
 
               {/* Right: Top Tier Badge */}

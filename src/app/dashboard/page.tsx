@@ -311,20 +311,6 @@ export default function StudentDashboard() {
                     student.subscriptionStatus === "COMPLIMENTARY" || 
                     (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
                   } />
-                
-                <div className="hidden md:inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[9px] sm:text-[10px] font-medium shadow-sm shrink-0">
-                  <span className="text-slate-400">Designed by</span>
-                  <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                  <span className="text-cyan-500/60 text-[9px] hidden xs:inline">•</span>
-                  <a 
-                    href="tel:9830507435" 
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[9px]"
-                    title="Call Arghyadeep Roy"
-                  >
-                    <Phone className="w-2.5 h-2.5 fill-current text-cyan-400" />
-                    <span>9830507435</span>
-                  </a>
-                </div>
               </div>
 
               

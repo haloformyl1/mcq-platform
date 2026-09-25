@@ -401,22 +401,6 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             {/* Left: Logo & Attribution */}
             <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">
               <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} />
-              
-              <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full border border-cyan-500/30 bg-[#061421]/90 text-[8.5px] sm:text-[10px] text-slate-300 font-medium shadow-sm shrink-0">
-                <span className="text-slate-400">Designed by</span>
-                <span className="font-semibold text-cyan-400">Arghyadeep Roy</span>
-                <span className="text-cyan-500/60 text-[9px] hidden sm:inline">•</span>
-                <a 
-                  href="tel:9830507435" 
-                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 hover:text-white border border-cyan-500/40 transition font-mono text-[8.5px] sm:text-[9px]"
-                  title="Call Arghyadeep Roy"
-                >
-                  <svg className="w-2.5 h-2.5 text-cyan-400 fill-current shrink-0" viewBox="0 0 24 24">
-                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                  </svg>
-                  <span>9830507435</span>
-                </a>
-              </div>
             </div>
 
             {/* Right: Notifications + Account Button matching Front Page */}

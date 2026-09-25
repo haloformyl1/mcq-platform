@@ -161,8 +161,6 @@ export default function LabViewerClient({ material }: LabViewerClientProps) {
     };
   }, [triggerBlackout]);
 
-  const watermarkText = "Designed by Arghyadeep Roy \u2022 9830507435";
-
   return (
     <div 
       ref={containerRef}
@@ -241,12 +239,6 @@ export default function LabViewerClient({ material }: LabViewerClientProps) {
           title={material.title}
         />
       )}
-
-      {/* Clean Creator Attribution Badge (Zero background noise, 100% study clarity) */}
-      <div className="absolute bottom-3 right-3 z-30 pointer-events-auto select-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#030911]/90 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold tracking-wide shadow-2xl backdrop-blur-md opacity-90">
-        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-        <span>{watermarkText}</span>
-      </div>
     </div>
   );
 }

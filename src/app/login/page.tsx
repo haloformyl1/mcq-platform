@@ -300,26 +300,8 @@ export default function StudentLogin() {
         <header className="relative z-20 w-full px-4 sm:px-8 lg:px-12 py-4 sm:py-6 flex items-center justify-between gap-4">
           {/* Logo on Far Left (Locked to Standard Cyan/White logo per user rule) */}
           <div className="flex items-center">
-            <PiechemLogo size="md" isGoldMember={false} subtitle="Learning Platform" />
+            <PiechemLogo size="md" isGoldMember={false}  />
           </div>
-
-          {/* Designer Badge & Quick Hotline on Far Right */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-[#04111d]/90 backdrop-blur-xl shadow-lg">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-[11px] sm:text-xs text-slate-300 font-medium whitespace-nowrap">
-                Designed by <strong className="font-semibold text-cyan-300">Arghyadeep Roy</strong>
-              </span>
-              <span className="text-cyan-500/60 text-[10px] hidden xs:inline">•</span>
-              <a
-                href="tel:9830507435"
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border border-cyan-500/40 bg-cyan-950/80 text-cyan-300 hover:text-white hover:border-cyan-300 transition-all text-[10px] sm:text-[11px] font-mono font-semibold tracking-wide whitespace-nowrap shadow-sm hover:shadow-[0_0_12px_rgba(0,242,254,0.4)]"
-                title="Call / WhatsApp Arghyadeep Roy"
-              >
-                <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current text-cyan-400 shrink-0" />
-                <span>9830507435</span>
-              </a>
-            </div>
           </div>
         </header>
 

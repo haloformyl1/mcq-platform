@@ -227,11 +227,6 @@ export default function OnboardingPage() {
 
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="w-full text-center text-xs text-slate-500 z-10">
-        PIECHEM Chemistry Platform • Designed by Arghyadeep Roy (9830507435)
-      </footer>
     </div>
   );
 }

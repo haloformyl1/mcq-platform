@@ -123,10 +123,6 @@ export default function PiFiringLoader({ fullScreen = true }: PiFiringLoaderProp
               CHEM
             </span>
           </div>
-
-          <div className="text-[9px] sm:text-[10px] tracking-[0.28em] font-semibold uppercase text-cyan-300/60 leading-none">
-            LEARNING PLATFORM
-          </div>
         </div>
 
         {/* Loading Message: Single, Muted, Calming */}

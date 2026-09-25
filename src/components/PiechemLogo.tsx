@@ -226,8 +226,8 @@ export default function PiechemLogo({
               (theme === 'light' ? 'text-cyan-700 font-bold' : 'text-cyan-300/70')
             }
           >
-            <span className="hidden sm:inline">{subtitle || "Learning Platform"}</span>
-            <span className="sm:hidden">{subtitle ? subtitle.split(' ')[0] : "Learn"}</span>
+            <span className="hidden sm:inline">{subtitle}</span>
+            <span className="sm:hidden">{subtitle ? subtitle.split(' ')[0] : ""}</span>
           </div>
         </div>
       )}
