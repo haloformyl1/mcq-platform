@@ -239,43 +239,43 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
           
           {/* Stats Badges Grid */}
-          <div className="grid grid-cols-2 gap-2 text-sm font-mono">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <span className="font-bold text-white">{test.totalQuestions}</span>
-              <span className="text-slate-400">Questions</span>
+          <div className="grid grid-cols-2 gap-2 text-base font-mono">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
+              <span className="font-bold text-white text-base">{test.totalQuestions}</span>
+              <span className="text-slate-300 text-sm">Questions</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-bold text-white">{test.durationMinutes}</span>
-              <span className="text-slate-400">mins</span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
+              <Clock className="w-4 h-4 text-cyan-400" />
+              <span className="font-bold text-white text-base">{test.durationMinutes}</span>
+              <span className="text-slate-300 text-sm">mins</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <Award className="w-3.5 h-3.5 text-amber-400" />
-              <span className="font-bold text-white">{test.totalQuestions * test.marksPerQuestion}</span>
-              <span className="text-slate-400">Marks</span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
+              <Award className="w-4 h-4 text-amber-400" />
+              <span className="font-bold text-white text-base">{test.totalQuestions * test.marksPerQuestion}</span>
+              <span className="text-slate-300 text-sm">Marks</span>
             </div>
             {test.negativeMarking ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-sm font-semibold">
                 <span>-{test.negativeMarks} wrong</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-sm font-semibold">
                 <span>No negative</span>
               </div>
             )}
           </div>
           
           {/* Status & Timing Capsule */}
-          <div className="text-sm bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
+          <div className="text-base bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
             {isUpcomingStage && test.unlockDate && (
               <div className="text-amber-300 font-medium truncate flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <Clock className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
               </div>
             )}
             {isLiveStage && test.lockState === "SCHEDULED_OPEN" && test.lockDate && (
               <div className="text-emerald-400 font-medium truncate flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Flame className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
               </div>
             )}
@@ -293,7 +293,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             )}
             {isLockedStage && (
               <div className="text-rose-400 font-medium truncate flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                <Lock className="w-4 h-4 text-rose-400 shrink-0" />
                 <span>Test window closed • Contact Admin for access</span>
               </div>
             )}
