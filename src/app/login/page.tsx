@@ -528,7 +528,7 @@ export default function StudentLogin() {
                       >
                         Student Email or 10-Digit Mobile
                       </label>
-                      <div id="recaptcha-container" className="hidden"></div>
+                      <div id="recaptcha-container"></div>
                     </div>
                     
                     <button
