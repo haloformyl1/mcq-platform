@@ -83,57 +83,22 @@ export default function StudentDashboard() {
   }, []);
 
   useEffect(() => {
-    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-    const isGuestQuery = params?.get("guest") === "true";
-    const apiUrl = isGuestQuery ? "/api/student/dashboard?guest=true" : "/api/student/dashboard";
-
-    fetch(apiUrl)
+    fetch("/api/student/dashboard")
       .then(res => res.json())
       .then(data => {
         if (data.error) {
           if (data.error.includes("revoked") || data.code === "CONCURRENT_DEVICE") {
             router.push("/login?reason=concurrent_device");
-            return;
+          } else {
+            router.push("/");
           }
-          setData({
-            student: {
-              id: "guest",
-              email: "guest@piechem.internal",
-              name: "Guest Student",
-              isGuest: true,
-              subscriptionStatus: "FREE",
-              board: null,
-              academicLevel: null
-            },
-            availableTests: [],
-            testAlertSettings: null,
-            allAttempts: [],
-            lastExamTopStudents: [],
-            lastExamTitle: ""
-          });
-          setLoading(false);
           return;
         }
         setData(data);
+
         setLoading(false);
       })
       .catch(() => {
-        setData({
-          student: {
-            id: "guest",
-            email: "guest@piechem.internal",
-            name: "Guest Student",
-            isGuest: true,
-            subscriptionStatus: "FREE",
-            board: null,
-            academicLevel: null
-          },
-          availableTests: [],
-          testAlertSettings: null,
-          allAttempts: [],
-          lastExamTopStudents: [],
-          lastExamTitle: ""
-        });
         setLoading(false);
       });
 
@@ -147,13 +112,6 @@ export default function StudentDashboard() {
   }, [router]);
 
   const handleCurriculumChange = async (newBoard: string, newLevel: string) => {
-    if (student?.isGuest) {
-      setData((prev: any) => ({
-        ...prev,
-        student: { ...prev.student, board: newBoard, academicLevel: newLevel }
-      }));
-      return;
-    }
     setUpdatingCurriculum(true);
     try {
       const res = await fetch("/api/student/profile", {

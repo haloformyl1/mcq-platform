@@ -13,61 +13,50 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     const { id } = await context.params;
     const cleanId = id.startsWith("db-") ? id.replace("db-", "") : id;
 
-    const material = await prisma.studyMaterial.findUnique({
-      where: { id: cleanId }
-    });
-
-    if (!material) {
-      return new NextResponse("Study material or 3D Lab simulation not found", { status: 404 });
-    }
-
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value;
     const payload = session ? await decrypt(session) : null;
 
     if (!payload || !payload.id) {
-      // Unauthenticated visitor check
-      if (material.isPremium) {
-        return new NextResponse(
-          `<!DOCTYPE html>
+      return new NextResponse(
+        `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Student Login Required</title>
+  <title>Login Required</title>
   <style>
     body { background: #040b12; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-    .card { background: #081420; border: 1px solid rgba(245, 158, 11, 0.4); padding: 36px 30px; border-radius: 20px; max-width: 440px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-    h2 { color: #fbbf24; margin: 0 0 12px 0; font-size: 20px; font-weight: 800; }
-    p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0; }
-    a { display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card { background: #081420; border: 1px solid rgba(0, 195, 255, 0.2); padding: 32px; border-radius: 16px; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    h2 { color: #38bdf8; margin: 0 0 12px 0; font-size: 20px; }
+    p { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 0 0 20px 0; }
+    a { display: inline-block; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; text-decoration: none; padding: 10px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>Student Login Required</h2>
-    <p>This 3D Interactive Lab is exclusive to PIE CHEM Gold members. Please sign in with your student credentials or upgrade your account to unlock this simulation.</p>
-    <a href="/login?redirect=${encodeURIComponent(`/dashboard/lab-viewer/${cleanId}`)}" target="_top">Log In to Unlock</a>
+    <p>Please log in to your student account to access this 3D Chemistry Interactive Simulation.</p>
+    <a href="/login" target="_top">Go to Login</a>
   </div>
 </body>
 </html>`,
-          { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } }
-        );
-      }
-      // If free 3D lab: allow streaming to visitor without login!
-    } else {
-      // Authenticated student checks
-      const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore, req);
-      if (!isValid || isRevoked) {
-        cookieStore.delete("session");
-        return new NextResponse(
-          `<!DOCTYPE html>
+        { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } }
+      );
+    }
+
+    // Enforce single active device concurrency check
+    const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore, req);
+    if (!isValid || isRevoked) {
+      cookieStore.delete("session");
+      return new NextResponse(
+        `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Session Terminated</title>
   <style>
     body { background: #040b12; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-    .card { background: #081420; border: 1px solid rgba(239, 68, 68, 0.4); padding: 32px; border-radius: 16px; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .card { background: #081420; border: 1px solid rgba(239, 68, 68, 0.4); padding: 32px; border-radius: 16px; max-width: 440px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     h2 { color: #f87171; margin: 0 0 12px 0; font-size: 20px; }
     p { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 0 0 20px 0; }
     a { display: inline-block; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; text-decoration: none; padding: 10px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; }
@@ -81,33 +70,41 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
   </div>
 </body>
 </html>`,
-          { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } }
-        );
+        { status: 401, headers: { "Content-Type": "text/html; charset=utf-8" } }
+      );
+    }
+
+    const student = await prisma.student.findUnique({
+      where: { id: payload.id },
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        subscriptionStatus: true, 
+        subscriptionExpiresAt: true,
+        board: true,
+        academicLevel: true
       }
+    });
 
-      const student = await prisma.student.findUnique({
-        where: { id: payload.id },
-        select: { 
-          id: true, 
-          email: true, 
-          name: true, 
-          subscriptionStatus: true, 
-          subscriptionExpiresAt: true,
-          board: true,
-          academicLevel: true
-        }
-      });
+    if (!student) {
+      return new NextResponse("Student profile not found", { status: 404 });
+    }
 
-      if (!student) {
-        return new NextResponse("Student profile not found", { status: 404 });
-      }
+    const material = await prisma.studyMaterial.findUnique({
+      where: { id: cleanId }
+    });
 
-      // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)
-      const meta = parseMaterialMetadata(material.description, material.title, material.type);
-      const eligibility = isStudentEligibleForMaterial(student, meta.section, meta.classSem);
-      if (!eligibility.eligible) {
-        return new NextResponse(
-          `<!DOCTYPE html>
+    if (!material) {
+      return new NextResponse("Study material or 3D Lab simulation not found", { status: 404 });
+    }
+
+    // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)
+    const meta = parseMaterialMetadata(material.description, material.title, material.type);
+    const eligibility = isStudentEligibleForMaterial(student, meta.section, meta.classSem);
+    if (!eligibility.eligible) {
+      return new NextResponse(
+        `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -131,16 +128,16 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
   </div>
 </body>
 </html>`,
-          { status: 403, headers: { "Content-Type": "text/html; charset=utf-8" } }
-        );
-      }
+        { status: 403, headers: { "Content-Type": "text/html; charset=utf-8" } }
+      );
+    }
 
-      // Enforce subscription verification for premium labs
-      if (material.isPremium) {
-        const canAccess = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
-        if (!canAccess) {
-          return new NextResponse(
-            `<!DOCTYPE html>
+    // Enforce subscription verification for premium labs
+    if (material.isPremium) {
+      const canAccess = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
+      if (!canAccess) {
+        return new NextResponse(
+          `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -161,9 +158,8 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
   </div>
 </body>
 </html>`,
-            { status: 403, headers: { "Content-Type": "text/html; charset=utf-8" } }
-          );
-        }
+          { status: 403, headers: { "Content-Type": "text/html; charset=utf-8" } }
+        );
       }
     }
 

@@ -45,12 +45,8 @@ export async function GET(req: Request) {
 
     const sanitized = materials.map(m => {
       const meta = parseMaterialMetadata(m.description, m.title, m.type);
-      // For enrolled logged-in students, enforce academic curriculum cohort eligibility.
-      // For guest visitors without an account (studentProfile === null), allow open exploration of all free content!
-      const eligibility = studentProfile 
-        ? isStudentEligibleForMaterial(studentProfile, meta.section, meta.classSem)
-        : { eligible: true, reason: "" };
-      const isLevelRestricted = studentProfile ? !eligibility.eligible : false;
+      const eligibility = isStudentEligibleForMaterial(studentProfile, meta.section, meta.classSem);
+      const isLevelRestricted = !eligibility.eligible;
       const isPaidLocked = m.isPremium && !isSubscribed;
       const isLocked = isLevelRestricted || isPaidLocked;
       const is3D = meta.category === '3D animations' || m.type === 'LINK';

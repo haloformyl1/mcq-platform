@@ -40,10 +40,9 @@ export default function AnimationCatalogCard({
   onLockedClick,
   featured = false
 }: AnimationCatalogCardProps) {
-  const isGuest = !student || student.isGuest || (!student.board && !student.academicLevel);
   const hasGold = Boolean(isGold ?? isGoldMember);
   const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
-  const isLevelRestricted = !isGuest ? !eligibility.eligible : false;
+  const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
   const restrictionReason = eligibility.reason || item.restrictionReason;
   const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
   const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
@@ -261,15 +260,6 @@ export default function AnimationCatalogCard({
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Launch 3D Lab</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
-            </Link>
-          ) : isGuest && item.isPremium ? (
-            <Link
-              href={`/login?redirect=${encodeURIComponent(`/dashboard/lab-viewer/${item.id}`)}`}
-              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-[0_0_16px_rgba(245,158,11,0.35)] tracking-wide uppercase group/btn"
-            >
-              <Lock className="w-3.5 h-3.5 text-slate-950 shrink-0" />
-              <span>Log in first to continue</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-950 transition-transform group-hover/btn:translate-x-1" />
             </Link>
           ) : isLevelRestricted ? (
             <button

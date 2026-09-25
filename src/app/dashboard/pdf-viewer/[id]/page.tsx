@@ -19,41 +19,15 @@ export default async function PdfViewerPage({
   const { id } = await params;
   const cleanId = id.startsWith("db-") ? id.replace("db-", "") : id;
 
-  const material = await prisma.studyMaterial.findUnique({
-    where: { id: cleanId }
-  });
-
-  if (!material) {
-    notFound();
-  }
-
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value;
   const payload = session ? await decrypt(session) : null;
 
-  // If visitor is NOT logged in:
   if (!payload || !payload.id) {
-    // Strictly block premium materials from unauthenticated access
-    if (material.isPremium) {
-      redirect(`/login?redirect=${encodeURIComponent(`/dashboard/pdf-viewer/${cleanId}`)}`);
-    }
-
-    // Allow students to read free materials without login!
-    return (
-      <PdfViewerClient 
-        material={{
-          id: material.id,
-          title: material.title,
-          description: material.description,
-          isPremium: false,
-          fileSize: material.fileSize
-        }}
-        student={undefined}
-      />
-    );
+    redirect("/login");
   }
 
-  // Enforce single active device concurrency check for logged in students
+  // Enforce single active device concurrency check
   const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore);
   if (!isValid || isRevoked) {
     cookieStore.delete("session");
@@ -75,6 +49,14 @@ export default async function PdfViewerPage({
 
   if (!student) {
     redirect("/login");
+  }
+
+  const material = await prisma.studyMaterial.findUnique({
+    where: { id: cleanId }
+  });
+
+  if (!material) {
+    notFound();
   }
 
   // Enforce academic curriculum eligibility

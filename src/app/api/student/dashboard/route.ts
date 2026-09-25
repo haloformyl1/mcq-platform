@@ -1,5 +1,5 @@
 import { touchOrCreateStudentSession, getActiveStudentSessions } from "@/lib/sessionService";
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { recalculateStudentAttempts } from "@/lib/recalculate";
 import { decrypt } from "@/lib/auth";
@@ -18,126 +18,81 @@ function isRealStudent(student: { email: string; name?: string | null }) {
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
-    const forceGuest = url.searchParams.get("guest") === "true";
-
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value;
-    const payload = (!forceGuest && session) ? await decrypt(session) : null;
-    let isGuest = forceGuest || !payload || !payload.id;
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const payload = await decrypt(session);
+    
+    if (!payload || !payload.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    let student: any = null;
-    let studentId: string | null = null;
+    const studentId = payload.id;
+    const { deviceId, isRevoked } = await touchOrCreateStudentSession(studentId, req, cookieStore);
+    if (isRevoked) {
+      cookieStore.delete('session');
+      return NextResponse.json({ error: "Session has been revoked" }, { status: 401 });
+    }
+    cookieStore.set('session', session, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 400,
+      path: '/',
+    });
+    await autoExpireSubscriptions();
 
-    if (!isGuest && payload && payload.id) {
-      try {
-        studentId = payload.id as string;
-        const { deviceId, isRevoked } = await touchOrCreateStudentSession(studentId, req, cookieStore);
-        if (isRevoked) {
-          cookieStore.delete('session');
-          // If revoked, fallback to guest instead of erroring out
-          isGuest = true;
-          studentId = null;
-        } else {
-          cookieStore.set('session', session!, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 60 * 60 * 24 * 400,
-            path: '/',
-          });
-          try { await autoExpireSubscriptions(); } catch (e) { console.warn("autoExpire error:", e); }
-          try { await recalculateStudentAttempts(studentId); } catch (e) { console.warn("recalculate error:", e); }
+    // Recalculate all submitted attempts for this student to guarantee latest scores
+    await recalculateStudentAttempts(studentId);
 
-          const dbStudent = await prisma.student.update({
-            where: { id: studentId },
-            data: { lastLogin: new Date() },
-            select: { 
-              id: true, 
-              email: true, 
-              name: true, 
-              phone: true, 
-              gender: true, 
-              dob: true, 
-              board: true, 
-              academicLevel: true, 
-              status: true,
-              subscriptionStatus: true,
-              subscriptionStartedAt: true,
-              subscriptionExpiresAt: true,
-              avatarUrl: true,
-              createdAt: true 
-            }
-          });
-          if (dbStudent) {
-            student = { ...dbStudent, isGuest: false };
-          } else {
-            isGuest = true;
-            studentId = null;
-          }
-        }
-      } catch (authError) {
-        console.warn("Auth check failed, gracefully falling back to guest mode:", authError);
-        isGuest = true;
-        studentId = null;
+    const student = await prisma.student.update({
+      where: { id: studentId },
+      data: { lastLogin: new Date() },
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        phone: true, 
+        gender: true, 
+        dob: true, 
+        board: true, 
+        academicLevel: true, 
+        status: true,
+        subscriptionStatus: true,
+        subscriptionStartedAt: true,
+        subscriptionExpiresAt: true,
+        avatarUrl: true,
+        createdAt: true 
       }
-    }
+    });
 
-    if (isGuest || !student) {
-      isGuest = true;
-      student = {
-        id: "guest",
-        email: "guest@piechem.internal",
-        name: "Guest Student",
-        phone: null,
-        gender: null,
-        dob: null,
-        board: null,
-        academicLevel: null,
-        status: "ACTIVE",
-        subscriptionStatus: "FREE",
-        subscriptionStartedAt: null,
-        subscriptionExpiresAt: null,
-        avatarUrl: null,
-        createdAt: new Date(),
-        isGuest: true
-      };
-    }
-
-    let availableTests: any[] = [];
-    try {
-      availableTests = await prisma.test.findMany({
-        where: { 
-          status: { in: ["LIVE", "UPCOMING", "PUBLISHED", "LOCKED", "EXPIRED", "SCHEDULE_EXPIRED"] }
-        },
-        select: {
-          id: true,
-          title: true,
-          totalQuestions: true,
-          durationMinutes: true,
-          marksPerQuestion: true,
-          negativeMarking: true,
-          negativeMarks: true,
-          status: true,
-          unlockAt: true,
-          lockAt: true,
-          postLockHoldMinutes: true,
-          maximumAttempts: true,
-          targetBoard: true,
-          targetAcademicLevel: true,
-          isPremium: true
-        },
-        orderBy: { createdAt: 'desc' }
-      });
-    } catch (testErr) {
-      console.warn("Error querying tests:", testErr);
-    }
+    const availableTests = await prisma.test.findMany({
+      where: { 
+        status: { in: ["LIVE", "UPCOMING", "PUBLISHED", "LOCKED", "EXPIRED", "SCHEDULE_EXPIRED"] }
+      },
+      select: {
+        id: true,
+        title: true,
+        totalQuestions: true,
+        durationMinutes: true,
+        marksPerQuestion: true,
+        negativeMarking: true,
+        negativeMarks: true,
+        status: true,
+        unlockAt: true,
+        lockAt: true,
+        postLockHoldMinutes: true,
+        maximumAttempts: true,
+        targetBoard: true,
+        targetAcademicLevel: true,
+        isPremium: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
 
     // Filter tests by target audience (Board and Class/Semester eligibility)
-    // If guest or student has no board/academicLevel, they can freely explore all tests!
     const eligibleTests = availableTests.filter(t => {
-      if (isGuest || (!student.board && !student.academicLevel)) {
-        return true;
-      }
       const matchesBoard = !t.targetBoard || t.targetBoard === "ALL" || t.targetBoard === student.board;
       let matchesLevel = !t.targetAcademicLevel || t.targetAcademicLevel === "ALL" || t.targetAcademicLevel === student.academicLevel;
       if (!matchesLevel && student.board && student.academicLevel && t.targetAcademicLevel) {
@@ -154,24 +109,14 @@ export async function GET(req: Request) {
     });
 
     // Apply per-student overrides: prefer any StudentTestOverride for this student & test
-    let overrides: any[] = [];
-    try {
-      if (studentId && !isGuest) {
-        overrides = await prisma.studentTestOverride.findMany({ where: { studentId } });
-      }
-    } catch (e) {}
+    const overrides = await prisma.studentTestOverride.findMany({ where: { studentId } });
     const overridesMap: Record<string, any> = {};
     overrides.forEach(o => {
       overridesMap[o.testId] = o;
     });
 
     // Fetch access requests made by this student
-    let requests: any[] = [];
-    try {
-      if (studentId && !isGuest) {
-        requests = await prisma.testAccessRequest.findMany({ where: { studentId } });
-      }
-    } catch (e) {}
+    const requests = await prisma.testAccessRequest.findMany({ where: { studentId } });
     const requestsMap: Record<string, any> = {};
     requests.forEach(r => {
       requestsMap[r.testId] = r;
@@ -192,28 +137,43 @@ export async function GET(req: Request) {
       };
     });
 
-    let allAttempts: any[] = [];
-    try {
-      if (studentId && !isGuest) {
-        allAttempts = await prisma.testAttempt.findMany({
-          where: { studentId },
-          include: {
-            test: {
-              select: { title: true, totalQuestions: true }
-            }
-          },
-          orderBy: { startedAt: 'desc' }
-        });
-      }
-    } catch (e) {}
+    const allAttempts = await prisma.testAttempt.findMany({
+      where: { studentId },
+      include: {
+        test: {
+          select: { title: true, totalQuestions: true }
+        }
+      },
+      orderBy: { startedAt: 'desc' }
+    });
 
     // Fetch Top 2 Students of the Last Submitted Exam (Excluding Admin Test Student)
     let lastExamTopStudents: any[] = [];
     let lastExamTitle = "";
 
-    try {
-      const recentAttempt = await prisma.testAttempt.findFirst({
+    const recentAttempt = await prisma.testAttempt.findFirst({
+      where: {
+        status: "SUBMITTED",
+        student: {
+          NOT: [
+            { email: { endsWith: "@student.local" } },
+            { email: { contains: "admin.test" } }
+          ]
+        }
+      },
+      orderBy: [
+        { submittedAt: 'desc' },
+        { startedAt: 'desc' }
+      ],
+      select: { testId: true, test: { select: { title: true } } }
+    });
+
+    if (recentAttempt) {
+      lastExamTitle = recentAttempt.test.title;
+      
+      const testAttempts = await prisma.testAttempt.findMany({
         where: {
+          testId: recentAttempt.testId,
           status: "SUBMITTED",
           student: {
             NOT: [
@@ -222,109 +182,82 @@ export async function GET(req: Request) {
             ]
           }
         },
-        orderBy: [
-          { submittedAt: 'desc' },
-          { startedAt: 'desc' }
-        ],
-        select: { testId: true, test: { select: { title: true } } }
-      });
-
-      if (recentAttempt) {
-        lastExamTitle = recentAttempt.test.title;
-        
-        const testAttempts = await prisma.testAttempt.findMany({
-          where: {
-            testId: recentAttempt.testId,
-            status: "SUBMITTED",
-            student: {
-              NOT: [
-                { email: { endsWith: "@student.local" } },
-                { email: { contains: "admin.test" } }
-              ]
-            }
-          },
-          include: {
-            student: {
-              select: { id: true, name: true, email: true }
-            }
-          }
-        });
-
-        const studentMap = new Map<string, any>();
-
-        for (const att of testAttempts) {
-          if (!att.student || !isRealStudent(att.student)) continue;
-
-          const existing = studentMap.get(att.studentId);
-          if (!existing || (att.score || 0) > (existing.score || 0)) {
-            // Calculate student's overall accuracy across all submitted attempts
-            const allStudentAttempts = await prisma.testAttempt.findMany({
-              where: { studentId: att.studentId, status: "SUBMITTED" },
-              select: { correctCount: true, incorrectCount: true, percentage: true }
-            });
-
-            let totalCorrect = 0;
-            let totalAnswered = 0;
-            let totalPercentageSum = 0;
-
-            allStudentAttempts.forEach(a => {
-              totalCorrect += a.correctCount || 0;
-              totalAnswered += (a.correctCount || 0) + (a.incorrectCount || 0);
-              totalPercentageSum += a.percentage || 0;
-            });
-
-            const avgAccuracy = totalAnswered > 0
-              ? (totalCorrect / totalAnswered) * 100
-              : (allStudentAttempts.length > 0 ? totalPercentageSum / allStudentAttempts.length : (att.percentage || 0));
-
-            const displayName = att.student.name || att.student.email.split('@')[0];
-
-            // Completion time in seconds
-            const startMs = new Date(att.startedAt).getTime();
-            const submitMs = att.submittedAt ? new Date(att.submittedAt).getTime() : startMs;
-            const durationSeconds = Math.max(0, Math.floor((submitMs - startMs) / 1000));
-
-            studentMap.set(att.studentId, {
-              studentId: att.studentId,
-              name: displayName,
-              score: att.score || 0,
-              percentage: att.percentage || 0,
-              accuracy: Number(avgAccuracy.toFixed(1)),
-              durationSeconds
-            });
+        include: {
+          student: {
+            select: { id: true, name: true, email: true }
           }
         }
+      });
 
-        // Sort by score desc, then by accuracy desc, then by faster completion time asc
-        const sorted = Array.from(studentMap.values()).sort((a, b) => {
-          if (b.score !== a.score) {
-            return b.score - a.score;
-          }
-          if (b.accuracy !== a.accuracy) {
-            return b.accuracy - a.accuracy;
-          }
-          // Tie-breaker: Faster test completion time (fewer seconds taken) wins!
-          return a.durationSeconds - b.durationSeconds;
-        });
+      const studentMap = new Map<string, any>();
 
-        lastExamTopStudents = sorted.slice(0, 2).map((st, idx) => ({
-          rank: idx + 1,
-          name: st.name,
-          score: st.score,
-          percentage: st.percentage,
-          accuracy: st.accuracy
-        }));
+      for (const att of testAttempts) {
+        if (!att.student || !isRealStudent(att.student)) continue;
+
+        const existing = studentMap.get(att.studentId);
+        if (!existing || (att.score || 0) > (existing.score || 0)) {
+          // Calculate student's overall accuracy across all submitted attempts
+          const allStudentAttempts = await prisma.testAttempt.findMany({
+            where: { studentId: att.studentId, status: "SUBMITTED" },
+            select: { correctCount: true, incorrectCount: true, percentage: true }
+          });
+
+          let totalCorrect = 0;
+          let totalAnswered = 0;
+          let totalPercentageSum = 0;
+
+          allStudentAttempts.forEach(a => {
+            totalCorrect += a.correctCount || 0;
+            totalAnswered += (a.correctCount || 0) + (a.incorrectCount || 0);
+            totalPercentageSum += a.percentage || 0;
+          });
+
+          const avgAccuracy = totalAnswered > 0
+            ? (totalCorrect / totalAnswered) * 100
+            : (allStudentAttempts.length > 0 ? totalPercentageSum / allStudentAttempts.length : (att.percentage || 0));
+
+          const displayName = att.student.name || att.student.email.split('@')[0];
+
+          // Completion time in seconds
+          const startMs = new Date(att.startedAt).getTime();
+          const submitMs = att.submittedAt ? new Date(att.submittedAt).getTime() : startMs;
+          const durationSeconds = Math.max(0, Math.floor((submitMs - startMs) / 1000));
+
+          studentMap.set(att.studentId, {
+            studentId: att.studentId,
+            name: displayName,
+            score: att.score || 0,
+            percentage: att.percentage || 0,
+            accuracy: Number(avgAccuracy.toFixed(1)),
+            durationSeconds
+          });
+        }
       }
-    } catch (e) {
-      console.warn("Could not query top students:", e);
+
+      // Sort by score desc, then by accuracy desc, then by faster completion time asc
+      const sorted = Array.from(studentMap.values()).sort((a, b) => {
+        if (b.score !== a.score) {
+          return b.score - a.score;
+        }
+        if (b.accuracy !== a.accuracy) {
+          return b.accuracy - a.accuracy;
+        }
+        // Tie-breaker: Faster test completion time (fewer seconds taken) wins!
+        return a.durationSeconds - b.durationSeconds;
+      });
+
+      lastExamTopStudents = sorted.slice(0, 2).map((st, idx) => ({
+        rank: idx + 1,
+        name: st.name,
+        score: st.score,
+        percentage: st.percentage,
+        accuracy: st.accuracy
+      }));
     }
     
-    let testAlertSettings: any = null;
-    try {
-      testAlertSettings = await prisma.testAlertSetting.findUnique({
-        where: { id: "default" }
-      });
-    } catch (e) {}
+    let testAlertSettings = await prisma.testAlertSetting.findUnique({
+      where: { id: "default" }
+    });
 
     if (!testAlertSettings) {
       testAlertSettings = {
@@ -348,39 +281,7 @@ export async function GET(req: Request) {
       lastExamTitle
     });
   } catch (error) {
-    console.error("Dashboard route global error:", error);
-    return NextResponse.json({
-      student: {
-        id: "guest",
-        email: "guest@piechem.internal",
-        name: "Guest Student",
-        phone: null,
-        gender: null,
-        dob: null,
-        board: null,
-        academicLevel: null,
-        status: "ACTIVE",
-        subscriptionStatus: "FREE",
-        subscriptionStartedAt: null,
-        subscriptionExpiresAt: null,
-        avatarUrl: null,
-        createdAt: new Date(),
-        isGuest: true
-      },
-      availableTests: [],
-      testAlertSettings: {
-        id: "default",
-        badgeText: "PIECHEM EXPLORE",
-        bgGradient: "from-cyan-950/90 via-sky-900/70 to-cyan-950/90",
-        badgeColor: "bg-cyan-500 text-black",
-        textColor: "text-cyan-200",
-        marqueeSpeed: "normal",
-        customNotice: "Welcome to PieChem! Explore all free curriculum content.",
-        updatedAt: new Date()
-      },
-      allAttempts: [],
-      lastExamTopStudents: [],
-      lastExamTitle: ""
-    });
+    console.error(error);
+    return NextResponse.json({ error: "Failed to load dashboard data" }, { status: 500 });
   }
 }

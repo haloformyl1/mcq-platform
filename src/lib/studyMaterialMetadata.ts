@@ -405,23 +405,19 @@ export function getTailoredRestrictionDetails(
 }
 
 export function isStudentEligibleForMaterial(
-  student?: (StudentAcademicProfile & { isGuest?: boolean }) | null,
+  student?: StudentAcademicProfile | null,
   materialSection?: string | null,
   materialClassSem?: string | null
 ): MaterialEligibilityResult {
-  // Guest users (or un-onboarded visitors exploring freely) are eligible for all free curriculum materials!
-  const isGuest = !student || student.isGuest || (!student.board && !student.academicLevel);
-  if (isGuest) {
-    return {
-      eligible: true,
-      badgeLabel: undefined,
-      buttonLabel: undefined,
-      targetLabel: formatTargetLabel(materialSection || "ALL", materialClassSem || "ALL"),
-      reason: ""
+  const tailored = getTailoredRestrictionDetails(student, materialSection || "ALL", materialClassSem || "ALL");
+
+  if (!student || !student.board || !student.academicLevel) {
+    return { 
+      eligible: false, 
+      ...tailored,
+      reason: "Please sign in or complete profile onboarding to access this curriculum material."
     };
   }
-
-  const tailored = getTailoredRestrictionDetails(student, materialSection || "ALL", materialClassSem || "ALL");
 
   const studentBoard = (student.board || "").toUpperCase().trim();
   const studentLevel = (student.academicLevel || "").toUpperCase().trim();

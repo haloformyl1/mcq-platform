@@ -15,6 +15,38 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     const { id } = await context.params;
     const cleanId = id.startsWith("db-") ? id.replace("db-", "") : id;
 
+    const cookieStore = await cookies();
+    const session = cookieStore.get("session")?.value;
+    const payload = session ? await decrypt(session) : null;
+
+    if (!payload || !payload.id) {
+      return new NextResponse("Unauthorized: Student login required", { status: 401 });
+    }
+
+    // Single active device concurrency check
+    const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore, req);
+    if (!isValid || isRevoked) {
+      cookieStore.delete("session");
+      return new NextResponse("Session expired or signed in from another device", { status: 401 });
+    }
+
+    const student = await prisma.student.findUnique({
+      where: { id: payload.id },
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        subscriptionStatus: true, 
+        subscriptionExpiresAt: true,
+        board: true,
+        academicLevel: true
+      }
+    });
+
+    if (!student) {
+      return new NextResponse("Student profile not found", { status: 404 });
+    }
+
     const material = await prisma.studyMaterial.findUnique({
       where: { id: cleanId }
     });
@@ -23,57 +55,21 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       return new NextResponse("Study material not found", { status: 404 });
     }
 
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value;
-    const payload = session ? await decrypt(session) : null;
+    // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)
+    const meta = parseMaterialMetadata(material.description, material.title, material.type);
+    const eligibility = isStudentEligibleForMaterial(student, meta.section, meta.classSem);
+    if (!eligibility.eligible) {
+      return new NextResponse(
+        `Forbidden: Access restricted to ${eligibility.targetLabel || "assigned class/semester"}. ${eligibility.reason || ""}`, 
+        { status: 403 }
+      );
+    }
 
-    if (!payload || !payload.id) {
-      // Unauthenticated visitor check
-      if (material.isPremium) {
-        return new NextResponse("Unauthorized: Student login required to access Gold premium study materials.", { status: 401 });
-      }
-      // If free material: allow streaming to visitor without login!
-    } else {
-      // Single active device concurrency check for logged in students
-      const { isValid, isRevoked } = await validateStudentSession(payload.id, cookieStore, req);
-      if (!isValid || isRevoked) {
-        cookieStore.delete("session");
-        return new NextResponse("Session expired or signed in from another device", { status: 401 });
-      }
-
-      const student = await prisma.student.findUnique({
-        where: { id: payload.id },
-        select: { 
-          id: true, 
-          email: true, 
-          name: true, 
-          subscriptionStatus: true, 
-          subscriptionExpiresAt: true,
-          board: true,
-          academicLevel: true
-        }
-      });
-
-      if (!student) {
-        return new NextResponse("Student profile not found", { status: 404 });
-      }
-
-      // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)
-      const meta = parseMaterialMetadata(material.description, material.title, material.type);
-      const eligibility = isStudentEligibleForMaterial(student, meta.section, meta.classSem);
-      if (!eligibility.eligible) {
-        return new NextResponse(
-          `Forbidden: Access restricted to ${eligibility.targetLabel || "assigned class/semester"}. ${eligibility.reason || ""}`, 
-          { status: 403 }
-        );
-      }
-
-      // Verify access tier for premium materials
-      if (material.isPremium) {
-        const canAccess = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
-        if (!canAccess) {
-          return new NextResponse("Forbidden: Gold membership required", { status: 403 });
-        }
+    // Verify access tier
+    if (material.isPremium) {
+      const canAccess = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
+      if (!canAccess) {
+        return new NextResponse("Forbidden: Gold membership required", { status: 403 });
       }
     }
 
@@ -121,7 +117,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     return new NextResponse(externalRes.body, {
       headers: {
         "Content-Type": externalRes.headers.get("content-type") || "application/pdf",
-        "Content-Disposition": `${disposition}; filename="${safeTitle}.pdf"`,
+        "Content-Disposition": "inline; filename=\"material.pdf\"",
         "Cache-Control": "private, no-cache, no-store",
         "X-Content-Type-Options": "nosniff",
       },

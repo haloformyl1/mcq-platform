@@ -285,9 +285,8 @@ export default function CurriculumLevelPage({
         {filteredList.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredList.map(item => {
-              const isGuest = !student || student.isGuest || (!student.board && !student.academicLevel);
               const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
-              const isLevelRestricted = !isGuest ? !eligibility.eligible : false;
+              const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
               const restrictionReason = eligibility.reason || item.restrictionReason;
               const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
               const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
@@ -335,9 +334,7 @@ export default function CurriculumLevelPage({
 
                     <h4 
                       onClick={() => {
-                        if (isGuest && item.isPremium) {
-                          window.location.href = `/login?redirect=${encodeURIComponent(`/dashboard`)}`;
-                        } else if (isLevelRestricted) {
+                        if (isLevelRestricted) {
                           setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
                         } else if (!canAccess) {
                           setUpgradeItem(item);
@@ -380,14 +377,6 @@ export default function CurriculumLevelPage({
                           </a>
                         )}
                       </div>
-                    ) : isGuest && item.isPremium ? (
-                      <Link
-                        href={`/login?redirect=${encodeURIComponent(`/dashboard`)}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs uppercase transition shadow-[0_0_12px_rgba(245,158,11,0.25)]"
-                      >
-                        <Lock className="w-3.5 h-3.5 text-slate-950 shrink-0" />
-                        <span>Log in first to continue</span>
-                      </Link>
                     ) : isLevelRestricted ? (
                         <button
                           type="button"
@@ -420,7 +409,7 @@ export default function CurriculumLevelPage({
         )}
       </div>
 
-      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} student={student} />
+      <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
     </div>
   );
 }

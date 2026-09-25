@@ -19,39 +19,12 @@ export default async function LabViewerPage({
   const { id } = await params;
   const cleanId = id.startsWith("db-") ? id.replace("db-", "") : id;
 
-  const material = await prisma.studyMaterial.findUnique({
-    where: { id: cleanId }
-  });
-
-  if (!material) {
-    notFound();
-  }
-
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value;
   const payload = session ? await decrypt(session) : null;
 
-  // If visitor is NOT logged in:
   if (!payload || !payload.id) {
-    // Strictly block premium 3D labs from unauthenticated access
-    if (material.isPremium) {
-      redirect(`/login?redirect=${encodeURIComponent(`/dashboard/lab-viewer/${cleanId}`)}`);
-    }
-
-    // Allow students to explore free 3D labs without login!
-    const encodedUrl = Buffer.from(material.url).toString('base64');
-    return (
-      <LabViewerClient
-        material={{
-          id: material.id,
-          title: material.title,
-          description: material.description,
-          isPremium: false,
-          token: encodedUrl
-        }}
-        student={undefined}
-      />
-    );
+    redirect("/login");
   }
 
   // Enforce single active device concurrency check
@@ -76,6 +49,14 @@ export default async function LabViewerPage({
 
   if (!student) {
     redirect("/login");
+  }
+
+  const material = await prisma.studyMaterial.findUnique({
+    where: { id: cleanId }
+  });
+
+  if (!material) {
+    notFound();
   }
 
   // Enforce academic curriculum eligibility

@@ -28,45 +28,17 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   }, []);
 
   useEffect(() => {
-    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-    const isGuestQuery = params?.get("guest") === "true";
-    const apiUrl = isGuestQuery ? "/api/student/dashboard?guest=true" : "/api/student/dashboard";
-
-    fetch(apiUrl)
+    fetch("/api/student/dashboard")
       .then(res => res.json())
       .then(data => {
         if (data.error) {
-          setData({
-            student: {
-              id: "guest",
-              email: "guest@piechem.internal",
-              name: "Guest Student",
-              isGuest: true,
-              subscriptionStatus: "FREE",
-              board: null,
-              academicLevel: null
-            },
-            availableTests: []
-          });
-          setLoading(false);
+          router.push("/");
           return;
         }
         setData(data);
         setLoading(false);
       })
       .catch(() => {
-        setData({
-          student: {
-            id: "guest",
-            email: "guest@piechem.internal",
-            name: "Guest Student",
-            isGuest: true,
-            subscriptionStatus: "FREE",
-            board: null,
-            academicLevel: null
-          },
-          availableTests: []
-        });
         setLoading(false);
       });
   }, [router]);
@@ -393,21 +365,12 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
               );
             })()
           ) : test.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
-              student?.isGuest ? (
-                <Link
-                  href={`/login?redirect=/dashboard/category/${categoryKey}`}
-                  className="w-full block text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] tracking-wide uppercase"
-                >
-                  🔒 Log in first to continue
-                </Link>
-              ) : (
-                <Link
-                  href="/dashboard/account"
-                  className="w-full block text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] tracking-wide uppercase"
-                >
-                  🔒 Subscribe to Access
-                </Link>
-              )
+              <Link
+                href="/dashboard/account"
+                className="w-full block text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] tracking-wide uppercase"
+              >
+                🔒 Subscribe to Access
+              </Link>
             ) : (
               <Link 
                 href={`/exam/start/${test.id}`}
