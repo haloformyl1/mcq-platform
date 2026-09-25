@@ -63,8 +63,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   };
 
   const { student, availableTests = [], allAttempts = [] } = data;
-  const studentName = student?.name || (student?.email ? student.email.split('@')[0] : 'Student');
-  const isComplimentary = student?.subscriptionStatus === "COMPLIMENTARY";
+    const isComplimentary = student?.subscriptionStatus === "COMPLIMENTARY";
   const isPaidActive = student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
   const isGoldActive = isComplimentary || isPaidActive;
 
@@ -438,7 +437,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                   />
                   <User className="w-3 h-3 text-white" />
                 </div>
-                <span className="hidden sm:inline">{studentName.split(' ')[0]}</span>
+                <span className="hidden sm:inline">My Account</span>
               </Link>
             </div>
           </div>

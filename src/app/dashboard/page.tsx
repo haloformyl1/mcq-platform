@@ -210,8 +210,7 @@ export default function StudentDashboard() {
 
   const recentAttempts = completedAttempts.slice(0, 5);
   const last25Attempts = completedAttempts.slice(0, 25);
-  const studentName = student.name || student.email.split('@')[0];
-
+  
   const formatDateTime = (dateInput: Date | string | null | undefined) => {
     if (!dateInput) return "";
     const dateObj = dateInput instanceof Date ? dateInput : new Date(dateInput);
@@ -405,7 +404,7 @@ export default function StudentDashboard() {
                   />
                   <User className="w-3 h-3 text-white" />
                 </div>
-                <span className="hidden sm:inline">{studentName.split(' ')[0]}</span>
+                <span className="hidden sm:inline">My Account</span>
               </Link>
             </div>
 
