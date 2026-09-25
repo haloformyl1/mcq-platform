@@ -13,7 +13,6 @@ import {
   Sparkles, 
   Lock, 
   AlertCircle, 
-  Phone,
   ArrowRight,
   Sparkle,
   Eye,
@@ -301,7 +300,6 @@ export default function StudentLogin() {
           {/* Logo on Far Left (Locked to Standard Cyan/White logo per user rule) */}
           <div className="flex items-center">
             <PiechemLogo size="md" isGoldMember={false}  />
-          </div>
           </div>
         </header>
 

@@ -499,7 +499,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               </button>
             </div>
           </div>
-          </div>
         </main>
 
         {showPalette && (

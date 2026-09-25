@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
-  Copy, Check, X, User, Mail, Phone, ShieldCheck, 
+  Copy, Check, X, User, Mail, ShieldCheck, 
   ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
   Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
   ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag, History
