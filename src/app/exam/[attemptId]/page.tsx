@@ -342,7 +342,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const currentQuestion = questions[currentQ];
 
   return (
-    <div className="exam-session-shell min-h-screen flex flex-col text-white select-none">
+    <div className="exam-session-shell min-h-screen flex flex-col text-white select-none" style={{minHeight: "100dvh"}}>
       <AdminPreviewBanner />
       <header className="exam-session-header mcq-panel rounded-none border-x-0 border-t-0 p-3 sm:p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div className="flex justify-between items-center w-full md:w-auto gap-2 min-w-0">
@@ -391,7 +391,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
         </div>
       </header>
 
-      <div className="exam-session-body flex flex-1 overflow-hidden relative">
+      <div className="exam-session-body flex flex-1 overflow-hidden relative min-h-0">
         <main className="exam-session-main flex-1 overflow-y-auto p-3 sm:p-6 md:p-8">
           <div className="mcq-panel-elevated max-w-4xl mx-auto w-full p-4 sm:p-6 md:p-8">
             <div className="mb-6 flex justify-between items-start gap-4">

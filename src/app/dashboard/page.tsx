@@ -699,7 +699,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Category Folders Grid (Netflix Style Cards) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             
             {/* Live Tests Card */}
             <Link
@@ -938,7 +938,7 @@ export default function StudentDashboard() {
                   <span className="text-xs text-slate-400">Last {last25Attempts.length} tests</span>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto dashboard-results-table-wrap">
                   <table className="min-w-full divide-y divide-slate-800">
                     <thead className="bg-transparent border-b border-white/10">
                       <tr>

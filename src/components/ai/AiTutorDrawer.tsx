@@ -563,7 +563,7 @@ export default function AiTutorDrawer({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex flex-col bg-[#050203] text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex flex-col bg-[#050203] text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200 ai-workspace-root"
       style={{
         backgroundImage: `
           radial-gradient(ellipse at 50% 10%, rgba(190, 24, 48, 0.08) 0%, transparent 60%),
@@ -1165,7 +1165,7 @@ export default function AiTutorDrawer({
           </div>
 
           {/* BOTTOM AI COMMAND CONSOLE */}
-          <div className="shrink-0 px-4 md:px-8 pb-4 pt-1 bg-gradient-to-t from-[#050203] via-[#050203]/95 to-transparent z-20">
+          <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-4 pt-1 bg-gradient-to-t from-[#050203] via-[#050203]/95 to-transparent z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">
               
               {/* Main Rounded Input Console Container */}

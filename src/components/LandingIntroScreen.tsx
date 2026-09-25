@@ -441,7 +441,7 @@ export default function LandingIntroScreen() {
       {/* ============================================================ */}
       {/* CENTER STAGE: Asymmetric Apple Keynote Spatial Composition   */}
       {/* ============================================================ */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 my-auto py-4 flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-14 my-auto py-2 sm:py-4 flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-12 landing-hero-content">
         
         {/* LEFT COLUMN: Editorial Typography Statement (Col 1-7) */}
         <div className="lg:col-span-7 flex flex-col justify-center text-left space-y-5 sm:space-y-6 z-20">
@@ -461,7 +461,7 @@ export default function LandingIntroScreen() {
               isPhase3 ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-4 blur-[6px]"
             }`}
           >
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl tracking-tight text-[#F5F5F2] leading-[1.04]">
+            <h1 className="landing-hero-h1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight text-[#F5F5F2] leading-[1.04]">
               <span className="font-serif italic font-light text-slate-100">
                 Chemistry,
               </span>
@@ -493,7 +493,7 @@ export default function LandingIntroScreen() {
         </div>
 
         {/* RIGHT COLUMN: The Hero Scientific Molecular Object (Col 8-12) */}
-        <div className="lg:col-span-5 relative h-[260px] sm:h-[340px] lg:h-[440px] w-full flex items-center justify-center pointer-events-none mt-2 lg:mt-0">
+        <div className="lg:col-span-5 relative h-[200px] sm:h-[280px] md:h-[340px] lg:h-[440px] w-full flex items-center justify-center pointer-events-none mt-2 lg:mt-0 landing-hero-canvas">
           <canvas
             ref={canvasRef}
             className="absolute inset-0 w-full h-full object-contain"
@@ -515,7 +515,7 @@ export default function LandingIntroScreen() {
       {/* ============================================================ */}
       {/* BOTTOM ANCHOR: Minimalist Capability Strip & Progress        */}
       {/* ============================================================ */}
-      <footer className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 pb-5 sm:pb-7 space-y-3 shrink-0">
+      <footer className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-14 pb-4 sm:pb-6 space-y-3 shrink-0 safe-pb">
         
         {/* Capability Strip: Minimal Uppercase Typography (Phase 4) */}
         <div 

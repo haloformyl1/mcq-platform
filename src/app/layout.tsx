@@ -15,6 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: '#000000',
+};
+
 export const metadata: Metadata = {
   title: "PIECHEM - Smart Learning Platform",
   description: "PIECHEM Online Chemistry Exam and Assessment Platform",

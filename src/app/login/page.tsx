@@ -279,7 +279,7 @@ export default function StudentLogin() {
       {/* ========================================================= */}
       {/* 1. UPPER SIDE (HERO SECTION - PREVIOUS THEME / IMAGE 2)  */}
       {/* ========================================================= */}
-      <section className="relative min-h-[90vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-transparent">
+      <section className="relative min-h-[90dvh] sm:min-h-dvh flex flex-col justify-between overflow-hidden bg-transparent">
         
         {/* Ambient Glows & Chemical Grid Texture */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(0,210,255,0.22),transparent_70%)] pointer-events-none" />
