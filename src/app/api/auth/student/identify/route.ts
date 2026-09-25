@@ -5,41 +5,81 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
+    const body = await req.json();
+    const rawIdentifier = (body.identifier || body.email || "").trim();
     
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
+    if (!rawIdentifier) {
+      return NextResponse.json({ error: "Email or phone number is required" }, { status: 400 });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const isEmail = rawIdentifier.includes("@");
 
-    // Dedicated Admin Email Check
-    if (normalizedEmail === "piechemotp@gmail.com") {
-      return NextResponse.json({ accountStatus: "ACTIVE", name: "Administrator", isAdmin: true });
-    }
+    if (isEmail) {
+      const normalizedEmail = rawIdentifier.toLowerCase();
 
-    const student = await prisma.student.findUnique({
-      where: { email: normalizedEmail },
-      select: {
-        id: true,
-        name: true,
-        passwordHash: true,
-        status: true,
+      // Dedicated Admin Email Check
+      if (normalizedEmail === "piechemotp@gmail.com") {
+        return NextResponse.json({ accountStatus: "ACTIVE", name: "Administrator", isAdmin: true, type: "EMAIL" });
       }
-    });
 
-    if (!student) {
-      return NextResponse.json({ accountStatus: "NEW", name: null });
-    }
+      const student = await prisma.student.findUnique({
+        where: { email: normalizedEmail },
+        select: {
+          id: true,
+          name: true,
+          passwordHash: true,
+          status: true,
+        }
+      });
 
-    if (student.status === "SUSPENDED") {
-      return NextResponse.json({ accountStatus: "SUSPENDED", name: student.name, error: "Your account has been suspended. Please contact the administrator for assistance." });
-    }
+      if (!student) {
+        return NextResponse.json({ accountStatus: "NEW", name: null, type: "EMAIL" });
+      }
 
-    if (student.passwordHash) {
-      return NextResponse.json({ accountStatus: "ACTIVE", name: student.name });
+      if (student.status === "SUSPENDED") {
+        return NextResponse.json({ accountStatus: "SUSPENDED", name: student.name, error: "Your account has been suspended. Please contact the administrator for assistance." });
+      }
+
+      if (student.passwordHash) {
+        return NextResponse.json({ accountStatus: "ACTIVE", name: student.name, type: "EMAIL" });
+      } else {
+        return NextResponse.json({ accountStatus: "UNVERIFIED", name: student.name, type: "EMAIL" });
+      }
     } else {
-      return NextResponse.json({ accountStatus: "UNVERIFIED", name: student.name });
+      // Phone verification
+      const phoneDigits = rawIdentifier.replace(/\D/g, "");
+      if (phoneDigits.length < 10) {
+        return NextResponse.json({ error: "Please enter a valid 10-digit mobile number." }, { status: 400 });
+      }
+      const localNumber = phoneDigits.slice(-10);
+
+      const student = await prisma.student.findFirst({
+        where: {
+          OR: [
+            { phone: rawIdentifier },
+            { phone: localNumber },
+            { phone: `+91${localNumber}` },
+            { phone: `91${localNumber}` }
+          ]
+        },
+        select: {
+          id: true,
+          name: true,
+          status: true,
+          board: true,
+          academicLevel: true
+        }
+      });
+
+      if (!student) {
+        return NextResponse.json({ accountStatus: "PHONE_NEW", name: null, type: "PHONE", phone: `+91${localNumber}` });
+      }
+
+      if (student.status === "SUSPENDED") {
+        return NextResponse.json({ accountStatus: "SUSPENDED", name: student.name, error: "Your account has been suspended. Please contact the administrator for assistance." });
+      }
+
+      return NextResponse.json({ accountStatus: "PHONE_EXISTING", name: student.name, type: "PHONE", phone: `+91${localNumber}` });
     }
   } catch (error) {
     console.error("Identify Error:", error);
