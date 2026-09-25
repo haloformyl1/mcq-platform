@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
@@ -206,7 +206,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           {/* Top row: Discipline Chip + Status Badge */}
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <span className="text-[10px] font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
+              <span className="text-xs font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
                 {test.discipline || "CHEMISTRY"}
               </span>
               <h3 className="font-serif text-lg sm:text-xl font-bold text-white group-hover:text-cyan-200 transition-colors line-clamp-2 leading-snug">
@@ -215,31 +215,31 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             </div>
 
             {isLiveStage && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                 <span>LIVE NOW</span>
               </span>
             )}
             {isUpcomingStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-amber-950/90 border border-amber-500/50 text-amber-300 shrink-0 shadow-sm">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-amber-950/90 border border-amber-500/50 text-amber-300 shrink-0 shadow-sm">
                 <Clock className="w-3 h-3 text-amber-400" />
                 <span>UPCOMING</span>
               </span>
             )}
             {isHoldingStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-orange-950/90 border border-orange-500/50 text-orange-300 shrink-0">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-orange-950/90 border border-orange-500/50 text-orange-300 shrink-0">
                 <span>HOLDING</span>
               </span>
             )}
             {isLockedStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-red-950/90 border border-red-500/50 text-red-300 shrink-0">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-red-950/90 border border-red-500/50 text-red-300 shrink-0">
                 <span>CONCLUDED</span>
               </span>
             )}
           </div>
           
           {/* Stats Badges Grid */}
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div className="grid grid-cols-2 gap-2 text-sm font-mono">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
               <span className="font-bold text-white">{test.totalQuestions}</span>
               <span className="text-slate-400">Questions</span>
@@ -266,7 +266,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
           
           {/* Status & Timing Capsule */}
-          <div className="text-xs bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
+          <div className="text-sm bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
             {isUpcomingStage && test.unlockDate && (
               <div className="text-amber-300 font-medium truncate flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -286,7 +286,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
               </div>
             )}
             {isHoldingStage && test.autoLiveDate && (
-              <div className="text-orange-300 font-medium text-[11px] leading-tight space-y-0.5">
+              <div className="text-orange-300 font-medium text-sm leading-tight space-y-0.5">
                 <div>Concluded at {formatDateTime(test.lockDate)}</div>
                 <div className="text-emerald-400 font-mono">Auto-lives: {formatDateTime(test.autoLiveDate)}</div>
               </div>
@@ -522,7 +522,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             </div>
             <div className="min-w-0 space-y-1">
               <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-widest uppercase border ${themeConfig.tagBorder} ${themeConfig.tagBg} ${themeConfig.tagText}`}>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-widest uppercase border ${themeConfig.tagBorder} ${themeConfig.tagBg} ${themeConfig.tagText}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${themeConfig.tagDot} animate-pulse`} />
                   {themeConfig.tagLabel}
                 </span>
