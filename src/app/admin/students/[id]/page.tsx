@@ -75,6 +75,71 @@ export default function AdminStudentDetails() {
   const [targetSearch, setTargetSearch] = useState("");
 
   const router = useRouter();
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [tempPassword, setTempPassword] = useState("");
+  const [showTempPass, setShowTempPass] = useState(true);
+  const [notifyEmail, setNotifyEmail] = useState(true);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const generateStrongPassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    let rand = "";
+    for (let i = 0; i < 4; i++) {
+      rand += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const num = Math.floor(1000 + Math.random() * 9000);
+    return `Chem#${num}${rand}`;
+  };
+
+  const openResetModal = () => {
+    setTempPassword(generateStrongPassword());
+    setShowTempPass(true);
+    setNotifyEmail(true);
+    setResetSuccess(null);
+    setResetError(null);
+    setCopied(false);
+    setShowResetModal(true);
+  };
+
+  const handleResetPassword = async () => {
+    if (!student) return;
+    if (!tempPassword || tempPassword.trim().length < 6) {
+      setResetError("Password must be at least 6 characters long.");
+      return;
+    }
+    setResetLoading(true);
+    setResetError(null);
+    setResetSuccess(null);
+    try {
+      const res = await fetch(`/api/admin/students/${student.id}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          newPassword: tempPassword.trim(),
+          notifyStudent: notifyEmail,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResetSuccess(data.message || "Password updated successfully!");
+      } else {
+        setResetError(data.error || "Failed to update password.");
+      }
+    } catch (err: any) {
+      setResetError(err?.message || "An unexpected error occurred.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
   const params = useParams();
   const id = params?.id as string;
 
@@ -489,6 +554,16 @@ export default function AdminStudentDetails() {
             </div>
             <div className="flex justify-between"><span className="text-gray-500">Registered</span> <span className="text-gray-300">{new Date(student.createdAt).toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Last Seen</span> <span className="text-[#00e5ff] font-medium">{formatWhatsAppLastSeen(student.lastLogin)}</span></div>
+            <div className="pt-2 border-t border-[#333] flex justify-between items-center">
+              <span className="text-gray-400 text-xs">Security & Password:</span>
+              <button
+                onClick={openResetModal}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-950/40 border border-amber-800/60 hover:bg-amber-900/50 px-3 py-1.5 rounded-lg transition"
+              >
+                <span>🔑</span>
+                <span>Reset Password</span>
+              </button>
+            </div>
           </div>
         </div>
 

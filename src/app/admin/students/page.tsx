@@ -57,6 +57,77 @@ export default function AdminStudents() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const router = useRouter();
+  const [resetModalStudent, setResetModalStudent] = useState<Student | null>(null);
+  const [tempPassword, setTempPassword] = useState("");
+  const [showTempPass, setShowTempPass] = useState(true);
+  const [notifyEmail, setNotifyEmail] = useState(true);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const generateStrongPassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    let rand = "";
+    for (let i = 0; i < 4; i++) {
+      rand += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const num = Math.floor(1000 + Math.random() * 9000);
+    return `Chem#${num}${rand}`;
+  };
+
+  const openResetModal = (s: Student) => {
+    setResetModalStudent(s);
+    setTempPassword(generateStrongPassword());
+    setShowTempPass(true);
+    setNotifyEmail(true);
+    setResetSuccess(null);
+    setResetError(null);
+    setCopied(false);
+  };
+
+  const closeResetModal = () => {
+    setResetModalStudent(null);
+    setResetSuccess(null);
+    setResetError(null);
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetModalStudent) return;
+    if (!tempPassword || tempPassword.trim().length < 6) {
+      setResetError("Password must be at least 6 characters long.");
+      return;
+    }
+    setResetLoading(true);
+    setResetError(null);
+    setResetSuccess(null);
+    try {
+      const res = await fetch(`/api/admin/students/${resetModalStudent.id}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          newPassword: tempPassword.trim(),
+          notifyStudent: notifyEmail,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResetSuccess(data.message || "Password updated successfully!");
+      } else {
+        setResetError(data.error || "Failed to update password.");
+      }
+    } catch (err: any) {
+      setResetError(err?.message || "An unexpected error occurred.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
 
   const fetchStudents = async () => {
     setLoading(true);

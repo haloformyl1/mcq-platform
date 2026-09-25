@@ -243,3 +243,135 @@ export async function sendSubscriptionUpgradeEmail(params: SubscriptionUpgradeEm
 
   return true;
 }
+
+
+export interface StudentPasswordResetEmailParams {
+  email: string;
+  name?: string | null;
+  temporaryPassword: string;
+}
+
+export async function sendStudentPasswordResetEmail(params: StudentPasswordResetEmailParams) {
+  const { email, name, temporaryPassword } = params;
+  const studentName = name || "Student";
+
+  // 1. If custom SMTP is provided in env, dispatch via nodemailer
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: Number(process.env.SMTP_PORT) === 465,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const htmlContent = `
+        <div style="background-color:#f1f3f4; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; max-width:580px; margin:0 auto; padding:32px 16px;">
+          <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:12px; border:1px solid #dadce0; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <tr>
+              <td style="padding:16px 28px; background-color:#f8f9fa; border-bottom:1px solid #e8eaed;">
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="left" style="vertical-align:middle;">
+                      <img src="https://piechem.vercel.app/apple-touch-icon.png" width="36" height="36" alt="PIECHEM" style="display:inline-block; vertical-align:middle; border-radius:6px; border:0; margin-right:8px;" />
+                      <span style="font-size:20px; font-weight:800; vertical-align:middle; font-family:sans-serif;">
+                        <span style="color:#0284c7;">PIE</span><span style="color:#0f172a;">CHEM</span>
+                      </span>
+                    </td>
+                    <td align="right" style="vertical-align:middle; font-size:12.5px; font-weight:500; color:#5f6368;">
+                      🔒 Safe and secure
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px 28px;">
+                <h1 style="margin:0 0 12px 0; font-size:22px; font-weight:600; color:#202124;">Temporary Login Credentials</h1>
+                <p style="margin:0 0 20px 0; font-size:14.5px; color:#5f6368; line-height:1.6;">
+                  Hello <strong>${studentName}</strong>,<br>
+                  Administrator <strong>Arghyadeep Roy</strong> has configured a temporary password for your PIECHEM account.
+                </p>
+                <div style="background-color:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:18px; text-align:center; margin-bottom:24px;">
+                  <div style="font-size:11.5px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Your Temporary Password</div>
+                  <div style="font-family:monospace; font-size:24px; font-weight:700; color:#0284c7; letter-spacing:2px;">${temporaryPassword}</div>
+                </div>
+                <div style="text-align:center; margin-bottom:24px;">
+                  <a href="https://piechem.vercel.app/login" style="background:#0284c7; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:8px; font-weight:bold; font-size:14px; display:inline-block;">
+                    Log In to Your Account
+                  </a>
+                </div>
+                <p style="margin:0; font-size:13px; color:#70757a; line-height:1.5;">
+                  <strong>Important Security Reminder:</strong> Once you log in, please visit <strong>My Account</strong> to update this to your personal password.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || `"PIECHEM Platform" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: "🔑 Your PIECHEM Account Password Has Been Reset",
+        html: htmlContent,
+      });
+
+      console.log(`[PASSWORD RESET EMAIL] Sent successfully to ${email} via SMTP.`);
+      return true;
+    } catch (err) {
+      console.error("[PASSWORD RESET EMAIL] SMTP dispatch failed:", err);
+    }
+  }
+
+  // 2. Try EmailJS
+  const serviceId = process.env.EMAILJS_SERVICE_ID || DEFAULT_EMAILJS_SERVICE_ID;
+  const templateId = process.env.EMAILJS_TEMPLATE_ID || DEFAULT_EMAILJS_TEMPLATE_ID;
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY || DEFAULT_EMAILJS_PUBLIC_KEY;
+  const privateKey = process.env.EMAILJS_PRIVATE_KEY;
+
+  if (serviceId && templateId && publicKey) {
+    try {
+      const data: any = {
+        service_id: serviceId,
+        template_id: templateId,
+        user_id: publicKey,
+        template_params: {
+          to_email: email,
+          student_name: studentName,
+          otp: temporaryPassword,
+          new_password: temporaryPassword,
+          message: `Hello ${studentName},\n\nYour PIECHEM Account password has been reset by Administrator Arghyadeep Roy.\n\nYour temporary password: ${temporaryPassword}\n\nPlease login at: https://piechem.vercel.app/login and update your password in My Account.`,
+        },
+      };
+      if (privateKey) data.accessToken = privateKey;
+
+      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        signal: AbortSignal.timeout(20000),
+      });
+
+      if (res.ok) {
+        console.log(`[PASSWORD RESET EMAIL] Sent via EmailJS to ${email}`);
+        return true;
+      }
+    } catch (err: any) {
+      console.error("[PASSWORD RESET EMAIL] EmailJS failed:", err?.message || err);
+    }
+  }
+
+  // Fallback console log
+  console.log("\n========================================");
+  console.log("[STUDENT PASSWORD RESET EMAIL DISPATCH]");
+  console.log(`To: ${email} (${studentName})`);
+  console.log(`Temporary Password: ${temporaryPassword}`);
+  console.log("========================================\n");
+
+  return true;
+}
