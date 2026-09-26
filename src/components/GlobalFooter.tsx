@@ -136,7 +136,7 @@ export default function GlobalFooter() {
 
 
           {/* Navigation Group 3: SUPPORT (Links + Single Dedicated Support Card) */}
-          <div className="sm:col-span-2 lg:col-span-4 flex flex-col">
+          <div className="sm:col-span-2 lg:col-span-4 lg:col-start-9 flex flex-col">
             <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-cyan-400" />
               Support
