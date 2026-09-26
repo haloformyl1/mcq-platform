@@ -219,15 +219,28 @@ export default function PiechemLogo({
             )}
           </div>
           
-          {/* Subtitle */}
-          <div
-            className={
-              "text-[7.5px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.25em] font-semibold uppercase mt-0.5 sm:mt-1 " +
-              (theme === 'light' ? 'text-cyan-700 font-bold' : 'text-cyan-300/70')
-            }
-          >
-            <span className="hidden sm:inline">{subtitle}</span>
-            <span className="sm:hidden">{subtitle ? subtitle.split(' ')[0] : ""}</span>
+          {/* Attribution Subtitle */}
+          <div className="flex items-center mt-0.5 select-none leading-none">
+            <span
+              className={
+                (size === 'sm'
+                  ? "text-[6px] sm:text-[7.5px] tracking-[0.04em] sm:tracking-[0.06em] "
+                  : size === 'lg' || size === 'xl'
+                  ? "text-[8px] sm:text-[10px] tracking-[0.06em] sm:tracking-[0.08em] "
+                  : "text-[6.5px] sm:text-[8px] tracking-[0.05em] sm:tracking-[0.07em] ") +
+                "font-sans font-medium whitespace-nowrap " +
+                (theme === 'light' ? 'text-slate-600' : 'text-slate-400')
+              }
+            >
+              {subtitle || (
+                <>
+                  An initiative by{" "}
+                  <span className={theme === 'light' ? 'text-slate-900 font-semibold' : 'text-slate-200 font-semibold'}>
+                    Arghyadeep Roy.
+                  </span>
+                </>
+              )}
+            </span>
           </div>
         </div>
       )}

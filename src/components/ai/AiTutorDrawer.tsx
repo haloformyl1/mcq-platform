@@ -10,7 +10,7 @@ import {
   Lightbulb, RotateCcw,
   Sparkles, Compass, Calculator, ChevronDown, ChevronRight,
   MessageSquare, Lock, Paperclip, ThumbsUp, ThumbsDown,
-  Search, MoreVertical, Edit2, Trash2, Menu, Clock
+  Search, MoreVertical, Edit2, Trash2, Clock
 } from "lucide-react";
 import { 
   generateConversationTitle, 
@@ -563,17 +563,17 @@ export default function AiTutorDrawer({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex flex-col bg-[#050203] text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200 ai-workspace-root"
+      className="fixed inset-0 z-50 flex flex-col bg-black text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200 ai-workspace-root"
       style={{
         backgroundImage: `
-          radial-gradient(ellipse at 50% 10%, rgba(190, 24, 48, 0.08) 0%, transparent 60%),
-          radial-gradient(circle at 15% 40%, rgba(160, 15, 35, 0.04) 0%, transparent 45%),
-          radial-gradient(circle at 85% 65%, rgba(180, 20, 45, 0.03) 0%, transparent 50%)
+          radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+          radial-gradient(circle at 15% 40%, rgba(255, 255, 255, 0.01) 0%, transparent 45%),
+          radial-gradient(circle at 85% 65%, rgba(255, 255, 255, 0.01) 0%, transparent 50%)
         `
       }}
     >
       {/* BACKGROUND SUBTLE SCIENTIFIC ORBITAL GEOMETRY */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.025] overflow-hidden">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50%" cy="40%" r="380" fill="none" stroke="#fff" strokeWidth="1" strokeDasharray="4 8" />
           <circle cx="50%" cy="40%" r="620" fill="none" stroke="#fff" strokeWidth="1" strokeDasharray="6 12" />
@@ -583,38 +583,26 @@ export default function AiTutorDrawer({
       </div>
 
       {/* 1. TOP HEADER */}
-      <header className="h-14 shrink-0 px-3 sm:px-4 md:px-6 flex items-center justify-between border-b border-red-950/70 bg-[#070204]/90 backdrop-blur-md z-30 gap-2">
+      <header className="h-14 shrink-0 px-3 sm:px-4 md:px-6 flex items-center justify-between border-b border-white/10 bg-black/95 backdrop-blur-md z-30 gap-2">
         
         {/* Left: Brand + Status Pill + Usage Pill */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          {/* Mobile sidebar toggle */}
-          <button
-            type="button"
-            onClick={() => setIsMobileSidebarOpen(prev => !prev)}
-            className="p-2 -ml-1 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 text-slate-300 lg:hidden cursor-pointer touch-target flex items-center justify-center shrink-0"
-            title="Toggle Conversation History"
-            aria-label="Toggle Conversation History"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-
           <div className="flex items-center gap-2 min-w-0">
-            {/* Header Brand Logo matching Image 1 exactly */}
+            {/* Header Brand Logo matching OLED Dark Aesthetic */}
             <div className="relative shrink-0">
-              <div className="absolute inset-0 rounded-2xl bg-red-600/25 blur-md animate-pulse" />
-              <div className="relative p-1.5 sm:p-2 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1c070c] to-[#0d0305] border border-red-500/30 shadow-lg shadow-red-950/60 flex items-center justify-center">
+              <div className="relative p-1.5 sm:p-2 rounded-xl sm:rounded-2xl bg-zinc-950 border border-white/10 shadow-lg flex items-center justify-center">
                 <PiechemAiLogo size="sm" animated />
               </div>
             </div>
             <div className="font-serif font-bold text-sm sm:text-base md:text-lg text-white tracking-tight flex items-baseline gap-1 shrink-0">
               <span className="hidden xs:inline">PIECHEM</span>
-              <span className="text-red-500">AI</span>
+              <span className="text-white font-black">AI</span>
             </div>
           </div>
 
           {/* Daily Usage Indicator - Desktop */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#120406] border border-red-900/40 text-[11px] font-medium text-slate-300 shadow-sm shrink-0">
-            <span className="text-red-400 font-bold text-xs">✦</span>
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-950 border border-white/10 text-[11px] font-medium text-slate-300 shadow-sm shrink-0">
+            <span className="text-cyan-400 font-bold text-xs">✦</span>
             {quota?.isUnlimited ? (
               <span className="font-semibold text-amber-300 tracking-wide">GOLD UNLIMITED</span>
             ) : (
@@ -626,8 +614,8 @@ export default function AiTutorDrawer({
           </div>
 
           {/* Daily Usage Indicator - Mobile Compact */}
-          <div className="sm:hidden flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#120406] border border-red-900/40 text-[10px] font-semibold text-slate-300 shrink-0">
-            <span className="text-red-400 text-xs">✦</span>
+          <div className="sm:hidden flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-950 border border-white/10 text-[10px] font-semibold text-slate-300 shrink-0">
+            <span className="text-cyan-400 text-xs">✦</span>
             {quota?.isUnlimited ? (
               <span className="text-amber-300 font-bold">GOLD</span>
             ) : (
@@ -639,12 +627,12 @@ export default function AiTutorDrawer({
         {/* Right: Controls (Language, Level, Exit) */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Language Toggle */}
-          <div className="flex items-center p-0.5 rounded-xl bg-[#120406] border border-red-950 text-xs font-semibold">
+          <div className="flex items-center p-0.5 rounded-xl bg-zinc-950 border border-white/10 text-xs font-semibold">
             <button
               type="button"
               onClick={() => handleToggleLang('en')}
               className={`px-2 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs ${
-                language === 'en' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                language === 'en' ? 'bg-white text-black font-bold shadow-sm' : 'text-slate-400 hover:text-white'
               }`}
             >
               EN
@@ -653,7 +641,7 @@ export default function AiTutorDrawer({
               type="button"
               onClick={() => handleToggleLang('bn')}
               className={`px-2 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs ${
-                language === 'bn' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                language === 'bn' ? 'bg-white text-black font-bold shadow-sm' : 'text-slate-400 hover:text-white'
               }`}
             >
               বাংলা
@@ -665,16 +653,16 @@ export default function AiTutorDrawer({
             <button
               type="button"
               onClick={() => setShowLevelMenu(prev => !prev)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl bg-[#120406] hover:bg-[#1b060a] border border-red-950 text-xs font-semibold text-slate-300 transition cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-white/10 text-xs font-semibold text-slate-300 transition cursor-pointer"
               title={`Difficulty: ${level}`}
             >
-              <GraduationCap className="h-3.5 w-3.5 text-rose-400 shrink-0" />
+              <GraduationCap className="h-3.5 w-3.5 text-slate-400 shrink-0" />
               <span className="capitalize hidden md:inline">{level}</span>
               <ChevronDown className="h-3 w-3 text-slate-500 shrink-0" />
             </button>
 
             {showLevelMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-40 rounded-xl bg-[#140507] border border-red-900/60 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-top-1">
+              <div className="absolute right-0 top-full mt-1.5 w-40 rounded-xl bg-zinc-950 border border-zinc-800 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-top-1">
                 {(['beginner', 'intermediate', 'advanced'] as const).map(lvl => (
                   <button
                     key={lvl}
@@ -684,11 +672,11 @@ export default function AiTutorDrawer({
                       setShowLevelMenu(false);
                     }}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer capitalize flex items-center justify-between ${
-                      level === lvl ? 'bg-red-500/20 text-rose-300 font-bold' : 'text-slate-300 hover:bg-white/5'
+                      level === lvl ? 'bg-white/10 text-white font-bold' : 'text-slate-300 hover:bg-white/5'
                     }`}
                   >
                     <span>{lvl}</span>
-                    {level === lvl && <Check className="h-3 w-3 text-red-400" />}
+                    {level === lvl && <Check className="h-3 w-3 text-cyan-400" />}
                   </button>
                 ))}
               </div>
@@ -699,7 +687,7 @@ export default function AiTutorDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-1 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-[#120406] hover:bg-red-950/60 border border-red-950 hover:border-red-500/40 text-slate-300 hover:text-white text-xs font-semibold transition cursor-pointer touch-target"
+            className="flex items-center gap-1 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white text-xs font-semibold transition cursor-pointer touch-target"
             title="Exit PIECHEM AI (Esc)"
           >
             <X className="h-4 w-4" />
@@ -721,16 +709,16 @@ export default function AiTutorDrawer({
 
         {/* LEFT SIDEBAR (Width: 260px, Desktop + Mobile Overlay) */}
         <aside 
-          className={`w-72 sm:w-80 lg:w-64 xl:w-72 shrink-0 border-r border-red-950/60 bg-[#070204] lg:bg-[#070204]/90 flex flex-col justify-between p-3.5 z-40 lg:z-20 transition-transform duration-200 ${
+          className={`w-72 sm:w-80 lg:w-64 xl:w-72 shrink-0 border-r border-white/10 bg-black flex flex-col justify-between p-3.5 z-40 lg:z-20 transition-transform duration-200 ${
             isMobileSidebarOpen 
               ? 'fixed inset-y-0 left-0 pt-3 flex shadow-2xl safe-area-inset-top safe-area-inset-bottom' 
               : 'hidden lg:flex'
           }`}
         >
           {/* Mobile Sidebar Header */}
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-red-950/60 lg:hidden">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 lg:hidden">
             <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-rose-400" />
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
               <span>Chat History</span>
             </span>
             <button
@@ -748,13 +736,13 @@ export default function AiTutorDrawer({
             <button
               type="button"
               onClick={handleNewChat}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#180509] hover:bg-[#22080d] border border-red-500/30 hover:border-red-500/50 text-white text-xs font-bold shadow-sm transition cursor-pointer group"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-white/10 hover:border-white/20 text-white text-xs font-bold shadow-sm transition cursor-pointer group"
             >
               <span className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-rose-400 group-hover:rotate-12 transition-transform" />
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
                 <span>New Chat</span>
               </span>
-              <span className="text-[10px] font-mono text-slate-500 bg-black/40 px-1.5 py-0.5 rounded border border-white/5">
+              <span className="text-[10px] font-mono text-slate-400 bg-black/60 px-1.5 py-0.5 rounded border border-white/10">
                 ⌘ K
               </span>
             </button>
@@ -767,7 +755,7 @@ export default function AiTutorDrawer({
                 value={historySearch}
                 onChange={(e) => setHistorySearch(e.target.value)}
                 placeholder="Search history..."
-                className="w-full bg-[#120406]/90 border border-red-950/70 focus:border-red-500/40 rounded-lg pl-7 pr-6 py-1 text-[11px] text-slate-300 placeholder-slate-600 outline-none transition"
+                className="w-full bg-zinc-950 border border-white/10 focus:border-white/25 rounded-lg pl-7 pr-6 py-1 text-[11px] text-slate-300 placeholder-slate-600 outline-none transition"
               />
               {historySearch && (
                 <button
@@ -792,12 +780,12 @@ export default function AiTutorDrawer({
                   <div className="h-7 bg-white/[0.04] rounded-lg animate-pulse" />
                 </div>
               ) : historyError ? (
-                <div className="px-2 py-3 rounded-lg bg-red-950/20 border border-red-900/30 text-center space-y-1.5">
-                  <p className="text-[11px] text-red-300 font-medium">{historyError}</p>
+                <div className="px-2 py-3 rounded-lg bg-zinc-900 border border-zinc-800 text-center space-y-1.5">
+                  <p className="text-[11px] text-slate-300 font-medium">{historyError}</p>
                   <button
                     type="button"
                     onClick={fetchConversations}
-                    className="text-[10px] text-rose-400 underline hover:text-white cursor-pointer"
+                    className="text-[10px] text-cyan-400 underline hover:text-white cursor-pointer"
                   >
                     Retry
                   </button>
@@ -812,7 +800,7 @@ export default function AiTutorDrawer({
                     </div>
 
                     {items.length === 0 ? (
-                      <div className="px-2.5 py-3 text-center space-y-1 border border-dashed border-red-950/40 rounded-xl bg-[#0e0305]/30">
+                      <div className="px-2.5 py-3 text-center space-y-1 border border-dashed border-zinc-800 rounded-xl bg-zinc-950/40">
                         <p className="text-[11px] font-medium text-slate-400">No conversations yet.</p>
                         <p className="text-[10px] text-slate-500 leading-relaxed">
                           Start by asking a Physics, Chemistry, Mathematics, or Biology question.
@@ -827,7 +815,7 @@ export default function AiTutorDrawer({
                           >
                             {editingChatId === chat.id ? (
                               /* Inline Rename Input */
-                              <div className="w-full flex items-center gap-1 px-2 py-1 rounded-lg bg-[#1a060a] border border-red-500/50">
+                              <div className="w-full flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-900 border border-zinc-700">
                                 <input
                                   type="text"
                                   autoFocus
@@ -848,7 +836,7 @@ export default function AiTutorDrawer({
                                 onClick={() => handleSelectChat(chat.id)}
                                 className={`w-full flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-xl text-left transition cursor-pointer ${
                                   activeChatId === chat.id
-                                    ? 'bg-[#1e070c] border-l-2 border-red-500 text-white font-semibold shadow-[inset_0_1px_8px_rgba(239,68,68,0.2)]'
+                                    ? 'bg-zinc-900 border-l-2 border-white text-white font-semibold shadow-sm'
                                     : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
                                 }`}
                               >
@@ -873,7 +861,7 @@ export default function AiTutorDrawer({
 
                             {/* Context Menu Dropdown */}
                             {openMenuChatId === chat.id && (
-                              <div className="absolute right-0 top-full mt-0.5 w-32 rounded-lg bg-[#160508] border border-red-900/60 shadow-xl p-1 z-50 animate-in fade-in slide-in-from-top-1">
+                              <div className="absolute right-0 top-full mt-0.5 w-32 rounded-lg bg-zinc-950 border border-zinc-800 shadow-xl p-1 z-50 animate-in fade-in slide-in-from-top-1">
                                 <button
                                   type="button"
                                   onClick={(e) => handleStartRename(chat, e)}
@@ -885,7 +873,7 @@ export default function AiTutorDrawer({
                                 <button
                                   type="button"
                                   onClick={(e) => handleDeleteChat(chat.id, e)}
-                                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-rose-400 hover:text-rose-300 hover:bg-red-950/40 transition text-left cursor-pointer"
+                                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-rose-400 hover:text-rose-300 hover:bg-white/5 transition text-left cursor-pointer"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                   <span>Delete</span>
@@ -903,17 +891,17 @@ export default function AiTutorDrawer({
           </div>
 
           {/* Bottom Quote */}
-          <div className="pt-3 border-t border-red-950/40 shrink-0">
+          <div className="pt-3 border-t border-white/10 shrink-0">
             <p className="text-[10px] font-serif italic text-slate-400 leading-relaxed">
               &ldquo; Better Questions.<br />
               Deeper Understanding. &rdquo;
             </p>
-            <div className="w-5 h-0.5 bg-red-500/40 mt-1" />
+            <div className="w-5 h-0.5 bg-zinc-600 mt-1" />
           </div>
         </aside>
 
         {/* CENTER MAIN WORKSPACE */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#050102]">
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-black">
           
           {/* Messages & Workspace Container */}
           <div 
@@ -926,16 +914,16 @@ export default function AiTutorDrawer({
               {messages.length === 0 && (
                 <div className="py-8 md:py-14 flex flex-col items-center text-center animate-in fade-in duration-300">
                   
-                  {/* Centered Glass Atomic Icon */}
+                  {/* Centered Atomic Icon */}
                   <div className="relative mb-5">
-                    <div className="absolute inset-0 rounded-full bg-red-600/20 blur-xl animate-pulse" />
-                    <div className="relative p-4 rounded-2xl bg-gradient-to-b from-[#1c070c] to-[#0d0305] border border-red-500/30 shadow-2xl">
+                    <div className="absolute inset-0 rounded-full bg-white/[0.04] blur-xl animate-pulse" />
+                    <div className="relative p-4 rounded-2xl bg-zinc-950 border border-white/10 shadow-2xl">
                       <PiechemAiLogo size="lg" animated />
                     </div>
                   </div>
 
                   <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">
-                    PIECHEM <span className="text-red-500">AI</span>
+                    PIECHEM <span className="text-white font-black">AI</span>
                   </h1>
 
                   <p className="text-xs md:text-sm text-slate-400 max-w-lg leading-relaxed mb-8">
@@ -947,48 +935,48 @@ export default function AiTutorDrawer({
                     <button
                       type="button"
                       onClick={() => { setSelectedSubject('Chemistry'); handleSendMessage("Explain SN1 vs SN2 reaction mechanism"); }}
-                      className="group p-4 rounded-2xl bg-[#0d0305]/90 hover:bg-[#160609] border border-red-950/60 hover:border-red-500/40 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-lg shadow-black/40"
+                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
                     >
-                      <div className="p-2 rounded-xl bg-red-950/40 w-fit text-rose-400 mb-2.5 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
                         <Atom className="w-4 h-4" />
                       </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-rose-200">Chemistry</div>
+                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Chemistry</div>
                       <div className="text-[11px] text-slate-400 mt-1 leading-snug">Molecular structure & reactions</div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => { setSelectedSubject('Physics'); handleSendMessage("Explain Newton's second law and derive F = ma"); }}
-                      className="group p-4 rounded-2xl bg-[#0d0305]/90 hover:bg-[#160609] border border-red-950/60 hover:border-red-500/40 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-lg shadow-black/40"
+                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
                     >
-                      <div className="p-2 rounded-xl bg-red-950/40 w-fit text-rose-400 mb-2.5 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
                         <Compass className="w-4 h-4" />
                       </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-rose-200">Physics</div>
+                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Physics</div>
                       <div className="text-[11px] text-slate-400 mt-1 leading-snug">Mechanics, fields & waves</div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => { setSelectedSubject('Mathematics'); handleSendMessage("Derive the integration by parts formula"); }}
-                      className="group p-4 rounded-2xl bg-[#0d0305]/90 hover:bg-[#160609] border border-red-950/60 hover:border-red-500/40 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-lg shadow-black/40"
+                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
                     >
-                      <div className="p-2 rounded-xl bg-red-950/40 w-fit text-rose-400 mb-2.5 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
                         <Calculator className="w-4 h-4" />
                       </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-rose-200">Mathematics</div>
+                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Mathematics</div>
                       <div className="text-[11px] text-slate-400 mt-1 leading-snug">Equations, calculus & proofs</div>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => { setSelectedSubject('Biology'); handleSendMessage("Explain DNA replication process step by step"); }}
-                      className="group p-4 rounded-2xl bg-[#0d0305]/90 hover:bg-[#160609] border border-red-950/60 hover:border-red-500/40 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-lg shadow-black/40"
+                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
                     >
-                      <div className="p-2 rounded-xl bg-red-950/40 w-fit text-rose-400 mb-2.5 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
                         <Dna className="w-4 h-4" />
                       </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-rose-200">Biology</div>
+                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Biology</div>
                       <div className="text-[11px] text-slate-400 mt-1 leading-snug">Cells, genetics & systems</div>
                     </button>
                   </div>
@@ -1004,10 +992,10 @@ export default function AiTutorDrawer({
                   return (
                     <div key={msg.id} className="flex justify-end pt-2 pb-4">
                       <div className="flex items-start gap-2.5 max-w-2xl">
-                        <div className="px-4 py-3 rounded-2xl bg-[#1a080d] border border-red-900/40 text-slate-100 text-xs sm:text-sm leading-relaxed shadow-lg backdrop-blur-md">
+                        <div className="px-4 py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-slate-100 text-xs sm:text-sm leading-relaxed shadow-lg backdrop-blur-md">
                           {msg.content}
                         </div>
-                        <div className="w-7 h-7 rounded-full bg-red-950/60 border border-red-800/40 flex items-center justify-center shrink-0 text-slate-300">
+                        <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 text-slate-300">
                           <User className="w-3.5 h-3.5" />
                         </div>
                       </div>
@@ -1020,12 +1008,12 @@ export default function AiTutorDrawer({
                   <div key={msg.id} className="grid grid-cols-1 lg:grid-cols-12 gap-5 py-2">
                     
                     {/* Left 8 Cols: Academic Solution Document */}
-                    <div className="lg:col-span-8 p-5 sm:p-6 rounded-2xl bg-[#0a0305]/95 border border-red-950/70 shadow-2xl relative backdrop-blur-md">
+                    <div className="lg:col-span-8 p-5 sm:p-6 rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl relative backdrop-blur-md">
                       
                       {/* Subdued Brand Tag */}
                       <div className="flex items-center gap-2 mb-3">
                         <PiechemAiLogo size="xs" />
-                        <span className="text-[11px] font-bold text-red-500 tracking-wider uppercase">PIECHEM AI</span>
+                        <span className="text-[11px] font-bold text-white tracking-wider uppercase">PIECHEM AI</span>
                       </div>
 
                       {/* Editorial Title */}
@@ -1040,8 +1028,8 @@ export default function AiTutorDrawer({
 
                       {/* Out of Scope Warning */}
                       {msg.isOutOfScope && (
-                        <div className="mt-4 p-3 rounded-xl bg-red-950/30 border border-red-800/40 text-xs text-rose-300 flex items-center gap-2">
-                          <Lock className="w-4 h-4 text-red-400 shrink-0" />
+                        <div className="mt-4 p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-slate-300 flex items-center gap-2">
+                          <Lock className="w-4 h-4 text-slate-400 shrink-0" />
                           <span>PIECHEM AI focuses strictly on Physics, Chemistry, Mathematics, and Biology.</span>
                         </div>
                       )}
@@ -1103,7 +1091,7 @@ export default function AiTutorDrawer({
                         </div>
 
                         <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500 inline-block" />
                           <span>{msg.timestamp}</span>
                         </div>
                       </div>
@@ -1115,9 +1103,9 @@ export default function AiTutorDrawer({
                       
                       {/* Key Concepts */}
                       {msg.keyConcepts && msg.keyConcepts.length > 0 && (
-                        <div className="p-4 rounded-xl bg-[#0b0305] border border-red-950/60 shadow-lg">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-rose-300 uppercase tracking-wider mb-2">
-                            <BookOpen className="w-3.5 h-3.5 text-red-400" />
+                        <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-300 uppercase tracking-wider mb-2">
+                            <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
                             <span>Key Concepts</span>
                           </div>
                           <ul className="space-y-1.5 text-[11px] text-slate-300 list-disc list-inside">
@@ -1130,7 +1118,7 @@ export default function AiTutorDrawer({
 
                       {/* Key Takeaway */}
                       {msg.keyTakeaway && (
-                        <div className="p-4 rounded-xl bg-[#0b0305] border border-red-950/60 shadow-lg">
+                        <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
                           <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 uppercase tracking-wider mb-2">
                             <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
                             <span>Key Takeaway</span>
@@ -1143,9 +1131,9 @@ export default function AiTutorDrawer({
 
                       {/* Related Topics */}
                       {msg.relatedTopics && msg.relatedTopics.length > 0 && (
-                        <div className="p-4 rounded-xl bg-[#0b0305] border border-red-950/60 shadow-lg">
+                        <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
                           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+                            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                             <span>Related Topics</span>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
@@ -1154,7 +1142,7 @@ export default function AiTutorDrawer({
                                 key={i}
                                 type="button"
                                 onClick={() => handleSendMessage(`Explain ${topic} in detail`)}
-                                className="px-2.5 py-1 rounded-full bg-[#160608] hover:bg-red-950/60 border border-red-900/40 text-[11px] text-slate-300 hover:text-white transition cursor-pointer"
+                                className="px-2.5 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] text-slate-300 hover:text-white transition cursor-pointer"
                               >
                                 {topic}
                               </button>
@@ -1172,7 +1160,7 @@ export default function AiTutorDrawer({
               {/* Generating / Thinking State */}
               {loading && (
                 <div className="py-4 flex items-center gap-3 animate-in fade-in">
-                  <div className="p-2 rounded-xl bg-[#140407] border border-red-900/40 shadow-sm">
+                  <div className="p-2 rounded-xl bg-zinc-950 border border-zinc-800 shadow-sm">
                     <PiechemAiLogo size="xs" animated />
                   </div>
                   <div>
@@ -1180,9 +1168,9 @@ export default function AiTutorDrawer({
                     <div className="flex items-center gap-2 text-[11px] text-slate-400">
                       <span>Analyzing equations and formulating solution...</span>
                       <span className="flex gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
                       </span>
                     </div>
                   </div>
@@ -1193,11 +1181,11 @@ export default function AiTutorDrawer({
           </div>
 
           {/* BOTTOM AI COMMAND CONSOLE */}
-          <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-4 pt-1 bg-gradient-to-t from-[#050203] via-[#050203]/95 to-transparent z-20 ai-input-area">
+          <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-4 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">
               
               {/* Main Rounded Input Console Container */}
-              <div className="relative rounded-2xl bg-[#0c0305]/95 border border-red-900/50 shadow-2xl p-2.5 backdrop-blur-xl focus-within:border-red-500/70 focus-within:shadow-[0_0_25px_rgba(239,68,68,0.2)] transition-all">
+              <div className="relative rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-2.5 backdrop-blur-xl focus-within:border-zinc-600 focus-within:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all">
                 
                 {/* Embedded Context Pills (Subject & Difficulty) */}
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 px-1">
@@ -1206,15 +1194,15 @@ export default function AiTutorDrawer({
                     <button
                       type="button"
                       onClick={() => setShowModelMenu(prev => !prev)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#160508] hover:bg-[#20070b] border border-red-900/40 text-[11px] font-semibold text-slate-200 transition cursor-pointer"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-semibold text-slate-200 transition cursor-pointer"
                     >
-                      <Sparkles className="w-3 h-3 text-red-400" />
+                      <Sparkles className="w-3 h-3 text-cyan-400" />
                       <span>{selectedModel}</span>
                       <ChevronDown className="w-2.5 h-2.5 text-slate-500" />
                     </button>
 
                     {showModelMenu && (
-                      <div className="absolute left-0 bottom-full mb-1.5 w-44 rounded-xl bg-[#140507] border border-red-900/60 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-bottom-1">
+                      <div className="absolute left-0 bottom-full mb-1.5 w-44 rounded-xl bg-zinc-950 border border-zinc-800 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-bottom-1">
                         {PIECHEM_AI_MODELS.map(m => (
                           <button
                             key={m.id}
@@ -1224,18 +1212,18 @@ export default function AiTutorDrawer({
                               setShowModelMenu(false);
                             }}
                             className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between ${
-                              selectedModel === m.id ? 'bg-red-500/20 text-rose-300 font-bold' : 'text-slate-300 hover:bg-white/5'
+                              selectedModel === m.id ? 'bg-white/10 text-white font-bold' : 'text-slate-300 hover:bg-white/5'
                             }`}
                           >
                             <div className="flex items-center gap-2">
                               <span>{m.name}</span>
                               {m.badge && (
-                                <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase bg-red-950/80 text-rose-300 border border-red-800/40">
+                                <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase bg-white/10 text-slate-300 border border-white/10">
                                   {m.badge}
                                 </span>
                               )}
                             </div>
-                            {selectedModel === m.id && <Check className="w-3 h-3 text-red-400" />}
+                            {selectedModel === m.id && <Check className="w-3 h-3 text-cyan-400" />}
                           </button>
                         ))}
                       </div>
@@ -1243,7 +1231,7 @@ export default function AiTutorDrawer({
                   </div>
 
                   {/* Level Pill */}
-                  <div className="flex items-center gap-1 text-[11px] text-slate-500 px-2 py-0.5 rounded-lg bg-black/30 border border-white/5">
+                  <div className="flex items-center gap-1 text-[11px] text-slate-400 px-2 py-0.5 rounded-lg bg-black/40 border border-white/10">
                     <GraduationCap className="w-3 h-3 text-slate-400" />
                     <span className="capitalize">{level}</span>
                   </div>
@@ -1261,7 +1249,7 @@ export default function AiTutorDrawer({
                     }
                   }}
                   rows={1}
-                  placeholder="Ask a question in Physics, Chemistry, Mathematics, or Biology..."
+                  placeholder="Ask Anything."
                   className="w-full resize-none bg-transparent px-3 py-1 text-xs sm:text-sm text-white placeholder-slate-500 border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 leading-relaxed font-sans no-scrollbar"
                   style={{ minHeight: "38px", maxHeight: "120px", scrollbarWidth: "none", msOverflowStyle: "none", outline: "none", boxShadow: "none" }}
                 />
@@ -1295,7 +1283,7 @@ export default function AiTutorDrawer({
                       type="button"
                       onClick={() => handleSendMessage()}
                       disabled={!input.trim() || loading}
-                      className="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 disabled:opacity-40 disabled:hover:from-red-600 disabled:hover:to-rose-500 flex items-center justify-center text-white shadow-lg shadow-red-950/60 transition active:scale-95 cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-white flex items-center justify-center text-black shadow-lg shadow-white/10 transition active:scale-95 cursor-pointer"
                     >
                       <Send className="w-3.5 h-3.5" />
                     </button>
