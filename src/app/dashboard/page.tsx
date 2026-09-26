@@ -180,7 +180,7 @@ export default function StudentDashboard() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black text-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent text-white flex flex-col items-center justify-center p-4">
         <AdminPreviewBanner />
         <SubscriptionExpiredModal student={data?.student} />
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
