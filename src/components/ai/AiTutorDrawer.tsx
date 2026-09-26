@@ -563,14 +563,7 @@ export default function AiTutorDrawer({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex flex-col bg-black text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200 ai-workspace-root"
-      style={{
-        backgroundImage: `
-          radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
-          radial-gradient(circle at 15% 40%, rgba(255, 255, 255, 0.01) 0%, transparent 45%),
-          radial-gradient(circle at 85% 65%, rgba(255, 255, 255, 0.01) 0%, transparent 50%)
-        `
-      }}
+      className="fixed inset-0 z-50 flex flex-col bg-transparent text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200 ai-workspace-root"
     >
       {/* BACKGROUND SUBTLE SCIENTIFIC ORBITAL GEOMETRY */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.025] overflow-hidden">
@@ -583,7 +576,7 @@ export default function AiTutorDrawer({
       </div>
 
       {/* 1. TOP HEADER */}
-      <header className="h-14 shrink-0 px-3 sm:px-4 md:px-6 flex items-center justify-between border-b border-white/10 bg-black/95 backdrop-blur-md z-30 gap-2">
+      <header className="h-14 shrink-0 px-3 sm:px-4 md:px-6 flex items-center justify-between border-b border-white/10 bg-transparent backdrop-blur-md z-30 gap-2">
         
         {/* Left: Brand + Status Pill + Usage Pill */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -709,7 +702,7 @@ export default function AiTutorDrawer({
 
         {/* LEFT SIDEBAR (Width: 260px, Desktop + Mobile Overlay) */}
         <aside 
-          className={`w-72 sm:w-80 lg:w-64 xl:w-72 shrink-0 border-r border-white/10 bg-black flex flex-col justify-between p-3.5 z-40 lg:z-20 transition-transform duration-200 ${
+          className={`w-72 sm:w-80 lg:w-64 xl:w-72 shrink-0 border-r border-white/10 bg-transparent flex flex-col justify-between p-3.5 z-40 lg:z-20 transition-transform duration-200 ${
             isMobileSidebarOpen 
               ? 'fixed inset-y-0 left-0 pt-3 flex shadow-2xl safe-area-inset-top safe-area-inset-bottom' 
               : 'hidden lg:flex'
@@ -901,7 +894,7 @@ export default function AiTutorDrawer({
         </aside>
 
         {/* CENTER MAIN WORKSPACE */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-black">
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent">
           
           {/* Messages & Workspace Container */}
           <div 

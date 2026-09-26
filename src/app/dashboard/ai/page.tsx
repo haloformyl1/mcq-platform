@@ -41,7 +41,7 @@ export default function AiTutorPage() {
   return (
     <Suspense
       fallback={
-        <div className="fixed inset-0 bg-black text-white flex items-center justify-center">
+        <div className="fixed inset-0 bg-transparent text-white flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-cyan-400 animate-spin" />
             <span className="text-xs text-slate-400 font-mono tracking-wider uppercase">
