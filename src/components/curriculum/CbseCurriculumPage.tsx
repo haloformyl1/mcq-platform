@@ -59,7 +59,6 @@ export default function CbseCurriculumPage({
           <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-3xl space-y-4">
           <div className="relative z-10 max-w-3xl space-y-6 pt-6 pb-10">
             <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-serif italic drop-shadow-xl">
               CBSE Chemistry Academic Vault
