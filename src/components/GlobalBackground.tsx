@@ -7,7 +7,7 @@ export default function GlobalBackground() {
   return (
     <div 
       aria-hidden="true" 
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden w-full max-w-full bg-black select-none"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden w-full max-w-full bg-gradient-to-br from-[#0a3147] via-[#030f17] to-black select-none"
       style={{ overflow: "hidden", maxWidth: "100vw" }}
     >
       {/* 1. Subtle Native Molecular Orbital Canvas Animation spanning full screen */}
