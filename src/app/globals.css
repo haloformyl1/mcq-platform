@@ -1173,5 +1173,36 @@ button:active:not(:disabled),
   }
 }
 
+/* ================================================================
+   ACCESSIBILITY: PREFERS-REDUCED-MOTION
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================================
+   MOBILE SAFARI: iOS AUTO-ZOOM PREVENTION
+   Enforce 16px font-size on mobile inputs/selects to stop iOS viewport zoom
+   ================================================================ */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 
 

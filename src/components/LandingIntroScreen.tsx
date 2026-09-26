@@ -26,15 +26,19 @@ export default function LandingIntroScreen() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Time & Sequence States (15.0s Total)
-  const [elapsed, setElapsed] = useState(0);
+  // Milestone Phase state (0, 1, 3, 4, 5) - only triggers React render on milestone crossing
+  const [phase, setPhase] = useState(0);
+  const currentPhaseRef = useRef(0);
+  const progressBarRef = useRef<HTMLDivElement | null>(null);
+  const elapsedRef = useRef(0);
+
   const [isPaused, setIsPaused] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const pausedAtRef = useRef<number>(0);
   const redirectTriggeredRef = useRef(false);
 
-  const TOTAL_DURATION = 15000; // 15.0 seconds // 7.0 seconds
+  const TOTAL_DURATION = 15000; // 15.0 seconds
 
   // Lock body scroll while splash screen is active
   useEffect(() => {
@@ -45,7 +49,7 @@ export default function LandingIntroScreen() {
     };
   }, []);
 
-  // 1. Precision Animation Frame Clock (0 to 15000ms)
+  // 1. High-Performance Animation Frame Clock (direct DOM style + milestone state updates)
   useEffect(() => {
     let animFrameId: number;
 
@@ -60,7 +64,25 @@ export default function LandingIntroScreen() {
       }
 
       const currentElapsed = Math.min(TOTAL_DURATION, now - startTimeRef.current);
-      setElapsed(currentElapsed);
+      elapsedRef.current = currentElapsed;
+
+      // Direct DOM update for 60fps hairline progress bar without triggering React virtual DOM thrashing
+      if (progressBarRef.current) {
+        const pct = Math.min(100, Math.max(0, (currentElapsed / TOTAL_DURATION) * 100));
+        progressBarRef.current.style.width = `${pct}%`;
+      }
+
+      // Check phase milestones
+      let nextPhase = 0;
+      if (currentElapsed >= 13500) nextPhase = 5;
+      else if (currentElapsed >= 5000) nextPhase = 4;
+      else if (currentElapsed >= 3500) nextPhase = 3;
+      else if (currentElapsed >= 1000) nextPhase = 1;
+
+      if (nextPhase !== currentPhaseRef.current) {
+        currentPhaseRef.current = nextPhase;
+        setPhase(nextPhase);
+      }
 
       if (currentElapsed >= TOTAL_DURATION && !redirectTriggeredRef.current) {
         redirectTriggeredRef.current = true;
@@ -82,7 +104,7 @@ export default function LandingIntroScreen() {
   const togglePause = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isPaused) {
-      pausedAtRef.current = elapsed;
+      pausedAtRef.current = elapsedRef.current;
       startTimeRef.current = null;
       setIsPaused(true);
     } else {
@@ -371,14 +393,24 @@ export default function LandingIntroScreen() {
         }
       });
 
-      animId = requestAnimationFrame(render);
+      if (!document.hidden) {
+        animId = requestAnimationFrame(render);
+      }
+    };
+
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        animId = requestAnimationFrame(render);
+      }
     };
 
     animId = requestAnimationFrame(render);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
 
@@ -387,15 +419,12 @@ export default function LandingIntroScreen() {
   // 1.0s - 2.0s: Brand header & author badge appear
   // 2.0s - 3.5s: Complete molecule assembled
   // 3.5s - 5.0s: Hero headline "Chemistry, reimagined." appears with blur-to-sharp ease
-  // 5.0s - 6.5s: Minimal capability strip & scientific metadata settle
-  // 6.5s - 7.0s: Transition contraction to login
-  const isPhase1 = elapsed >= 1000;
-  const isPhase3 = elapsed >= 3500;
-  const isPhase4 = elapsed >= 5000;
-  const isPhase5 = elapsed >= 13500;
-
-  // Exact progress line tracking 0% to 100% across 15000ms
-  const progressPercent = Math.min(100, Math.max(0, (elapsed / TOTAL_DURATION) * 100));
+  // 5.0s - 13.5s: Minimal capability strip & scientific metadata settle
+  // 13.5s - 15.0s: Transition contraction to login
+  const isPhase1 = phase >= 1;
+  const isPhase3 = phase >= 3;
+  const isPhase4 = phase >= 4;
+  const isPhase5 = phase >= 5;
 
   return (
     <div
@@ -552,8 +581,9 @@ export default function LandingIntroScreen() {
           {/* Minimalist Hairline Progress Line */}
           <div className="w-full sm:max-w-xs relative h-[1.5px] bg-white/[0.08] overflow-hidden rounded-full my-auto">
             <div 
-              className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-white/60 via-[#5DE6FF] to-white transition-all duration-100 ease-linear shadow-[0_0_8px_#5DE6FF]"
-              style={{ width: `${progressPercent}%` }}
+              ref={progressBarRef}
+              className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-white/60 via-[#5DE6FF] to-white shadow-[0_0_8px_#5DE6FF]"
+              style={{ width: "0%" }}
             />
           </div>
 

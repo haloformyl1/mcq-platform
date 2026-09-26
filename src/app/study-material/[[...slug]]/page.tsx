@@ -169,20 +169,22 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
           slug.length > 0 ? (
             <Link
               href="/study-material"
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
+              className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-[11px] sm:text-xs font-mono transition-all group shrink-0"
+              title="All Curriculums"
             >
-              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform shrink-0" />
               <span className="hidden sm:inline">All Curriculums</span>
-              <span className="sm:hidden">Curriculums</span>
+              <span className="hidden xs:inline sm:hidden">Curriculums</span>
             </Link>
           ) : (
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
+              className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-[11px] sm:text-xs font-mono transition-all group shrink-0"
+              title="Back to Dashboard"
             >
-              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform shrink-0" />
               <span className="hidden sm:inline">Back to Dashboard</span>
-              <span className="sm:hidden">Dashboard</span>
+              <span className="hidden xs:inline sm:hidden">Dashboard</span>
             </Link>
           )
         }

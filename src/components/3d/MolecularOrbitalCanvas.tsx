@@ -20,13 +20,13 @@ export default function MolecularOrbitalCanvas({
     if (!ctx) return;
 
     let animationFrameId: number;
-    let isVisible = true;
+    let isRunning = false;
     let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth);
     let height = (canvas.height = canvas.parentElement?.clientHeight || 450);
 
     const handleResize = () => {
       if (!canvas.parentElement) return;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.parentElement.clientWidth;
       height = canvas.parentElement.clientHeight;
       canvas.width = width * dpr;
@@ -37,14 +37,39 @@ export default function MolecularOrbitalCanvas({
     handleResize();
     window.addEventListener("resize", handleResize);
 
+    const startLoop = () => {
+      if (!isRunning) {
+        isRunning = true;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    const stopLoop = () => {
+      isRunning = false;
+      cancelAnimationFrame(animationFrameId);
+    };
+
     // Pause when off-screen for maximum laptop battery and GPU efficiency
     const observer = new IntersectionObserver(
       ([entry]) => {
-        isVisible = entry.isIntersecting;
+        if (entry.isIntersecting && !document.hidden) {
+          startLoop();
+        } else {
+          stopLoop();
+        }
       },
       { threshold: 0.05 }
     );
     observer.observe(canvas);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stopLoop();
+      } else {
+        startLoop();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     // Generate balanced molecular nodes
     const nodeCount = density === "dense" ? 28 : density === "normal" ? 20 : 15;
@@ -87,10 +112,7 @@ export default function MolecularOrbitalCanvas({
     let orbitalAngle2 = Math.PI / 3;
 
     const render = () => {
-      if (!isVisible) {
-        animationFrameId = requestAnimationFrame(render);
-        return;
-      }
+      if (!isRunning) return;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -195,14 +217,17 @@ export default function MolecularOrbitalCanvas({
         ctx.fill();
       }
 
-      animationFrameId = requestAnimationFrame(render);
+      if (isRunning) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
 
-    render();
+    startLoop();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stopLoop();
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       observer.disconnect();
     };
   }, [density]);

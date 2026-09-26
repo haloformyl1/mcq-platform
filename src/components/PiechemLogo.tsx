@@ -220,7 +220,7 @@ export default function PiechemLogo({
           </div>
           
           {/* Attribution Subtitle */}
-          <div className="flex items-center mt-0.5 select-none leading-none">
+          <div className="flex items-center mt-0.5 select-none leading-none overflow-hidden">
             <span
               className={
                 (size === 'sm'
@@ -228,7 +228,7 @@ export default function PiechemLogo({
                   : size === 'lg' || size === 'xl'
                   ? "text-[8px] sm:text-[10px] tracking-[0.06em] sm:tracking-[0.08em] "
                   : "text-[6.5px] sm:text-[8px] tracking-[0.05em] sm:tracking-[0.07em] ") +
-                "font-sans font-medium whitespace-nowrap " +
+                "font-sans font-medium whitespace-nowrap truncate max-w-[130px] sm:max-w-none " +
                 (theme === 'light' ? 'text-slate-600' : 'text-slate-400')
               }
             >

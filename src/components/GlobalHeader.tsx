@@ -45,13 +45,13 @@ export default function GlobalHeader({
     <header
       className={`dashboard-header sticky top-0 z-50 w-full bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)] border-b border-white/[0.06] ${className}`}
     >
-      <div className="site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+      <div className="site-header-inner w-full px-2.5 sm:px-6 lg:px-8 py-2 sm:py-3">
         {children ? (
           children
         ) : (
-          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-4">
+          <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-4">
             {/* 1. FAR LEFT: PIE CHEM LOGO & CONTEXT */}
-            <div className="flex items-center gap-2 sm:gap-3.5 shrink-0 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-3.5 shrink-0 min-w-0 max-w-[55%] xs:max-w-none">
               <PiechemLogo
                 size="md"
                 href={logoHref}
@@ -70,7 +70,7 @@ export default function GlobalHeader({
             )}
 
             {/* 3. FAR RIGHT: Header Actions, Curriculum, Notifications & Account */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {/* Custom actions slot if provided */}
               {actions}
 
@@ -187,7 +187,7 @@ export default function GlobalHeader({
               ) : (
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-xs font-bold text-cyan-300 hover:text-white transition"
+                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-[11px] sm:text-xs font-bold text-cyan-300 hover:text-white transition shrink-0"
                 >
                   <span>Sign In</span>
                 </Link>
