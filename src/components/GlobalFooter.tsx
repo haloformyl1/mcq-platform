@@ -134,45 +134,6 @@ export default function GlobalFooter() {
             </p>
           </div>
 
-          {/* Navigation Group 1: EXPLORE */}
-          <div className="lg:col-span-2 flex flex-col">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-cyan-400" />
-              {NAVIGATION_GROUPS[0].title}
-            </h3>
-            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12.5px]">
-              {NAVIGATION_GROUPS[0].links.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-[#91A5B8] hover:text-cyan-300 transition-all duration-150 inline-block hover:translate-x-1"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Navigation Group 2: LEARN */}
-          <div className="lg:col-span-2 flex flex-col">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-cyan-400" />
-              {NAVIGATION_GROUPS[1].title}
-            </h3>
-            <ul className="space-y-1 sm:space-y-1.5 text-xs sm:text-[12.5px]">
-              {NAVIGATION_GROUPS[1].links.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-[#91A5B8] hover:text-cyan-300 transition-all duration-150 inline-block hover:translate-x-1"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
 
           {/* Navigation Group 3: SUPPORT (Links + Single Dedicated Support Card) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col">

@@ -60,16 +60,12 @@ export default function CbseCurriculumPage({
           <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono tracking-widest uppercase">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00D9FF] animate-pulse" />
-              <span>NATIONAL SYLLABUS • CBSE BOARD ARCHIVE</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight font-serif italic">
+          <div className="relative z-10 max-w-3xl space-y-6 pt-6 pb-10">
+            <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-serif italic drop-shadow-xl">
               CBSE Chemistry Academic Vault
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-2xl">
+            <p className="text-base sm:text-lg text-slate-300 font-light leading-relaxed max-w-2xl mx-auto md:mx-0">
               Engineered with 100% NCERT line-by-line alignment, chapter derivations, competitive bridge problems, and Board exemplary numerical sets for Class XI and XII.
             </p>
 

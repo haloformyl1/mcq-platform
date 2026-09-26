@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { BookOpen, User, ChevronDown, X, Check } from "lucide-react";
+import { BookOpen, User, ChevronDown, X, Check, LogOut } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 
@@ -35,6 +35,7 @@ export default function GlobalHeader({
   children
 }: GlobalHeaderProps) {
   const [mobileCurriculumModalOpen, setMobileCurriculumModalOpen] = useState(false);
+  const [internalUpdating, setInternalUpdating] = useState(false);
 
   const isGold =
     isGoldMember ||
@@ -42,6 +43,31 @@ export default function GlobalHeader({
     (student?.subscriptionStatus === "PAID" &&
       (!student?.subscriptionExpiresAt ||
         new Date(student.subscriptionExpiresAt).getTime() > Date.now()));
+
+  const isUpdating = updatingCurriculum || internalUpdating;
+
+  const handleCurriculumChange = async (board: string, level: string) => {
+    if (onCurriculumChange) {
+      return onCurriculumChange(board, level);
+    }
+    
+    // Fallback internal handler
+    setInternalUpdating(true);
+    try {
+      const res = await fetch("/api/student/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ board, academicLevel: level })
+      });
+      if (res.ok) {
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Failed to update curriculum", err);
+    } finally {
+      setInternalUpdating(false);
+    }
+  };
 
   return (
     <header
@@ -79,17 +105,17 @@ export default function GlobalHeader({
                 {actions}
 
                 {/* DESKTOP-ONLY Curriculum Switcher (md and up) */}
-                {student && onCurriculumChange && (
+                {student && (
                   <div className="hidden md:flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-xl bg-[#061421]/90 border border-cyan-500/30 text-xs shadow-inner">
                     <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
 
                     <select
                       value={student.board || "CBSE"}
-                      disabled={updatingCurriculum}
+                      disabled={isUpdating}
                       onChange={(e) => {
                         const nb = e.target.value;
                         const defaultLevel = nb === "WBCHSE" ? "SEM-I" : "11";
-                        onCurriculumChange(nb, defaultLevel);
+                        handleCurriculumChange(nb, defaultLevel);
                       }}
                       className="bg-transparent text-cyan-300 font-extrabold text-xs focus:outline-none cursor-pointer"
                       aria-label="Select Education Board"
@@ -110,9 +136,9 @@ export default function GlobalHeader({
                     {student.board === "WBCHSE" ? (
                       <select
                         value={student.academicLevel || "SEM-I"}
-                        disabled={updatingCurriculum}
+                        disabled={isUpdating}
                         onChange={(e) =>
-                          onCurriculumChange(student.board || "WBCHSE", e.target.value)
+                          handleCurriculumChange(student.board || "WBCHSE", e.target.value)
                         }
                         className="bg-transparent text-teal-300 font-extrabold text-xs focus:outline-none cursor-pointer"
                         aria-label="Select Semester"
@@ -133,9 +159,9 @@ export default function GlobalHeader({
                     ) : (
                       <select
                         value={student.academicLevel || "11"}
-                        disabled={updatingCurriculum}
+                        disabled={isUpdating}
                         onChange={(e) =>
-                          onCurriculumChange(student.board || "CBSE", e.target.value)
+                          handleCurriculumChange(student.board || "CBSE", e.target.value)
                         }
                         className="bg-transparent text-teal-300 font-extrabold text-xs focus:outline-none cursor-pointer"
                         aria-label="Select Class Level"
@@ -149,7 +175,7 @@ export default function GlobalHeader({
                       </select>
                     )}
 
-                    {updatingCurriculum ? (
+                    {isUpdating ? (
                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping ml-1" />
                     ) : (
                       <span
@@ -170,24 +196,36 @@ export default function GlobalHeader({
 
                 {/* Account Link / Sign In */}
                 {student ? (
-                  <Link
-                    href="/dashboard/account"
-                    className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm shrink-0"
-                    title="My Profile & Settings"
-                  >
-                    <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0 border border-cyan-400/30">
-                      <img
-                        src={student.avatarUrl || "/avatars/atom.jpg"}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                        onError={(e: any) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
-                      <User className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="hidden md:inline">My Account</span>
-                  </Link>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Link
+                      href="/dashboard/account"
+                      className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm shrink-0"
+                      title="My Profile & Settings"
+                    >
+                      <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0 border border-cyan-400/30">
+                        <img
+                          src={student.avatarUrl || "/avatars/atom.jpg"}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={(e: any) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                        <User className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="hidden md:inline">My Account</span>
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        await fetch('/api/auth/student/logout', { method: 'POST' });
+                        window.location.href = '/login';
+                      }}
+                      title="Logout"
+                      className="p-1.5 sm:p-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 hover:border-red-400/60 text-red-400 hover:text-red-300 transition-all group shrink-0 active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+                    >
+                      <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
                 ) : (
                   <Link
                     href="/login"
@@ -200,8 +238,8 @@ export default function GlobalHeader({
             </div>
 
             {/* DEDICATED MOBILE CURRICULUM STRIP (md:hidden) */}
-            {student && onCurriculumChange && (
-              <div className="md:hidden mt-2 pt-2 border-t border-white/[0.08] flex items-center justify-between gap-2 px-0.5">
+            {student && (
+              <div className="md:hidden mt-2 pt-2 border-t border-white/[0.08] flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_#10b981]" />
                   <span className="text-[10px] font-mono tracking-wider text-slate-400 uppercase shrink-0">
@@ -227,7 +265,7 @@ export default function GlobalHeader({
       </div>
 
       {/* MOBILE CURRICULUM BOTTOM SHEET MODAL */}
-      {mobileCurriculumModalOpen && student && onCurriculumChange && (
+      {mobileCurriculumModalOpen && student && (
         <div 
           className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={() => setMobileCurriculumModalOpen(false)}
@@ -270,9 +308,9 @@ export default function GlobalHeader({
                       type="button"
                       onClick={() => {
                         const defaultLevel = b === "WBCHSE" ? "SEM-I" : "11";
-                        onCurriculumChange(b, defaultLevel);
+                        handleCurriculumChange(b, defaultLevel);
                       }}
-                      disabled={updatingCurriculum}
+                      disabled={isUpdating}
                       className={`py-2.5 px-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 border ${
                         isSelected
                           ? "bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.25)]"
@@ -304,10 +342,10 @@ export default function GlobalHeader({
                       key={lvl}
                       type="button"
                       onClick={() => {
-                        onCurriculumChange(student.board || "CBSE", lvl);
+                        handleCurriculumChange(student.board || "CBSE", lvl);
                         setMobileCurriculumModalOpen(false);
                       }}
-                      disabled={updatingCurriculum}
+                      disabled={isUpdating}
                       className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-between border ${
                         isSelected
                           ? "bg-teal-500/20 border-teal-400 text-teal-200 shadow-[0_0_12px_rgba(20,184,166,0.25)]"
@@ -322,7 +360,7 @@ export default function GlobalHeader({
               </div>
             </div>
 
-            {updatingCurriculum && (
+            {isUpdating && (
               <div className="flex items-center justify-center gap-2 pt-1 text-xs text-cyan-300 font-mono">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                 <span>Syncing curriculum data...</span>

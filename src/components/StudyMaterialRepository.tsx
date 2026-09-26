@@ -484,15 +484,11 @@ export default function StudyMaterialRepository({
         <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 animate-in fade-in zoom-in-98 duration-400">
           
           {/* Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>PIECHEM ACADEMIC ARCHIVES</span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif italic">
+          <div className="text-center max-w-3xl mx-auto space-y-6 pt-8 pb-12">
+            <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-serif italic drop-shadow-xl">
               Your Chemistry Knowledge Repository
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-300 font-light leading-relaxed max-w-2xl mx-auto">
               Structured theory, derivations, DPPs, and previous year examination archives engineered for your specific board curriculum.
             </p>
           </div>

@@ -871,14 +871,10 @@ export default function StudentAccountPage() {
                         <span>Member since {memberSinceFormatted}</span>
                       </div>
 
-                      {isGold ? (
+                      {isGold && (
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                           <span>ACTIVE ACCESS</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">
-                          <span>STANDARD ACCESS</span>
                         </span>
                       )}
                     </div>
@@ -889,9 +885,11 @@ export default function StudentAccountPage() {
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black text-white tracking-tight">
                           {isGold ? "Premium plan" : "Basic Student Plan"}
                         </h2>
-                        <span className="text-xs sm:text-sm font-bold text-cyan-300 px-3 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 font-mono tracking-wide">
-                          {!isGold ? "Free Tier" : is30Day ? "30-Day Premium Access" : "Complimentary"}
-                        </span>
+                        {isGold && (
+                          <span className="text-xs sm:text-sm font-bold text-cyan-300 px-3 py-0.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 font-mono tracking-wide">
+                            {is30Day ? "30-Day Premium Access" : "Complimentary"}
+                          </span>
+                        )}
                       </div>
 
                       <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-xl leading-relaxed">

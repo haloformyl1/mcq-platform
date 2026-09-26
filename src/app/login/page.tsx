@@ -305,15 +305,6 @@ export default function StudentLogin() {
 
         {/* --- Center Hero Content --- */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center my-auto pt-4 sm:pt-8 pb-14 w-full flex flex-col items-center">
-          
-          {/* Scientific Status Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/35 bg-[#031525]/85 backdrop-blur-xl text-cyan-300 text-[11px] sm:text-xs font-mono tracking-wider mb-5 shadow-[0_0_20px_rgba(0,242,254,0.18)]">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
-            </span>
-            <span className="uppercase font-bold tracking-widest text-[10.5px]">AI-Proctored Chemistry Examination Engine</span>
-          </div>
 
           {/* Grand Hero Headline */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-4 leading-[1.12] drop-shadow-md">

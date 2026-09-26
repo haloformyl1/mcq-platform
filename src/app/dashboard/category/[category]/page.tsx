@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
@@ -209,7 +209,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
               <span className="text-xs font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
                 {test.discipline || "CHEMISTRY"}
               </span>
-              <h3 className="font-serif text-base sm:text-lg font-bold text-white group-hover:text-cyan-200 transition-colors line-clamp-2 leading-snug">
+              <h3 className="font-serif text-lg sm:text-xl md:text-2xl font-black text-white group-hover:text-cyan-200 transition-colors break-words leading-tight pr-2 drop-shadow-sm">
                 {test.title}
               </h3>
             </div>
