@@ -43,8 +43,10 @@ export async function GET(req: Request) {
     });
     await autoExpireSubscriptions();
 
-    // Recalculate all submitted attempts for this student to guarantee latest scores
-    await recalculateStudentAttempts(studentId);
+    // Run attempt score check in the background without blocking the dashboard response
+    recalculateStudentAttempts(studentId).catch(err => {
+      console.error("Non-blocking attempt recalculation warning:", err?.message);
+    });
 
     const student = await prisma.student.update({
       where: { id: studentId },
