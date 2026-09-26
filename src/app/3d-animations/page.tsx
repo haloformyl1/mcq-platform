@@ -336,7 +336,7 @@ function ThreeDAnimationsContent() {
               <button
                 type="button"
                 onClick={() => setAccessFilter("ALL")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                className={`px-3.5 py-2 sm:py-1.5 min-h-[38px] sm:min-h-0 rounded-lg text-xs font-mono font-bold transition ${
                   accessFilter === "ALL" 
                     ? "bg-slate-800 text-white shadow-sm" 
                     : "text-slate-400 hover:text-slate-200"
@@ -347,7 +347,7 @@ function ThreeDAnimationsContent() {
               <button
                 type="button"
                 onClick={() => setAccessFilter("FREE")}
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                className={`inline-flex items-center gap-1 px-3.5 py-2 sm:py-1.5 min-h-[38px] sm:min-h-0 rounded-lg text-xs font-mono font-bold transition ${
                   accessFilter === "FREE" 
                     ? "bg-emerald-950/80 border border-emerald-400/40 text-emerald-300 shadow-sm" 
                     : "text-slate-400 hover:text-emerald-300"
@@ -358,7 +358,7 @@ function ThreeDAnimationsContent() {
               <button
                 type="button"
                 onClick={() => setAccessFilter("PREMIUM")}
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                className={`inline-flex items-center gap-1 px-3.5 py-2 sm:py-1.5 min-h-[38px] sm:min-h-0 rounded-lg text-xs font-mono font-bold transition ${
                   accessFilter === "PREMIUM" 
                     ? "bg-amber-950/80 border border-amber-400/50 text-amber-300 shadow-sm" 
                     : "text-slate-400 hover:text-amber-300"
@@ -375,7 +375,7 @@ function ThreeDAnimationsContent() {
               <select
                 value={sortBy}
                 onChange={(e: any) => setSortBy(e.target.value)}
-                className="py-2.5 px-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono font-semibold text-slate-300 focus:outline-none focus:border-cyan-400 cursor-pointer"
+                className="py-2.5 px-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono font-semibold text-slate-300 focus:outline-none focus:border-cyan-400 cursor-pointer min-h-[38px]"
               >
                 <option value="featured">Featured First</option>
                 <option value="az">Title (A – Z)</option>
@@ -397,7 +397,7 @@ function ThreeDAnimationsContent() {
                 key={cat.id}
                 type="button"
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition border ${
+                className={`px-4 py-2.5 min-h-[38px] rounded-xl text-xs font-medium whitespace-nowrap transition border active:scale-95 ${
                   activeCategory === cat.id
                     ? "bg-cyan-950 border-cyan-400/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(0,217,255,0.15)]"
                     : "bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
