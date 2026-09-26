@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import MolecularOrbitalCanvas from "@/components/3d/MolecularOrbitalCanvas";
 
 export default function GlobalBackground() {
   return (
@@ -15,11 +14,6 @@ export default function GlobalBackground() {
         style={{
           background: 'radial-gradient(circle at 50% 46%, rgba(0, 210, 255, 0.08) 0%, rgba(3, 16, 24, 0.5) 38%, rgba(2, 7, 11, 0.98) 75%)',
         }}
-      />
-      {/* Subtle Native Molecular Orbital Canvas Animation spanning full screen */}
-      <MolecularOrbitalCanvas 
-        className="absolute inset-0 pointer-events-none opacity-40" 
-        density="subtle" 
       />
     </div>
   );
