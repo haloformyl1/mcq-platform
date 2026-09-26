@@ -23,41 +23,53 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+// In-memory module cache so sub-curriculum navigations (CBSE, ICSE, Class XI, Notes, etc.) render instantaneously (0ms)
+let cachedStudent: any = null;
+let cachedStudyMaterials: any[] | null = null;
+
 export default function StudyMaterialPage({ params, searchParams }: PageProps) {
   const resolvedParams = use(params);
   const resolvedSearchParams = use(searchParams);
   const router = useRouter();
 
-  const [student, setStudent] = useState<any>(null);
-  const [studyMaterials, setStudyMaterials] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [student, setStudent] = useState<any>(cachedStudent);
+  const [studyMaterials, setStudyMaterials] = useState<any[]>(cachedStudyMaterials || []);
+  const [loading, setLoading] = useState(cachedStudyMaterials === null);
 
   // Parse dynamic slug array: e.g. ["cbse"], ["cbse", "class-xi"], ["cbse", "class-xi", "notes"]
   const slug = resolvedParams.slug || [];
 
   useEffect(() => {
-    // Fetch student session & dashboard data
-    fetch("/api/student/dashboard")
-      .then(res => res.json())
-      .then(dashData => {
-        if (!dashData.error) {
-          setStudent(dashData.student);
-        }
-      })
-      .catch(() => {});
+    // If not cached yet, fetch student session
+    if (!cachedStudent) {
+      fetch("/api/student/dashboard")
+        .then(res => res.json())
+        .then(dashData => {
+          if (!dashData.error) {
+            cachedStudent = dashData.student;
+            setStudent(dashData.student);
+          }
+        })
+        .catch(() => {});
+    }
 
-    // Fetch materials
-    fetch("/api/student/study-materials")
-      .then(res => res.json())
-      .then(mats => {
-        if (Array.isArray(mats)) {
-          setStudyMaterials(mats);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    // If not cached yet, fetch materials
+    if (!cachedStudyMaterials) {
+      fetch("/api/student/study-materials")
+        .then(res => res.json())
+        .then(mats => {
+          if (Array.isArray(mats)) {
+            cachedStudyMaterials = mats;
+            setStudyMaterials(mats);
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const sanitized = React.useMemo(() => {

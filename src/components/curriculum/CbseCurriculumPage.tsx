@@ -107,7 +107,7 @@ export default function CbseCurriculumPage({
           {/* Class XI Card */}
           <Link
             href="/study-material/cbse/class-xi"
-            className="group relative rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-cyan-950/30 hover:to-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/60 p-8 flex flex-col justify-between min-h-[260px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_rgba(0,217,255,0.18)] shadow-lg"
+            className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-cyan-950/30 hover:to-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/60 p-8 flex flex-col justify-between min-h-[260px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_rgba(0,217,255,0.18)] shadow-lg"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export default function CbseCurriculumPage({
           {/* Class XII Card */}
           <Link
             href="/study-material/cbse/class-xii"
-            className="group relative rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-cyan-950/30 hover:to-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/60 p-8 flex flex-col justify-between min-h-[260px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_rgba(0,217,255,0.18)] shadow-lg"
+            className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-cyan-950/30 hover:to-white/[0.03] border border-cyan-500/20 hover:border-cyan-400/60 p-8 flex flex-col justify-between min-h-[260px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_rgba(0,217,255,0.18)] shadow-lg"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">

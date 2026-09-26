@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
   Search, 
@@ -39,6 +40,7 @@ export default function CurriculumCategoryPage({
   student,
   basePath = "/study-material"
 }: CurriculumCategoryPageProps) {
+  const router = useRouter();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [disciplineFilter, setDisciplineFilter] = useState<"ALL" | "PHYSICAL" | "INORGANIC" | "ORGANIC">("ALL");
@@ -151,7 +153,7 @@ export default function CurriculumCategoryPage({
               <Link
                 key={cat.id}
                 href={`/study-material/${board.toLowerCase()}/${level.toLowerCase().replace(/_/g, "-")}/${cat.id}`}
-                className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-all duration-150 touch-manipulation select-none active:scale-[0.96] ${
                   isActive 
                     ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold" 
                     : "bg-white/[0.02] text-slate-400 hover:text-white border border-white/[0.06]"
@@ -184,7 +186,7 @@ export default function CurriculumCategoryPage({
                 <button
                   key={disc}
                   onClick={() => setDisciplineFilter(disc)}
-                  className={`px-2.5 py-1 rounded ${disciplineFilter === disc ? "bg-cyan-500/20 text-cyan-300 font-bold" : "text-slate-400 hover:text-white"}`}
+                  className={`px-2.5 py-1 rounded touch-manipulation select-none active:scale-[0.96] ${disciplineFilter === disc ? "bg-cyan-500/20 text-cyan-300 font-bold" : "text-slate-400 hover:text-white"}`}
                 >
                   {disc}
                 </button>
@@ -194,13 +196,13 @@ export default function CurriculumCategoryPage({
             <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/10 text-[11px] font-mono">
               <button
                 onClick={() => setSortBy("CHAPTER")}
-                className={`px-2.5 py-1 rounded ${sortBy === "CHAPTER" ? "bg-white/10 text-white font-bold" : "text-slate-400"}`}
+                className={`px-2.5 py-1 rounded touch-manipulation select-none active:scale-[0.96] ${sortBy === "CHAPTER" ? "bg-white/10 text-white font-bold" : "text-slate-400"}`}
               >
                 Chapter #
               </button>
               <button
                 onClick={() => setSortBy("AZ")}
-                className={`px-2.5 py-1 rounded ${sortBy === "AZ" ? "bg-white/10 text-white font-bold" : "text-slate-400"}`}
+                className={`px-2.5 py-1 rounded touch-manipulation select-none active:scale-[0.96] ${sortBy === "AZ" ? "bg-white/10 text-white font-bold" : "text-slate-400"}`}
               >
                 A - Z
               </button>
@@ -225,7 +227,7 @@ export default function CurriculumCategoryPage({
               return (
                 <div
                   key={item.id}
-                  className={`rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border p-5 flex flex-col justify-between transition-all duration-300 shadow-sm ${
+                  className={`rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border p-5 flex flex-col justify-between transition-all duration-200 shadow-sm touch-manipulation select-none ${
                     isLevelRestricted 
                       ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]" 
                       : "border-white/[0.08] hover:border-cyan-500/40"
@@ -267,9 +269,13 @@ export default function CurriculumCategoryPage({
                             setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
                           } else if (!canAccess) {
                             setUpgradeItem(item);
+                          } else {
+                            router.push(`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`);
                           }
                         }}
-                        className={`text-base font-bold text-white leading-snug line-clamp-2 ${!canAccess ? "cursor-pointer hover:text-rose-200" : ""}`}
+                        className={`text-base font-bold text-white leading-snug line-clamp-2 cursor-pointer transition-colors ${
+                          !canAccess ? "hover:text-rose-200" : "hover:text-cyan-300"
+                        }`}
                       >
                         {item.title}
                       </h4>

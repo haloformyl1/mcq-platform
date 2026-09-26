@@ -508,7 +508,7 @@ export default function StudyMaterialRepository({
               {/* 1. CBSE */}
               <Link 
                 href="/study-material/cbse"
-                className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -543,7 +543,7 @@ export default function StudyMaterialRepository({
               {/* 2. ICSE / ISC */}
               <Link 
                 href="/study-material/icse"
-                className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -578,7 +578,7 @@ export default function StudyMaterialRepository({
               {/* 3. WBCHSE */}
               <Link 
                 href="/study-material/wbchse"
-                className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -613,7 +613,7 @@ export default function StudyMaterialRepository({
               {/* 4. NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS */}
               <Link 
                 href="/study-material/entrance"
-                className="group relative cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -687,7 +687,7 @@ export default function StudyMaterialRepository({
               {/* Class XI */}
               <div
                 onClick={() => setSelectedLevel("CLASS_XI")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-8 flex flex-col justify-between min-h-[240px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,217,255,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-8 flex flex-col justify-between min-h-[240px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-xs font-mono text-cyan-300/80 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30">
@@ -710,7 +710,7 @@ export default function StudyMaterialRepository({
               {/* Class XII */}
               <div
                 onClick={() => setSelectedLevel("CLASS_XII")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-purple-500/20 hover:border-purple-400/60 p-8 flex flex-col justify-between min-h-[240px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(139,92,246,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-purple-500/20 hover:border-purple-400/60 p-8 flex flex-col justify-between min-h-[240px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(139,92,246,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-xs font-mono text-purple-300/80 px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/30">
@@ -740,7 +740,7 @@ export default function StudyMaterialRepository({
               {/* Semester I */}
               <div
                 onClick={() => setSelectedLevel("SEM_1")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(16,185,129,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(16,185,129,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-[11px] font-mono text-emerald-300/80 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30">
@@ -762,7 +762,7 @@ export default function StudyMaterialRepository({
               {/* Semester II */}
               <div
                 onClick={() => setSelectedLevel("SEM_2")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,217,255,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-[11px] font-mono text-cyan-300/80 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30">
@@ -784,7 +784,7 @@ export default function StudyMaterialRepository({
               {/* Semester III */}
               <div
                 onClick={() => setSelectedLevel("SEM_3")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(245,158,11,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(245,158,11,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-[11px] font-mono text-amber-300/80 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/30">
@@ -806,7 +806,7 @@ export default function StudyMaterialRepository({
               {/* Semester IV */}
               <div
                 onClick={() => setSelectedLevel("SEM_4")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-purple-500/20 hover:border-purple-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(139,92,246,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-purple-500/20 hover:border-purple-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(139,92,246,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-[11px] font-mono text-purple-300/80 px-2.5 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/30">
@@ -835,7 +835,7 @@ export default function StudyMaterialRepository({
               {/* 1. NEET UG */}
               <div
                 onClick={() => setSelectedLevel("NEET")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(244,63,94,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(244,63,94,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-xs font-mono text-rose-300/80 px-2.5 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/30">
@@ -857,7 +857,7 @@ export default function StudyMaterialRepository({
               {/* 2. JEE MAINS & ADVANCED */}
               <div
                 onClick={() => setSelectedLevel("JEE")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,217,255,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-xs font-mono text-cyan-300/80 px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30">
@@ -879,7 +879,7 @@ export default function StudyMaterialRepository({
               {/* 3. WBJEE */}
               <div
                 onClick={() => setSelectedLevel("WBJEE")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(16,185,129,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(16,185,129,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-xs font-mono text-emerald-300/80 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30">
@@ -901,7 +901,7 @@ export default function StudyMaterialRepository({
               {/* 4. CUET & OTHER ENTRANCES */}
               <div
                 onClick={() => setSelectedLevel("CUET")}
-                className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(245,158,11,0.15)] shadow-md"
+                className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(245,158,11,0.15)] shadow-md"
               >
                 <div>
                   <span className="text-xs font-mono text-amber-300/80 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/30">
@@ -981,7 +981,7 @@ export default function StudyMaterialRepository({
                   <div
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className="group cursor-pointer rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] hover:border-cyan-500/50 p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,217,255,0.12)] shadow-md"
+                    className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] hover:border-cyan-500/50 p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,217,255,0.12)] shadow-md"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="space-y-1.5">
@@ -1122,7 +1122,7 @@ export default function StudyMaterialRepository({
                 return (
                   <div
                     key={item.id}
-                    className={`group relative rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm ${
+                    className={`group relative select-none rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-sm touch-manipulation ${
                       isLevelRestricted
                         ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]"
                         : "border-white/[0.08] hover:border-cyan-500/40 hover:shadow-[0_10px_25px_rgba(0,217,255,0.1)]"
@@ -1167,10 +1167,12 @@ export default function StudyMaterialRepository({
                               setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
                             } else if (!canAccess) {
                               setUpgradeItem(item);
+                            } else {
+                              router.push(`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`);
                             }
                           }}
-                          className={`text-base sm:text-lg font-bold text-white transition-colors leading-snug ${
-                            !canAccess ? "cursor-pointer hover:text-rose-200" : "group-hover:text-cyan-300"
+                          className={`text-base sm:text-lg font-bold text-white transition-colors leading-snug cursor-pointer ${
+                            !canAccess ? "hover:text-rose-200" : "hover:text-cyan-300"
                           }`}
                         >
                           {item.title}

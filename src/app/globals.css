@@ -1088,10 +1088,44 @@ div {
 
 .mobile-nav-drawer-closed {
   transform: translateX(105%);
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 .mobile-nav-drawer-open {
   transform: translateX(0);
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* ================================================================
+   INSTANT TOUCH & CLICK RESPONSIVENESS
+   ================================================================ */
+html, body, a, button, [role="button"], input, select, textarea, .cursor-pointer {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tactile visual response on interactive buttons without changing layout coordinates */
+button:active:not(:disabled),
+[role="button"]:active:not(:disabled) {
+  opacity: 0.92;
+  transition-duration: 75ms !important;
+}
+
+/* Guard hover-only transform animations so touch screens fire clicks immediately on first tap */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:-translate-y-1,
+  .hover\:-translate-y-1\.5,
+  .hover\:-translate-y-2,
+  .hover\:scale-105,
+  .hover\:scale-\[1\.02\],
+  .hover\:scale-102,
+  .group:hover .group-hover\:-translate-y-1,
+  .group:hover .group-hover\:-translate-y-1\.5,
+  .group:hover .group-hover\:translate-x-1 {
+    transform: none !important;
+  }
 }
 
 /* Touch UX target standard (44px min touch target) */

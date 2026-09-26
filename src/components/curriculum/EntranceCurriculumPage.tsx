@@ -98,7 +98,7 @@ export default function EntranceCurriculumPage({
           {/* NEET UG */}
           <Link
             href="/study-material/entrance/neet"
-            className="group relative rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-rose-500/20 hover:border-rose-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(244,63,94,0.18)] shadow-md"
+            className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-rose-500/20 hover:border-rose-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(244,63,94,0.18)] shadow-md"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export default function EntranceCurriculumPage({
           {/* JEE Mains & Adv */}
           <Link
             href="/study-material/entrance/jee"
-            className="group relative rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-blue-500/20 hover:border-blue-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(59,130,246,0.18)] shadow-md"
+            className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-blue-500/20 hover:border-blue-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(59,130,246,0.18)] shadow-md"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -168,7 +168,7 @@ export default function EntranceCurriculumPage({
           {/* WBJEE Target */}
           <Link
             href="/study-material/entrance/wbjee"
-            className="group relative rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(16,185,129,0.18)] shadow-md"
+            className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-emerald-500/20 hover:border-emerald-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(16,185,129,0.18)] shadow-md"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -203,7 +203,7 @@ export default function EntranceCurriculumPage({
           {/* CUET & Others */}
           <Link
             href="/study-material/entrance/cuet"
-            className="group relative rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(245,158,11,0.18)] shadow-md"
+            className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] hover:from-rose-950/30 hover:to-white/[0.03] border border-amber-500/20 hover:border-amber-400/60 p-6 flex flex-col justify-between min-h-[260px] transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_35px_rgba(245,158,11,0.18)] shadow-md"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -39,6 +40,7 @@ export default function CurriculumLevelPage({
   student,
   basePath = "/study-material"
 }: CurriculumLevelPageProps) {
+  const router = useRouter();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [disciplineFilter, setDisciplineFilter] = useState<"ALL" | "PHYSICAL" | "INORGANIC" | "ORGANIC">("ALL");
@@ -203,7 +205,7 @@ export default function CurriculumLevelPage({
               <Link
                 key={cat.id}
                 href={categoryUrl}
-                className={`group rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.08] ${theme.cardBorder} p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm`}
+                className={`group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.08] ${theme.cardBorder} p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-sm`}
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -297,10 +299,10 @@ export default function CurriculumLevelPage({
               return (
                 <div
                   key={item.id}
-                  className={`rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border p-5 flex flex-col justify-between transition-all duration-300 shadow-sm ${
+                  className={`rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border p-5 flex flex-col justify-between transition-all duration-200 shadow-sm touch-manipulation select-none ${
                     isLevelRestricted 
                       ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]" 
-                      : "border-white/[0.08] hover:border-white/20"
+                      : "border-white/[0.08] hover:border-cyan-500/40"
                   }`}
                 >
                   <div className="space-y-2.5">
@@ -338,9 +340,13 @@ export default function CurriculumLevelPage({
                           setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
                         } else if (!canAccess) {
                           setUpgradeItem(item);
+                        } else {
+                          router.push(`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`);
                         }
                       }}
-                      className={`text-base font-bold text-white leading-snug line-clamp-2 ${!canAccess ? "cursor-pointer hover:text-rose-200" : ""}`}
+                      className={`text-base font-bold text-white leading-snug line-clamp-2 cursor-pointer transition-colors ${
+                        !canAccess ? "hover:text-rose-200" : "hover:text-cyan-300"
+                      }`}
                     >
                       {item.title}
                     </h4>

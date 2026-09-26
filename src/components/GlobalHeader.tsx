@@ -549,7 +549,7 @@ export default function GlobalHeader({
                 key={item.label}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
+                className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition active:bg-white/[0.08] touch-manipulation ${
                   item.isActive
                     ? "bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 shadow-sm"
                     : "text-slate-300 hover:text-white hover:bg-white/[0.04]"
@@ -578,7 +578,7 @@ export default function GlobalHeader({
             <Link
               href="/dashboard/account"
               onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
+              className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition active:bg-white/[0.08] touch-manipulation ${
                 pathname === "/dashboard/account"
                   ? "bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 shadow-sm"
                   : "text-slate-300 hover:text-white hover:bg-white/[0.04]"

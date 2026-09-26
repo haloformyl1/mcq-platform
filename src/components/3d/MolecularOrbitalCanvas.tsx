@@ -110,16 +110,17 @@ export default function MolecularOrbitalCanvas({
       ctx.setLineDash([6, 8]);
       ctx.stroke();
 
-      // Electron 1
+      // Electron 1 (Glow halo + core)
       const e1X = Math.cos(orbitalAngle1 * 1.5) * (width * 0.22);
       const e1Y = Math.sin(orbitalAngle1 * 1.5) * (height * 0.32);
       ctx.beginPath();
-      ctx.arc(e1X, e1Y, 3, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(0, 242, 254, 0.8)";
-      ctx.shadowColor = "#00f2fe";
-      ctx.shadowBlur = 8;
+      ctx.arc(e1X, e1Y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0, 242, 254, 0.25)";
       ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(e1X, e1Y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0, 242, 254, 0.9)";
+      ctx.fill();
 
       // Ring 2 (Counter-tilted Indigo/Gold Orbital)
       ctx.rotate(orbitalAngle2 - orbitalAngle1);
@@ -130,16 +131,17 @@ export default function MolecularOrbitalCanvas({
       ctx.setLineDash([4, 6]);
       ctx.stroke();
 
-      // Electron 2
+      // Electron 2 (Glow halo + core)
       const e2X = Math.cos(-orbitalAngle2 * 1.2) * (width * 0.18);
       const e2Y = Math.sin(-orbitalAngle2 * 1.2) * (height * 0.26);
       ctx.beginPath();
-      ctx.arc(e2X, e2Y, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(251, 191, 36, 0.75)";
-      ctx.shadowColor = "#fbbf24";
-      ctx.shadowBlur = 6;
+      ctx.arc(e2X, e2Y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(251, 191, 36, 0.25)";
       ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(e2X, e2Y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(251, 191, 36, 0.85)";
+      ctx.fill();
 
       ctx.restore();
 
