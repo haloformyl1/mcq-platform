@@ -206,67 +206,67 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           {/* Top row: Discipline Chip + Status Badge */}
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <span className="text-xs font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
+              <span className="text-[10px] sm:text-xs font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
                 {test.discipline || "CHEMISTRY"}
               </span>
-              <h3 className="font-serif text-lg sm:text-xl md:text-2xl font-black text-white group-hover:text-cyan-200 transition-colors break-words leading-tight pr-2 drop-shadow-sm">
+              <h3 className="font-serif text-base sm:text-lg md:text-xl font-black text-white group-hover:text-cyan-200 transition-colors break-words leading-tight pr-2 drop-shadow-sm">
                 {test.title}
               </h3>
             </div>
 
             {isLiveStage && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                 <span>LIVE NOW</span>
               </span>
             )}
             {isUpcomingStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-amber-950/90 border border-amber-500/50 text-amber-300 shrink-0 shadow-sm">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-amber-950/90 border border-amber-500/50 text-amber-300 shrink-0 shadow-sm">
                 <Clock className="w-3 h-3 text-amber-400" />
                 <span>UPCOMING</span>
               </span>
             )}
             {isHoldingStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-orange-950/90 border border-orange-500/50 text-orange-300 shrink-0">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-orange-950/90 border border-orange-500/50 text-orange-300 shrink-0">
                 <span>HOLDING</span>
               </span>
             )}
             {isLockedStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider bg-red-950/90 border border-red-500/50 text-red-300 shrink-0">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-red-950/90 border border-red-500/50 text-red-300 shrink-0">
                 <span>CONCLUDED</span>
               </span>
             )}
           </div>
           
           {/* Stats Badges Grid */}
-          <div className="grid grid-cols-2 gap-2 text-sm font-mono">
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
               <span className="font-bold text-white">{test.totalQuestions}</span>
-              <span className="text-slate-300 text-sm">Questions</span>
+              <span className="text-slate-300 text-[10px] sm:text-xs">Questions</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <Clock className="w-4 h-4 text-cyan-400" />
+              <Clock className="w-3.5 h-3.5 text-cyan-400" />
               <span className="font-bold text-white">{test.durationMinutes}</span>
-              <span className="text-slate-300 text-sm">mins</span>
+              <span className="text-slate-300 text-[10px] sm:text-xs">mins</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <Award className="w-4 h-4 text-amber-400" />
+              <Award className="w-3.5 h-3.5 text-amber-400" />
               <span className="font-bold text-white">{test.totalQuestions * test.marksPerQuestion}</span>
-              <span className="text-slate-300 text-sm">Marks</span>
+              <span className="text-slate-300 text-[10px] sm:text-xs">Marks</span>
             </div>
             {test.negativeMarking ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-sm font-semibold">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-[10px] sm:text-xs font-semibold">
                 <span>-{test.negativeMarks} wrong</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-sm font-semibold">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-[10px] sm:text-xs font-semibold">
                 <span>No negative</span>
               </div>
             )}
           </div>
           
           {/* Status & Timing Capsule */}
-          <div className="text-sm bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
+          <div className="text-xs bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
             {isUpcomingStage && test.unlockDate && (
               <div className="text-amber-300 font-medium truncate flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0" />
@@ -506,12 +506,12 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             </div>
             <div className="min-w-0 space-y-1">
               <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-widest uppercase border ${themeConfig.tagBorder} ${themeConfig.tagBg} ${themeConfig.tagText}`}>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-widest uppercase border ${themeConfig.tagBorder} ${themeConfig.tagBg} ${themeConfig.tagText}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${themeConfig.tagDot} animate-pulse`} />
                   {themeConfig.tagLabel}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black text-white tracking-tight break-words">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-serif font-black text-white tracking-tight break-words">
                 {selectedTitle}
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 font-light">
@@ -521,8 +521,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           </div>
 
           <div className="self-start sm:self-center shrink-0 z-10">
-            <span className={`text-xs px-4 py-2 rounded-full border font-mono font-bold whitespace-nowrap inline-flex items-center gap-2 ${themeConfig.badge}`}>
-              <span className="font-extrabold text-sm">{displayTests.length}</span>
+            <span className={`text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border font-mono font-bold whitespace-nowrap inline-flex items-center gap-2 ${themeConfig.badge}`}>
+              <span className="font-extrabold text-xs sm:text-sm">{displayTests.length}</span>
               <span>Tests Total</span>
             </span>
           </div>
