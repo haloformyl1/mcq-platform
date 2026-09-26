@@ -335,10 +335,79 @@ export default function StudentDashboard() {
       )}
 
       {/* ========================================================= */}
+      {/* 2.5. CURRICULUM SELECTOR (NEW POSITION)                  */}
+      {/* ========================================================= */}
+      {student && (
+        <section className="w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-6 pb-2 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 z-20 relative">
+          <span className="text-xs sm:text-sm font-black text-slate-300 tracking-wider">YOU ARE CURRENTLY STUDYING AT -</span>
+          <div className="flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-cyan-950/40 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.15)] backdrop-blur-md">
+            <BookOpen className="w-4 h-4 text-cyan-400 shrink-0" />
+
+            <select
+              value={student.board || "CBSE"}
+              disabled={updatingCurriculum}
+              onChange={(e) => {
+                const nb = e.target.value;
+                const defaultLevel = nb === "WBCHSE" ? "SEM-I" : "11";
+                handleCurriculumChange(nb, defaultLevel);
+              }}
+              className="bg-transparent text-cyan-300 font-extrabold text-sm focus:outline-none cursor-pointer appearance-none outline-none"
+              aria-label="Select Education Board"
+            >
+              <option value="CBSE" className="bg-[#040e17] text-cyan-300">CBSE</option>
+              <option value="ICSE" className="bg-[#040e17] text-cyan-300">ICSE</option>
+              <option value="WBCHSE" className="bg-[#040e17] text-cyan-300">WBCHSE</option>
+            </select>
+            <ChevronDown className="w-3 h-3 text-cyan-500 shrink-0 pointer-events-none -ml-1" />
+
+            <span className="text-slate-500 text-[10px] mx-1">•</span>
+
+            {student.board === "WBCHSE" ? (
+              <>
+                <select
+                  value={student.academicLevel || "SEM-I"}
+                  disabled={updatingCurriculum}
+                  onChange={(e) => handleCurriculumChange(student.board || "WBCHSE", e.target.value)}
+                  className="bg-transparent text-teal-300 font-extrabold text-sm focus:outline-none cursor-pointer appearance-none outline-none"
+                  aria-label="Select Semester"
+                >
+                  <option value="SEM-I" className="bg-[#040e17] text-teal-300">SEM-I</option>
+                  <option value="SEM-II" className="bg-[#040e17] text-teal-300">SEM-II</option>
+                  <option value="SEM-III" className="bg-[#040e17] text-teal-300">SEM-III</option>
+                  <option value="SEM-IV" className="bg-[#040e17] text-teal-300">SEM-IV</option>
+                </select>
+                <ChevronDown className="w-3 h-3 text-teal-500 shrink-0 pointer-events-none -ml-1" />
+              </>
+            ) : (
+              <>
+                <select
+                  value={student.academicLevel || "11"}
+                  disabled={updatingCurriculum}
+                  onChange={(e) => handleCurriculumChange(student.board || "CBSE", e.target.value)}
+                  className="bg-transparent text-teal-300 font-extrabold text-sm focus:outline-none cursor-pointer appearance-none outline-none"
+                  aria-label="Select Class Level"
+                >
+                  <option value="11" className="bg-[#040e17] text-teal-300">Class 11</option>
+                  <option value="12" className="bg-[#040e17] text-teal-300">Class 12</option>
+                </select>
+                <ChevronDown className="w-3 h-3 text-teal-500 shrink-0 pointer-events-none -ml-1" />
+              </>
+            )}
+
+            {updatingCurriculum ? (
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping ml-1" />
+            ) : (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 ml-1.5 shadow-[0_0_8px_#10b981]" title="Active Curriculum" />
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ========================================================= */}
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* Full Free Space Utilization - No Enclosing Box           */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-8 sm:py-14 transition-all duration-300 group">
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-4 sm:py-8 transition-all duration-300 group">
 
         {/* Content Container - Utilizing Full Available Space */}
         <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between min-h-0 sm:min-h-[300px]">
