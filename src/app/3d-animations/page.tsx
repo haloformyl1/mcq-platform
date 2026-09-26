@@ -230,6 +230,7 @@ function ThreeDAnimationsContent() {
       {/* ========================================================= */}
       <GlobalHeader
         isGoldMember={isGold}
+        student={student}
         logoHref="/dashboard"
       />
 

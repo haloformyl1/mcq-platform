@@ -4,6 +4,7 @@ import React, { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PiechemLogo from "@/components/PiechemLogo";
+import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import StudyMaterialRepository from "@/components/StudyMaterialRepository";
 import CbseCurriculumPage from "@/components/curriculum/CbseCurriculumPage";
@@ -150,42 +151,30 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-transparent text-slate-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-200">
       {/* Top Header */}
-      <header className="dashboard-header sticky top-0 z-50 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2 group">
-              <PiechemLogo 
-                size="md" 
-                href="/dashboard" 
-                isGoldMember={
-                  student?.subscriptionStatus === "COMPLIMENTARY" || 
-                  (student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > Date.now()))
-                }
-              />
+      <GlobalHeader
+        student={student}
+        actions={
+          slug.length > 0 ? (
+            <Link
+              href="/study-material"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:inline">All Curriculums</span>
+              <span className="sm:hidden">Curriculums</span>
             </Link>
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            {slug.length > 0 ? (
-              <Link
-                href="/study-material"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
-                <span>All Curriculums</span>
-              </Link>
-            ) : (
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
-                <span>Back to Dashboard</span>
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white text-xs font-mono transition-all group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
+              <span className="sm:hidden">Dashboard</span>
+            </Link>
+          )
+        }
+      />
 
       {/* Main Repository Stage */}
       <main className="flex-1 w-full mx-auto pb-12">

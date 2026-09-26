@@ -520,3 +520,624 @@ div {
 .dashboard-header {
   padding-top: max(0px, var(--safe-top));
 }
+
+/* ================================================================
+   PHASE 2 RESPONSIVE ADDITIONS
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   WIDE SCREEN MAX-WIDTH CONTAINERS
+   ---------------------------------------------------------------- */
+.site-max-w {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.site-px {
+  padding-inline: clamp(12px, 4vw, 64px);
+}
+
+/* ----------------------------------------------------------------
+   ADMIN LAYOUT: Tables & Data-Dense UI
+   ---------------------------------------------------------------- */
+.admin-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+}
+.admin-table-wrap table {
+  min-width: 640px;
+  width: 100%;
+}
+
+/* Admin page body padding */
+@media (max-width: 640px) {
+  .admin-page-body {
+    padding: 12px 10px;
+  }
+  .admin-page-body h1, .admin-page-body h2 {
+    font-size: clamp(1.1rem, 5vw, 1.5rem) !important;
+  }
+}
+
+/* ----------------------------------------------------------------
+   DASHBOARD: Improved responsive coverage
+   ---------------------------------------------------------------- */
+
+/* Stats cards row: single col on very small, 2-col on sm, 4-col on lg */
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+@media (min-width: 1024px) {
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 380px) {
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Dashboard hero: clamp padding */
+.dashboard-hero {
+  padding: clamp(16px, 3vw, 36px) clamp(12px, 3vw, 32px);
+}
+
+/* Dashboard leaderboard table scroll */
+.dashboard-leaderboard-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.dashboard-leaderboard-wrap table {
+  min-width: 500px;
+}
+
+/* Dashboard tests grid improvement */
+.dashboard-tests-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .dashboard-tests-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+@media (min-width: 1280px) {
+  .dashboard-tests-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Performance chart container: responsive height */
+.dashboard-chart-container {
+  width: 100%;
+  height: clamp(180px, 30vw, 300px);
+}
+
+/* ----------------------------------------------------------------
+   EXAM SESSION: Improved mobile layout
+   ---------------------------------------------------------------- */
+
+/* Question palette: proper mobile drawer */
+.exam-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+}
+
+.exam-palette-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 70dvh;
+  overflow-y: auto;
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border-default);
+  background: linear-gradient(160deg, #0b1c2d, #07131d);
+  padding: 12px 14px max(16px, var(--safe-bottom));
+  -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 1024px) {
+  .exam-palette-drawer {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    max-height: none;
+    border-radius: 0;
+    border-top: none;
+    border-left: 1px solid var(--border-default);
+    width: 240px;
+    flex-shrink: 0;
+  }
+  .exam-palette-overlay { display: none; }
+}
+
+/* ----------------------------------------------------------------
+   EXAM RESULT: Better mobile review
+   ---------------------------------------------------------------- */
+.exam-result-review-wrap {
+  overflow-x: hidden;
+}
+@media (max-width: 640px) {
+  .exam-result-filter-bar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .exam-result-filter-bar button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ----------------------------------------------------------------
+   LOGIN PAGE
+   ---------------------------------------------------------------- */
+.login-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100svh;
+}
+@media (min-width: 1024px) {
+  .login-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Login feature cards section: hide on small portrait mobile, show on landscape/tablet+ */
+.login-features-panel {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .login-features-panel {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Login form: max-width with fluid padding */
+.login-form-container {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 5vw, 40px);
+}
+
+/* ----------------------------------------------------------------
+   STUDY MATERIALS: Card grids
+   ---------------------------------------------------------------- */
+.study-material-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .study-material-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .study-material-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .study-material-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ----------------------------------------------------------------
+   AI TUTOR DRAWER
+   ---------------------------------------------------------------- */
+.ai-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+@media (max-width: 1023px) {
+  .ai-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(300px, 85vw);
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #070203;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  .ai-sidebar.ai-sidebar-open {
+    transform: translateX(0);
+  }
+}
+
+.ai-sidebar-overlay {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .ai-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 55;
+  }
+}
+
+/* AI model/subject selector row: allow wrap on small screens */
+.ai-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 0;
+}
+
+/* ----------------------------------------------------------------
+   LANDING PAGE: Improved mobile
+   ---------------------------------------------------------------- */
+/* Capability strip: wrap on narrow */
+.landing-capability-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap-y: 6px;
+}
+
+/* Landing hero header: safe padding */
+.landing-hero-header {
+  padding-top: max(10px, var(--safe-top));
+}
+
+/* Feature cards: 1-col mobile, 2-col tablet, 4-col desktop */
+.login-feature-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .login-feature-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ----------------------------------------------------------------
+   3D LABS: Responsive canvas
+   ---------------------------------------------------------------- */
+.lab-canvas-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 200px;
+  max-height: 600px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+@media (max-width: 640px) {
+  .lab-canvas-container {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ----------------------------------------------------------------
+   ONBOARDING: Full responsive
+   ---------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .onboarding-card {
+    padding: 20px 16px;
+    border-radius: 18px;
+  }
+}
+
+/* ----------------------------------------------------------------
+   DIALOGS & MODALS: Mobile-safe
+   ---------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+@media (min-width: 640px) {
+  .modal-overlay {
+    align-items: center;
+    padding: 16px;
+  }
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  border-radius: 20px 20px 0 0;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(24px, var(--safe-bottom));
+}
+@media (min-width: 640px) {
+  .modal-sheet {
+    border-radius: 20px;
+    max-height: 85dvh;
+    padding-bottom: 24px;
+  }
+}
+
+/* ----------------------------------------------------------------
+   GLOBAL FOOTER: Improved xs layout
+   ---------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .global-footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ----------------------------------------------------------------
+   RECHARTS: Responsive
+   ---------------------------------------------------------------- */
+.recharts-wrapper {
+  font-size: 11px;
+}
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    font-size: 10px;
+  }
+  .recharts-cartesian-axis-tick-value {
+    font-size: 9px;
+  }
+}
+
+/* ----------------------------------------------------------------
+   SAFE AREA BOTTOM NAV CLEARANCE
+   ---------------------------------------------------------------- */
+.safe-area-bottom {
+  height: max(0px, var(--safe-bottom));
+}
+
+/* ----------------------------------------------------------------
+   LANDSCAPE PHONE: Overlay protections
+   ---------------------------------------------------------------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-overlay {
+    align-items: flex-start;
+    padding-top: max(8px, var(--safe-top));
+    overflow-y: auto;
+  }
+  .modal-sheet {
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+  .exam-palette-drawer {
+    max-height: 85dvh;
+    border-radius: 12px 12px 0 0;
+  }
+  /* Compact dashboard header in landscape */
+  .dashboard-header {
+    padding-block: 4px;
+  }
+  .dashboard-hero {
+    padding: 8px clamp(12px, 3vw, 32px);
+  }
+}
+
+/* ----------------------------------------------------------------
+   PRINT-SAFE (for result pages)
+   ---------------------------------------------------------------- */
+@media print {
+  .no-print { display: none !important; }
+  .mcq-shell { max-width: 100%; padding: 0; }
+}
+
+/* ================================================================
+   ADDITIONAL FINE-TUNING (Phase 2B)
+   ================================================================ */
+
+/* Dashboard hero: tighter on mobile portrait */
+@media (max-width: 640px) {
+  .dashboard-hero {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+}
+
+/* Fix: very narrow screens - prevent panel padding overflow */
+@media (max-width: 380px) {
+  .mcq-panel {
+    padding: 14px 12px;
+  }
+  .mcq-panel-elevated {
+    padding: 14px 12px;
+  }
+  .mcq-shell {
+    padding-inline: 8px;
+  }
+}
+
+/* Fix: AI tutor header overflow on narrow mobile */
+@media (max-width: 480px) {
+  .ai-workspace-root header {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+}
+
+/* Fix: Login page - h1 on very small screens */
+@media (max-width: 380px) {
+  .login-hero-h1 {
+    font-size: clamp(1.6rem, 8vw, 2.2rem) !important;
+    line-height: 1.15 !important;
+  }
+}
+
+/* Prevent iOS zoom on form focus - only on mobile screen sizes */
+@media (max-width: 768px) {
+  input[type="text"]:not(.no-zoom-fix),
+  input[type="email"]:not(.no-zoom-fix),
+  input[type="password"]:not(.no-zoom-fix),
+  input[type="number"]:not(.no-zoom-fix),
+  input[type="tel"]:not(.no-zoom-fix),
+  textarea:not(.no-zoom-fix) {
+    font-size: 16px;
+  }
+  select:not(.no-zoom-fix) {
+    font-size: 16px;
+  }
+}
+
+/* mcq-choice: ensure min touch target */
+.mcq-choice {
+  min-height: 52px;
+}
+
+/* Safe-area aware page shell */
+.exam-session-shell {
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Responsive text for question number header in exam */
+@media (max-width: 380px) {
+  .exam-session-main .mcq-panel-elevated {
+    padding: 12px;
+  }
+}
+
+/* Dashboard tab bar landscape fix */
+@media (max-height: 500px) and (max-width: 900px) {
+  .dashboard-tab-bar {
+    padding-block: 0;
+  }
+}
+
+/* Smooth transition for palette open/close */
+.exam-palette {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+/* Footer bottom bar: safe-area */
+.global-footer-bottom {
+  padding-bottom: max(12px, var(--safe-bottom));
+}
+
+/* Login badge: prevent overflow on xs */
+@media (max-width: 380px) {
+  .login-badge-text {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+}
+
+/* ================================================================
+   MOBILE NAVIGATION DRAWER SYSTEM
+   ================================================================ */
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 90;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 86vw);
+  background: linear-gradient(175deg, #050d18 0%, #03080e 55%, #010408 100%);
+  border-left: 1px solid rgba(0, 217, 255, 0.18);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.85);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding-top: max(16px, var(--safe-top));
+  padding-bottom: max(20px, var(--safe-bottom));
+  padding-inline: 18px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-nav-drawer-closed {
+  transform: translateX(105%);
+}
+
+.mobile-nav-drawer-open {
+  transform: translateX(0);
+}
+
+/* Touch UX target standard (44px min touch target) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Exam session sticky bottom controls on mobile */
+.exam-mobile-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: rgba(3, 11, 20, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(0, 217, 255, 0.2);
+  padding: 10px 14px max(12px, var(--safe-bottom));
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Text wrapping protection for chemical formulae & long words */
+.break-words-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Short viewport / Landscape Mobile Optimization */
+@media (max-height: 540px) {
+  .landing-hero-content {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+  .landing-hero-canvas {
+    height: clamp(110px, 26vh, 170px) !important;
+  }
+  .landing-hero-h1 {
+    font-size: clamp(1.3rem, 6vh, 2rem) !important;
+    line-height: 1.1 !important;
+  }
+}
+
+
+

@@ -1,5 +1,6 @@
 "use client";
 import GlobalFooter from "@/components/GlobalFooter";
+import GlobalHeader from "@/components/GlobalHeader";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -769,100 +770,12 @@ export default function StudentAccountPage() {
       <SubscriptionExpiredModal student={student} />
       <GoldUpgradeCelebrationModal student={student} />
 
-      {/* 1. TOP NAVBAR (ELECTRIC BLACKISH-BLUE THEME) */}
-      <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-          
-          {/* Left: Brand Identity & Designer Attribution */}
-          <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-            <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
-          </div>
-
-          {/* Right: Netflix-Style Profile Dropdown Trigger */}
-          <div className="relative flex items-center gap-3 shrink-0">
-
-
-            {/* Option 4: Notification Center Dropdown */}
-            <NotificationCenterDropdown student={student} upgradeReq={upgradeReq} />
-            <button
-              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-              className="flex items-center gap-1.5 p-1 rounded-xl hover:bg-white/5 transition cursor-pointer group"
-              title="Account Menu"
-            >
-              <div className="w-8 h-8 rounded-lg overflow-hidden bg-cyan-950 ring-1 ring-cyan-500/40 group-hover:ring-cyan-400 transition shrink-0">
-                <img
-                  src={student?.avatarUrl || "/avatars/atom.jpg"}
-                  alt={student?.name || "Avatar"}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-cyan-300 transition-transform ${profileDropdownOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            {/* Profile Dropdown Menu */}
-            {profileDropdownOpen && (
-              <div className="absolute right-0 top-12 w-64 bg-[#061421]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-cyan-500/30 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-3 ">
-                  <p className="text-sm font-bold text-white truncate">{student.name || "Student"}</p>
-                  <p className="text-xs text-slate-400 truncate mt-0.5 font-mono">{student.email}</p>
-                  <div className="mt-2">
-                    {isGold ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                        <Sparkles className="w-3 h-3 text-amber-400" /> Gold Member
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
-                        Free Account
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="py-1">
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setProfileDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-cyan-400" />
-                    <span>Back to Dashboard</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      navigateToTab("profiles");
-                    }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition text-left cursor-pointer"
-                  >
-                    <User className="w-4 h-4 text-cyan-400" />
-                    <span>Edit Profile Details</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      navigateToTab("security");
-                    }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-cyan-950/50 hover:text-white transition text-left cursor-pointer"
-                  >
-                    <KeyRound className="w-4 h-4 text-cyan-400" />
-                    <span>Security & Password</span>
-                  </button>
-                </div>
-
-                <div className="border-t border-cyan-500/15 pt-1 mt-1">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-950/30 transition text-left cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4 text-red-400" />
-                    <span>Sign out of Piechem</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* 1. TOP NAVBAR (UNIFIED RESPONSIVE GLOBAL HEADER WITH MOBILE DRAWER) */}
+      <GlobalHeader
+        student={student}
+        upgradeReq={upgradeReq}
+        isGoldMember={isGold}
+      />
       {/* 2. MAIN LAYOUT (FULL SCREEN NETFLIX ACCOUNT SETTINGS PAGE) */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1">
         

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { 
@@ -374,12 +374,12 @@ export default function AdminPaymentsPage() {
                   className="bg-gradient-to-b from-[#1c180e] via-[#141007] to-[#0a0803] border border-amber-500/50 p-5 rounded-2xl flex flex-col justify-between gap-4 shadow-[0_0_25px_rgba(245₹58₹1,0.15)] hover:border-amber-400 transition-all"
                 >
                   <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-2 border-b border-amber-500/20 pb-3">
-                      <div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
+                      <div className="min-w-0">
                         <div className="font-black text-white text-base flex items-center gap-2">
-                          <span>{studentName}</span>
+                          <span className="truncate">{studentName}</span>
                         </div>
-                        <div className="text-xs text-amber-300 font-mono">{studentEmail}</div>
+                        <div className="text-xs text-amber-300 font-mono truncate">{studentEmail}</div>
                         <div className="text-xs text-gray-400 font-mono mt-0.5">Phone: {studentPhone}</div>
                       </div>
                       <span className="bg-amber-950 text-amber-300 border border-amber-500/60 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shrink-0 shadow">
@@ -392,10 +392,10 @@ export default function AdminPaymentsPage() {
                         <span>Amount Paid:</span>
                         <span className="font-extrabold text-green-400 text-sm">₹{req.amount || paymentSettings?.monthlyFee || 199}</span>
                       </div>
-                      <div className="flex justify-between items-center text-slate-300 pt-1 border-t border-slate-800">
-                        <span className="text-amber-300 font-bold">Student Payer UPI ID:</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-black text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800 tracking-wider">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 text-slate-300 pt-1 border-t border-slate-800">
+                        <span className="text-amber-300 font-bold shrink-0">Student Payer UPI ID:</span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="font-black text-cyan-300 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800 tracking-wider truncate max-w-full">
                             {req.utrNumber || "NOT PROVIDED"}
                           </span>
                           {req.utrNumber && (
@@ -406,7 +406,7 @@ export default function AdminPaymentsPage() {
                                 setCopiedUtr(req.utrNumber);
                                 setTimeout(() => setCopiedUtr(null), 2000);
                               }}
-                              className="p-1 text-slate-400 hover:text-white transition"
+                              className="p-1 text-slate-400 hover:text-white transition shrink-0"
                               title="Copy Student Payer UPI ID"
                             >
                               {copiedUtr === req.utrNumber ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -486,119 +486,211 @@ export default function AdminPaymentsPage() {
             <p className="text-xs">No active subscribers found matching your criteria.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="text-[11px] text-slate-400 uppercase tracking-wider bg-slate-950/80 border-b border-slate-800 font-bold">
-                <tr>
-                  <th className="px-4 py-3.5">Student Details</th>
-                  <th className="px-4 py-3.5 text-cyan-300">Payer UPI ID</th>
-                  <th className="px-4 py-3.5 text-emerald-400">Active Since (DD/MM/YYYY HH:MM:SS)</th>
-                  <th className="px-4 py-3.5 text-amber-400">Next Payment / Expiry Date (DD/MM/YYYY HH:MM:SS)</th>
-                  <th className="px-4 py-3.5">Time Remaining</th>
-                  <th className="px-4 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {filteredActiveStudents.map((st: any) => {
-                  const latestReq = st.upgradeRequests?.[0];
-                  // If subscriptionStartedAt is null, fallback to approvedAt or createdAt
-                  const activeSince = st.subscriptionStartedAt || latestReq?.approvedAt || st.updatedAt;
-                  // If subscriptionExpiresAt is null, compute exactly 30 days from activeSince
-                  const expiresAt = st.subscriptionExpiresAt || null;
-                  const remaining = calculateRemainingDays(expiresAt);
-                  const isExpired = remaining === "EXPIRED";
+          <div>
+            {/* Mobile / Tablet Cards View (lg:hidden) */}
+            <div className="lg:hidden space-y-3">
+              {filteredActiveStudents.map((st: any) => {
+                const latestReq = st.upgradeRequests?.[0];
+                const activeSince = st.subscriptionStartedAt || latestReq?.approvedAt || st.updatedAt;
+                const expiresAt = st.subscriptionExpiresAt || null;
+                const remaining = calculateRemainingDays(expiresAt);
+                const isExpired = remaining === "EXPIRED";
 
-                  return (
-                    <tr key={st.id} className="hover:bg-slate-900/50 transition">
-                      {/* Student Info */}
-                      <td className="px-4 py-3.5">
-                        <div className="font-bold text-white text-sm">{st.name || "Student"}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">{st.email}</div>
-                        {st.phone && <div className="text-[10px] text-slate-500 font-mono">Ph: {st.phone}</div>}
-                      </td>
+                return (
+                  <div 
+                    key={st.id} 
+                    className="bg-[#0b1017] border border-slate-800 rounded-2xl p-4 space-y-3 shadow-md"
+                  >
+                    {/* Header: Student Name + Status Badge */}
+                    <div className="flex items-start justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+                      <div className="min-w-0">
+                        <div className="font-bold text-white text-sm truncate">{st.name || "Student"}</div>
+                        <div className="text-xs text-slate-400 font-mono truncate">{st.email}</div>
+                        {st.phone && <div className="text-[11px] text-slate-500 font-mono">Ph: {st.phone}</div>}
+                      </div>
+                      {expiresAt ? (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border font-mono shrink-0 ${
+                          isExpired 
+                            ? "bg-red-950/80 text-red-400 border-red-800" 
+                            : "bg-cyan-950/80 text-cyan-300 border-cyan-600/60"
+                        }`}>
+                          {remaining}
+                        </span>
+                      ) : (
+                        <span className="bg-blue-950/80 text-blue-300 border border-blue-600/60 px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase font-mono shrink-0">
+                          ♾️ NEVER
+                        </span>
+                      )}
+                    </div>
 
-                      {/* UTR Info */}
-                      <td className="px-4 py-3.5">
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-semibold">Payment / UTR</span>
                         {latestReq?.utrNumber ? (
-                          <div>
-                            <div className="inline-flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded border border-cyan-800 font-mono font-bold text-cyan-300 text-[11px] shadow-[0_0_10px_rgba(6,182,212,0.25)]">
-                              <span>{latestReq.utrNumber}</span>
-                            </div>
-                            <div className="text-[11px] text-cyan-400 font-mono font-bold mt-1">
-                              Paid: ₹{latestReq.amount || paymentSettings?.monthlyFee || 199}
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                              💎 COMPLIMENTARY
+                          <div className="mt-0.5">
+                            <span className="font-mono font-bold text-cyan-300 text-[11px] bg-slate-950 px-1.5 py-0.5 rounded border border-cyan-900/60">
+                              {latestReq.utrNumber}
                             </span>
-                            <div className="text-[10px] text-blue-300/80 font-mono mt-1">
-                              Paid: ₹0 (Complimentary)
+                            <div className="text-[10px] text-cyan-400 font-mono font-semibold mt-0.5">
+                              ₹{latestReq.amount || paymentSettings?.monthlyFee || 199}
                             </div>
                           </div>
-                        )}
-                      </td>
-
-                      {/* Active Since */}
-                      <td className="px-4 py-3.5 font-mono text-cyan-300 font-bold whitespace-nowrap">
-                        {formatDateTime24(activeSince)}
-                      </td>
-
-                      {/* Next Payment / Expiry Date */}
-                      <td className="px-4 py-3.5 font-mono whitespace-nowrap">
-                        {expiresAt ? (
-                          <span className="text-amber-300 font-bold">{formatDateTime24(expiresAt)}</span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 bg-blue-950/90 text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase shadow-sm">
-                            ♾️ NEVER
+                          <span className="inline-block mt-0.5 text-blue-300 font-bold text-[10px] uppercase">
+                            💎 Complimentary
                           </span>
                         )}
-                      </td>
+                      </div>
 
-                      {/* Time Remaining */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        {expiresAt ? (
-                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border font-mono ${
-                            isExpired 
-                              ? "bg-red-950/80 text-red-400 border-red-800" 
-                              : "bg-cyan-950/80 text-cyan-300 border-cyan-600/60 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
-                          }`}>
-                            {remaining}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 bg-blue-950/80 text-blue-300 border border-blue-600/60 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase font-mono shadow-sm">
-                            ♾️ NEVER
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Quick Actions */}
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleStudentDirectAction(st.id, "EXTEND")}
-                            disabled={actionLoading === st.id}
-                            className="px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/60 rounded-lg text-[11px] font-bold transition disabled:opacity-50"
-                            title="Extend 30 more days"
-                          >
-                            +30 Days
-                          </button>
-                          <button
-                            onClick={() => handleStudentDirectAction(st.id, "REVOKE")}
-                            disabled={actionLoading === st.id}
-                            className="px-2.5 py-1 bg-red-950 hover:bg-red-900 text-red-400 border border-red-800/60 rounded-lg text-[11px] font-bold transition disabled:opacity-50"
-                            title="Revoke subscription and reset to FREE"
-                          >
-                            Revoke
-                          </button>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-semibold">Expires / Next Due</span>
+                        <div className="mt-0.5 font-mono text-[11px] text-amber-300 font-bold">
+                          {expiresAt ? formatDateTime24(expiresAt) : "Never"}
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <div className="text-[10px] text-slate-500 font-mono">
+                          Active: {formatDateTime24(activeSince).split(' ')[0]}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/80">
+                      <button
+                        onClick={() => handleStudentDirectAction(st.id, "EXTEND")}
+                        disabled={actionLoading === st.id}
+                        className="flex-1 py-1.5 px-3 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/60 rounded-xl text-xs font-bold transition text-center disabled:opacity-50 touch-target"
+                      >
+                        +30 Days
+                      </button>
+                      <button
+                        onClick={() => handleStudentDirectAction(st.id, "REVOKE")}
+                        disabled={actionLoading === st.id}
+                        className="flex-1 py-1.5 px-3 bg-red-950 hover:bg-red-900 text-red-400 border border-red-800/60 rounded-xl text-xs font-bold transition text-center disabled:opacity-50 touch-target"
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View (hidden lg:block) */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="text-[11px] text-slate-400 uppercase tracking-wider bg-slate-950/80 border-b border-slate-800 font-bold">
+                  <tr>
+                    <th className="px-4 py-3.5">Student Details</th>
+                    <th className="px-4 py-3.5 text-cyan-300">Payer UPI ID</th>
+                    <th className="px-4 py-3.5 text-emerald-400">Active Since (DD/MM/YYYY HH:MM:SS)</th>
+                    <th className="px-4 py-3.5 text-amber-400">Next Payment / Expiry Date (DD/MM/YYYY HH:MM:SS)</th>
+                    <th className="px-4 py-3.5">Time Remaining</th>
+                    <th className="px-4 py-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/80">
+                  {filteredActiveStudents.map((st: any) => {
+                    const latestReq = st.upgradeRequests?.[0];
+                    // If subscriptionStartedAt is null, fallback to approvedAt or createdAt
+                    const activeSince = st.subscriptionStartedAt || latestReq?.approvedAt || st.updatedAt;
+                    // If subscriptionExpiresAt is null, compute exactly 30 days from activeSince
+                    const expiresAt = st.subscriptionExpiresAt || null;
+                    const remaining = calculateRemainingDays(expiresAt);
+                    const isExpired = remaining === "EXPIRED";
+
+                    return (
+                      <tr key={st.id} className="hover:bg-slate-900/50 transition">
+                        {/* Student Info */}
+                        <td className="px-4 py-3.5">
+                          <div className="font-bold text-white text-sm">{st.name || "Student"}</div>
+                          <div className="text-[11px] text-slate-400 font-mono">{st.email}</div>
+                          {st.phone && <div className="text-[10px] text-slate-500 font-mono">Ph: {st.phone}</div>}
+                        </td>
+
+                        {/* UTR Info */}
+                        <td className="px-4 py-3.5">
+                          {latestReq?.utrNumber ? (
+                            <div>
+                              <div className="inline-flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded border border-cyan-800 font-mono font-bold text-cyan-300 text-[11px] shadow-[0_0_10px_rgba(6,182,212,0.25)]">
+                                <span>{latestReq.utrNumber}</span>
+                              </div>
+                              <div className="text-[11px] text-cyan-400 font-mono font-bold mt-1">
+                                Paid: ₹{latestReq.amount || paymentSettings?.monthlyFee || 199}
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                💎 COMPLIMENTARY
+                              </span>
+                              <div className="text-[10px] text-blue-300/80 font-mono mt-1">
+                                Paid: ₹0 (Complimentary)
+                              </div>
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Active Since */}
+                        <td className="px-4 py-3.5 font-mono text-cyan-300 font-bold whitespace-nowrap">
+                          {formatDateTime24(activeSince)}
+                        </td>
+
+                        {/* Next Payment / Expiry Date */}
+                        <td className="px-4 py-3.5 font-mono whitespace-nowrap">
+                          {expiresAt ? (
+                            <span className="text-amber-300 font-bold">{formatDateTime24(expiresAt)}</span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 bg-blue-950/90 text-blue-300 border border-blue-500/60 px-2.5 py-0.5 rounded text-[11px] font-black tracking-wider uppercase shadow-sm">
+                              ♾️ NEVER
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Time Remaining */}
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          {expiresAt ? (
+                            <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border font-mono ${
+                              isExpired 
+                                ? "bg-red-950/80 text-red-400 border-red-800" 
+                                : "bg-cyan-950/80 text-cyan-300 border-cyan-600/60 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                            }`}>
+                              {remaining}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 bg-blue-950/80 text-blue-300 border border-blue-600/60 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase font-mono shadow-sm">
+                              ♾️ NEVER
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Quick Actions */}
+                        <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleStudentDirectAction(st.id, "EXTEND")}
+                              disabled={actionLoading === st.id}
+                              className="px-2.5 py-1 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/60 rounded-lg text-[11px] font-bold transition disabled:opacity-50"
+                              title="Extend 30 more days"
+                            >
+                              +30 Days
+                            </button>
+                            <button
+                              onClick={() => handleStudentDirectAction(st.id, "REVOKE")}
+                              disabled={actionLoading === st.id}
+                              className="px-2.5 py-1 bg-red-950 hover:bg-red-900 text-red-400 border border-red-800/60 rounded-lg text-[11px] font-bold transition disabled:opacity-50"
+                              title="Revoke subscription and reset to FREE"
+                            >
+                              Revoke
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </section>

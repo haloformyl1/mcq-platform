@@ -344,47 +344,47 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   return (
     <div className="exam-session-shell min-h-screen flex flex-col text-white select-none" style={{minHeight: "100dvh"}}>
       <AdminPreviewBanner />
-      <header className="exam-session-header mcq-panel rounded-none border-x-0 border-t-0 p-3 sm:p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div className="flex justify-between items-center w-full md:w-auto gap-2 min-w-0">
+      <header className="exam-session-header mcq-panel rounded-none border-t-0 border-x-0 p-2.5 sm:p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 sm:gap-3 shrink-0 shadow-md">
+        <div className="flex items-center justify-between w-full md:w-auto gap-2 sm:gap-4">
           <PiechemLogo size="sm" showText={false} isGoldMember={
             examData?.student?.subscriptionStatus === "COMPLIMENTARY" ||
             (examData?.student?.subscriptionStatus === "PAID" && (!examData?.student?.subscriptionExpiresAt || new Date(examData.student.subscriptionExpiresAt).getTime() > Date.now()))
           } />
           <div className="min-w-0 flex-1 px-1">
-            <h1 className="text-base sm:text-lg md:text-xl font-bold tracking-wide truncate" title={examData.test.title}>{examData.test.title}</h1>
-            <p className="text-xs sm:text-sm text-[#a6a6a6] mt-0.5">Question {currentQ + 1} of {questions.length}</p>
+            <h1 className="text-sm sm:text-lg md:text-xl font-bold tracking-wide truncate" title={examData.test.title}>{examData.test.title}</h1>
+            <p className="text-[11px] sm:text-xs text-[#a6a6a6] mt-0.5">Q {currentQ + 1} of {questions.length}</p>
           </div>
-          <div className="text-base sm:text-lg md:text-2xl font-mono font-bold bg-[var(--surface-secondary)] px-2.5 py-1 sm:px-3 sm:py-1.5 md:py-2 md:px-4 rounded-lg text-cyan-300 border border-cyan-500/30 shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+          <div className="text-sm sm:text-lg md:text-2xl font-mono font-bold bg-[var(--surface-secondary)] px-2 py-1 sm:px-3 sm:py-1.5 md:py-2 md:px-4 rounded-lg text-cyan-300 border border-cyan-500/30 shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
             {timeLeft}
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto justify-end">
+        <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto justify-between sm:justify-end">
           <button
             onClick={() => {
               const docEl = document.documentElement as any;
               if (docEl.requestFullscreen) docEl.requestFullscreen().catch((e: any) => console.warn(e));
               else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
             }}
-            className="mcq-button mcq-button-secondary py-2 px-3 text-cyan-400 border-cyan-500/40 text-sm md:text-base"
+            className="mcq-button mcq-button-secondary py-1.5 sm:py-2 px-2.5 sm:px-3 text-cyan-400 border-cyan-500/40 text-xs sm:text-sm md:text-base touch-target flex items-center gap-1.5"
             title="Enter Fullscreen"
           >
-            <Maximize2 size={18} />
+            <Maximize2 size={16} />
             <span className="font-medium hidden sm:inline text-xs">Fullscreen</span>
           </button>
           <button 
             onClick={handleManualSubmit}
             disabled={isSubmitting}
-            className="mcq-button bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 text-sm md:flex-none"
+            className="mcq-button bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 text-xs sm:text-sm py-1.5 sm:py-2 px-3 sm:px-4 md:flex-none touch-target"
           >
             Submit
           </button>
           <button
             onClick={() => setShowPalette(!showPalette)}
-            className="mcq-button mcq-button-secondary text-sm md:flex-none"
+            className="mcq-button mcq-button-secondary text-xs sm:text-sm py-1.5 sm:py-2 px-2.5 sm:px-3 md:flex-none touch-target flex items-center gap-1.5"
             title="Toggle Question Palette"
             aria-label={showPalette ? "Hide question palette" : "Show question palette"}
           >
-            <Menu size={20} />
+            <Menu size={16} />
             <span className="font-medium hidden sm:inline">{showPalette ? 'Hide Palette' : 'Show Palette'}</span>
             <span className="font-medium sm:hidden">Questions</span>
           </button>
@@ -392,7 +392,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       </header>
 
       <div className="exam-session-body flex flex-1 overflow-hidden relative min-h-0">
-        <main className="exam-session-main flex-1 overflow-y-auto p-3 sm:p-6 md:p-8">
+        <main className="exam-session-main flex-1 overflow-y-auto p-3 sm:p-6 md:p-8 pb-28 sm:pb-8">
           <div className="mcq-panel-elevated max-w-4xl mx-auto w-full p-4 sm:p-6 md:p-8">
             <div className="mb-6 flex justify-between items-start gap-4">
               <h2 className="text-xl font-medium text-[#a6a6a6] pt-1">
@@ -438,6 +438,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               })}
             </div>
 
+            {/* In-page action bar (Desktop and tablet view) */}
             <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-8 sm:mt-12 pt-6 border-t border-[#404040] gap-3 sm:gap-4">
               {/* Mobile row: Previous / Next */}
               <div className="flex justify-between w-full sm:hidden order-2 gap-2.5">
@@ -501,18 +502,69 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </div>
         </main>
 
+        {/* Sticky Mobile Bottom Bar */}
+        <div className="exam-mobile-bottom-bar sm:hidden">
+          <div className="flex items-center justify-between gap-2 max-w-lg mx-auto w-full">
+            <button 
+              type="button"
+              onClick={() => setCurrentQ(prev => Math.max(0, prev - 1))}
+              disabled={currentQ === 0}
+              className="mcq-button mcq-button-secondary py-2 px-3 text-xs disabled:opacity-30 flex items-center gap-1 touch-target shrink-0"
+              aria-label="Previous Question"
+            >
+              ← Prev
+            </button>
+
+            <div className="flex items-center gap-1.5 min-w-0">
+              <button 
+                type="button"
+                onClick={() => setMarkedForReview(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
+                className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all touch-target flex items-center gap-1 shrink-0 ${
+                  markedForReview[currentQuestion.id] 
+                    ? 'bg-purple-900/70 border-purple-500 text-purple-200 shadow-sm' 
+                    : 'bg-[#202020] border-[#404040] text-purple-300'
+                }`}
+                title="Mark for Review"
+              >
+                {markedForReview[currentQuestion.id] ? "★ Review" : "☆ Review"}
+              </button>
+
+              {answers[currentQuestion.id] && (
+                <button 
+                  type="button"
+                  onClick={() => handleClearAnswer(currentQuestion.id)}
+                  className="px-2 py-1.5 text-[11px] font-semibold text-red-400 bg-red-950/40 border border-red-800/60 rounded-lg touch-target shrink-0"
+                  title="Clear Choice"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            <button 
+              type="button"
+              onClick={() => setCurrentQ(prev => Math.min(questions.length - 1, prev + 1))}
+              disabled={currentQ === questions.length - 1}
+              className="mcq-button mcq-button-primary py-2 px-3 text-xs disabled:opacity-30 flex items-center gap-1 touch-target shrink-0"
+              aria-label="Next Question"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+
         {showPalette && (
           <>
             <div 
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
               onClick={() => setShowPalette(false)}
             />
-            <aside className="exam-palette fixed inset-y-0 right-0 z-50 w-[85vw] sm:w-80 mcq-panel rounded-none border-y-0 border-r-0 p-5 sm:p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[color-mix(in_srgb,var(--surface-primary)_40%,transparent)] transition-transform flex flex-col">
+            <aside className="exam-palette fixed inset-y-0 right-0 z-50 w-[85vw] max-w-xs sm:w-80 mcq-panel rounded-none border-y-0 border-r-0 p-4 sm:p-6 overflow-y-auto shadow-2xl lg:relative lg:z-10 lg:block lg:bg-[color-mix(in_srgb,var(--surface-primary)_40%,transparent)] transition-transform flex flex-col safe-area-inset-top safe-area-inset-bottom">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-bold text-[#a6a6a6] uppercase tracking-wider">Question Palette</h3>
                 <button 
                   onClick={() => setShowPalette(false)} 
-                  className="lg:hidden p-2 bg-[#262626] rounded-md text-[#a6a6a6] hover:text-white flex items-center space-x-1"
+                  className="lg:hidden p-2 bg-[#262626] rounded-md text-[#a6a6a6] hover:text-white flex items-center space-x-1 touch-target"
                   aria-label="Close palette"
                 >
                   <X size={16} />
@@ -549,7 +601,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                       setShowPalette(false);
                     }
                   }}
-                  className={`h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center rounded-md text-sm font-medium transition-all ${btnClass}`}
+                  className={`h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center rounded-md text-sm font-medium transition-all touch-target ${btnClass}`}
                   aria-label={`Question ${i + 1}`}
                 >
                   {i + 1}
@@ -559,11 +611,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </div>
           
           <div className="mt-8 space-y-3 text-sm text-[#a6a6a6] pt-6 border-t border-[#404040]">
-            <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#0099ff] border border-[#0099ff] mr-3"></span> Answered</div>
-            <div className="flex items-center"><span className="w-4 h-4 rounded bg-purple-600 border border-purple-500 mr-3"></span> Answered & Review</div>
-            <div className="flex items-center"><span className="w-4 h-4 rounded bg-purple-900/40 border border-purple-500 mr-3"></span> Review (No Answer)</div>
-            <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#262626] border border-[#404040] mr-3"></span> Unanswered</div>
-            <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#262626] ring-1 ring-white border border-[#404040] mr-3"></span> Current Question</div>
+            <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#0099ff] border border-[#0099ff] mr-3 shrink-0"></span> Answered</div>
+            <div className="flex items-center"><span className="w-4 h-4 rounded bg-purple-600 border border-purple-500 mr-3 shrink-0"></span> Answered & Review</div>
+            <div className="flex items-center"><span className="w-4 h-4 rounded bg-purple-900/40 border border-purple-500 mr-3 shrink-0"></span> Review (No Answer)</div>
+            <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#262626] border border-[#404040] mr-3 shrink-0"></span> Unanswered</div>
+            <div className="flex items-center"><span className="w-4 h-4 rounded bg-[#262626] ring-1 ring-white border border-[#404040] mr-3 shrink-0"></span> Current Question</div>
           </div>
             </aside>
           </>

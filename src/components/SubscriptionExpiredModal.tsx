@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -69,7 +69,7 @@ export default function SubscriptionExpiredModal({ student }: SubscriptionExpire
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-gradient-to-b from-[#161208] via-[#0d1017] to-black border border-amber-500/50 p-6 sm:p-7 rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.25)] text-center space-y-5 animate-scale-in">
+      <div className="relative w-full max-w-md max-h-[90dvh] overflow-y-auto bg-gradient-to-b from-[#161208] via-[#0d1017] to-black border border-amber-500/50 p-6 sm:p-7 rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.25)] text-center space-y-5 animate-scale-in">
         
         {/* Close "X" Button */}
         <button

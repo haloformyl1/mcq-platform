@@ -421,7 +421,7 @@ export default function LandingIntroScreen() {
       {/* TOP BAR: Minimalist Scientific Precision Header              */}
       {/* ============================================================ */}
       <header 
-        className={`relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 pt-5 sm:pt-7 flex items-center justify-between transition-all duration-1000 ease-out ${
+        className={`landing-hero-header relative z-20 w-full max-w-7xl mx-auto px-3 sm:px-8 lg:px-14 pt-4 sm:pt-6 flex items-center justify-between transition-all duration-1000 ease-out ${
           isPhase1 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
         }`}
       >
@@ -441,7 +441,7 @@ export default function LandingIntroScreen() {
       {/* ============================================================ */}
       {/* CENTER STAGE: Asymmetric Apple Keynote Spatial Composition   */}
       {/* ============================================================ */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-14 my-auto py-2 sm:py-4 flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-12 landing-hero-content">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-3 sm:px-8 lg:px-14 my-auto py-1 sm:py-4 flex-1 flex flex-col lg:grid lg:grid-cols-12 lg:items-center lg:gap-12 landing-hero-content">
         
         {/* LEFT COLUMN: Editorial Typography Statement (Col 1-7) */}
         <div className="lg:col-span-7 flex flex-col justify-center text-left space-y-5 sm:space-y-6 z-20">
@@ -461,7 +461,7 @@ export default function LandingIntroScreen() {
               isPhase3 ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-4 blur-[6px]"
             }`}
           >
-            <h1 className="landing-hero-h1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight text-[#F5F5F2] leading-[1.04]">
+            <h1 className="landing-hero-h1 text-[clamp(1.9rem,8vw,3rem)] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight text-[#F5F5F2] leading-[1.04] break-words">
               <span className="font-serif italic font-light text-slate-100">
                 Chemistry,
               </span>
@@ -519,11 +519,11 @@ export default function LandingIntroScreen() {
         
         {/* Capability Strip: Minimal Uppercase Typography (Phase 4) */}
         <div 
-          className={`flex flex-wrap items-center justify-between gap-y-2 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-[#9298A3] border-b border-white/[0.06] pb-3 transition-all duration-1000 ease-out ${
+          className={`flex flex-wrap items-center justify-between gap-x-2 sm:gap-y-2 text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-[#9298A3] border-b border-white/[0.06] pb-3 transition-all duration-1000 ease-out ${
             isPhase4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
-          <div className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-1">
+          <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-4 gap-y-1">
             <span className="hover:text-white transition-colors">3D MOLECULAR LABS</span>
             <span className="text-white/20">·</span>
             <span className="hover:text-white transition-colors">SMART NOTES</span>
@@ -539,7 +539,7 @@ export default function LandingIntroScreen() {
         </div>
 
         {/* Instrumentation Progress Line & Seamless Transition */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-1 text-[10px] font-mono text-[#9298A3]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1 text-[10px] font-mono text-[#9298A3]">
           
           {/* Status Label */}
           <div className="flex items-center gap-2 tracking-[0.2em] uppercase">
@@ -594,3 +594,4 @@ export default function LandingIntroScreen() {
     </div>
   );
 }
+

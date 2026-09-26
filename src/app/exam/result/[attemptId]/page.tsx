@@ -158,7 +158,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-[#161616]/80 p-3.5 sm:p-5 rounded-xl border border-[#333333] backdrop-blur-md text-center">
             <div className="text-xs font-medium text-[#a6a6a6] mb-1">Final Score</div>
-            <div className="text-3xl font-extrabold text-white">{result.score != null ? result.score : '-'}</div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-white">{result.score != null ? result.score : '-'}</div>
             <div className="text-xs font-bold text-blue-400 mt-1">{result.percentage != null ? `${Number(result.percentage).toFixed(1)}%` : '-'}</div>
           </div>
 
@@ -267,7 +267,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
                       </div>
 
                       {/* Options Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 mb-4">
                         {['A', 'B', 'C', 'D'].map((opt) => {
                           const shufflings = result.questionShufflings as Record<string, Record<string, string>> | null;
                           const mapping = shufflings?.[q.id];
@@ -362,3 +362,4 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
     </div>
   );
 }
+

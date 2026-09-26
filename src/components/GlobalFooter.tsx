@@ -124,7 +124,7 @@ export default function GlobalFooter() {
       <div className="relative w-full px-4 sm:px-8 lg:px-12 2xl:px-16 pt-4 sm:pt-5 pb-3 sm:pb-3.5">
         
         {/* Main Grid: Brand (~30%), Explore (~18%), Learn (~18%), Support (~34%) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+        <div className="global-footer-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
           
           {/* Brand Column (Left Anchor) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col items-start">
@@ -293,3 +293,4 @@ export default function GlobalFooter() {
     </footer>
   );
 }
+

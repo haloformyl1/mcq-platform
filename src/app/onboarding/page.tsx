@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -116,7 +116,7 @@ export default function OnboardingPage() {
 
       {/* Main Vertically Centered Content Container */}
       <main className="flex-1 flex flex-col items-center justify-center my-8 z-10">
-        <div className="w-full max-w-md bg-gradient-to-b from-[#0d1f2d]/90 via-[#081521]/90 to-[#040a10]/95 border border-cyan-500/30 p-6 sm:p-8 rounded-3xl shadow-[0_0_40px_rgba(6,182,212,0.15)] backdrop-blur-xl space-y-6">
+        <div className="onboarding-card w-full max-w-md bg-gradient-to-b from-[#0d1f2d]/90 via-[#081521]/90 to-[#040a10]/95 border border-cyan-500/30 p-6 sm:p-8 rounded-3xl shadow-[0_0_40px_rgba(6,182,212,0.15)] backdrop-blur-xl space-y-6">
           
           {error && (
             <div className="bg-red-500/10 border border-red-500/60 text-red-300 p-3.5 rounded-xl text-xs font-semibold text-center">
@@ -230,3 +230,4 @@ export default function OnboardingPage() {
     </div>
   );
 }
+

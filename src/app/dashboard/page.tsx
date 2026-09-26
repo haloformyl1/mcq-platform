@@ -1,5 +1,6 @@
 "use client";
 import GlobalFooter from "@/components/GlobalFooter";
+import GlobalHeader from "@/components/GlobalHeader";
 import AdaptiveQuizModal from "@/components/ai/AdaptiveQuizModal";
 
 import { useEffect, useState, useMemo } from "react";
@@ -298,303 +299,17 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 1. TOP NAVBAR (NETFLIX GLOBAL HEADER INSPIRATION)         */}
       {/* ========================================================= */}
-      <header className="dashboard-header sticky top-0 z-50 bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="dashboard-header-inner site-header-inner w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3">
-          <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-4">
-            
-            {/* Left Group: Brand Identity & Designer Attribution at Far Left for Mobile & Desktop */}
-            <div className="flex items-center gap-2 sm:gap-5 min-w-0">
-              
-              {/* Horizontal Logo + Designer Badge Side-by-Side (Image 1 style) */}
-              <div className="flex items-center gap-1.5 sm:gap-3.5 shrink-0">
-                <PiechemLogo size="md" href="/dashboard" isGoldMember={
-                    student.subscriptionStatus === "COMPLIMENTARY" || 
-                    (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
-                  } />
-              </div>
-
-              
-            </div>
-
-            {/* Right Group: Curriculum Switcher + Account Profile */}
-            {/* Desktop Right Group (UNTOUCHED: Exactly as before) */}
-            <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0">
-              {/* Option 4: Notification Center Dropdown */}
-              <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
-              
-              {/* Sleek Curriculum Selector Pill */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#061421]/90 border border-cyan-500/30 text-xs shadow-inner">
-                <BookOpen className="w-3.5 h-3.5 text-cyan-400 hidden sm:block shrink-0" />
-                
-                {/* Board Dropdown */}
-                <select
-                  value={student.board || 'CBSE'}
-                  disabled={updatingCurriculum}
-                  onChange={(e) => {
-                    const nb = e.target.value;
-                    const defaultLevel = nb === 'WBCHSE' ? 'SEM-I' : '11';
-                    handleCurriculumChange(nb, defaultLevel);
-                  }}
-                  className="bg-transparent text-cyan-300 font-extrabold text-xs focus:outline-none cursor-pointer"
-                >
-                  <option value="CBSE" className="bg-[#040e17] text-cyan-300">CBSE</option>
-                  <option value="ICSE" className="bg-[#040e17] text-cyan-300">ICSE</option>
-                  <option value="WBCHSE" className="bg-[#040e17] text-cyan-300">WBCHSE</option>
-                </select>
-
-                <span className="text-slate-500 text-[10px]">•</span>
-
-                {/* Level Dropdown */}
-                {student.board === 'WBCHSE' ? (
-                  <select
-                    value={student.academicLevel || 'SEM-I'}
-                    disabled={updatingCurriculum}
-                    onChange={(e) => handleCurriculumChange(student.board || 'WBCHSE', e.target.value)}
-                    className="bg-transparent text-teal-300 font-extrabold text-xs focus:outline-none cursor-pointer"
-                  >
-                    <option value="SEM-I" className="bg-[#040e17] text-teal-300">SEM-I</option>
-                    <option value="SEM-II" className="bg-[#040e17] text-teal-300">SEM-II</option>
-                    <option value="SEM-III" className="bg-[#040e17] text-teal-300">SEM-III</option>
-                    <option value="SEM-IV" className="bg-[#040e17] text-teal-300">SEM-IV</option>
-                  </select>
-                ) : (
-                  <select
-                    value={student.academicLevel || '11'}
-                    disabled={updatingCurriculum}
-                    onChange={(e) => handleCurriculumChange(student.board || 'CBSE', e.target.value)}
-                    className="bg-transparent text-teal-300 font-extrabold text-xs focus:outline-none cursor-pointer"
-                  >
-                    <option value="11" className="bg-[#040e17] text-teal-300">Class 11</option>
-                    <option value="12" className="bg-[#040e17] text-teal-300">Class 12</option>
-                  </select>
-                )}
-
-                {updatingCurriculum ? (
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping ml-1" />
-                ) : (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-0.5" title="Active Curriculum" />
-                )}
-              </div>
-
-              {/* My Account Button (Netflix Profile Pill) */}
-              <Link 
-                href="/dashboard/account"
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm shrink-0"
-              >
-                <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0">
-                  <img
-                    src={student.avatarUrl || "/avatars/atom.jpg"}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                    onError={(e: any) => { e.target.style.display = 'none'; }}
-                  />
-                  <User className="w-3 h-3 text-white" />
-                </div>
-                <span className="hidden sm:inline">My Account</span>
-              </Link>
-            </div>
-
-            {/* Mobile Right Group: Notification Dropdown + Curriculum Trigger Button + Avatar */}
-            <div className="flex md:hidden items-center gap-1 sm:gap-1.5 shrink-0">
-              {/* Option 4: Notification Center Dropdown */}
-              <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
-
-              {/* Curriculum Trigger Button (Zero Truncation Guarantee) */}
-              <button
-                type="button"
-                onClick={() => setMobileCurriculumOpen(prev => !prev)}
-                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-black/85 hover:bg-black border border-white/25 active:border-cyan-400 text-white font-bold text-xs shadow-md transition active:scale-95 shrink-0 whitespace-nowrap"
-                aria-label="Select Curriculum"
-              >
-                <span className="text-cyan-300 font-black text-[10px] sm:text-[11px] tracking-tight">
-                  {student.board || 'CBSE'}
-                </span>
-                <span className="text-slate-500 text-[9px] sm:text-[10px]">•</span>
-                <span className="text-teal-300 font-black text-[10px] sm:text-[11px] tracking-tight">
-                  {student.board === 'WBCHSE' ? (student.academicLevel || 'SEM-I') : `Cl ${student.academicLevel || '11'}`}
-                </span>
-                <ChevronDown className={`w-3 h-3 text-slate-300 transition-transform duration-200 ${mobileCurriculumOpen ? 'rotate-180 text-cyan-400' : ''}`} />
-              </button>
-
-              {/* Mobile Profile Avatar (Always Fully Visible) */}
-              <Link 
-                href="/dashboard/account"
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-gradient-to-tr from-cyan-950 to-blue-900 border border-cyan-500/50 flex items-center justify-center shrink-0 shadow-sm active:scale-95 hover:border-cyan-400 transition"
-                title="My Account"
-              >
-                <img
-                  src={student.avatarUrl || "/avatars/atom.jpg"}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  onError={(e: any) => { e.target.style.display = 'none'; }}
-                />
-                <User className="w-3.5 h-3.5 text-cyan-300" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Netflix Image 2 Window Overlay (Mobile Browser Only) */}
-          {mobileCurriculumOpen && (
-            <>
-              {/* Backdrop */}
-              <div 
-                className="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200"
-                onClick={() => setMobileCurriculumOpen(false)}
-              />
-
-              {/* Netflix Menu Window */}
-              <div className="absolute top-full left-2 right-2 mt-1.5 z-50 bg-[#040a14]/98 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden md:hidden animate-in fade-in zoom-in-95 duration-150">
-                
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/10">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-cyan-400" />
-                    <span className="text-xs font-black tracking-wider uppercase text-white">
-                      Curriculum & Browse
-                    </span>
-                  </div>
-                  <button 
-                    type="button"
-                    onClick={() => setMobileCurriculumOpen(false)}
-                    className="text-slate-400 hover:text-white p-1 rounded-md transition"
-                    aria-label="Close menu"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Columns Grid (Netflix Image 2 3-Column Layout) */}
-                <div className="p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs max-h-[65vh] overflow-y-auto">
-                  
-                  {/* Column 1: WBCHSE Semesters */}
-                  <div className="space-y-1">
-                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-400 pb-1 border-b border-cyan-500/20 mb-1.5">
-                      WBCHSE
-                    </div>
-                    {[
-                      { level: 'SEM-I', label: 'SEM-I' },
-                      { level: 'SEM-II', label: 'SEM-II' },
-                      { level: 'SEM-III', label: 'SEM-III' },
-                      { level: 'SEM-IV', label: 'SEM-IV' }
-                    ].map((item) => {
-                      const isSelected = student.board === 'WBCHSE' && (student.academicLevel || 'SEM-I') === item.level;
-                      return (
-                        <button
-                          key={item.level}
-                          type="button"
-                          disabled={updatingCurriculum}
-                          onClick={async () => {
-                            setMobileCurriculumOpen(false);
-                            if (!isSelected) {
-                              await handleCurriculumChange('WBCHSE', item.level);
-                            }
-                          }}
-                          className={`w-full text-left px-2 py-1.5 rounded text-[11px] font-bold transition flex items-center justify-between ${
-                            isSelected 
-                              ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 shadow-sm' 
-                              : 'text-slate-300 hover:text-white hover:bg-white/5'
-                          }`}
-                        >
-                          <span>{item.label}</span>
-                          {isSelected && <Check className="w-3 h-3 text-cyan-400 shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Column 2: CBSE & ICSE */}
-                  <div className="space-y-1">
-                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-teal-400 pb-1 border-b border-teal-500/20 mb-1.5">
-                      CBSE / ICSE
-                    </div>
-                    {[
-                      { board: 'CBSE', level: '11', label: 'CBSE 11' },
-                      { board: 'CBSE', level: '12', label: 'CBSE 12' },
-                      { board: 'ICSE', level: '11', label: 'ICSE 11' },
-                      { board: 'ICSE', level: '12', label: 'ICSE 12' }
-                    ].map((item) => {
-                      const isSelected = student.board === item.board && (student.academicLevel || '11') === item.level;
-                      return (
-                        <button
-                          key={`${item.board}-${item.level}`}
-                          type="button"
-                          disabled={updatingCurriculum}
-                          onClick={async () => {
-                            setMobileCurriculumOpen(false);
-                            if (!isSelected) {
-                              await handleCurriculumChange(item.board, item.level);
-                            }
-                          }}
-                          className={`w-full text-left px-2 py-1.5 rounded text-[11px] font-bold transition flex items-center justify-between ${
-                            isSelected 
-                              ? 'bg-teal-500/25 text-teal-300 border border-teal-500/40 shadow-sm' 
-                              : 'text-slate-300 hover:text-white hover:bg-white/5'
-                          }`}
-                        >
-                          <span className="truncate">{item.label}</span>
-                          {isSelected && <Check className="w-3 h-3 text-teal-400 shrink-0 ml-0.5" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Column 3: Navigation Sections */}
-                  <div className="space-y-1">
-                    <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 pb-1 border-b border-white/10 mb-1.5">
-                      Sections
-                    </div>
-                    {[
-                      { id: 'overview', label: 'Overview' },
-                      { id: 'materials', label: 'Study Materials' },
-                      { id: 'tests', label: 'Tests' },
-                      { id: 'leaderboard', label: 'Ranks' },
-                      { id: 'performance', label: 'Tracker' }
-                    ].map((item) => {
-                      const isSelected = activeTab === item.id;
-                      return (
-                        <a
-                          key={item.id}
-                          href={`#${item.id}`}
-                          onClick={() => {
-                            setActiveTab(item.id as any);
-                            setMobileCurriculumOpen(false);
-                          }}
-                          className={`w-full block text-left px-2 py-1.5 rounded text-[11px] font-medium transition ${
-                            isSelected 
-                              ? 'bg-white/20 text-white font-bold border border-white/30 shadow-sm' 
-                              : 'text-slate-300 hover:text-white hover:bg-white/5'
-                          }`}
-                        >
-                          <span>{item.label}</span>
-                        </a>
-                      );
-                    })}
-                  </div>
-
-                </div>
-
-                {/* Footer */}
-                <div className="px-4 py-2.5 bg-black/60 border-t border-white/10 flex items-center justify-between text-[10px]">
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Curriculum: <strong className="text-cyan-300">{student.board} • {student.academicLevel}</strong></span>
-                  </div>
-                  <Link 
-                    href="/dashboard/account"
-                    onClick={() => setMobileCurriculumOpen(false)}
-                    className="text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1"
-                  >
-                    <span>My Profile</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </Link>
-                </div>
-
-              </div>
-            </>
-          )}
-
-          </div>
-      </header>
+      {/* 1. TOP NAVBAR (UNIFIED RESPONSIVE GLOBAL HEADER WITH MOBILE DRAWER) */}
+      <GlobalHeader
+        student={student}
+        upgradeReq={data?.upgradeReq}
+        onCurriculumChange={handleCurriculumChange}
+        updatingCurriculum={updatingCurriculum}
+        isGoldMember={
+          student.subscriptionStatus === "COMPLIMENTARY" || 
+          (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
+        }
+      />
 
       {/* ========================================================= */}
       {/* 2. UPCOMING TEST MARQUEE ALERT BANNER                    */}
@@ -915,12 +630,11 @@ export default function StudentDashboard() {
               {/* Performance Line Chart */}
               <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 backdrop-blur-sm shadow-xl">
                 <h3 className="text-base sm:text-lg font-bold text-white mb-4">Score Trajectory Across Tests</h3>
-                <div className="h-[260px] w-full">
+                <div className="dashboard-chart-container w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={graphData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                      <XAxis dataKey="attempt" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                      <YAxis stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 12 }} domain={[0, 100]} />
+                      <XAxis dataKey="attempt" stroke="#64748b" tick={{ fill: "#94a3b8", fontSize: 10 }} /><YAxis stroke="#64748b" tick={{ fill: "#94a3b8", fontSize: 10 }} domain={[0, 100]} />
                       <Tooltip 
                         contentStyle={{ backgroundColor: '#02070c', borderColor: '#0284c7', borderRadius: '12px', color: '#fff' }}
                         itemStyle={{ color: '#00e5ff' }}
@@ -938,7 +652,7 @@ export default function StudentDashboard() {
                   <span className="text-xs text-slate-400">Last {last25Attempts.length} tests</span>
                 </div>
 
-                <div className="overflow-x-auto dashboard-results-table-wrap">
+                <div className="overflow-x-auto dashboard-results-table-wrap -webkit-overflow-scrolling-touch">
                   <table className="min-w-full divide-y divide-slate-800">
                     <thead className="bg-transparent border-b border-white/10">
                       <tr>
@@ -1015,3 +729,4 @@ export default function StudentDashboard() {
     </div>
   );
 }
+

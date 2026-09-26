@@ -22,7 +22,7 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
         onClick={onClose}
       >
         <div 
-          className="relative w-full max-w-lg rounded-3xl bg-gradient-to-b from-[#140b15] via-[#0f0913] to-[#060408] border border-rose-500/40 p-6 sm:p-8 shadow-[0_0_60px_rgba(244,63,94,0.2)] overflow-hidden"
+          className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-3xl bg-gradient-to-b from-[#140b15] via-[#0f0913] to-[#060408] border border-rose-500/40 p-6 sm:p-8 shadow-[0_0_60px_rgba(244,63,94,0.2)]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Glowing Atmospheric Accents */}
@@ -106,7 +106,7 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-lg rounded-3xl bg-gradient-to-b from-[#091522] to-[#040a10] border border-amber-500/40 p-6 sm:p-8 shadow-[0_0_60px_rgba(245,158,11,0.2)] overflow-hidden"
+        className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-3xl bg-gradient-to-b from-[#091522] to-[#040a10] border border-amber-500/40 p-6 sm:p-8 shadow-[0_0_60px_rgba(245,158,11,0.2)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Glowing Amber Backdrop Accents */}
