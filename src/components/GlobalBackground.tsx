@@ -15,7 +15,7 @@ export default function GlobalBackground() {
     >
       {!isIntroPage && (
         <div 
-          className="absolute inset-0 pointer-events-none z-0 bg-black"
+          className="absolute inset-0 pointer-events-none z-0 bg-gradient-to-br from-[#020a17] via-[#010308] to-black"
         />
       )}
     </div>
