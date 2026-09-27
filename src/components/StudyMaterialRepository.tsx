@@ -219,6 +219,7 @@ export default function StudyMaterialRepository({
           policyTitle: mat.policyTitle,
           policyNote: mat.policyNote,
           category,
+          originalCategory: mat.category || "",
           discipline,
           chapterNumber,
           chapterTitle,
@@ -260,19 +261,19 @@ export default function StudyMaterialRepository({
         } else if (selectedLevel === "SEM_4") {
           if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-IV") return false;
         } else if (selectedLevel === "NEET") {
-          const isLegacyMatch = item.category === "NEET Prev. 34 Years" || item.category.toLowerCase().includes("neet") || item.title.toLowerCase().includes("neet 34") || (item.category.includes("34 Years") && item.title.toLowerCase().includes("neet"));
+          const isLegacyMatch = (item.title && item.title.toLowerCase().includes("neet")) || (item.originalCategory && item.originalCategory.toLowerCase().includes("neet"));
           const isNewMatch = item.classSem === "NEET" || item.classSem === "ALL";
           if (!isLegacyMatch && !isNewMatch) return false;
         } else if (selectedLevel === "JEE" || selectedLevel === "JEE_MAINS" || selectedLevel === "JEE_ADVANCED") {
-          const isLegacyMatch = item.category === "JEE (MAINS) Prev. Years" || item.category.toLowerCase().includes("jee") || item.title.toLowerCase().includes("jee mains") || (item.category.includes("Prev. Years") && item.title.toLowerCase().includes("jee"));
+          const isLegacyMatch = (item.title && item.title.toLowerCase().includes("jee")) || (item.originalCategory && item.originalCategory.toLowerCase().includes("jee"));
           const isNewMatch = item.classSem === "JEE" || item.classSem === "ALL";
           if (!isLegacyMatch && !isNewMatch) return false;
         } else if (selectedLevel === "WBJEE") {
-          const isLegacyMatch = item.category === "WBJEE Prev. Years" || item.category.toLowerCase().includes("wbjee") || item.title.toLowerCase().includes("wbjee");
+          const isLegacyMatch = (item.title && item.title.toLowerCase().includes("wbjee")) || (item.originalCategory && item.originalCategory.toLowerCase().includes("wbjee"));
           const isNewMatch = item.classSem === "WBJEE" || item.classSem === "ALL";
           if (!isLegacyMatch && !isNewMatch) return false;
         } else if (selectedLevel === "CUET") {
-          const isLegacyMatch = item.category.toLowerCase().includes("cuet") || item.title.toLowerCase().includes("cuet");
+          const isLegacyMatch = (item.title && item.title.toLowerCase().includes("cuet")) || (item.originalCategory && item.originalCategory.toLowerCase().includes("cuet"));
           const isNewMatch = item.classSem === "CUET" || item.classSem === "ALL";
           if (!isLegacyMatch && !isNewMatch) return false;
         }
