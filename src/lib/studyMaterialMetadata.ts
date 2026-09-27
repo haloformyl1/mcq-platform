@@ -36,6 +36,10 @@ export const CLASS_SEM_OPTIONS = [
   'SEM-II',
   'SEM-III',
   'SEM-IV',
+  'NEET',
+  'JEE',
+  'WBJEE',
+  'CUET',
   'ALL'
 ] as const;
 

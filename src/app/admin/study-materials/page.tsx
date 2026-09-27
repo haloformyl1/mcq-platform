@@ -771,26 +771,6 @@ export default function AdminStudyMaterials() {
                         />
                       </div>
           
-                      {/* Shelf Category Selector */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide flex items-center gap-1.5">
-                          <Tag className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>Library Shelf Category <span className="text-red-400">*</span></span>
-                        </label>
-                        <select
-                          value={form.category}
-                          onChange={e => setForm({ ...form, category: e.target.value as LibraryCategoryType })}
-                          className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer font-medium"
-                        >
-                          {LIBRARY_CATEGORIES.map(cat => (
-                            <option key={cat} value={cat} className="bg-[#181818] text-white">
-                              {cat}
-                            </option>
-                          ))}
-                        </select>
-                        <p className="text-[11px] text-gray-500">Determines which tab this material appears under in the student vault.</p>
-                      </div>
-
                       {/* Curriculum Section Selector */}
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-purple-300 uppercase tracking-wide flex items-center gap-1.5">
@@ -847,19 +827,18 @@ export default function AdminStudyMaterials() {
                               <option value="SEM-II">Semester II (Class 11 Term 2)</option>
                               <option value="SEM-III">Semester III (Class 12 Term 1)</option>
                               <option value="SEM-IV">Semester IV (Class 12 Term 2)</option>
-                              <option value="ALL">All Semesters (General WBCHSE)</option>
                             </>
                           ) : form.section === "CBSE" || form.section === "ICSE" ? (
                             <>
                               <option value="11">Class 11</option>
                               <option value="12">Class 12</option>
-                              <option value="ALL">Both Classes (11 & 12)</option>
                             </>
                           ) : (
                             <>
-                              <option value="11">Class 11 (Foundation)</option>
-                              <option value="12">Class 12 (Target)</option>
-                              <option value="ALL">Both Classes (11 & 12)</option>
+                              <option value="NEET">NEET</option>
+                              <option value="JEE">JEE</option>
+                              <option value="WBJEE">WBJEE</option>
+                              <option value="CUET">CUET</option>
                             </>
                           )}
                         </select>
@@ -868,7 +847,7 @@ export default function AdminStudyMaterials() {
                             ? "For WBCHSE, select Semester I, II, III or IV."
                             : form.section === "CBSE" || form.section === "ICSE"
                             ? "For CBSE / ICSE, select Class 11 or 12."
-                            : "Specify target class or semester."}
+                            : "Select the specific entrance exam target."}
                         </p>
                       </div>
           
@@ -1703,29 +1682,15 @@ export default function AdminStudyMaterials() {
                             </>
                           ) : (
                             <>
-                              <option value="11">Class 11</option>
-                              <option value="12">Class 12</option>
-                              <option value="ALL">Both 11 & 12</option>
+                              <option value="NEET">NEET</option>
+                              <option value="JEE">JEE</option>
+                              <option value="WBJEE">WBJEE</option>
+                              <option value="CUET">CUET</option>
                             </>
                           )}
                         </select>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                        <span className="text-[10px] text-gray-400 font-bold uppercase shrink-0">Change Shelf:</span>
-                        <select
-                          value={item.category || "3D animations"}
-                          onChange={e => handleUpdateCategory(item.id, e.target.value)}
-                          disabled={isUpdatingThis}
-                          className="bg-[#1a1a1a] border border-[#333] text-cyan-300 rounded px-2 py-1 text-[11px] focus:outline-none cursor-pointer font-medium w-full sm:w-auto max-w-full sm:max-w-[190px]"
-                        >
-                          {LIBRARY_CATEGORIES.map(cat => (
-                            <option key={cat} value={cat} className="bg-[#1a1a1a] text-white">
-                              {cat}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
 
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <span className="text-[10px] text-gray-400 font-bold uppercase shrink-0">Branch:</span>
@@ -1833,23 +1798,6 @@ export default function AdminStudyMaterials() {
                   />
                 </div>
 
-                {/* Shelf Category */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide">
-                    Library Shelf Category <span className="text-red-400">*</span>
-                  </label>
-                  <select
-                    value={editForm.category}
-                    onChange={e => setEditForm({ ...editForm, category: e.target.value as LibraryCategoryType })}
-                    className="w-full bg-[#181818] border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
-                  >
-                    {LIBRARY_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat} className="bg-[#181818] text-white">
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
                 {/* Curriculum / Section */}
                 <div className="space-y-1.5">
@@ -1913,9 +1861,10 @@ export default function AdminStudyMaterials() {
                       </>
                     ) : (
                       <>
-                        <option value="11">Class 11</option>
-                        <option value="12">Class 12</option>
-                        <option value="ALL">Both (11 & 12)</option>
+                        <option value="NEET">NEET</option>
+                        <option value="JEE">JEE</option>
+                        <option value="WBJEE">WBJEE</option>
+                        <option value="CUET">CUET</option>
                       </>
                     )}
                   </select>
