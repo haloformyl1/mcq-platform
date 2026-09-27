@@ -99,9 +99,6 @@ export default function GlobalFooter() {
           {/* Brand Column (Left Anchor) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col items-start">
             <PiechemLogo size="md" href="/dashboard" isGoldMember={false}  />
-            <p className="mt-2 text-xs sm:text-[12.5px] text-[#91A5B8] leading-normal max-w-xs sm:max-w-sm">
-              Interactive learning for the sciences.
-            </p>
           </div>
 
 
@@ -182,6 +179,13 @@ export default function GlobalFooter() {
 
           </div>
 
+        </div>
+
+        {/* Admin Login Link at the very bottom */}
+        <div className="mt-8 pt-4 border-t border-white/5 flex justify-center">
+          <Link href="/admin/login" className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors uppercase tracking-widest font-semibold">
+            Admin Panel
+          </Link>
         </div>
 
       </div>

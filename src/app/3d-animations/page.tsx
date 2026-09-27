@@ -266,22 +266,6 @@ function ThreeDAnimationsContent() {
             Explore real-time 3D simulations of solid state crystal lattices, atomic voids, and spatial chemical bonding directly in your browser. Visualise complex VSEPR geometries, hybridisation orbitals, and unit cell structures with interactive rotation and slicing.
           </p>
 
-          {/* High-Level Feature Badges */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-mono">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span>WebGL 2.0 Spatial Engine</span>
-            </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span>NCERT • JEE • NEET Aligned</span>
-            </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Full Interactive Controls</span>
-            </div>
-          </div>
-
         </div>
       </section>
 
