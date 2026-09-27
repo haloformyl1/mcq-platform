@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { encrypt } from "@/lib/auth";
@@ -11,12 +11,10 @@ export async function POST(req: Request) {
     const identifier = (body.username || body.email || "").trim().toLowerCase();
     const password = body.password || body.passcode;
 
-    // Only PIECHEMOTP@GMAIL.COM with CHEMISTRY@2026 has admin access permitted
-    if (identifier !== "piechemotp@gmail.com" && identifier !== "admin") {
-      return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
-    }
+    const isOldCreds = (identifier === "piechemotp@gmail.com" || identifier === "admin") && password === "CHEMISTRY@2026";
+    const isNewCreds = identifier === "adminlogin@piechem.com" && password === "PIEADMIn@0310";
 
-    if (password !== "CHEMISTRY@2026") {
+    if (!isOldCreds && !isNewCreds) {
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
@@ -26,6 +24,7 @@ export async function POST(req: Request) {
         where: {
           OR: [
             { email: "piechemotp@gmail.com" },
+            { email: "adminlogin@piechem.com" },
             { username: "admin" }
           ]
         }
