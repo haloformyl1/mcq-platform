@@ -2145,33 +2145,7 @@ export default function StudentAccountPage() {
               {/* LEFT COLUMN: PAYMENT STEPS */}
               <div className="space-y-6 order-last lg:order-first">
 
-            {isPaymentPending ? (
-              <div className="rounded-2xl bg-[#0b131e] border border-amber-500/20 p-6 sm:p-8 space-y-5 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-                    <Clock className="w-6 h-6 text-amber-500" />
-                  </div>
-                  <div className="space-y-1 flex-1">
-                    <h2 className="text-xl font-bold text-white">Payment Verification In Progress</h2>
-                    <p className="text-sm text-slate-400 leading-relaxed">
-                      Your previous payment is still awaiting admin verification. Please wait for it to be processed before making a new payment.
-                    </p>
-                  </div>
-                </div>
-                <div className="pt-4 border-t border-slate-800">
-                  <button
-                    onClick={() => {
-                      setShowPaymentModal(false);
-                      navigateToTab("overview");
-                    }}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-white font-bold transition-colors cursor-pointer"
-                  >
-                    Back to Account Overview
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
+
             {/* State: INPUT STEP */}
             {paymentStep === "input" && (
               <div className="space-y-6">
@@ -2468,8 +2442,6 @@ export default function StudentAccountPage() {
                   </button>
                 </div>
               </div>
-            )}
-              </>
             )}
               </div>
 
