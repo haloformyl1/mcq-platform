@@ -493,7 +493,7 @@ export default function AiTutorDrawer({
           assistantMsg = {
             id: `ai-${Date.now()}`,
             role: "assistant",
-            content: data.response || "No response generated.",
+            content: data.answer || data.content || data.response || "No response generated.",
             title: derivedTitle || "Academic Solution",
             keyConcepts: data.telemetry?.keyConcepts || [],
             keyTakeaway: data.telemetry?.keyTakeaway || "",

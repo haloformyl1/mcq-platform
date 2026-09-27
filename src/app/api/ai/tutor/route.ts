@@ -32,39 +32,7 @@ export async function POST(req: NextRequest) {
 
     const trimmedPrompt = userPrompt.trim();
 
-    // 3. Server-Side Anti-Cheating Verification during active exams
-    let isExamActive = Boolean(context?.isExamActive);
-    if (student?.id) {
-      const activeAttempt = await prisma.testAttempt.findFirst({
-        where: {
-          studentId: student.id,
-          status: 'IN_PROGRESS'
-        }
-      });
-      if (activeAttempt) {
-        isExamActive = true;
-      }
-    }
-
-    if (isExamActive) {
-      const isBengali = language === 'bn' || /[ঀ-৿]/.test(trimmedPrompt);
-      const refusal = isBengali
-        ? "এই সক্রিয় পরীক্ষা চলাকালীন AI সহায়তা কঠোরভাবে নিষ্ক্রিয় করা হয়েছে। অনুগ্রহ করে সম্পূর্ণ সততার সাথে আপনার পরীক্ষা সম্পন্ন করুন।"
-        : "AI assistance is disabled during this active examination. Please complete your test independently.";
-
-      return NextResponse.json({
-        answer: refusal,
-        reply: refusal,
-        content: refusal,
-        model: "PIECHEM Exam Proctor Guard",
-        sources: [],
-        sourceCategory: 'GENERAL_ACADEMIC',
-        groundedInPiechem: false,
-        suggestedFollowUps: [],
-        activeExamBlocked: true,
-        language: isBengali ? 'bn' : 'en'
-      });
-    }
+    // 3. Server-Side Anti-Cheating Verification during active exams - REMOVED
 
     // 4. Pre-check Daily AI Quota (Check without consuming yet)
     const quotaStatus = await getAiQuotaStatus(student?.id);

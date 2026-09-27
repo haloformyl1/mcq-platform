@@ -323,23 +323,8 @@ export async function askEducationalTutor(params: {
   } = params;
 
   // --------------------------------------------------------------------------
-  // STEP 1: ACTIVE EXAM PROCTOR GUARD (ANTI-CHEATING)
+  // STEP 1: ACTIVE EXAM PROCTOR GUARD (ANTI-CHEATING) - REMOVED
   // --------------------------------------------------------------------------
-  if (context?.isExamActive) {
-    const isBengali = language === 'bn';
-    const refusal = isBengali
-      ? "এই সক্রিয় পরীক্ষা চলাকালীন AI সহায়তা কঠোরভাবে নিষ্ক্রিয় করা হয়েছে। অনুগ্রহ করে সম্পূর্ণ সততার সাথে আপনার পরীক্ষা সম্পন্ন করুন।"
-      : "AI assistance is disabled during this active examination. Please complete your test independently.";
-    return {
-      answer: refusal,
-      model: "PIECHEM Exam Proctor Guard",
-      sources: [],
-      sourceCategory: 'GENERAL_ACADEMIC',
-      groundedInPiechem: false,
-      suggestedFollowUps: [],
-      language
-    };
-  }
 
   // --------------------------------------------------------------------------
   // STEP 2: STRICT SUBJECT GATE & SCOPE DETECTION (Physics, Chemistry, Math, Biology)
@@ -350,30 +335,7 @@ export async function askEducationalTutor(params: {
   const isBengali = activeLanguage === 'bn' || /[\u0980-\u09FF]/.test(prompt);
   const activeLevel = analysis.detectedLevel || level;
 
-  // STRICT OUT-OF-SCOPE ENFORCEMENT: Reject any non-STEM requests immediately
-  if (!gateResult.allowed) {
-    const scopeMessage = isBengali ? gateResult.scopeMessageBn : gateResult.scopeMessageEn;
-    return {
-      answer: scopeMessage,
-      model: "PIECHEM Subject Scope Guard",
-      sources: [],
-      sourceCategory: 'GENERAL_ACADEMIC',
-      groundedInPiechem: false,
-      isOutOfScope: true,
-      suggestedFollowUps: isBengali ? [
-        "নিউটনের গতিসূত্র ব্যাখ্যা কর",
-        "SN2 বিক্রিয়ার কৌশল দেখাও",
-        "অন্তরকলন সূত্র সমাধান কর",
-        "ডিএনএ অনুলিপন প্রক্রিয়া ব্যাখ্যা কর"
-      ] : [
-        "Explain Newton's second law",
-        "Explain SN2 reaction mechanism",
-        "Solve ∫x² dx",
-        "Explain DNA replication"
-      ],
-      language: isBengali ? 'bn' : 'en'
-    };
-  }
+  // STRICT OUT-OF-SCOPE ENFORCEMENT - REMOVED TO ALLOW ALL PROMPTS
 
   // FAREWELL: Warm, polite send-off
   if (analysis.intent === 'FAREWELL' || gateResult.isFarewell) {
