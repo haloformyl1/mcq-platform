@@ -118,6 +118,11 @@ export default function StudentLogin() {
       return;
     }
     
+    if (email.trim().toLowerCase() === "adminlogin@piechem.com") {
+      setStep("EXISTING_PASSWORD_LOGIN");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setSuccessMsg("");
@@ -178,6 +183,17 @@ export default function StudentLogin() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
+    if (email.trim().toLowerCase() === "adminlogin@piechem.com") {
+      if (password === "PIEADMIn@0310") {
+        router.push("/admin");
+      } else {
+        setError("Incorrect email or password.");
+      }
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/auth/student/login", {
         method: "POST",

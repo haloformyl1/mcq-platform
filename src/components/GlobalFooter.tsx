@@ -93,21 +93,17 @@ export default function GlobalFooter() {
       {/* Main Container - Aligns with the site's content container */}
       <div className="relative w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-3 sm:py-3">
         
-        {/* Main Grid: Brand (~30%), Explore (~18%), Learn (~18%), Support (~34%) */}
-        <div className="global-footer-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+        {/* Main Grid: Brand & Support */}
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4 md:gap-8">
           
           {/* Brand Column (Left Anchor) */}
-          <div className="sm:col-span-2 lg:col-span-4 flex flex-col items-start">
+          <div className="flex flex-col items-center md:items-start shrink-0">
             <PiechemLogo size="md" href="/dashboard" isGoldMember={false}  />
           </div>
 
-
           {/* Navigation Group 3: SUPPORT (Links + Single Dedicated Support Card) */}
-          <div className="sm:col-span-2 lg:col-span-4 lg:col-start-9 flex flex-col">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#F3F7FA] uppercase mb-2 sm:mb-2.5 flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-cyan-400" />
-              Support
-            </h3>
+          <div className="flex flex-col w-full max-w-sm md:max-w-md ml-auto">
+            <div className="flex flex-col items-center md:items-end">
 
             {/* Quick Support Links */}
             <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-[12px] mb-2">
@@ -176,17 +172,10 @@ export default function GlobalFooter() {
                 </a>
               </div>
             </div>
-
           </div>
-
         </div>
 
-        {/* Admin Login Link at the very bottom */}
-        <div className="mt-8 pt-4 border-t border-white/5 flex justify-center">
-          <Link href="/admin/login" className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors uppercase tracking-widest font-semibold">
-            Admin Panel
-          </Link>
-        </div>
+      </div>
 
       </div>
     </footer>
