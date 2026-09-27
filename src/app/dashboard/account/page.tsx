@@ -2430,7 +2430,7 @@ export default function StudentAccountPage() {
 
       {/* 3.1 PAYMENT DONE CONFIRMATION DIALOG */}
       {showPaymentDoneDialog && (
-        <div className="fixed inset-0 z-[60] bg-transparent text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
           <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
@@ -2527,7 +2527,7 @@ export default function StudentAccountPage() {
 
       {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
       {showPromoModal && (
-        <div className="fixed inset-0 z-50 bg-transparent text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
           <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
@@ -2612,7 +2612,7 @@ export default function StudentAccountPage() {
 
       {/* 6. PAYMENT HISTORY MODAL (NETFLIX STYLE) */}
       {showHistoryModal && (
-        <div className="fixed inset-0 z-50 bg-transparent text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
           <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
@@ -2695,7 +2695,7 @@ export default function StudentAccountPage() {
 
       {/* 4. HIGHEST ENROLLED PLAN MODAL */}
       {showHighestPlanModal && (
-        <div className="fixed inset-0 z-50 bg-transparent text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
           <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
