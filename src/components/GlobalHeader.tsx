@@ -118,10 +118,10 @@ export default function GlobalHeader({
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <Link
                       href="/dashboard/account"
-                      className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm shrink-0"
+                      className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition-colors shadow-sm shrink-0"
                       title="My Profile & Settings"
                     >
-                      <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0 border border-cyan-400/30">
+                      <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600">
                         <img
                           src={student.avatarUrl || "/avatars/atom.jpg"}
                           alt="Profile"
@@ -140,7 +140,7 @@ export default function GlobalHeader({
                         window.location.href = '/login';
                       }}
                       title="Logout"
-                      className="p-1.5 sm:p-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 hover:border-red-400/60 text-red-400 hover:text-red-300 transition-all group shrink-0 active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+                      className="p-1.5 sm:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 transition-colors group shrink-0 cursor-pointer shadow-sm"
                     >
                       <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-0.5 transition-transform" />
                     </button>
