@@ -105,20 +105,6 @@ export default function GlobalFooter() {
           <div className="flex flex-col w-full max-w-sm md:max-w-md ml-auto">
             <div className="flex flex-col items-center md:items-end">
 
-            {/* Quick Support Links */}
-            <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-[12px] mb-2">
-              {SUPPORT_LINKS.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-[#91A5B8] hover:text-cyan-300 transition-all duration-150 inline-block hover:translate-x-0.5"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
             {/* Single Source of Contact / Support Block */}
             <div className="p-2.5 sm:p-3 rounded-lg bg-[#06111A]/80 border border-[rgba(0,180,255,0.14)] shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
               <div className="text-[11px] text-[#91A5B8] font-medium">
@@ -133,14 +119,7 @@ export default function GlobalFooter() {
                 >
                   {SUPPORT_INFO.phone}
                 </a>
-                <span className="text-[9px] sm:text-[10px] text-cyan-400/80 font-mono tracking-wider uppercase">
-                  Platform Helpline
-                </span>
               </div>
-
-              <p className="mt-1 text-[11px] text-[#607487] leading-tight">
-                {SUPPORT_INFO.note}
-              </p>
 
               <div className="mt-2.5 flex items-center gap-2">
                 <a
