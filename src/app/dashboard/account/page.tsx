@@ -1997,23 +1997,29 @@ export default function StudentAccountPage() {
       </main>
       {/* 3. INSTANT UPI QR CODE MODAL (NETFLIX PREMIUM CRIMSON/INDIGO THEME) */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-transparent text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
           
           {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          <header className="sticky top-0 z-40 bg-[#030910]/80 backdrop-blur-2xl border-b border-rose-500/10 shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
+            <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
               
               {/* Left: Brand Identity & Designer Attribution */}
               <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
                 <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} />
               </div>
 
-              {/* Right: Instant UPI Badge */}
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-950/80 via-[#1e1028] to-indigo-950/80 border border-rose-500/30 text-rose-300 text-xs font-black uppercase tracking-wider shadow-sm">
+              {/* Right: Instant UPI Badge & Close */}
+              <div className="flex items-center gap-4">
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-950/80 via-[#1e1028] to-indigo-950/80 border border-rose-500/30 text-rose-300 text-xs font-black uppercase tracking-wider shadow-sm">
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Pay with UPI</span>
+                  <span>Secure Checkout</span>
                 </span>
+                <button
+                  onClick={() => closeModal()}
+                  className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
             </div>
