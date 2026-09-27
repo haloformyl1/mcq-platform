@@ -748,7 +748,7 @@ export default function StudentLogin() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           
           {/* Card 1: Live Exam Simulation */}
-          <div className="group relative rounded-3xl bg-gradient-to-br from-[#06182c]/90 via-[#030d17]/90 to-black/95 border border-cyan-500/25 hover:border-cyan-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(0,210,255,0.18)] hover:-translate-y-1.5 transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
+          <div className="group relative rounded-3xl bg-gradient-to-br from-[#06182c]/90 via-[#030d17]/90 to-black/95 border border-cyan-500/25 hover:border-cyan-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(0,210,255,0.18)] transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
             {/* Top accent highlight */}
             <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent group-hover:via-cyan-400 transition-all" />
 
@@ -775,7 +775,7 @@ export default function StudentLogin() {
           </div>
 
           {/* Card 2: AI Proctoring & Integrity */}
-          <div className="group relative rounded-3xl bg-gradient-to-br from-[#120a24]/90 via-[#070312]/90 to-black/95 border border-purple-500/25 hover:border-purple-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(168,85,247,0.18)] hover:-translate-y-1.5 transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
+          <div className="group relative rounded-3xl bg-gradient-to-br from-[#120a24]/90 via-[#070312]/90 to-black/95 border border-purple-500/25 hover:border-purple-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(168,85,247,0.18)] transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
             {/* Top accent highlight */}
             <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-400/50 to-transparent group-hover:via-purple-400 transition-all" />
 
@@ -802,7 +802,7 @@ export default function StudentLogin() {
           </div>
 
           {/* Card 3: PIECHEM Molecular Lab */}
-          <div className="group relative rounded-3xl bg-gradient-to-br from-[#051c24]/90 via-[#020e13]/90 to-black/95 border border-teal-500/30 hover:border-teal-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(20,184,166,0.22)] hover:-translate-y-1.5 transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
+          <div className="group relative rounded-3xl bg-gradient-to-br from-[#051c24]/90 via-[#020e13]/90 to-black/95 border border-teal-500/30 hover:border-teal-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(20,184,166,0.22)] transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
             {/* Top accent highlight */}
             <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-teal-400/50 to-transparent group-hover:via-teal-400 transition-all" />
 
@@ -836,7 +836,7 @@ export default function StudentLogin() {
           </div>
 
           {/* Card 4: Academic Study Repository */}
-          <div className="group relative rounded-3xl bg-gradient-to-br from-[#1f1704]/90 via-[#0e0a02]/90 to-black/95 border border-amber-500/30 hover:border-amber-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] hover:-translate-y-1.5 transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
+          <div className="group relative rounded-3xl bg-gradient-to-br from-[#1f1704]/90 via-[#0e0a02]/90 to-black/95 border border-amber-500/30 hover:border-amber-400/60 p-6 sm:p-7 flex flex-col justify-between shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300 backdrop-blur-xl overflow-hidden min-h-[300px]">
             {/* Top accent highlight */}
             <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/50 to-transparent group-hover:via-amber-400 transition-all" />
 
