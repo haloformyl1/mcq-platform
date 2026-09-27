@@ -806,7 +806,7 @@ export default function AdminStudyMaterials() {
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide flex items-center gap-1.5">
                           <GraduationCap className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>Class / Semester <span className="text-red-400">* (Mandatory)</span></span>
+                          <span>{form.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? "Target Exam" : "Class / Semester"} <span className="text-red-400">* (Mandatory)</span></span>
                         </label>
                         <select
                           value={form.classSem}
@@ -1591,9 +1591,17 @@ export default function AdminStudyMaterials() {
                           </span>
                         )}
                         {item.classSem && item.classSem !== "ALL" && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-blue-950 text-blue-300 border border-blue-500/40">
-                            {item.classSem === "11" ? "CLASS 11" : item.classSem === "12" ? "CLASS 12" : item.classSem}
-                          </span>
+                          item.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? (
+                            ["NEET", "JEE", "WBJEE", "CUET"].includes(item.classSem) && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-950 text-rose-300 border border-rose-500/40">
+                                {item.classSem}
+                              </span>
+                            )
+                          ) : (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-blue-950 text-blue-300 border border-blue-500/40">
+                              {item.classSem === "11" ? "CLASS 11" : item.classSem === "12" ? "CLASS 12" : item.classSem}
+                            </span>
+                          )
                         )}
                         {item.discipline && item.discipline !== "GENERAL" && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#222] text-gray-300 border border-[#333]">
@@ -1652,7 +1660,9 @@ export default function AdminStudyMaterials() {
 
                       {/* Class / Sem Quick Shortcut */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                        <span className="text-[10px] text-cyan-300 font-bold uppercase shrink-0">Class/Sem:</span>
+                        <span className="text-[10px] text-cyan-300 font-bold uppercase shrink-0">
+                          {item.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? "TARGET EXAM:" : "CLASS/SEM:"}
+                        </span>
                         <select
                           value={item.classSem || (item.section === "WBCHSE" ? "SEM-I" : "11")}
                           onChange={e => handleUpdateClassSem(item.id, e.target.value)}
@@ -1831,7 +1841,7 @@ export default function AdminStudyMaterials() {
                 {/* Class / Semester */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-cyan-300 uppercase tracking-wide">
-                    Class / Semester <span className="text-red-400">*</span>
+                    {editForm.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? "Target Exam" : "Class / Semester"} <span className="text-red-400">*</span>
                   </label>
                   <select
                     value={editForm.classSem}
