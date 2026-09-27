@@ -17,14 +17,14 @@ export async function POST(req: Request) {
 
     const studentId = payload.id;
 
-    const result = await prisma.subscriptionUpgradeRequest.updateMany({
+    const result = await prisma.paytmTransaction.updateMany({
       where: {
         studentId: studentId,
-        status: "APPROVED",
-        approvalRevealClaimedAt: null,
+        status: "SUCCESS",
+        upgradeRevealClaimedAt: null,
       },
       data: {
-        approvalRevealClaimedAt: new Date(),
+        upgradeRevealClaimedAt: new Date(),
       }
     });
 
