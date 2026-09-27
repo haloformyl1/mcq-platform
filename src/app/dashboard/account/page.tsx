@@ -1207,10 +1207,7 @@ export default function StudentAccountPage() {
                     </div>
 
                     {/* Detailed Payment Status Row */}
-                    <div className="p-6 sm:p-7 space-y-4 border-t border-slate-800">
-                      <h4 className="text-sm uppercase tracking-wider font-bold text-slate-500">
-                        Detailed Payment Status
-                      </h4>
+                    <div className="p-6 sm:p-7 space-y-4">
                       {!upgradeReq ? (
                         <div className="text-sm font-medium text-slate-400">
                           Not Applicable
