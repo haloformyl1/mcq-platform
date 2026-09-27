@@ -777,7 +777,7 @@ export default function StudentAccountPage() {
         isGoldMember={isGold}
       />
       {/* 2. MAIN LAYOUT (FULL SCREEN NETFLIX ACCOUNT SETTINGS PAGE) */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1">
+      <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1">
         
         {/* Top Navigation Row */}
         <div className="flex items-center justify-between">
@@ -852,7 +852,7 @@ export default function StudentAccountPage() {
 
             {/* VIEW A: OVERVIEW TAB (Ultra-Premium Luxury Suite) */}
             {activeTab === "overview" && (
-              <div className="space-y-8 animate-in fade-in duration-200">
+              <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-200">
                 
                 {/* 1. Ultra-Luxury VIP Membership Passport Card */}
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c1c2e]/95 via-[#071320]/95 to-[#02070d]/98 border border-cyan-500/30 hover:border-cyan-400/60 p-7 sm:p-9 shadow-[0_0_50px_rgba(6,182,212,0.14)] transition-all duration-300 backdrop-blur-2xl group">
@@ -1109,7 +1109,7 @@ export default function StudentAccountPage() {
 
             {/* VIEW B: MEMBERSHIP TAB (NETFLIX STYLE) */}
             {activeTab === "membership" && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
                 
                 {/* 1. Plan Details Card (Netflix Red/Purple Gradient Top Accent) */}
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl overflow-hidden">
@@ -1242,7 +1242,7 @@ export default function StudentAccountPage() {
             )}
             {/* VIEW C: SECURITY TAB */}
             {activeTab === "security" && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
                 
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
@@ -1392,7 +1392,7 @@ export default function StudentAccountPage() {
             )}
             {/* VIEW D: PROFILES TAB */}
             {activeTab === "profiles" && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
                 
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
                   
@@ -1597,7 +1597,7 @@ export default function StudentAccountPage() {
 
             {/* VIEW E: DEVICES TAB */}
             {activeTab === "devices" && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
                 
                 {/* Global Status Notification */}
                 {deviceActionMsg && (
@@ -2026,29 +2026,11 @@ export default function StudentAccountPage() {
           </header>
 
           {/* Full Screen Main Content */}
-          <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6">
-            
-            {/* Plan & Pricing Box */}
-            <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-5 sm:p-6 relative overflow-hidden shadow-lg">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 uppercase tracking-wider mb-1">
-                    <Sparkles className="w-3 h-3 text-amber-400" /> Gold Membership
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-black text-white">30 Days All-Access Pass</h3>
-                  <p className="text-xs text-slate-400 mt-1 max-w-xl">
-                    Full access to all 50+ Chemistry Exams, 3D Molecular Models, Full Solutions & Proctored Analytics
-                  </p>
-                </div>
-                <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
-                  <span className="text-3xl font-black text-amber-300 font-mono">
-                    ₹{paymentSettings?.monthlyFee || 199}
-                  </span>
-                  <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
-                </div>
-              </div>
-            </div>
+          <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-10 items-start">
+              
+              {/* LEFT COLUMN: PAYMENT STEPS */}
+              <div className="space-y-6 order-last lg:order-first">
 
             {/* State: INPUT STEP */}
             {paymentStep === "input" && (
@@ -2416,14 +2398,42 @@ export default function StudentAccountPage() {
               </div>
             )}
 
-            {/* Support Contact */}
-            <div className="pt-4 text-xs text-slate-400 text-center border-t border-rose-500/20">
-              <span>Assistance or query? Contact Arghyadeep Roy: </span>
-              <a href="tel:9830507435" className="font-mono font-bold text-rose-400 hover:underline">
-                9830507435
-              </a>
-            </div>
+              </div>
 
+              {/* RIGHT COLUMN: ORDER SUMMARY */}
+              <div className="order-first lg:order-last space-y-6 lg:sticky lg:top-24">
+                {/* Plan & Pricing Box */}
+                <div className="bg-slate-950/90 border border-rose-500/30 rounded-2xl p-5 sm:p-6 relative overflow-hidden shadow-lg">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="flex flex-col gap-4 relative z-10">
+                    <div>
+                      <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 uppercase tracking-wider mb-1">
+                        <Sparkles className="w-3 h-3 text-amber-400" /> Gold Membership
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-black text-white">30 Days All-Access Pass</h3>
+                      <p className="text-xs text-slate-400 mt-2">
+                        Full access to all 50+ Chemistry Exams, 3D Molecular Models, Full Solutions & Proctored Analytics
+                      </p>
+                    </div>
+                    <div className="pt-3 border-t border-slate-800/80 mt-1">
+                      <span className="text-3xl font-black text-amber-300 font-mono">
+                        ₹{paymentSettings?.monthlyFee || 199}
+                      </span>
+                      <span className="text-xs text-slate-400 block font-normal mt-0.5">/ 30 Days</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Support Contact */}
+                <div className="pt-4 text-xs text-slate-400 text-center border-t border-rose-500/20">
+                  <span>Assistance or query? Contact Arghyadeep Roy: </span>
+                  <a href="tel:9830507435" className="font-mono font-bold text-rose-400 hover:underline block mt-1">
+                    9830507435
+                  </a>
+                </div>
+              </div>
+
+            </div>
           </main>
         </div>
       )}
