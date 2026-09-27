@@ -1252,7 +1252,7 @@ export default function StudentAccountPage() {
                           
                           <div className="pt-2">
                             <p className="text-xs text-slate-400 leading-relaxed">
-                              Need help? Contact our support helpline:<br/>
+                              After payment, please allow us up to 24 hours to check and verify your payment. If you don't receive any resolution from us within this timeframe, please contact our support helpline:<br/>
                               <a href="tel:9830507435" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors mt-1 inline-block">
                                 📞 9830507435
                               </a>
