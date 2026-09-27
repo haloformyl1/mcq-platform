@@ -341,13 +341,11 @@ export default function StudyMaterialRepository({
 
   // Active Category Items (for the Resource List view)
   const activeCategoryObject = useMemo(() => {
-    if (!selectedCategory) return null;
-    return resourceCategories.find(c => c.id === selectedCategory || c.name === selectedCategory) || resourceCategories[0];
-  }, [selectedCategory, resourceCategories]);
+    return { name: "All Materials", subtitle: "Direct access to notes, questions, and revision sheets." };
+  }, []);
 
   const activeCategoryItems = useMemo(() => {
-    if (!activeCategoryObject) return [];
-    let items = contextMaterials.filter(activeCategoryObject.matchFn);
+    let items = [...contextMaterials];
 
     // Apply Search Query
     if (searchQuery.trim()) {
@@ -374,7 +372,7 @@ export default function StudyMaterialRepository({
       }
       return 0;
     });
-  }, [activeCategoryObject, contextMaterials, searchQuery, activeDiscipline, sortBy]);
+  }, [contextMaterials, searchQuery, activeDiscipline, sortBy]);
 
   // Format Level Label for Display
   const getBoardLabel = (board: string | null) => {
@@ -923,108 +921,9 @@ export default function StudyMaterialRepository({
       )}
 
       {/* ============================================================ */}
-      {/* STEP 3: ACADEMIC HUB CATEGORIES (When Class/Semester active) */}
+      {/* STEP 3: RESOURCE LIST PAGE                                   */}
       {/* ============================================================ */}
-      {selectedBoard && selectedLevel && !selectedCategory && (
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8 animate-in fade-in zoom-in-98 duration-400">
-          
-          {/* Top Hero Communicating Active Academic Context */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-sm shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-wider">
-                  {selectedBoard === "ENTRANCE" ? "ENTRANCE EXAMS" : selectedBoard} · {getLevelLabel(selectedLevel)}
-                </span>
-                <span className="text-xs text-slate-400 hidden sm:inline">•</span>
-                <span className="text-xs font-mono text-slate-300">Chemistry Academic Repository</span>
-              </div>
-
-              <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif italic">
-                CHEMISTRY Study Repository
-              </h1>
-
-              <p className="text-xs sm:text-sm text-slate-300/90 font-light max-w-2xl leading-relaxed">
-                Structured notes, practice material, previous questions and exam-focused resources calibrated for {selectedBoard} {getLevelLabel(selectedLevel)} Chemistry.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={handleResetLevel}
-                className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-xs font-mono text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Switch {selectedBoard === "WBCHSE" ? "Semester" : selectedBoard === "ENTRANCE" ? "Exam" : "Class"}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Resource Category Selection: Large Editorial Cards */}
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xs sm:text-sm font-mono tracking-[0.2em] text-slate-400 uppercase">
-                Academic Resource Categories
-              </h2>
-              <span className="text-xs font-mono text-cyan-400">
-                {contextMaterials.length} Documents Available
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-              {resourceCategories.map((cat) => {
-                const IconComponent = cat.icon;
-                return (
-                  <div
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className="group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] hover:border-cyan-500/50 p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,217,255,0.12)] shadow-md"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono font-bold text-cyan-400 tracking-wider">
-                            {cat.name}
-                          </span>
-                        </div>
-                        <p className="text-xs font-mono text-slate-400">
-                          {cat.subtitle}
-                        </p>
-                        <p className="text-xs text-slate-300/80 font-light pt-1 leading-relaxed">
-                          {cat.description}
-                        </p>
-                      </div>
-
-                      <div className="w-10 h-10 rounded-xl bg-cyan-950/70 border border-cyan-500/30 flex items-center justify-center text-cyan-300 group-hover:scale-110 transition-transform shrink-0">
-                        <IconComponent className="w-5 h-5" />
-                      </div>
-                    </div>
-
-                    <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                      <span className="font-mono text-slate-400">
-                        {cat.count > 0 ? (
-                          <span className="text-cyan-300 font-semibold">{cat.count} Resources Ready</span>
-                        ) : (
-                          <span className="text-slate-500">Under Curation</span>
-                        )}
-                      </span>
-                      <div className="inline-flex items-center gap-1.5 font-bold text-cyan-400 group-hover:text-cyan-300 transition-colors">
-                        <span>Explore {cat.name.split(" ")[0]}</span>
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-        </section>
-      )}
-
-      {/* ============================================================ */}
-      {/* STEP 4: RESOURCE LIST PAGE (When a Category is open)         */}
-      {/* ============================================================ */}
-      {selectedBoard && selectedLevel && selectedCategory && activeCategoryObject && (
+      {selectedBoard && selectedLevel && activeCategoryObject && (
         <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 animate-in fade-in duration-300">
           
           {/* Header & Back Link */}
@@ -1034,11 +933,9 @@ export default function StudyMaterialRepository({
                 <span>{selectedBoard === "ENTRANCE" ? "ENTRANCE EXAMS" : selectedBoard}</span>
                 <span>•</span>
                 <span>{getLevelLabel(selectedLevel)}</span>
-                <span>•</span>
-                <span>{activeCategoryObject.name}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-serif tracking-tight mt-1">
-                {activeCategoryObject.name}
+                {activeCategoryObject.name} ({activeCategoryItems.length})
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 font-light mt-0.5">
                 {activeCategoryObject.subtitle}
@@ -1046,11 +943,11 @@ export default function StudyMaterialRepository({
             </div>
 
             <button
-              onClick={handleResetCategory}
+              onClick={handleResetLevel}
               className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-300 hover:text-white transition-colors self-start sm:self-center px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Categories</span>
+              <span>Change Level</span>
             </button>
           </div>
 
@@ -1064,7 +961,7 @@ export default function StudyMaterialRepository({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={`Search ${activeCategoryObject.name.toLowerCase()}...`}
+                placeholder={`Search materials...`}
                 className="w-full bg-[#030910] border border-cyan-500/25 focus:border-cyan-400 rounded-lg pl-9 pr-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none transition-colors"
               />
             </div>
@@ -1250,15 +1147,15 @@ export default function StudyMaterialRepository({
                   CHEMISTRY ARCHIVE UNDER CURATION
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-400 font-light leading-relaxed">
-                  Resources for this academic section ({selectedBoard} {getLevelLabel(selectedLevel)} - {activeCategoryObject.name}) are being prepared by the faculty.
+                  Resources for this academic section ({selectedBoard} {getLevelLabel(selectedLevel)}) are being prepared by the faculty.
                 </p>
               </div>
               <button
-                onClick={handleResetCategory}
+                onClick={handleResetLevel}
                 className="inline-flex items-center gap-1.5 text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors pt-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>← Choose another section</span>
+                <span>← Choose another level</span>
               </button>
             </div>
           )}

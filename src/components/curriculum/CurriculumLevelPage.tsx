@@ -182,69 +182,7 @@ export default function CurriculumLevelPage({
         </div>
       </div>
 
-      {/* Categories Grid (Hidden for Entrance: NEET/JEE/WBJEE/CUET show contents directly) */}
-      {!isEntranceExam && (
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xs font-mono tracking-[0.2em] text-slate-400 uppercase">
-              Academic Resource Categories
-            </h2>
-            <p className="text-lg font-bold text-white mt-0.5">
-              Select a category to explore dedicated documents
-            </p>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {categoryCards.map(cat => {
-            const Icon = cat.icon;
-            const categoryUrl = `/study-material/${board.toLowerCase()}/${level.toLowerCase().replace(/_/g, "-")}/${cat.id}`;
-
-            return (
-              <Link
-                key={cat.id}
-                href={categoryUrl}
-                className={`group cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.08] ${theme.cardBorder} p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-sm`}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono font-bold tracking-wider text-slate-200 group-hover:text-white transition-colors">
-                      {cat.name}
-                    </span>
-                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 group-hover:scale-110 transition-transform">
-                      <Icon className="w-4 h-4" />
-                    </div>
-                  </div>
-
-                  <p className="text-xs font-mono text-slate-400">
-                    {cat.subtitle}
-                  </p>
-
-                  <p className="text-xs text-slate-300/80 font-light leading-relaxed pt-1">
-                    {cat.description}
-                  </p>
-                </div>
-
-                <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                  <span className="font-mono text-slate-400">
-                    {cat.count > 0 ? (
-                      <span className="text-emerald-400 font-semibold">{cat.count} Ready</span>
-                    ) : (
-                      <span className="text-slate-500">Under curation</span>
-                    )}
-                  </span>
-                  <div className="inline-flex items-center gap-1 font-bold text-slate-300 group-hover:text-white transition-colors">
-                    <span>Open Category</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-      )}
 
       {/* Quick Search & Materials Preview for this Level */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
