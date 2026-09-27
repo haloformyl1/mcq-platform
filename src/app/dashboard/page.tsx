@@ -171,7 +171,7 @@ export default function StudentDashboard() {
       } catch {}
     }
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
+    window.location.href = "/";
   };
 
   if (loading) {

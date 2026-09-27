@@ -170,8 +170,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         window.dispatchEvent(new Event("piechem_gold_status_changed"));
       } catch {}
     }
+    document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   const handleTestAsStudent = async () => {

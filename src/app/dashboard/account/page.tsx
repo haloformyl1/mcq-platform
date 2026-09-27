@@ -679,7 +679,7 @@ export default function StudentAccountPage() {
     }
     document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
+    window.location.href = "/";
   };
 
   // Reactively synchronize localStorage to active subscription state (must be before early return)
