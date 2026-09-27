@@ -34,6 +34,7 @@ export interface StudyMaterialItem {
   policyTitle?: string;
   policyNote?: string;
   category: string;
+  originalCategory?: string;
   discipline: "PHYSICAL" | "INORGANIC" | "ORGANIC" | "GENERAL";
   chapterNumber?: number;
   chapterTitle?: string;
