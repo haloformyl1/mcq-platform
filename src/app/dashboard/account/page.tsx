@@ -1610,7 +1610,8 @@ export default function StudentAccountPage() {
                               setAcademicLevel("11");
                             }
                           }}
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
+                          disabled={isGold}
+                          className={"w-full rounded-xl px-4 py-2.5 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-slate-900/50 border border-slate-800 text-slate-500 cursor-not-allowed" : "bg-slate-950/90 border border-slate-800 focus:border-cyan-400 text-cyan-300")}
                         >
                           <option value="CBSE">CBSE</option>
                           <option value="ICSE">ICSE</option>
@@ -1627,7 +1628,8 @@ export default function StudentAccountPage() {
                           <select
                             value={academicLevel}
                             onChange={(e) => setAcademicLevel(e.target.value)}
-                            className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
+                            disabled={isGold}
+                            className={"w-full rounded-xl px-4 py-2.5 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-slate-900/50 border border-slate-800 text-slate-500 cursor-not-allowed" : "bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
                           >
                             <option value="SEM-I">SEM-I</option>
                             <option value="SEM-II">SEM-II</option>
@@ -1638,13 +1640,23 @@ export default function StudentAccountPage() {
                           <select
                             value={academicLevel}
                             onChange={(e) => setAcademicLevel(e.target.value)}
-                            className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer font-bold text-cyan-300"
+                            disabled={isGold}
+                            className={"w-full rounded-xl px-4 py-2.5 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-slate-900/50 border border-slate-800 text-slate-500 cursor-not-allowed" : "bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
                           >
                             <option value="11">Class 11</option>
                             <option value="12">Class 12</option>
                           </select>
                         )}
                       </div>
+
+                      {isGold && (
+                        <div className="sm:col-span-2">
+                          <p className="text-xs text-amber-500/80 italic font-medium flex items-center gap-1.5">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            You cannot modify your board and {board === "WBCHSE" ? "semester" : "class"} while your current plan is active.
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex justify-end pt-2">
