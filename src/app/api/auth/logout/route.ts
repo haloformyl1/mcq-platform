@@ -19,8 +19,11 @@ export async function POST() {
     }
   }
 
-  cookieStore.set("session", "", { path: "/", maxAge: 0 });
-  cookieStore.set("admin_session", "", { path: "/", maxAge: 0 });
-  cookieStore.set("piechem_device_id", "", { path: "/", maxAge: 0 });
-  return NextResponse.json({ success: true });
+  const response = NextResponse.json({ success: true });
+  
+  response.cookies.set("session", "", { path: "/", maxAge: 0 });
+  response.cookies.set("admin_session", "", { path: "/", maxAge: 0 });
+  response.cookies.set("piechem_device_id", "", { path: "/", maxAge: 0 });
+
+  return response;
 }

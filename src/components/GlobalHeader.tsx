@@ -136,7 +136,14 @@ export default function GlobalHeader({
                     </Link>
                     <button
                       onClick={async () => {
-                        await fetch('/api/auth/student/logout', { method: 'POST' });
+                        try {
+                          localStorage.removeItem("piechem_is_gold");
+                          localStorage.removeItem("piechem_gold_expires_at");
+                          localStorage.removeItem("piechem_is_complimentary");
+                          window.dispatchEvent(new Event("piechem_gold_status_changed"));
+                        } catch {}
+                        document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                        await fetch('/api/auth/logout', { method: 'POST' });
                         window.location.href = '/login';
                       }}
                       title="Logout"
