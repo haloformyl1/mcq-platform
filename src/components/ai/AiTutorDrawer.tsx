@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import FormattedAiMessage from "./FormattedAiMessage";
 import PiechemAiLogo from "./PiechemAiLogo";
+import PiechemLogo from "@/components/PiechemLogo";
 import { 
   X, Send, User, ArrowRight, 
   Atom, BookOpen, Dna, 
@@ -700,199 +701,6 @@ export default function AiTutorDrawer({
           />
         )}
 
-        {/* LEFT SIDEBAR (Width: 260px, Desktop + Mobile Overlay) */}
-        <aside 
-          className={`w-72 sm:w-80 lg:w-64 xl:w-72 shrink-0 border-r border-white/10 bg-transparent flex flex-col justify-between p-3.5 z-40 lg:z-20 transition-transform duration-200 ${
-            isMobileSidebarOpen 
-              ? 'fixed inset-y-0 left-0 pt-3 flex shadow-2xl safe-area-inset-top safe-area-inset-bottom' 
-              : 'hidden lg:flex'
-          }`}
-        >
-          {/* Mobile Sidebar Header */}
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 lg:hidden">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Chat History</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsMobileSidebarOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 touch-target flex items-center justify-center"
-              aria-label="Close History"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="flex-1 flex flex-col min-h-0 space-y-3.5">
-            {/* New Chat Button */}
-            <button
-              type="button"
-              onClick={handleNewChat}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-white/10 hover:border-white/20 text-white text-xs font-bold shadow-sm transition cursor-pointer group"
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
-                <span>New Chat</span>
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 bg-black/60 px-1.5 py-0.5 rounded border border-white/10">
-                ⌘ K
-              </span>
-            </button>
-
-            {/* Search History Input */}
-            <div className="relative">
-              <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
-              <input
-                type="text"
-                value={historySearch}
-                onChange={(e) => setHistorySearch(e.target.value)}
-                placeholder="Search history..."
-                className="w-full bg-zinc-950 border border-white/10 focus:border-white/25 rounded-lg pl-7 pr-6 py-1 text-[11px] text-slate-300 placeholder-slate-600 outline-none transition"
-              />
-              {historySearch && (
-                <button
-                  type="button"
-                  onClick={() => setHistorySearch("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
-                >
-                  <X className="w-2.5 h-2.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Scrollable History Section */}
-            <div className="flex-1 overflow-y-auto pr-1 space-y-3 no-scrollbar" ref={menuContainerRef}>
-              
-              {historyLoading ? (
-                /* Loading Skeleton */
-                <div className="space-y-2 pt-1">
-                  <div className="h-3 w-12 bg-white/5 rounded animate-pulse" />
-                  <div className="h-7 bg-white/[0.04] rounded-lg animate-pulse" />
-                  <div className="h-7 bg-white/[0.04] rounded-lg animate-pulse" />
-                  <div className="h-7 bg-white/[0.04] rounded-lg animate-pulse" />
-                </div>
-              ) : historyError ? (
-                <div className="px-2 py-3 rounded-lg bg-zinc-900 border border-zinc-800 text-center space-y-1.5">
-                  <p className="text-[11px] text-slate-300 font-medium">{historyError}</p>
-                  <button
-                    type="button"
-                    onClick={fetchConversations}
-                    className="text-[10px] text-cyan-400 underline hover:text-white cursor-pointer"
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : (
-                /* Grouped History List */
-                dateGroups.map(({ group, items }) => (
-                  <div key={group} className="space-y-1">
-                    <div className="flex items-center justify-between text-[10px] font-bold tracking-wider text-slate-500 px-1 uppercase">
-                      <span>{group === 'TODAY' ? 'CONVERSATION HISTORY' : group}</span>
-                      <ChevronRight className="w-3 h-3 text-slate-700" />
-                    </div>
-
-                    {items.length === 0 ? (
-                      <div className="px-2.5 py-3 text-center space-y-1 border border-dashed border-zinc-800 rounded-xl bg-zinc-950/40">
-                        <p className="text-[11px] font-medium text-slate-400">No conversations yet.</p>
-                        <p className="text-[10px] text-slate-500 leading-relaxed">
-                          Start by asking a Physics, Chemistry, Mathematics, or Biology question.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-0.5 text-xs">
-                        {items.map((chat) => (
-                          <div
-                            key={chat.id}
-                            className="group/item relative flex items-center"
-                          >
-                            {editingChatId === chat.id ? (
-                              /* Inline Rename Input */
-                              <div className="w-full flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-900 border border-zinc-700">
-                                <input
-                                  type="text"
-                                  autoFocus
-                                  value={editTitleInput}
-                                  onChange={(e) => setEditTitleInput(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveRename(chat.id);
-                                    if (e.key === 'Escape') setEditingChatId(null);
-                                  }}
-                                  onBlur={() => handleSaveRename(chat.id)}
-                                  className="w-full bg-transparent text-xs text-white outline-none"
-                                />
-                              </div>
-                            ) : (
-                              /* Conversation Item Button */
-                              <button
-                                type="button"
-                                onClick={() => handleSelectChat(chat.id)}
-                                className={`w-full flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-xl text-left transition cursor-pointer ${
-                                  activeChatId === chat.id
-                                    ? 'bg-zinc-900 border-l-2 border-white text-white font-semibold shadow-sm'
-                                    : 'text-slate-400 hover:text-white hover:bg-white/[0.03]'
-                                }`}
-                              >
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
-                                  <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                                  <span className="truncate text-xs">{chat.title}</span>
-                                </div>
-
-                                {/* Three-Dot Context Menu Trigger */}
-                                <div 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenMenuChatId(openMenuChatId === chat.id ? null : chat.id);
-                                  }}
-                                  className="opacity-0 group-hover/item:opacity-100 p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
-                                  title="Options"
-                                >
-                                  <MoreVertical className="w-3 h-3" />
-                                </div>
-                              </button>
-                            )}
-
-                            {/* Context Menu Dropdown */}
-                            {openMenuChatId === chat.id && (
-                              <div className="absolute right-0 top-full mt-0.5 w-32 rounded-lg bg-zinc-950 border border-zinc-800 shadow-xl p-1 z-50 animate-in fade-in slide-in-from-top-1">
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleStartRename(chat, e)}
-                                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-slate-300 hover:text-white hover:bg-white/10 transition text-left cursor-pointer"
-                                >
-                                  <Edit2 className="w-3 h-3 text-slate-400" />
-                                  <span>Rename</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleDeleteChat(chat.id, e)}
-                                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-rose-400 hover:text-rose-300 hover:bg-white/5 transition text-left cursor-pointer"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                  <span>Delete</span>
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Bottom Quote */}
-          <div className="pt-3 border-t border-white/10 shrink-0">
-            <p className="text-[10px] font-serif italic text-slate-400 leading-relaxed">
-              &ldquo; Better Questions.<br />
-              Deeper Understanding. &rdquo;
-            </p>
-            <div className="w-5 h-0.5 bg-zinc-600 mt-1" />
-          </div>
-        </aside>
-
         {/* CENTER MAIN WORKSPACE */}
         <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent">
           
@@ -907,71 +715,8 @@ export default function AiTutorDrawer({
               {messages.length === 0 && (
                 <div className="py-8 md:py-14 flex flex-col items-center text-center animate-in fade-in duration-300">
                   
-                  {/* Centered Atomic Icon */}
-                  <div className="relative mb-5">
-                    <div className="absolute inset-0 rounded-full bg-white/[0.04] blur-xl animate-pulse" />
-                    <div className="relative p-4 rounded-2xl bg-zinc-950 border border-white/10 shadow-2xl">
-                      <PiechemAiLogo size="lg" animated />
-                    </div>
-                  </div>
-
-                  <h1 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">
-                    PIECHEM <span className="text-white font-black">AI</span>
-                  </h1>
-
-                  <p className="text-xs md:text-sm text-slate-400 max-w-lg leading-relaxed mb-8">
-                    Ask questions, explore concepts, derive equations, and practice problems across Physics, Chemistry, Mathematics, and Biology.
-                  </p>
-
-                  {/* 4 Premium Subject Quick Action Tiles */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 w-full max-w-3xl">
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedSubject('Chemistry'); handleSendMessage("Explain SN1 vs SN2 reaction mechanism"); }}
-                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
-                    >
-                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
-                        <Atom className="w-4 h-4" />
-                      </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Chemistry</div>
-                      <div className="text-[11px] text-slate-400 mt-1 leading-snug">Molecular structure & reactions</div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedSubject('Physics'); handleSendMessage("Explain Newton's second law and derive F = ma"); }}
-                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
-                    >
-                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
-                        <Compass className="w-4 h-4" />
-                      </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Physics</div>
-                      <div className="text-[11px] text-slate-400 mt-1 leading-snug">Mechanics, fields & waves</div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedSubject('Mathematics'); handleSendMessage("Derive the integration by parts formula"); }}
-                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
-                    >
-                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
-                        <Calculator className="w-4 h-4" />
-                      </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Mathematics</div>
-                      <div className="text-[11px] text-slate-400 mt-1 leading-snug">Equations, calculus & proofs</div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => { setSelectedSubject('Biology'); handleSendMessage("Explain DNA replication process step by step"); }}
-                      className="group p-4 rounded-2xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 text-left transition-all cursor-pointer hover:scale-[1.02] shadow-xl shadow-black/60"
-                    >
-                      <div className="p-2 rounded-xl bg-zinc-900 border border-white/5 w-fit text-slate-300 mb-2.5 group-hover:text-white transition-colors">
-                        <Dna className="w-4 h-4" />
-                      </div>
-                      <div className="font-serif font-bold text-sm text-white group-hover:text-slate-100">Biology</div>
-                      <div className="text-[11px] text-slate-400 mt-1 leading-snug">Cells, genetics & systems</div>
-                    </button>
+                  <div className="relative mb-8 mt-4 scale-[1.2]">
+                    <PiechemLogo size="xl" showText={true} subtitle="An initiative by Arghyadeep Roy." />
                   </div>
 
                 </div>
@@ -1303,4 +1048,5 @@ export default function AiTutorDrawer({
     </div>
   );
 }
+
 

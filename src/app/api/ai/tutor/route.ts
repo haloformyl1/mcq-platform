@@ -74,47 +74,7 @@ export async function POST(req: NextRequest) {
       return await createAiQuotaExceededResponse(quotaStatus);
     }
 
-    // 5. SERVER-SIDE SUBJECT GATE & SCOPE CHECK
-    // Restricts queries strictly to Physics, Chemistry, Mathematics, and Biology
-    const scopeResult = classifySubjectScope(trimmedPrompt);
-    const isBengali = language === 'bn' || /[ঀ-৿]/.test(trimmedPrompt);
 
-    if (!scopeResult.allowed) {
-      // OUT OF SCOPE: Return polite scope message immediately WITHOUT consuming quota or calling Gemini
-      const refusalMessage = isBengali ? scopeResult.scopeMessageBn : scopeResult.scopeMessageEn;
-      const goldPrice = await getDynamicGoldPrice();
-
-      return NextResponse.json({
-        answer: refusalMessage,
-        reply: refusalMessage,
-        content: refusalMessage,
-        isOutOfScope: true,
-        model: "PIECHEM Subject Scope Guard",
-        sources: [],
-        sourceCategory: 'GENERAL_ACADEMIC',
-        groundedInPiechem: false,
-        suggestedFollowUps: isBengali ? [
-          "নিউটনের গতিসূত্র ব্যাখ্যা কর",
-          "SN2 বিক্রিয়ার কৌশল দেখাও",
-          "অন্তরকলন সূত্র সমাধান কর",
-          "ডিএনএ অনুলিপন প্রক্রিয়া ব্যাখ্যা কর"
-        ] : [
-          "Explain Newton's second law",
-          "Explain SN2 reaction mechanism",
-          "Solve ∫x² dx",
-          "Explain DNA replication"
-        ],
-        language: isBengali ? 'bn' : 'en',
-        goldPrice,
-        quota: {
-          queriesUsed: quotaStatus.queriesUsed,
-          totalLimit: quotaStatus.totalLimit,
-          dailyLimit: quotaStatus.totalLimit,
-          remaining: quotaStatus.remaining,
-          isUnlimited: quotaStatus.isUnlimited
-        }
-      });
-    }
 
     // 6. Consume 1 AI query from student quota for valid requests
     const quota = await consumeAiQuota(student?.id, userApiKey);
