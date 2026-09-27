@@ -724,7 +724,7 @@ export default function StudentLogin() {
       {/* ========================================================= */}
       {/* 2. MORE REASONS TO JOIN - LUXURY BENTO GRID SHOWCASE      */}
       {/* ========================================================= */}
-      <section className="relative z-10 bg-[#030910] w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-10 sm:py-16">
+      <section className="relative z-10 bg-transparent w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-10 sm:py-16">
         
         {/* Ambient background glows for bento */}
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
