@@ -2015,7 +2015,7 @@ export default function StudentAccountPage() {
                   <span>Secure Checkout</span>
                 </span>
                 <button
-                  onClick={() => closeModal()}
+                  onClick={() => setShowPaymentModal(false)}
                   className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
