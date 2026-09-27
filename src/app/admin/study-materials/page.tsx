@@ -1644,6 +1644,7 @@ export default function AdminStudyMaterials() {
                     </div>
 
                     {/* Quick Category / Branch / Section Changer */}
+                    {item.type !== "LINK" && (
                     <div className="p-2.5 rounded-xl bg-[#0c0c0c] border border-[#222] space-y-2 text-xs">
                       {/* Section Quick Changer */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
@@ -1721,6 +1722,7 @@ export default function AdminStudyMaterials() {
                         </select>
                       </div>
                     </div>
+                    )}
                   </div>
 
                   <div className="pt-3 border-t border-[#222] flex flex-wrap items-center justify-between gap-2">
