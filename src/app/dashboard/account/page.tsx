@@ -758,21 +758,17 @@ export default function StudentAccountPage() {
   const isLifetime = isComplimentary;
   const is30Day = isGold && !!student.subscriptionExpiresAt;
 
-  const rawPayerUpi = (upgradeReq?.utrNumber && upgradeReq.utrNumber.includes("@"))
-    ? upgradeReq.utrNumber
-    : (paymentSettings?.upiId || "arg9830@axl");
+  const latestApprovedReq = (data?.allRequests || []).find((r: any) => r.status === "APPROVED" && r.utrNumber?.includes("@"));
+  const rawPayerUpi = latestApprovedReq?.utrNumber || null;
 
-  const displayUpiId = (() => {
-    if (rawPayerUpi.includes("@")) {
-      const [user, domain] = rawPayerUpi.split("@");
-      return `${user.slice(0, 1)}•••@${domain}`;
-    }
-    return rawPayerUpi;
-  })();
+  const displayUpiId = rawPayerUpi ? (() => {
+    const [user, domain] = rawPayerUpi.split("@");
+    return `${user.slice(0, 1)}•••@${domain}`;
+  })() : null;
 
-  const isPhonePe = rawPayerUpi.toLowerCase().endsWith("@ybl") || 
+  const isPhonePe = rawPayerUpi ? (rawPayerUpi.toLowerCase().endsWith("@ybl") || 
                     rawPayerUpi.toLowerCase().endsWith("@ibl") || 
-                    rawPayerUpi.toLowerCase().endsWith("@axl");
+                    rawPayerUpi.toLowerCase().endsWith("@axl")) : false;
 
   return (
     <div className="min-h-screen flex flex-col bg-transparent text-white font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden">
@@ -1221,7 +1217,7 @@ export default function StudentAccountPage() {
                         {is30Day ? nextPaymentFormatted : isComplimentary ? "Complimentary Pass" : "No payment method on file"}
                       </p>
 
-                      {is30Day && (
+                      {is30Day && displayUpiId && (
                         <div className="flex items-center gap-2 pt-2">
                           {isPhonePe ? (
                             <div className="w-6 h-6 rounded bg-[#5f259f] flex items-center justify-center text-white text-xs font-bold shadow-sm select-none shrink-0">
@@ -1239,20 +1235,64 @@ export default function StudentAccountPage() {
                       )}
                     </div>
 
-                    {/* Redeem Gift or Promo Code Link */}
-                    <button
-                      onClick={() => {
-                        setPromoMsg(null);
-                        setPromoCodeInput("");
-                        openModal("promo");
-                      }}
-                      className="w-full px-6 sm:px-7 py-5 flex items-center justify-between text-left hover:bg-[#111a27] transition-colors group cursor-pointer"
-                    >
-                      <span className="text-sm font-bold text-white">
-                        Redeem gift or promo code
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    {/* Detailed Payment Status Row */}
+                    <div className="p-6 sm:p-7 space-y-4 border-t border-slate-800">
+                      <h4 className="text-sm uppercase tracking-wider font-bold text-slate-500">
+                        Detailed Payment Status
+                      </h4>
+                      {!upgradeReq ? (
+                        <div className="text-sm font-medium text-slate-400">
+                          Not Applicable
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {upgradeReq.status === "PENDING" && (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                              <span>Under Verification by Admin</span>
+                            </div>
+                          )}
+                          {upgradeReq.status === "APPROVED" && (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Payment Accepted</span>
+                            </div>
+                          )}
+                          {upgradeReq.status === "REJECTED" && (
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider">
+                              <AlertCircle className="w-3.5 h-3.5" />
+                              <span>Payment Rejected</span>
+                            </div>
+                          )}
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+                            <div>
+                              <span className="block text-slate-500 mb-0.5">Submitted On:</span>
+                              <span className="text-slate-300">{formatDateTime24(upgradeReq.createdAt)}</span>
+                            </div>
+                            {upgradeReq.status !== "PENDING" && (
+                              <div>
+                                <span className="block text-slate-500 mb-0.5">Admin Verified On:</span>
+                                <span className="text-slate-300">
+                                  {upgradeReq.approvedAt 
+                                    ? formatDateTime24(upgradeReq.approvedAt) 
+                                    : formatDateTime24(upgradeReq.updatedAt)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="pt-2">
+                            <p className="text-xs text-slate-400 leading-relaxed">
+                              Need help? Contact our support helpline:<br/>
+                              <a href="tel:9830507435" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors mt-1 inline-block">
+                                📞 9830507435
+                              </a>
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {/* View Payment History Link */}
                     <button
