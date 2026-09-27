@@ -71,18 +71,8 @@ function ThreeDAnimationsContent() {
         if (matRes && matRes.ok) {
           const mats = await matRes.json();
           if (Array.isArray(mats) && mounted) {
-            // Filter strictly for 3D simulation experiences
-            const sims = mats.filter((m: any) => {
-              const lower = (m.title || "").toLowerCase();
-              return (
-                m.type === "LINK" || 
-                m.category === "3D animations" || 
-                (m.url && m.url.includes("lab-viewer")) ||
-                lower.includes("3d") ||
-                lower.includes("solid state") ||
-                lower.includes("bonding")
-              );
-            });
+            // Filter strictly for 3D simulation experiences (External Links)
+            const sims = mats.filter((m: any) => m.type === "LINK" && m.url);
             setAnimations(sims);
           }
         }
