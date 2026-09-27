@@ -74,7 +74,9 @@ export async function POST(req: NextRequest) {
       return await createAiQuotaExceededResponse(quotaStatus);
     }
 
-
+    // Variable restored for context mapping and language detection
+    const scopeResult = classifySubjectScope(trimmedPrompt);
+    const isBengali = language === 'bn' || /[ঀ-৿]/.test(trimmedPrompt);
 
     // 6. Consume 1 AI query from student quota for valid requests
     const quota = await consumeAiQuota(student?.id, userApiKey);
