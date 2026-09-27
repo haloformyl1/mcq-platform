@@ -439,6 +439,11 @@ export function isStudentEligibleForMaterial(
   const isCbseSec = rawSec === "CBSE";
   const isIcseSec = rawSec === "ICSE" || rawSec === "ISC";
 
+  // Bypassing class/semester restrictions for competitive content!
+  if (isEntranceSec) {
+    return { eligible: true, ...tailored };
+  }
+
   if (!isAllSec && !isEntranceSec) {
     if (isWbchseSec && !isWbchseStudent) {
       return { eligible: false, ...tailored };
