@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
@@ -168,13 +168,18 @@ export async function PATCH(req: Request) {
         : now;
 
       // 1. Upgrade student subscription to PAID with exact Active Since and Expiry
+      const studentUpdateData: any = {
+        subscriptionStatus: "PAID",
+        subscriptionStartedAt: activeSince,
+        subscriptionExpiresAt: expiresAt
+      };
+
+      if (upgradeReq.purchasedBoard) studentUpdateData.board = upgradeReq.purchasedBoard;
+      if (upgradeReq.purchasedClass) studentUpdateData.academicLevel = upgradeReq.purchasedClass;
+
       await prisma.student.update({
         where: { id: upgradeReq.studentId },
-        data: {
-          subscriptionStatus: "PAID",
-          subscriptionStartedAt: activeSince,
-          subscriptionExpiresAt: expiresAt
-        }
+        data: studentUpdateData
       });
 
       // 2. Mark request APPROVED with exact timestamps
@@ -263,13 +268,18 @@ export async function POST(req: Request) {
         ? matchingReq.student.subscriptionStartedAt
         : now;
 
+      const studentUpdateData: any = {
+        subscriptionStatus: "PAID",
+        subscriptionStartedAt: activeSince,
+        subscriptionExpiresAt: expiresAt
+      };
+
+      if (matchingReq.purchasedBoard) studentUpdateData.board = matchingReq.purchasedBoard;
+      if (matchingReq.purchasedClass) studentUpdateData.academicLevel = matchingReq.purchasedClass;
+
       await prisma.student.update({
         where: { id: matchingReq.studentId },
-        data: {
-          subscriptionStatus: "PAID",
-          subscriptionStartedAt: activeSince,
-          subscriptionExpiresAt: expiresAt
-        }
+        data: studentUpdateData
       });
 
       await prisma.subscriptionUpgradeRequest.update({
@@ -323,13 +333,18 @@ export async function POST(req: Request) {
             ? req.student.subscriptionStartedAt
             : now;
 
+          const studentUpdateData: any = {
+            subscriptionStatus: "PAID",
+            subscriptionStartedAt: activeSince,
+            subscriptionExpiresAt: expiresAt
+          };
+
+          if (req.purchasedBoard) studentUpdateData.board = req.purchasedBoard;
+          if (req.purchasedClass) studentUpdateData.academicLevel = req.purchasedClass;
+
           await prisma.student.update({
             where: { id: req.studentId },
-            data: {
-              subscriptionStatus: "PAID",
-              subscriptionStartedAt: activeSince,
-              subscriptionExpiresAt: expiresAt
-            }
+            data: studentUpdateData
           });
 
           await prisma.subscriptionUpgradeRequest.update({

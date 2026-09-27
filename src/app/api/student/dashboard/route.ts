@@ -95,7 +95,10 @@ export async function GET(req: Request) {
 
     // Filter tests by target audience (Board and Class/Semester eligibility)
     const eligibleTests = availableTests.filter(t => {
-      const matchesBoard = !t.targetBoard || t.targetBoard === "ALL" || t.targetBoard === student.board;
+      if (!t.isPremium) return true;
+      if (t.targetBoard === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" || t.targetBoard === "ALL" || !t.targetBoard) return true;
+
+      const matchesBoard = t.targetBoard === student.board;
       let matchesLevel = !t.targetAcademicLevel || t.targetAcademicLevel === "ALL" || t.targetAcademicLevel === student.academicLevel;
       if (!matchesLevel && student.board && student.academicLevel && t.targetAcademicLevel) {
         const isCbseOrIcse = student.board === "CBSE" || student.board === "ICSE";

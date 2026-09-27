@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const studentId = payload.id as string;
     const body = await req.json().catch(() => ({}));
-    const { utrNumber, studentUpiId, amount } = body;
+    const { utrNumber, studentUpiId, amount, purchasedBoard, purchasedClass } = body;
     const cleanUpi = studentUpiId ? String(studentUpiId).trim() : null;
     const cleanUtr = utrNumber ? String(utrNumber).trim() : null;
     const identifier = cleanUpi || cleanUtr;
@@ -67,6 +67,8 @@ export async function POST(req: Request) {
         utrNumber: identifier,
         note: cleanUpi ? "Payer UPI ID: " + cleanUpi : null,
         amount: finalAmount,
+        purchasedBoard: purchasedBoard || "CBSE",
+        purchasedClass: purchasedClass || "11",
         status: "PENDING"
       }
     });

@@ -46,10 +46,15 @@ export async function GET(req: Request) {
     const sanitized = materials.map(m => {
       const meta = parseMaterialMetadata(m.description, m.title, m.type);
       const eligibility = isStudentEligibleForMaterial(studentProfile, meta.section, meta.classSem);
-      const isLevelRestricted = !eligibility.eligible;
+      let isLevelRestricted = !eligibility.eligible;
+      const is3D = meta.category === '3D animations' || m.type === 'LINK';
+
+      if (!m.isPremium || is3D) {
+        isLevelRestricted = false;
+      }
+
       const isPaidLocked = m.isPremium && !isSubscribed;
       const isLocked = isLevelRestricted || isPaidLocked;
-      const is3D = meta.category === '3D animations' || m.type === 'LINK';
 
       let safeUrl = m.url;
       if (isLocked) {

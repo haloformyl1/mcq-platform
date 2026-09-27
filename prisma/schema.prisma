@@ -256,6 +256,8 @@ model SubscriptionUpgradeRequest {
   studentId String
   status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
   note      String?
+  purchasedBoard String?
+  purchasedClass String?
   approvedAt DateTime?
   expiresAt  DateTime?
   approvalRevealClaimedAt DateTime?

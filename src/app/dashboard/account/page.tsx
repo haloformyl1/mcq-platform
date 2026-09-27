@@ -198,6 +198,8 @@ export default function StudentAccountPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
   const [studentUpiId, setStudentUpiId] = useState("");
+  const [purchasedBoard, setPurchasedBoard] = useState("CBSE");
+  const [purchasedClass, setPurchasedClass] = useState("11");
   const [paymentStep, setPaymentStep] = useState<"input" | "notice" | "waiting" | "success">("input");
   const [utrNumber, setUtrNumber] = useState("");
   const [copiedUpi, setCopiedUpi] = useState(false);
@@ -527,6 +529,8 @@ export default function StudentAccountPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           studentUpiId: trimmedUpi, 
+          purchasedBoard,
+          purchasedClass,
           amount: paymentSettings?.monthlyFee || 199.0 
         })
       });
@@ -2157,6 +2161,48 @@ export default function StudentAccountPage() {
                 
                 <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 shadow-sm space-y-6">
                   
+                  {/* Board and Class Selection */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Board</label>
+                      <select 
+                        value={purchasedBoard}
+                        onChange={(e) => {
+                          setPurchasedBoard(e.target.value);
+                          if (e.target.value === "WBCHSE") setPurchasedClass("SEM-I");
+                          else setPurchasedClass("11");
+                        }}
+                        className="w-full bg-[#111a27] text-white rounded-xl px-4 py-3 text-sm font-medium border border-slate-700 outline-none focus:border-cyan-500/80"
+                      >
+                        <option value="CBSE">CBSE</option>
+                        <option value="ICSE">ICSE</option>
+                        <option value="WBCHSE">WBCHSE</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Class</label>
+                      <select 
+                        value={purchasedClass}
+                        onChange={(e) => setPurchasedClass(e.target.value)}
+                        className="w-full bg-[#111a27] text-white rounded-xl px-4 py-3 text-sm font-medium border border-slate-700 outline-none focus:border-cyan-500/80"
+                      >
+                        {purchasedBoard === "WBCHSE" ? (
+                          <>
+                            <option value="SEM-I">Semester I</option>
+                            <option value="SEM-II">Semester II</option>
+                            <option value="SEM-III">Semester III</option>
+                            <option value="SEM-IV">Semester IV</option>
+                          </>
+                        ) : (
+                          <>
+                            <option value="11">Class 11</option>
+                            <option value="12">Class 12</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+                  </div>
+
                   {/* UPI ID Input Field */}
                   <div className="space-y-2.5">
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
