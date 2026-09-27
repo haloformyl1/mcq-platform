@@ -730,24 +730,6 @@ export default function StudentLogin() {
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Live Examination Sessions Broadcast Ticker */}
-        <div className="relative mb-12 sm:mb-16 overflow-hidden rounded-2xl bg-gradient-to-r from-[#031526]/90 via-[#071d33]/90 to-[#031526]/90 border border-cyan-500/40 p-4 sm:p-5 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_25px_rgba(0,210,255,0.15)] backdrop-blur-xl">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-[10px] font-mono font-bold tracking-widest text-cyan-300 uppercase shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                PLATFORM BROADCAST
-              </span>
-              <p className="text-xs sm:text-sm text-slate-200 font-medium">
-                <strong className="text-white font-bold">2026 Examination Sessions Active:</strong> Weekly timed mock tests for WBCHSE, CBSE, ISC, and JEE/NEET with immediate AI evaluation are now live!
-              </p>
-            </div>
-            <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider bg-white/[0.05] border border-white/10 text-cyan-300 shrink-0">
-              Session 2026–27
-            </span>
-          </div>
-        </div>
-
         {/* Section Heading */}
         <div className="mb-10 sm:mb-14">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-cyan-400 mb-2">
