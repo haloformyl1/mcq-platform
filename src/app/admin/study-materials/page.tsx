@@ -64,7 +64,7 @@ export default function AdminStudyMaterials() {
     title: "",
     description: "",
     type: "PDF",
-    category: "Chapter wise PDF Notes" as LibraryCategoryType,
+    category: "3D animations" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
     section: "ALL" as CurriculumSectionType,
     classSem: "SEM-I" as ClassSemType,
@@ -646,7 +646,6 @@ export default function AdminStudyMaterials() {
 
   // Filter materials for catalog display
   const filteredMaterials = materials.filter((item: any) => {
-    if (item.category === "3D animations") return false;
     if (filterCategory !== "ALL" && item.category !== filterCategory) return false;
     if (filterSection !== "ALL" && (item.section || "ALL") !== filterSection) return false;
     if (filterClassSem !== "ALL" && (item.classSem || "ALL") !== filterClassSem) return false;
@@ -880,6 +879,7 @@ export default function AdminStudyMaterials() {
                           className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
                         >
                           <option value="PDF">PDF Document</option>
+                          <option value="LINK">External Link / 3D Simulation</option>
                           <option value="IMAGE">Image</option>
                         </select>
                       </div>

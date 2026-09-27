@@ -231,7 +231,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Test Alerts", href: "/admin/test-alerts" },
     { name: "Notifications", href: "/admin/notifications" },
     { name: "Content Upload", href: "/admin/study-materials" },
-    { name: "3D Animations", href: "/admin/3d-animations" },
   ];
 
   return (
@@ -241,32 +240,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Main Top Bar */}
           <div className="admin-top-bar flex items-center justify-between h-16 gap-3">
             
-            {/* Left Brand & Title & Nav Links */}
-            <div className="flex min-w-0 items-center shrink-0 flex-1">
-              <div className="flex min-w-0 items-center space-x-2.5 sm:space-x-3 shrink-0">
-                <PiechemLogo size="sm" isGoldMember={false} />
-                <span className="admin-panel-title border-l border-slate-700/80 pl-2 sm:pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
-                  Admin Panel
-                </span>
-              </div>
+            {/* Left Brand & Title */}
+            <div className="flex min-w-0 items-center space-x-2.5 sm:space-x-3 shrink-0">
+              <PiechemLogo size="sm" isGoldMember={false} />
+              <span className="admin-panel-title border-l border-slate-700/80 pl-2 sm:pl-2.5 text-xs sm:text-sm text-cyan-400 font-bold tracking-wide whitespace-nowrap">
+                Admin Panel
+              </span>
+            </div>
 
-              {/* Desktop Nav Links (Hidden on Mobile) */}
-              <div className="hidden md:flex items-center overflow-x-auto scrollbar-none py-1 ml-6 mr-4">
-                <div className="flex items-center space-x-1 whitespace-nowrap">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition shrink-0 ${
-                        pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
-                          ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-sm"
-                          : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
+            {/* Desktop Nav Links (Hidden on Mobile) */}
+            <div className="hidden md:flex flex-1 items-center overflow-x-auto scrollbar-none py-1 mx-4">
+              <div className="flex items-center space-x-1 whitespace-nowrap">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition shrink-0 ${
+                      pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/admin")
+                        ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-sm"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
             </div>
 
