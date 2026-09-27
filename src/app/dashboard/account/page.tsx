@@ -1125,36 +1125,7 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
-                {/* 3. Academic & System Telemetry Capsule Card */}
-                <div className="rounded-2xl bg-[#0b131e] border border-slate-800 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="text-slate-400">
-                      <Shield className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-white flex items-center gap-2">
-                        <span>Proctoring Security Shield Active</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Single-device exam lock active. Registered email: <strong className="text-slate-300 font-mono">{student.email}</strong>
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-4 text-xs">
-                    <div className="text-right hidden sm:block">
-                      <span className="text-slate-500 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Exams Attempted</span>
-                      <span className="font-bold text-white">{completedAttempts.length} Completed</span>
-                    </div>
-                    <Link
-                      href="/dashboard"
-                      className="px-4 py-2.5 rounded-xl bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white font-bold transition-colors cursor-pointer"
-                    >
-                      Dashboard Analytics →
-                    </Link>
-                  </div>
-                </div>
 
               </div>
             )}

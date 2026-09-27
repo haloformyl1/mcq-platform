@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { KeyRound, Shield, X, Check, Lock, Phone } from "lucide-react";
@@ -35,6 +35,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     enforceFullscreen: true,
     tabSwitchAction: "AUTO_SUBMIT"
   });
+  
+  const [pendingPaymentCount, setPendingPaymentCount] = useState(0);
+
+  useEffect(() => {
+    const checkPendingPayments = async () => {
+      try {
+        const res = await fetch("/api/admin/subscriptions");
+        if (res.ok) {
+          const data = await res.json();
+          const pending = (data.requests || []).filter((r: any) => r.status === "PENDING").length;
+          setPendingPaymentCount(pending);
+        }
+      } catch (err) {}
+    };
+    checkPendingPayments();
+    
+    // Check every 30 seconds for new payment requests
+    const interval = setInterval(checkPendingPayments, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchPaymentSettings = async () => {
     setPaymentLoading(true);
@@ -258,9 +278,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               <Link
                 href="/admin/payments"
-                className="bg-emerald-600/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-emerald-500/40 shrink-0"
+                className="relative bg-emerald-600/90 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-emerald-500/40 shrink-0"
               >
                 <span className="hidden sm:inline">💰 Payment</span><span className="sm:hidden">💰</span>
+                {pendingPaymentCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm border border-red-900 shadow-[0_0_8px_rgba(239,68,68,0.6)]">
+                    {pendingPaymentCount > 9 ? '9+' : pendingPaymentCount}
+                  </span>
+                )}
               </Link>
 
               <button
