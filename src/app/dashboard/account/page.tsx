@@ -2258,15 +2258,20 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
-                {/* Two Payment Options: Mobile vs PC/Laptop */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+                {/* Two Payment Options: Responsive Logic */}
+                <div className="grid grid-cols-1 gap-5 items-stretch">
                   
-                  {/* OPTION 1: MOBILE APP DIRECT */}
-                  <div className="p-5 sm:p-6 rounded-2xl bg-slate-950/90 border border-rose-500/30 flex flex-col justify-between space-y-5">
+                  {/* OPTION 1: MOBILE APP DIRECT (Only on Mobile) */}
+                  <div className="block md:hidden p-5 sm:p-6 rounded-2xl bg-slate-950/90 border border-rose-500/30 flex flex-col justify-between space-y-5 relative">
                     <div className="space-y-2">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs font-bold">
-                        <MonitorSmartphone className="w-4 h-4 text-rose-400" />
-                        <span>Mobile Device</span>
+                      <div className="flex items-center justify-between">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs font-bold">
+                          <MonitorSmartphone className="w-4 h-4 text-rose-400" />
+                          <span>Mobile Device</span>
+                        </div>
+                        <span className="text-[10px] font-black tracking-widest text-amber-300 uppercase px-2 py-1 bg-amber-950/60 rounded-md border border-amber-500/40 shadow-sm animate-pulse">
+                          RECOMMENDED
+                        </span>
                       </div>
                       <h4 className="text-base font-bold text-white">
                         Pay Directly via UPI App
@@ -2319,38 +2324,6 @@ export default function StudentAccountPage() {
                     </div>
                   </div>
 
-                </div>
-
-                {/* Payee Info & Copy UPI */}
-                <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-slate-950/90 border border-rose-500/20 rounded-2xl text-xs">
-                  <div className="text-left">
-                    <span className="text-slate-400 block text-xs">Receiving UPI ID (Admin):</span>
-                    <span className="text-white font-mono font-bold text-sm">{paymentSettings?.upiId || "9830507435@upi"}</span>
-                    <span className="text-slate-400 text-xs ml-2">({paymentSettings?.payeeName || "Arghyadeep Roy"})</span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(paymentSettings?.upiId || "9830507435@upi");
-                        setCopiedUpi(true);
-                        setTimeout(() => setCopiedUpi(false), 2000);
-                      }}
-                      className="px-3.5 py-1.5 rounded-xl bg-rose-950 border border-rose-700/60 text-rose-300 text-xs font-mono hover:bg-rose-900 transition flex items-center gap-1.5 cursor-pointer"
-                    >
-                      {copiedUpi ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                      <span>{copiedUpi ? "Copied!" : "Copy UPI"}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setPaymentStep("input")}
-                      className="text-xs text-slate-400 hover:text-rose-300 underline cursor-pointer"
-                    >
-                      Edit Payer UPI
-                    </button>
-                  </div>
                 </div>
 
                 {/* Live Status indicator */}
