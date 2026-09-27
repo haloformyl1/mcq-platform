@@ -95,7 +95,6 @@ export async function GET(req: Request) {
 
     // Filter tests by target audience (Board and Class/Semester eligibility)
     const eligibleTests = availableTests.filter(t => {
-      if (!t.isPremium) return true;
       if (t.targetBoard === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" || t.targetBoard === "ALL" || !t.targetBoard) return true;
 
       const matchesBoard = t.targetBoard === student.board;

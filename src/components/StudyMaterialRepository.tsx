@@ -1022,7 +1022,9 @@ export default function StudyMaterialRepository({
               {activeCategoryItems.map((item) => {
                 const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
                 const isEntranceContent = item.section?.toUpperCase().includes("ENTRANCE") || item.section?.toUpperCase().includes("NEET") || item.section?.toUpperCase().includes("JEE");
-                const isLevelRestricted = isEntranceContent ? false : (student ? !eligibility.eligible : Boolean(item.isLevelRestricted));
+                const is3D = item.category === '3D animations' || item.type === 'LINK';
+                const isFree = !item.isPremium;
+                const isLevelRestricted = (isEntranceContent || is3D || isFree) ? false : (student ? !eligibility.eligible : Boolean(item.isLevelRestricted));
                 const restrictionReason = eligibility.reason || item.restrictionReason;
                 const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
                 const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;

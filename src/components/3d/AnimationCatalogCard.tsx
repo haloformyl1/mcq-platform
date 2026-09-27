@@ -42,7 +42,7 @@ export default function AnimationCatalogCard({
 }: AnimationCatalogCardProps) {
   const hasGold = Boolean(isGold ?? isGoldMember);
   const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
-  const isLevelRestricted = student ? !eligibility.eligible : Boolean(item.isLevelRestricted);
+  const isLevelRestricted = false;
   const restrictionReason = eligibility.reason || item.restrictionReason;
   const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
   const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
