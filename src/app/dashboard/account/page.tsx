@@ -873,7 +873,7 @@ export default function StudentAccountPage() {
 
                       {isGold && (
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                           <span>ACTIVE ACCESS</span>
                         </span>
                       )}
