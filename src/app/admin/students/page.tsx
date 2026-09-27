@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatDateTime24 } from "@/lib/subscription";
 import { useRouter } from "next/navigation";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import ComplimentaryModal from "@/components/admin/ComplimentaryModal";
 
 function formatWhatsAppLastSeen(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return "-";
@@ -58,6 +59,7 @@ export default function AdminStudents() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const router = useRouter();
   const [resetModalStudent, setResetModalStudent] = useState<Student | null>(null);
+  const [complimentaryModalStudent, setComplimentaryModalStudent] = useState<Student | null>(null);
   const [tempPassword, setTempPassword] = useState("");
   const [showTempPass, setShowTempPass] = useState(true);
   const [notifyEmail, setNotifyEmail] = useState(true);
@@ -152,6 +154,44 @@ export default function AdminStudents() {
   useEffect(() => {
     fetchStudents();
   }, [search, statusFilter]);
+
+  const handleGrantComplimentary = async (board: string, academicLevel: string) => {
+    if (!complimentaryModalStudent) return;
+    try {
+      const res = await fetch(`/api/admin/students/${complimentaryModalStudent.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionStatus: "COMPLIMENTARY", board, academicLevel })
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        setStudents(prev => prev.map(s => s.id === complimentaryModalStudent.id ? { ...s, subscriptionStatus: "COMPLIMENTARY", subscriptionExpiresAt: null, hasActiveUpi: false } : s));
+        setComplimentaryModalStudent(null);
+      } else {
+        alert(resData.error || "Failed to update subscription");
+      }
+    } catch (err) {
+      console.error("Failed to update subscription", err);
+    }
+  };
+
+  const handleUpdateSubscription = async (studentId: string, newSub: string) => {
+    try {
+      const res = await fetch(`/api/admin/students/${studentId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionStatus: newSub })
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        setStudents(prev => prev.map(s => s.id === studentId ? { ...s, subscriptionStatus: newSub, subscriptionExpiresAt: null, hasActiveUpi: false } : s));
+      } else {
+        alert(resData.error || "Failed to update subscription");
+      }
+    } catch (err) {
+      console.error("Failed to update subscription", err);
+    }
+  };
 
   return (
     <div className="space-y-8">

@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
@@ -10,7 +10,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, subscriptionStatus } = body;
+    const { status, subscriptionStatus, board, academicLevel } = body;
     
     const cookieStore = await cookies();
     const adminSession = cookieStore.get("admin_session")?.value;
@@ -68,6 +68,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         // Admin Manual Upgrade: Full Premium Access for Free, NEVER EXPIRES!
         updateData.subscriptionStartedAt = new Date();
         updateData.subscriptionExpiresAt = null;
+        if (board) updateData.board = board;
+        if (academicLevel) updateData.academicLevel = academicLevel;
       } else if (subscriptionStatus === "FREE") {
         updateData.subscriptionStartedAt = null;
         updateData.subscriptionExpiresAt = null;
