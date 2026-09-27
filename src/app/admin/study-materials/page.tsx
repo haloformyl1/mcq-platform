@@ -772,7 +772,9 @@ export default function AdminStudyMaterials() {
                       </div>
           
                       {/* Curriculum Section Selector */}
-                      <div className="space-y-1.5">
+                      {form.type !== "LINK" && (
+                        <>
+                          <div className="space-y-1.5">
                         <label className="text-xs font-bold text-purple-300 uppercase tracking-wide flex items-center gap-1.5">
                           <Layers className="w-3.5 h-3.5 text-purple-400" />
                           <span>Curriculum / Section <span className="text-red-400">*</span></span>
@@ -867,6 +869,8 @@ export default function AdminStudyMaterials() {
                           <option value="ORGANIC">Organic Chemistry</option>
                         </select>
                       </div>
+                      </>
+                      )}
           
                       {/* Resource Type */}
                       <div className="space-y-1.5">
@@ -1810,7 +1814,9 @@ export default function AdminStudyMaterials() {
 
 
                 {/* Curriculum / Section */}
-                <div className="space-y-1.5">
+                {editForm.type !== "LINK" && (
+                  <>
+                    <div className="space-y-1.5">
                   <label className="text-xs font-bold text-purple-300 uppercase tracking-wide">
                     Curriculum / Section <span className="text-red-400">*</span>
                   </label>
@@ -1896,6 +1902,8 @@ export default function AdminStudyMaterials() {
                     <option value="ORGANIC">Organic Chemistry</option>
                   </select>
                 </div>
+                </>
+                )}
 
                 {/* Format Type */}
                 <div className="space-y-1.5">
