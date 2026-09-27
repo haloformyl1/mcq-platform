@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
@@ -15,6 +15,17 @@ export async function POST(req: Request) {
     const studentId = payload.id;
     const student = await prisma.student.findUnique({ where: { id: studentId } });
     if (!student) return NextResponse.json({ error: "Student not found" }, { status: 404 });
+
+    const existingPending = await prisma.subscriptionUpgradeRequest.findFirst({
+      where: { studentId: student.id, status: "PENDING" }
+    });
+
+    if (existingPending) {
+      return NextResponse.json({
+        error: "Your payment is currently awaiting admin verification.",
+        isPendingVerification: true
+      }, { status: 400 });
+    }
 
     const settings = await prisma.paymentSetting.findUnique({ where: { id: "default" } });
     const mid = settings?.paytmMid || process.env.PAYTM_MID;

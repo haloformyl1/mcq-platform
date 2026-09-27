@@ -8,7 +8,7 @@ import {
   Copy, Check, X, User, Mail, ShieldCheck, 
   ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
   Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
-  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag, History
+  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag, History, Phone
 } from "lucide-react";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -715,6 +715,12 @@ export default function StudentAccountPage() {
   const isPaidActive = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
   const isGold = isComplimentary || isPaidActive;
 
+  const isPaymentPending = upgradeReq?.status === "PENDING";
+  const paymentPendingHours = isPaymentPending && upgradeReq?.createdAt 
+    ? (now.getTime() - new Date(upgradeReq.createdAt).getTime()) / (1000 * 60 * 60) 
+    : 0;
+  const isPaymentPendingOver24h = paymentPendingHours >= 24;
+
   // Check if student is currently at the highest plan available
   // Currently, 1 paid plan exists: Gold Membership
   // If admin ever provides multiple active plans, check if student has reached the top tier
@@ -727,6 +733,10 @@ export default function StudentAccountPage() {
   const isAtHighestPlan = studentTier >= maxTier;
 
   const handleChangePlanClick = () => {
+    if (isPaymentPending) {
+      navigateToTab("overview");
+      return;
+    }
     if (isAtHighestPlan) {
       openModal("plan-status");
     } else {
@@ -854,6 +864,64 @@ export default function StudentAccountPage() {
             {activeTab === "overview" && (
               <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-200">
                 
+                {isPaymentPending && (
+                  <div className="rounded-2xl bg-[#0b131e] border border-amber-500/20 p-6 sm:p-8 space-y-5 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                        <Clock className="w-6 h-6 text-amber-500" />
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <h2 className="text-xl font-bold text-white">Payment Verification In Progress</h2>
+                        <p className="text-sm text-slate-400 leading-relaxed">
+                          Your payment has been submitted and is awaiting verification by the PIECHEM administration team.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-[#111a27] rounded-xl p-4 sm:p-5 border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Payment ID</div>
+                        <div className="text-sm text-white font-mono">{upgradeReq.id}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan</div>
+                        <div className="text-sm text-white font-medium">Gold Membership (Premium)</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Amount</div>
+                        <div className="text-sm text-amber-500 font-bold font-mono">₹{upgradeReq.amount || paymentSettings?.monthlyFee || 199.0}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Submitted</div>
+                        <div className="text-sm text-slate-300 font-mono">{formatDateTime24(upgradeReq.createdAt)}</div>
+                      </div>
+                      <div className="sm:col-span-2 pt-2 border-t border-slate-800">
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Status</div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                          <span>Pending Admin Verification</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {isPaymentPendingOver24h && (
+                      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 mt-4 space-y-3">
+                        <p className="text-sm text-slate-300 font-medium">
+                          Your payment has been awaiting verification for more than 24 hours. If your payment status has still not been verified, please contact PIECHEM support.
+                        </p>
+                        <div className="flex flex-wrap items-center gap-4 text-sm font-medium">
+                          <a href="tel:9830507435" className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+                            <Phone className="w-4 h-4" /> Call / WhatsApp: 9830507435
+                          </a>
+                          <a href="mailto:mailarghyadeeproy@gmail.com" className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+                            <Mail className="w-4 h-4" /> Email: mailarghyadeeproy@gmail.com
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 {/* 1. Ultra-Luxury VIP Membership Passport Card */}
                 <div className="relative overflow-hidden rounded-2xl bg-[#0b131e] border border-slate-800 p-7 sm:p-9 shadow-sm transition-all duration-300">
                   <div className="relative z-10 space-y-6">
@@ -962,31 +1030,33 @@ export default function StudentAccountPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* 1. Change Plan */}
-                    <button
-                      onClick={handleChangePlanClick}
-                      className="group p-5 sm:p-6 rounded-2xl bg-[#0b131e] hover:bg-[#111a27] border border-slate-800 transition-colors cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="text-slate-400 group-hover:text-amber-400 transition-colors">
-                          <Layers className="w-5 h-5" />
+                    {!isPaymentPending && (
+                      <button
+                        onClick={handleChangePlanClick}
+                        className="group p-5 sm:p-6 rounded-2xl bg-[#0b131e] hover:bg-[#111a27] border border-slate-800 transition-colors cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="text-slate-400 group-hover:text-amber-400 transition-colors">
+                            <Layers className="w-5 h-5" />
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            {isAtHighestPlan ? "MAX TIER" : "UPGRADE"}
+                          </span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          {isAtHighestPlan ? "MAX TIER" : "UPGRADE"}
-                        </span>
-                      </div>
 
-                      <div className="pt-4">
-                        <div className="flex items-center justify-between text-base font-bold text-white">
-                          <span>Change plan</span>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
+                        <div className="pt-4">
+                          <div className="flex items-center justify-between text-base font-bold text-white">
+                            <span>Change plan</span>
+                            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
+                          </div>
+                          <p className="text-sm text-slate-400 mt-1">
+                            {isAtHighestPlan 
+                              ? "You are currently enrolled in the highest possible plan"
+                              : "Explore available plans and upgrade to Premium"}
+                          </p>
                         </div>
-                        <p className="text-sm text-slate-400 mt-1">
-                          {isAtHighestPlan 
-                            ? "You are currently enrolled in the highest possible plan"
-                            : "Explore available plans and upgrade to Premium"}
-                        </p>
-                      </div>
-                    </button>
+                      </button>
+                    )}
 
                     {/* 2. Manage Access and Devices */}
                     <button
@@ -1118,17 +1188,19 @@ export default function StudentAccountPage() {
                         : "Standard access to chemistry practice tests with instant automated grading."}
                     </p>
 
-                    <div className="border-t border-slate-800 mt-6 pt-2">
-                      <button
-                        onClick={handleChangePlanClick}
-                        className="w-full py-4 flex items-center justify-between text-left hover:bg-[#111a27] transition-colors rounded-xl px-4 -mx-4 group cursor-pointer"
-                      >
-                        <span className="text-sm font-bold text-white">
-                          Change plan
-                        </span>
-                        <ChevronRight className="w-5 h-5 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    </div>
+                    {!isPaymentPending && (
+                      <div className="border-t border-slate-800 mt-6 pt-2">
+                        <button
+                          onClick={handleChangePlanClick}
+                          className="w-full py-4 flex items-center justify-between text-left hover:bg-[#111a27] transition-colors rounded-xl px-4 -mx-4 group cursor-pointer"
+                        >
+                          <span className="text-sm font-bold text-white">
+                            Change plan
+                          </span>
+                          <ChevronRight className="w-5 h-5 text-slate-500 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1792,7 +1864,49 @@ export default function StudentAccountPage() {
             {/* VIEW F: CHANGE PLAN TAB (NETFLIX-INSPIRED) */}
             {activeTab === "change-plan" && (
               <div className="space-y-8 animate-in fade-in duration-200">
-                
+                {isPaymentPending ? (
+                  <div className="max-w-4xl mx-auto rounded-2xl bg-[#0b131e] border border-amber-500/20 p-6 sm:p-8 space-y-5 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                        <Clock className="w-6 h-6 text-amber-500" />
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <h2 className="text-xl font-bold text-white">Payment Verification In Progress</h2>
+                        <p className="text-sm text-slate-400 leading-relaxed">
+                          Your payment has been submitted and is awaiting verification by the PIECHEM administration team. You cannot change your plan while a payment is being verified.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-[#111a27] rounded-xl p-4 sm:p-5 border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Payment ID</div>
+                        <div className="text-sm text-white font-mono">{upgradeReq.id}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan</div>
+                        <div className="text-sm text-white font-medium">Gold Membership (Premium)</div>
+                      </div>
+                      <div className="sm:col-span-2 pt-2 border-t border-slate-800">
+                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Status</div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                          <span>Pending Admin Verification</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-800 flex justify-end">
+                      <button
+                        onClick={() => navigateToTab("overview")}
+                        className="px-6 py-3 rounded-xl bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-white font-bold transition-colors cursor-pointer"
+                      >
+                        Return to Overview
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
                 {/* Plan Comparison Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
                   
@@ -1976,6 +2090,8 @@ export default function StudentAccountPage() {
                   </p>
                 </div>
 
+                  </>
+                )}
               </div>
             )}
 
@@ -2021,6 +2137,33 @@ export default function StudentAccountPage() {
               {/* LEFT COLUMN: PAYMENT STEPS */}
               <div className="space-y-6 order-last lg:order-first">
 
+            {isPaymentPending ? (
+              <div className="rounded-2xl bg-[#0b131e] border border-amber-500/20 p-6 sm:p-8 space-y-5 shadow-sm">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                    <Clock className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <div className="space-y-1 flex-1">
+                    <h2 className="text-xl font-bold text-white">Payment Verification In Progress</h2>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Your previous payment is still awaiting admin verification. Please wait for it to be processed before making a new payment.
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-slate-800">
+                  <button
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      navigateToTab("overview");
+                    }}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-white font-bold transition-colors cursor-pointer"
+                  >
+                    Back to Account Overview
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
             {/* State: INPUT STEP */}
             {paymentStep === "input" && (
               <div className="space-y-6">
@@ -2318,7 +2461,8 @@ export default function StudentAccountPage() {
                 </div>
               </div>
             )}
-
+              </>
+            )}
               </div>
 
               {/* RIGHT COLUMN: ORDER SUMMARY */}
@@ -2354,7 +2498,6 @@ export default function StudentAccountPage() {
                   </a>
                 </div>
               </div>
-
             </div>
           </main>
         </div>

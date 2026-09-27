@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -55,18 +55,10 @@ export async function POST(req: Request) {
     });
 
     if (existingPending) {
-      const updated = await prisma.subscriptionUpgradeRequest.update({
-        where: { id: existingPending.id },
-        data: {
-          utrNumber: identifier,
-          note: cleanUpi ? "Payer UPI ID: " + cleanUpi : existingPending.note,
-          amount: finalAmount
-        }
-      });
       return NextResponse.json({
-        message: "Payment request updated successfully!",
-        request: updated
-      });
+        error: "Your payment is currently awaiting admin verification.",
+        isPendingVerification: true
+      }, { status: 400 });
     }
 
     const newRequest = await prisma.subscriptionUpgradeRequest.create({
