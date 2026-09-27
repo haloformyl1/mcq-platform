@@ -581,17 +581,8 @@ export default function AiTutorDrawer({
         
         {/* Left: Brand + Status Pill + Usage Pill */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Header Brand Logo matching OLED Dark Aesthetic */}
-            <div className="relative shrink-0">
-              <div className="relative p-1.5 sm:p-2 rounded-xl sm:rounded-2xl bg-zinc-950 border border-white/10 shadow-lg flex items-center justify-center">
-                <PiechemAiLogo size="sm" animated />
-              </div>
-            </div>
-            <div className="font-serif font-bold text-sm sm:text-base md:text-lg text-white tracking-tight flex items-baseline gap-1 shrink-0">
-              <span className="hidden xs:inline">PIECHEM</span>
-              <span className="text-white font-black">AI</span>
-            </div>
+          <div className="flex items-center gap-2 min-w-0 pr-2">
+            <PiechemLogo size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." />
           </div>
 
           {/* Daily Usage Indicator - Desktop */}

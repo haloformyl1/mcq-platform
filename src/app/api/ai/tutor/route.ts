@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const userPrompt = body.prompt || body.message;
+    const userPrompt = body.prompt || body.message || body.query;
     const { history, context, mode, level, language, apiKey } = body;
     const userApiKey = apiKey || req.headers.get("x-gemini-api-key") || undefined;
 
