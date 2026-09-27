@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { X, Sparkles, ShieldCheck, Zap, BarChart3, Headphones } from "lucide-react";
 
 interface StudentProps {
   id: string;
@@ -17,225 +18,61 @@ interface CelebrationModalProps {
 
 export default function GoldUpgradeCelebrationModal({ student }: CelebrationModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
+  const [isClaiming, setIsClaiming] = useState(true);
+  
   const status = (student?.subscriptionStatus || "").trim().toUpperCase();
   const isGold = status === "PAID" || status === "COMPLIMENTARY";
 
-  // Calculate remaining days & whether this is an extension (e.g. 2 days left + 30 days = 32 days)
+  // Calculate remaining days
   const now = new Date();
   const expiryDate = student?.subscriptionExpiresAt ? new Date(student.subscriptionExpiresAt) : null;
   const diffMs = expiryDate ? Math.max(0, expiryDate.getTime() - now.getTime()) : 0;
   const totalDays = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
-  
-  // If total days > 30, it indicates an additive extension on top of remaining days
-  const isExtended = totalDays > 30;
 
-  const getStorageKey = useCallback(() => {
-    if (!student) return null;
-    // Key is tied to the exact expiration timestamp. When extended (e.g. from 2 days to 32 days),
-    // this timestamp changes, automatically generating a fresh key so the modal shows for the extension!
-    const expiryKey = student.subscriptionExpiresAt 
-      ? new Date(student.subscriptionExpiresAt).getTime() 
-      : "active";
-    const studentIdentifier = student.id || student.email || "student";
-    return "piechem_gold_celebrated_" + studentIdentifier + "_" + expiryKey;
-  }, [student]);
-
-  const checkAndShow = useCallback((force = false) => {
-    if (!isGold || !student) return;
-
-    if (force) {
-      setIsOpen(true);
+  useEffect(() => {
+    if (!isGold || !student) {
+      setIsClaiming(false);
       return;
     }
 
-    const key = getStorageKey();
-    if (!key) return;
+    let mounted = true;
 
-    const hash = typeof window !== "undefined" ? window.location.hash.toLowerCase() : "";
-    if (hash === "#celebrate") {
-      setIsOpen(true);
-      return;
-    }
-
-    try {
-      const alreadyCelebrated = localStorage.getItem(key);
-      if (!alreadyCelebrated) {
-        setIsOpen(true);
-      }
-    } catch (e) {
-      setIsOpen(true);
-    }
-  }, [isGold, student, getStorageKey]);
-
-  useEffect(() => {
-    if (!isGold || !student) return;
-
-    // Small delay to ensure smooth entry after page mount
-    const timer = setTimeout(() => {
-      checkAndShow();
-    }, 200);
-
-    // Navigation triggers (browser back/forward, hash changes, tab focus, app navigation)
-    const handlePopState = () => {
-      checkAndShow();
-    };
-
-    const handleHashChange = () => {
-      if (window.location.hash.toLowerCase() === "#celebrate") {
-        checkAndShow(true);
-      }
-    };
-
-    const handleCustomShow = () => {
-      checkAndShow(true);
-    };
-
-    const handleFocus = () => {
-      checkAndShow();
-    };
-
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
-        checkAndShow();
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    window.addEventListener("hashchange", handleHashChange);
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibility);
-    window.addEventListener("piechem:show-celebration", handleCustomShow);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("hashchange", handleHashChange);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("piechem:show-celebration", handleCustomShow);
-    };
-  }, [isGold, student, checkAndShow]);
-
-  // Confetti Particle System
-  useEffect(() => {
-    if (!isOpen || !canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const colors = ["#f59e0b", "#fbbf24", "#fef08a", "#38bdf8", "#10b981", "#ec4899", "#a855f7"];
-    const particles: Array<{
-      x: number;
-      y: number;
-      size: number;
-      color: string;
-      speedX: number;
-      speedY: number;
-      rotation: number;
-      rotationSpeed: number;
-      opacity: number;
-      type: "circle" | "rect" | "star";
-    }> = [];
-
-    for (let i = 0; i < 140; i++) {
-      particles.push({
-        x: canvas.width * 0.5 + (Math.random() - 0.5) * 360,
-        y: canvas.height * 0.35 + (Math.random() - 0.5) * 150,
-        size: Math.random() * 9 + 4,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        speedX: (Math.random() - 0.5) * 14,
-        speedY: Math.random() * -15 - 4,
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 8,
-        opacity: 1,
-        type: Math.random() > 0.6 ? "star" : Math.random() > 0.3 ? "rect" : "circle",
-      });
-    }
-
-    let animationId: number;
-
-    const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      let anyAlive = false;
-
-      particles.forEach((p) => {
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.speedY += 0.22;
-        p.speedX *= 0.985;
-        p.rotation += p.rotationSpeed;
-        p.opacity -= 0.003;
-
-        if (p.opacity > 0) {
-          anyAlive = true;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate((p.rotation * Math.PI) / 180);
-          ctx.globalAlpha = Math.max(0, p.opacity);
-          ctx.fillStyle = p.color;
-
-          if (p.type === "circle") {
-            ctx.beginPath();
-            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-            ctx.fill();
-          } else if (p.type === "rect") {
-            ctx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size * 0.6);
-          } else {
-            ctx.beginPath();
-            for (let i = 0; i < 5; i++) {
-              ctx.lineTo(
-                Math.cos(((18 + i * 72) * Math.PI) / 180) * p.size,
-                -Math.sin(((18 + i * 72) * Math.PI) / 180) * p.size
-              );
-              ctx.lineTo(
-                Math.cos(((54 + i * 72) * Math.PI) / 180) * (p.size / 2),
-                -Math.sin(((54 + i * 72) * Math.PI) / 180) * (p.size / 2)
-              );
-            }
-            ctx.closePath();
-            ctx.fill();
+    const claimReveal = async () => {
+      try {
+        const res = await fetch("/api/student/claim-reveal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        
+        if (!mounted) return;
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.showReveal) {
+            setIsOpen(true);
           }
-          ctx.restore();
         }
-      });
-
-      if (anyAlive) {
-        animationId = requestAnimationFrame(render);
+      } catch (error) {
+        console.error("Failed to claim reveal:", error);
+      } finally {
+        if (mounted) {
+          setIsClaiming(false);
+        }
       }
     };
 
-    animationId = requestAnimationFrame(render);
-
-    const handleResize = () => {
-      if (!canvas) return;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", handleResize);
+    // Small delay to ensure hydration is complete and avoid flashes
+    const timer = setTimeout(() => {
+      claimReveal();
+    }, 500);
 
     return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", handleResize);
+      mounted = false;
+      clearTimeout(timer);
     };
-  }, [isOpen]);
+  }, [isGold, student]);
 
   const handleClose = () => {
-    const key = getStorageKey();
-    if (key) {
-      try {
-        localStorage.setItem(key, "true");
-      } catch (e) {}
-    }
-    if (typeof window !== "undefined" && window.location.hash.toLowerCase() === "#celebrate") {
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-    }
     setIsOpen(false);
   };
 
@@ -245,159 +82,115 @@ export default function GoldUpgradeCelebrationModal({ student }: CelebrationModa
       const testsSection = document.getElementById("tests");
       if (testsSection) {
         testsSection.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = "/dashboard#tests";
       }
     }
   };
 
-  if (!isOpen || !isGold) return null;
+  if (!isOpen || !isGold || isClaiming) return null;
 
   const validUntilStr = student?.subscriptionExpiresAt
     ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "long",
         year: "numeric",
-      })
-    : "30 Days from approval";
+      }).toUpperCase()
+    : "30 DAYS FROM APPROVAL";
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
-      <canvas
-        ref={canvasRef}
-        className="pointer-events-none absolute inset-0 z-10 w-full h-full"
-      />
-
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-[#02050A]/95 backdrop-blur-md animate-in fade-in duration-700">
       <div 
         role="dialog"
         aria-modal="true"
         aria-labelledby="gold-upgrade-title"
-        className="relative z-20 w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl bg-gradient-to-b from-[#0f1d32] via-[#091322] to-[#040812] border-2 border-amber-500/40 p-5 sm:p-8 text-center shadow-[0_0_90px_rgba(245,158,11,0.35)] animate-in zoom-in-95 duration-300"
+        aria-describedby="gold-upgrade-desc"
+        className="relative w-full max-w-[26rem] sm:max-w-[28rem] rounded-2xl bg-gradient-to-b from-[#0a1120] to-[#040810] border border-[#262010] shadow-[0_20px_60px_-15px_rgba(234,179,8,0.15)] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out"
       >
-        <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl" />
+        {/* Subtle Ambient Gold Glow */}
+        <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px]" />
 
+        {/* Close Button */}
         <button
           onClick={handleClose}
-          aria-label="Close celebration modal"
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+          aria-label="Close membership reveal"
+          className="absolute top-4 right-4 z-50 p-2 text-slate-500 hover:text-white rounded-full hover:bg-white/5 transition-colors cursor-pointer"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-5 h-5" />
         </button>
 
-        {/* 3D Glowing Trophy Icon */}
-        <div className="relative mx-auto w-24 h-24 mb-4 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 blur-xl opacity-75 animate-pulse" />
-          <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-600 p-[2px] shadow-2xl shadow-amber-500/50 flex items-center justify-center">
-            <div className="w-full h-full rounded-2xl bg-[#08121e] flex flex-col items-center justify-center">
-              <span className="text-3xl filter drop-shadow">👑</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Status Pill */}
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide uppercase mb-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>
-            {isExtended ? ("+30 Days Added • Total " + totalDays + " Days Active") : "Payment Verified & Approved"}
-          </span>
-        </div>
-
-        <h2 id="gold-upgrade-title" className="text-2xl md:text-3xl font-black text-white tracking-tight mb-2">
-          {isExtended ? (
-            <>
-              Gold Pass <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">Extended!</span>
-            </>
-          ) : (
-            <>
-              Welcome to <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">PIECHEM Gold!</span>
-            </>
-          )}
-        </h2>
-
-        <p className="text-sm text-slate-300 mb-5 leading-relaxed">
-          {isExtended ? (
-            <>
-              Congratulations <strong className="text-white">{student?.name || "Student"}</strong>! Administrator <strong className="text-amber-300">Arghyadeep Roy</strong> has approved your transaction. <strong className="text-amber-300 font-bold">+30 Days</strong> have been added to your remaining validity, giving you <strong className="text-emerald-400 font-bold">{totalDays} days of total access</strong>!
-            </>
-          ) : (
-            <>
-              Congratulations <strong className="text-white">{student?.name || "Student"}</strong>! Administrator <strong className="text-amber-300">Arghyadeep Roy</strong> has approved your membership transaction. Your 30-Day All-Access Pass is now active.
-            </>
-          )}
-        </p>
-
-        {/* Validity Highlight Box */}
-        <div className="bg-white/5 border border-amber-500/25 rounded-2xl p-3.5 mb-5 flex items-center justify-between text-left shadow-inner">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl font-bold shrink-0">
-              ⭐
-            </div>
-            <div>
-              <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-                {isExtended ? "Updated Pass Validity" : "Pass Validity Period"}
-              </div>
-              <div className="text-xs sm:text-sm text-white font-bold">
-                Valid until {validUntilStr}
-              </div>
-              <div className="text-[10px] text-emerald-400 font-medium mt-0.5">
-                {totalDays} Days of Total Access Remaining
+        <div className="relative z-10 px-6 pt-10 pb-8 sm:px-8 sm:pt-12 sm:pb-10 flex flex-col items-center text-center">
+          
+          {/* Premium Gold Emblem */}
+          <div className="relative mb-6 flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20">
+            <div className="absolute inset-0 bg-gradient-to-tr from-amber-600/30 to-yellow-300/30 rounded-xl rotate-45 blur-md" />
+            <div className="relative w-full h-full bg-gradient-to-b from-[#1c1404] to-[#0a0701] border border-amber-500/40 rounded-xl rotate-45 flex items-center justify-center shadow-lg shadow-amber-900/20">
+              <div className="absolute inset-[2px] border border-amber-300/10 rounded-lg" />
+              <div className="-rotate-45 text-amber-400">
+                <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
               </div>
             </div>
           </div>
-          <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
-            Active Now
-          </span>
+
+          {/* Heading */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/5 border border-amber-500/20 text-amber-400/90 text-[10px] font-bold tracking-widest uppercase mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            Membership Activated
+          </div>
+
+          <h2 id="gold-upgrade-title" className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-amber-100 to-amber-600 mb-3 tracking-tight">
+            PIECHEM Gold
+          </h2>
+
+          <p id="gold-upgrade-desc" className="text-sm sm:text-base text-slate-400 font-medium max-w-[18rem] sm:max-w-xs mx-auto mb-8 leading-relaxed">
+            Your membership has been successfully verified and activated.
+          </p>
+
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent mb-8" />
+
+          {/* Pass Details */}
+          <div className="w-full bg-[#0d1524] rounded-xl border border-slate-800/50 p-4 mb-6">
+            <div className="text-[10px] sm:text-xs text-amber-500/80 font-bold tracking-widest uppercase mb-1">
+              {totalDays}-Day All-Access Pass
+            </div>
+            <div className="flex items-baseline justify-center gap-2">
+              <span className="text-slate-400 text-xs font-medium">VALID UNTIL</span>
+              <span className="text-white text-sm sm:text-base font-bold tracking-wide">{validUntilStr}</span>
+            </div>
+          </div>
+
+          {/* Benefits List */}
+          <div className="w-full text-left space-y-3 mb-8">
+            <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase text-center mb-4">Your Gold Benefits</p>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-amber-400" />
+                <span className="text-xs sm:text-sm text-slate-300 font-medium">Unlimited Tests</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <BarChart3 className="w-4 h-4 text-amber-400" />
+                <span className="text-xs sm:text-sm text-slate-300 font-medium">Rank Analytics</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <span className="text-xs sm:text-sm text-slate-300 font-medium">3D Chemistry</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Headphones className="w-4 h-4 text-amber-400" />
+                <span className="text-xs sm:text-sm text-slate-300 font-medium">Direct Support</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={handleStartPracticing}
+            className="w-full group relative flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 px-6 py-3.5 text-sm sm:text-base font-bold text-black transition-all hover:from-amber-300 hover:to-amber-500 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-[#0a1120]"
+          >
+            Enter PIECHEM Gold
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          </button>
         </div>
-
-        {/* Unlocked Benefits */}
-        <div className="grid grid-cols-2 gap-2.5 mb-6 text-left">
-          <div className="bg-[#0b1728] border border-white/10 rounded-xl p-2.5">
-            <div className="text-amber-400 font-bold text-xs flex items-center gap-1.5 mb-1">
-              <span>🔓</span> Unlimited Tests
-            </div>
-            <p className="text-[11px] text-slate-400 leading-tight">
-              Access all 50+ premium chemistry test modules.
-            </p>
-          </div>
-
-          <div className="bg-[#0b1728] border border-white/10 rounded-xl p-2.5">
-            <div className="text-blue-400 font-bold text-xs flex items-center gap-1.5 mb-1">
-              <span>🧪</span> 3D Models
-            </div>
-            <p className="text-[11px] text-slate-400 leading-tight">
-              Step-by-step solutions with 3D molecular structures.
-            </p>
-          </div>
-
-          <div className="bg-[#0b1728] border border-white/10 rounded-xl p-2.5">
-            <div className="text-purple-400 font-bold text-xs flex items-center gap-1.5 mb-1">
-              <span>📊</span> Rank Analytics
-            </div>
-            <p className="text-[11px] text-slate-400 leading-tight">
-              Proctored national percentiles & accuracy curves.
-            </p>
-          </div>
-
-          <div className="bg-[#0b1728] border border-white/10 rounded-xl p-2.5">
-            <div className="text-emerald-400 font-bold text-xs flex items-center gap-1.5 mb-1">
-              <span>⚡</span> Direct Support
-            </div>
-            <p className="text-[11px] text-slate-400 leading-tight">
-              Direct mentor helpline: 9830507435
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={handleStartPracticing}
-          className="w-full py-3.5 px-6 rounded-xl font-extrabold text-sm text-black bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-        >
-          🚀 Start Practicing Tests Now
-        </button>
-
-        <p className="text-[11px] text-slate-500 mt-3">
-          Need help with your subscription? Call or WhatsApp Administrator: <a href="tel:9830507435" className="text-amber-400 hover:underline font-bold">9830507435</a>
-        </p>
       </div>
     </div>
   );

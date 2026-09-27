@@ -258,6 +258,7 @@ model SubscriptionUpgradeRequest {
   note      String?
   approvedAt DateTime?
   expiresAt  DateTime?
+  approvalRevealClaimedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
