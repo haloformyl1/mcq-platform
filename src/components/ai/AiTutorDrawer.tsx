@@ -581,8 +581,21 @@ export default function AiTutorDrawer({
         
         {/* Left: Brand + Status Pill + Usage Pill */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex items-center gap-2 min-w-0 pr-2">
+          {/* Mobile Hamburger Menu */}
+          <button
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="lg:hidden p-1.5 -ml-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          </button>
+
+          <div className="flex items-center gap-2 min-w-0 pr-2 hidden sm:flex">
             <PiechemLogo size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." />
+          </div>
+          <div className="flex items-center gap-2 min-w-0 pr-2 sm:hidden">
+            <PiechemAiLogo size="xs" />
+            <span className="text-white font-semibold text-sm">PIECHEM AI</span>
           </div>
 
           {/* Daily Usage Indicator - Desktop */}
@@ -692,9 +705,18 @@ export default function AiTutorDrawer({
           />
         )}
 
-        {/* SIDEBAR */}
-        <div className={`absolute lg:relative z-40 lg:z-auto w-64 h-full bg-[#0a0a0a]/90 backdrop-blur-xl border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-          <div className="p-4 pt-6">
+                {/* SIDEBAR */}
+        <div className={`absolute lg:relative z-40 lg:z-auto w-72 h-full bg-[#131314] lg:bg-[#0a0a0a]/90 backdrop-blur-xl border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+          <div className="flex items-center justify-between p-4 pt-4 lg:hidden border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <PiechemAiLogo size="xs" />
+              <span className="text-white font-semibold text-sm">PIECHEM AI</span>
+            </div>
+            <button onClick={() => setIsMobileSidebarOpen(false)} className="p-1.5 rounded-full bg-white/5 text-slate-300 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="p-4 pt-4 lg:pt-6">
             <button 
               onClick={handleNewChat}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-sm font-semibold text-slate-200 transition cursor-pointer"
@@ -734,17 +756,23 @@ export default function AiTutorDrawer({
           >
             <div className="max-w-5xl mx-auto w-full">
 
-              {/* WELCOME STATE: When there are no messages */}
+                            {/* WELCOME STATE: When there are no messages */}
               {messages.length === 0 && (
                 <div className="flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in duration-300 w-full px-4 sm:px-8">
-                  <div className="mb-10 scale-[1.1]">
+                  {/* Desktop Logo */}
+                  <div className="mb-10 scale-[1.1] hidden md:block">
                     <PiechemLogo size="xl" showText={true} subtitle="An initiative by Arghyadeep Roy." />
+                  </div>
+                  {/* Mobile Logo */}
+                  <div className="mb-6 md:hidden">
+                    <PiechemAiLogo size="lg" animated />
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 mb-8 tracking-tight text-center">
                     Hi {studentName.split(' ')[0] || 'Scholar'}, what's the plan?
                   </h1>
                   
-                  <div className="w-full max-w-3xl">
+                  {/* Centered input is hidden on mobile in empty state */}
+                  <div className="w-full max-w-3xl hidden md:block">
                     
           <div className="w-full pb-4 pt-1 z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">
@@ -1066,8 +1094,8 @@ export default function AiTutorDrawer({
             </div>
           </div>
 
-          {/* BOTTOM AI COMMAND CONSOLE */}
-          <div className={messages.length === 0 ? "hidden" : "block"}>
+                    {/* BOTTOM AI COMMAND CONSOLE */}
+          <div className={messages.length === 0 ? "block md:hidden" : "block"}>
 
           <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-4 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">
