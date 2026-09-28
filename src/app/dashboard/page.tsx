@@ -403,9 +403,7 @@ export default function StudentDashboard() {
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                 <span>Available Tests & Exam Series</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30 font-mono font-bold">
-                  {currentAvailableTests.length} Live
-                </span>
+                
               </h2>
               <p className="text-xs text-slate-400">Timed, AI-proctored mock exams aligned to your curriculum</p>
             </div>
@@ -430,9 +428,7 @@ export default function StudentDashboard() {
                       (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
                     } />
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-green-500/20 text-green-300 border border-green-500/40 font-mono">
-                  {currentAvailableTests.length} Live
-                </span>
+                
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center justify-between group-hover:text-green-300 transition">
@@ -455,9 +451,7 @@ export default function StudentDashboard() {
                 <div className="p-3 rounded-xl bg-amber-950 border border-amber-600/50 shadow group-hover:scale-110 transition-transform">
                   <Clock className="w-5 h-5 text-amber-300" />
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
-                  {upcomingTests.length} Scheduled
-                </span>
+                
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center justify-between group-hover:text-amber-300 transition">
@@ -477,9 +471,7 @@ export default function StudentDashboard() {
                 <div className="p-3 rounded-xl bg-red-950 border border-red-600/50 shadow group-hover:scale-110 transition-transform">
                   <BookOpen className="w-5 h-5 text-red-300" />
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-red-500/20 text-red-300 border border-red-500/40 font-mono">
-                  {expiredTests.length} Expired
-                </span>
+                
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center justify-between group-hover:text-red-300 transition">
