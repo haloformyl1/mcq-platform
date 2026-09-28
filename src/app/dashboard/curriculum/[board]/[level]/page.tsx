@@ -128,8 +128,8 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
   });
 
   // Config based on current category
-  let selectedTitle = ${board} -  Tests;
-  let selectedSubtitle = Showing all tests available for  curriculum, ;
+  let selectedTitle = `${board} - ${level} Tests`;
+  let selectedSubtitle = `Showing all tests available for ${board} curriculum, ${level}`;
   let themeConfig = {
     gradient: "from-blue-950/40 via-[#071019]/50 to-[#02070d]/90",
     border: "border-blue-500/30 hover:border-blue-500/50",
