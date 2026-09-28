@@ -713,7 +713,7 @@ export default function AiTutorDrawer({
               conversations.map(chat => (
                 <button
                   key={chat.id}
-                  onClick={() => { setActiveChatId(chat.id); setIsMobileSidebarOpen(false); }}
+                  onClick={() => handleSelectChat(chat.id)}
                   className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm transition cursor-pointer ${activeChatId === chat.id ? 'bg-zinc-800/80 text-white font-medium' : 'text-slate-400 hover:bg-zinc-900/50 hover:text-slate-200'}`}
                 >
                   <MessageSquare className="w-4 h-4 shrink-0" />
