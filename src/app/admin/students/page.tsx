@@ -377,8 +377,12 @@ export default function AdminStudents() {
             </table>
           </div>
           </>
-        )}
-      </div>
+        )}      </div>
+      <ComplimentaryModal 
+        isOpen={!!complimentaryModalStudent} 
+        onClose={() => setComplimentaryModalStudent(null)} 
+        onConfirm={handleGrantComplimentary} 
+      />
     </div>
   );
 }
