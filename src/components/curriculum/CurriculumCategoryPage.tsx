@@ -254,7 +254,6 @@ export default function CurriculumCategoryPage({
                       </div>
                       {item.isPremium ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 border border-amber-500/40 text-amber-300">
-                          <Sparkle className="w-2.5 h-2.5" />
                           <span>PREMIUM</span>
                         </span>
                       ) : (

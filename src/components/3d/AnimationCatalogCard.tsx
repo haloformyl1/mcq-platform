@@ -182,8 +182,7 @@ export default function AnimationCatalogCard({
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-amber-600/25 border border-amber-400/50 text-amber-300 text-[10px] sm:text-[11px] font-mono font-bold tracking-wider shadow-[0_0_12px_rgba(245,158,11,0.25)]"
               aria-label="Premium Content"
             >
-              <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
-              <span>✦ PREMIUM</span>
+              <span>PREMIUM</span>
             </span>
           ) : (
             <span 

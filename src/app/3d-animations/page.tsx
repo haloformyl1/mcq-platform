@@ -338,8 +338,7 @@ function ThreeDAnimationsContent() {
                     : "text-slate-400 hover:text-amber-300"
                 }`}
               >
-                <Sparkles className="w-3 h-3 text-amber-300" />
-                <span>✦ PREMIUM</span>
+                <span>PREMIUM</span>
               </button>
             </div>
 
