@@ -174,7 +174,7 @@ export default function StudyMaterialRepository({
     return studyMaterials
       .filter((mat: any) => {
         // STRICT RULE: Remove 3D animations from Study Material repository!
-        const is3D = mat.type === "LINK" || mat.category === "3D animations" || (mat.url && mat.url.includes("lab-viewer"));
+        const is3D = mat.category === "3D animations" || (mat.url && mat.url.includes("lab-viewer"));
         return !is3D;
       })
       .map((mat: any) => {

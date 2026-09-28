@@ -156,7 +156,7 @@ export function parseMaterialMetadata(
   }
 
   const lowerTitle = (title || '').toLowerCase();
-  const is3D = type === 'LINK' || lowerTitle.includes('3d') || lowerTitle.includes('bonding') || lowerTitle.includes('solid state') || lowerTitle.includes('model');
+  const is3D = lowerTitle.includes('3d') || lowerTitle.includes('bonding') || lowerTitle.includes('solid state') || lowerTitle.includes('model');
 
   if (is3D) {
     category = '3D animations';
