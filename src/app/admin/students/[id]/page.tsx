@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import ComplimentaryModal from "@/components/admin/ComplimentaryModal";
 
 interface StudentDetails {
   student: {
@@ -83,6 +84,7 @@ export default function AdminStudentDetails() {
   const [resetSuccess, setResetSuccess] = useState<string | null>(null);
   const [resetError, setResetError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [complimentaryModalOpen, setComplimentaryModalOpen] = useState(false);
 
   const generateStrongPassword = () => {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
@@ -252,6 +254,43 @@ export default function AdminStudentDetails() {
       setTransferMessage({ type: "error", text: "An error occurred while transferring data." });
     } finally {
       setTransferring(false);
+    }
+  };
+
+  const handleGrantComplimentary = async (board: string, academicLevel: string) => {
+    try {
+      const res = await fetch(`/api/admin/students/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionStatus: "COMPLIMENTARY", board, academicLevel })
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        setComplimentaryModalOpen(false);
+        fetchStudent();
+      } else {
+        alert(resData.error || "Failed to update subscription");
+      }
+    } catch (err) {
+      console.error("Failed to update subscription", err);
+    }
+  };
+
+  const handleUpdateSubscription = async (newSub: string) => {
+    try {
+      const res = await fetch(`/api/admin/students/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionStatus: newSub })
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        fetchStudent();
+      } else {
+        alert(resData.error || "Failed to update subscription");
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -512,24 +551,7 @@ export default function AdminStudentDetails() {
               <span className="text-gray-500">Subscription Plan</span>
               <select
                 value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : student.subscriptionStatus === "PAID" ? "PAID" : "FREE"}
-                onChange={async (e) => {
-                  const newSub = e.target.value;
-                  try {
-                    const res = await fetch(`/api/admin/students/${id}/status`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ subscriptionStatus: newSub })
-                    });
-                    const resData = await res.json();
-                    if (res.ok) {
-                      fetchStudent();
-                    } else {
-                      alert(resData.error || "Failed to update subscription");
-                    }
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
+                onChange={(e) => { const newSub = e.target.value; if (newSub === 'COMPLIMENTARY') { setComplimentaryModalOpen(true); } else { handleUpdateSubscription(newSub); } }}
                 disabled={student.subscriptionStatus === "PAID" && !!student.subscriptionExpiresAt && new Date(student.subscriptionExpiresAt) > new Date()}
                 className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none transition ${
                   student.subscriptionStatus === "COMPLIMENTARY"
@@ -668,7 +690,4 @@ export default function AdminStudentDetails() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-  );
-}
+      </div> <ComplimentaryModal isOpen={complimentaryModalOpen} onClose={() => setComplimentaryModalOpen(false)} onConfirm={handleGrantComplimentary} /> </div> ); }
