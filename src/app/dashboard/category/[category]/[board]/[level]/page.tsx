@@ -13,9 +13,11 @@ import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 
-export default function CategoryTestsPage({ params }: { params: Promise<{ category: string }> }) {
+export default function CategoryCurriculumTestsPage({ params }: { params: Promise<{ category: string, board: string, level: string }> }) {
   const resolvedParams = use(params);
   const categoryKey = resolvedParams.category.toLowerCase();
+  const board = decodeURIComponent(resolvedParams.board).toUpperCase();
+  const level = decodeURIComponent(resolvedParams.level).toUpperCase();
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   }, []);
 
   useEffect(() => {
-    fetch("/api/student/dashboard")
+    fetch(`/api/student/curriculum/${board}/${level}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) {
@@ -41,7 +43,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
       .catch(() => {
         setLoading(false);
       });
-  }, [router]);
+  }, [router, board, level]);
 
   if (loading || !data) return <PiFiringLoader fullScreen={true} />;
 
@@ -126,8 +128,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   });
 
   // Config based on current category
-  let selectedTitle = "Available Tests";
-  let selectedSubtitle = "Showing all tests ready to attempt right now under this category";
+  let selectedTitle = `Available Tests (${board} ${level})`;
+  let selectedSubtitle = `Showing all ${board} ${level} tests ready to attempt right now`;
   let themeConfig = {
     gradient: "from-emerald-950/40 via-[#071912]/50 to-[#020d09]/90",
     border: "border-emerald-500/30 hover:border-emerald-500/50",
@@ -145,8 +147,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   let displayTests: any[] = [];
 
   if (categoryKey === "upcoming") {
-    selectedTitle = "Upcoming / Scheduled Tests";
-    selectedSubtitle = "Timed examination windows scheduled by faculty with countdown unlock alerts";
+    selectedTitle = `Upcoming ${board} ${level} Tests`;
+    selectedSubtitle = `Timed ${board} ${level} examination windows scheduled by faculty`;
     themeConfig = {
       gradient: "from-amber-950/40 via-[#1a1405]/50 to-[#0a0701]/90",
       border: "border-amber-500/30 hover:border-amber-500/50",
@@ -432,7 +434,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         {/* Top Action Row: Back Button + Announcement Ticker Banner */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           <Link 
-            href="/dashboard"
+            href={`/dashboard/category/${categoryKey}`}
             className="inline-flex items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-cyan-500/40 px-4 py-2 sm:py-2.5 rounded-xl transition shadow-sm shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -520,88 +522,83 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
             </div>
           </div>
 
-          
-        </div>
-
-        
-        <div className="space-y-6 mt-8">
-          {/* CBSE */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-blue-400 uppercase tracking-wider pl-1">CBSE</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Link href={`/dashboard/category/${categoryKey}/CBSE/11`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-blue-500/20 hover:border-blue-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-blue-950 border border-blue-600/50 text-blue-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-blue-300 transition-colors">Class 11</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/CBSE/12`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-blue-500/20 hover:border-blue-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-blue-950 border border-blue-600/50 text-blue-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-blue-300 transition-colors">Class 12</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-            </div>
-          </div>
-
-          {/* ICSE */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-emerald-400 uppercase tracking-wider pl-1">ICSE</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Link href={`/dashboard/category/${categoryKey}/ICSE/11`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-emerald-500/20 hover:border-emerald-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950 border border-emerald-600/50 text-emerald-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-emerald-300 transition-colors">Class 11</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/ICSE/12`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-emerald-500/20 hover:border-emerald-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950 border border-emerald-600/50 text-emerald-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-emerald-300 transition-colors">Class 12</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-            </div>
-          </div>
-
-          {/* WBCHSE */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider pl-1">WBCHSE</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-I`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-I</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-II`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-II</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-III`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-III</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-IV`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-IV</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-            </div>
+          <div className="self-start sm:self-center shrink-0 z-10">
+            <span className={`text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border font-mono font-bold whitespace-nowrap inline-flex items-center gap-2 ${themeConfig.badge}`}>
+              <span className="font-extrabold text-xs sm:text-sm">{displayTests.length}</span>
+              <span>Tests Total</span>
+            </span>
           </div>
         </div>
+
+        {/* Tests Grid or WOW Empty State */}
+        {displayTests.length === 0 ? (
+          categoryKey === "upcoming" ? (
+            /* WOW Empty State for Upcoming Tests (Image 2) */
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/[0.03] via-white/[0.01] to-transparent border border-white/10 backdrop-blur-2xl p-8 sm:p-14 text-center max-w-2xl mx-auto shadow-2xl space-y-6">
+              <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_40px_rgba(245,158,11,0.2)]">
+                <Clock className="w-10 h-10 animate-pulse" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                  No Upcoming Exams Scheduled
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-md mx-auto leading-relaxed">
+                  Faculty has not scheduled future examination windows for your curriculum yet. When new tests are scheduled, countdown alerts will appear right here.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <Link 
+                  href={`/dashboard/category/${categoryKey}`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Return to Dashboard</span>
+                </Link>
+                <Link 
+                  href="/dashboard/category/available"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-semibold text-xs sm:text-sm transition cursor-pointer"
+                >
+                  <span>Attempt Live Tests ({currentAvailableTests.length})</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            /* WOW Empty State for Expired Tests (Image 3) */
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/[0.03] via-white/[0.01] to-transparent border border-white/10 backdrop-blur-2xl p-8 sm:p-14 text-center max-w-2xl mx-auto shadow-2xl space-y-6">
+              <div className="w-20 h-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.2)]">
+                <BookOpen className="w-10 h-10" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                  Test Archive is Clear
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-md mx-auto leading-relaxed">
+                  There are currently no concluded or expired exam papers under your active curriculum profile. You can take any active paper directly from the live tests shelf.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <Link 
+                  href={`/dashboard/category/${categoryKey}`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Return to Dashboard</span>
+                </Link>
+                <Link 
+                  href="/dashboard/category/available"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-semibold text-xs sm:text-sm transition cursor-pointer"
+                >
+                  <span>View Live Tests ({currentAvailableTests.length})</span>
+                </Link>
+              </div>
+            </div>
+          )
+        ) : (
+          /* Live Tests Grid (Image 1) */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {displayTests.map(test => renderTestCard(test))}
+          </div>
+        )}
       </main>
     </div>
   );
