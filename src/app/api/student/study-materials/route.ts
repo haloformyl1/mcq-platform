@@ -47,7 +47,7 @@ export async function GET(req: Request) {
       const meta = parseMaterialMetadata(m.description, m.title, m.type);
       const eligibility = isStudentEligibleForMaterial(studentProfile, meta.section, meta.classSem);
       let isLevelRestricted = !eligibility.eligible;
-      const is3D = meta.category === '3D animations' || (m.url && m.url.includes("lab-viewer"));
+      const is3D = meta.category === '3D animations' || m.type === 'LINK';
 
       if (!m.isPremium || is3D) {
         isLevelRestricted = false;
