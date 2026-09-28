@@ -493,6 +493,99 @@ export default function StudentDashboard() {
           </div>
         </section>
 
+                {/* ========================================================= */}
+        {/* 5.5 CONTENT ROW 2.5: BROWSE BY CURRICULUM                */}
+        {/* ========================================================= */}
+        <section id="curriculum-browse" className="space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>Browse by Curriculum</span>
+              </h2>
+              <p className="text-xs text-slate-400">Explore tests across different boards and classes</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {/* CBSE */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-black text-blue-400 uppercase tracking-wider pl-1">CBSE</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <Link href="/dashboard/curriculum/CBSE/11" className="bg-white/[0.02] hover:bg-white/[0.05] border border-blue-500/20 hover:border-blue-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-blue-950 border border-blue-600/50 text-blue-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-blue-300 transition-colors">Class 11</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+                <Link href="/dashboard/curriculum/CBSE/12" className="bg-white/[0.02] hover:bg-white/[0.05] border border-blue-500/20 hover:border-blue-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-blue-950 border border-blue-600/50 text-blue-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-blue-300 transition-colors">Class 12</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+              </div>
+            </div>
+
+            {/* ICSE */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-black text-emerald-400 uppercase tracking-wider pl-1">ICSE</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <Link href="/dashboard/curriculum/ICSE/11" className="bg-white/[0.02] hover:bg-white/[0.05] border border-emerald-500/20 hover:border-emerald-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950 border border-emerald-600/50 text-emerald-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-emerald-300 transition-colors">Class 11</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+                <Link href="/dashboard/curriculum/ICSE/12" className="bg-white/[0.02] hover:bg-white/[0.05] border border-emerald-500/20 hover:border-emerald-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950 border border-emerald-600/50 text-emerald-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-emerald-300 transition-colors">Class 12</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+              </div>
+            </div>
+
+            {/* WBCHSE */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider pl-1">WBCHSE</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <Link href="/dashboard/curriculum/WBCHSE/SEM-I" className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-I</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+                <Link href="/dashboard/curriculum/WBCHSE/SEM-II" className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-II</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+                <Link href="/dashboard/curriculum/WBCHSE/SEM-III" className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-III</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+                <Link href="/dashboard/curriculum/WBCHSE/SEM-IV" className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                    <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-IV</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ========================================================= */}
         {/* 6. CONTENT ROW 3: HALL OF FAME / TOP PERFORMERS          */}
         {/* ========================================================= */}
@@ -731,4 +824,5 @@ export default function StudentDashboard() {
     </div>
   );
 }
+
 
