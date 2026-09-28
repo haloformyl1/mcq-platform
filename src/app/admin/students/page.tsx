@@ -266,24 +266,7 @@ export default function AdminStudents() {
                       ) : (
                         <select
                           value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : "FREE"}
-                          onChange={async (e) => {
-                            const newSub = e.target.value;
-                            try {
-                              const res = await fetch(`/api/admin/students/${student.id}/status`, {
-                                method: "PATCH",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ subscriptionStatus: newSub })
-                              });
-                              const resData = await res.json();
-                              if (res.ok) {
-                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, subscriptionStatus: newSub, subscriptionExpiresAt: null, hasActiveUpi: false } : s));
-                              } else {
-                                alert(resData.error || "Failed to update subscription");
-                              }
-                            } catch (err) {
-                              console.error("Failed to update subscription", err);
-                            }
-                          }}
+                          onChange={(e) => { const newSub = e.target.value; if (newSub === "COMPLIMENTARY") { setComplimentaryModalStudent(student); } else { handleUpdateSubscription(student.id, newSub); } }}
                           className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
                             student.subscriptionStatus === "COMPLIMENTARY"
                               ? "bg-blue-950 text-blue-300 border-blue-500/60"
@@ -358,24 +341,7 @@ export default function AdminStudents() {
                       ) : (
                         <select
                           value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : "FREE"}
-                          onChange={async (e) => {
-                            const newSub = e.target.value;
-                            try {
-                              const res = await fetch(`/api/admin/students/${student.id}/status`, {
-                                method: "PATCH",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ subscriptionStatus: newSub })
-                              });
-                              const resData = await res.json();
-                              if (res.ok) {
-                                setStudents(prev => prev.map(s => s.id === student.id ? { ...s, subscriptionStatus: newSub, subscriptionExpiresAt: null, hasActiveUpi: false } : s));
-                              } else {
-                                alert(resData.error || "Failed to update subscription");
-                              }
-                            } catch (err) {
-                              console.error("Failed to update subscription", err);
-                            }
-                          }}
+                          onChange={(e) => { const newSub = e.target.value; if (newSub === "COMPLIMENTARY") { setComplimentaryModalStudent(student); } else { handleUpdateSubscription(student.id, newSub); } }}
                           className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition ${
                             student.subscriptionStatus === "COMPLIMENTARY"
                               ? "bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border-blue-500/60 shadow-[0_0_14px_rgba(59,130,246,0.35)]"
