@@ -403,60 +403,7 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
             <span>Back to Dashboard</span>
           </Link>
 
-          {/* Announcement Ticker Banner - ONLY for upcoming tests */}
-          {(() => {
-            if (categoryKey !== "upcoming") return null;
-
-            const rawItems: any[] = [];
-            (availableTests || []).forEach((t: any) => {
-              if (t.status === "UPCOMING") {
-                const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
-                if (unlock && now < unlock) {
-                  rawItems.push({
-                    type: "UPCOMING",
-                    test: t,
-                    message: `⏰ Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
-                  });
-                }
-              }
-            });
-
-            if (rawItems.length === 0) return null;
-
-            const cfg = data?.testAlertSettings || {
-              badgeText: "TEST ALERT",
-              bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
-              badgeColor: "bg-amber-500 text-black",
-              textColor: "text-amber-200",
-              marqueeSpeed: "normal"
-            };
-            const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-            return (
-              <div className={`flex-1 min-w-0 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2 px-3 sm:py-2.5 sm:px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
-                <div className="flex items-center gap-2 sm:gap-3 overflow-hidden w-full min-w-0">
-                  <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                    {cfg.badgeText || "TEST ALERT"}
-                  </span>
-                  <div className="flex-1 min-w-0 overflow-hidden relative">
-                    <div 
-                      className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
-                      style={{ animationDuration: speedDuration }}
-                    >
-                      {rawItems.map((item: any) => (
-                        <span
-                          key={item.test.id}
-                          className="mr-16"
-                          dangerouslySetInnerHTML={{ __html: item.message }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
+          
         </div>
 
         {/* Category Hero Box (Front Page Theme) */}
@@ -494,68 +441,30 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
 
         {/* Tests Grid or WOW Empty State */}
         {displayTests.length === 0 ? (
-          categoryKey === "upcoming" ? (
-            /* WOW Empty State for Upcoming Tests (Image 2) */
+            /* Generic Empty State for Curriculum */
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/[0.03] via-white/[0.01] to-transparent border border-white/10 backdrop-blur-2xl p-8 sm:p-14 text-center max-w-2xl mx-auto shadow-2xl space-y-6">
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_40px_rgba(245,158,11,0.2)]">
-                <Clock className="w-10 h-10 animate-pulse" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                  No Upcoming Exams Scheduled
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-md mx-auto leading-relaxed">
-                  Faculty has not scheduled future examination windows for your curriculum yet. When new tests are scheduled, countdown alerts will appear right here.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                <Link 
-                  href="/dashboard"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Return to Dashboard</span>
-                </Link>
-                <Link 
-                  href="/dashboard/category/available"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-semibold text-xs sm:text-sm transition cursor-pointer"
-                >
-                  <span>Attempt Live Tests ({currentAvailableTests.length})</span>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            /* WOW Empty State for Expired Tests (Image 3) */
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/[0.03] via-white/[0.01] to-transparent border border-white/10 backdrop-blur-2xl p-8 sm:p-14 text-center max-w-2xl mx-auto shadow-2xl space-y-6">
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.2)]">
+              <div className="w-20 h-20 mx-auto rounded-3xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shadow-[0_0_40px_rgba(59,130,246,0.2)]">
                 <BookOpen className="w-10 h-10" />
               </div>
               <div className="space-y-2">
                 <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                  Test Archive is Clear
+                  No Tests Found
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-md mx-auto leading-relaxed">
-                  There are currently no concluded or expired exam papers under your active curriculum profile. You can take any active paper directly from the live tests shelf.
+                  There are currently no tests available for this specific curriculum.
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <Link 
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg active:scale-95 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Return to Dashboard</span>
                 </Link>
-                <Link 
-                  href="/dashboard/category/available"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-semibold text-xs sm:text-sm transition cursor-pointer"
-                >
-                  <span>View Live Tests ({currentAvailableTests.length})</span>
-                </Link>
               </div>
             </div>
-          )
-        ) : (
+          ) : (
           /* Live Tests Grid (Image 1) */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {displayTests.map(test => renderTestCard(test))}
