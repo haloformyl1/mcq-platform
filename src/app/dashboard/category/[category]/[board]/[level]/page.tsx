@@ -370,7 +370,7 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                 href="/dashboard/account"
                 className="w-full block text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] tracking-wide uppercase"
               >
-                🔒 Subscribe to Access
+                🔒 Unlock with Gold
               </Link>
             ) : (
               <Link 

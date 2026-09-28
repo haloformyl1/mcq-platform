@@ -287,7 +287,7 @@ export default function AnimationCatalogCard({
               className="w-full py-2.5 px-4 rounded-xl bg-amber-950/40 border border-amber-500/40 hover:bg-amber-900/60 text-amber-300 font-extrabold text-xs flex items-center justify-center gap-2 transition shadow-[0_0_14px_rgba(245,158,11,0.2)] group/btn"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>Unlock with Gold ✦</span>
+              <span>Unlock with Gold</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
             </button>
           )}
