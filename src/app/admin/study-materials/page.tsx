@@ -76,7 +76,7 @@ export default function AdminStudyMaterials() {
   
   // Catalog Filter States
   const [filterCategory, setFilterCategory] = useState<string>("ALL");
-  const [filterSection, setFilterSection] = useState<string>("ALL");
+  const [filterSection, setFilterSection] = useState<string>("ANY");
   const [filterClassSem, setFilterClassSem] = useState<string>("ALL");
   const [filterTier, setFilterTier] = useState<"ALL" | "FREE" | "PREMIUM">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
@@ -647,7 +647,7 @@ export default function AdminStudyMaterials() {
   // Filter materials for catalog display
   const filteredMaterials = materials.filter((item: any) => {
     if (filterCategory !== "ALL" && item.category !== filterCategory) return false;
-    if ((item.section || "ALL") !== filterSection) return false;
+    if (filterSection !== "ANY" && (item.section || "ALL") !== filterSection) return false;
     if (filterClassSem !== "ALL" && (item.classSem || "ALL") !== filterClassSem) return false;
     if (filterTier === "FREE" && item.isPremium) return false;
     if (filterTier === "PREMIUM" && !item.isPremium) return false;
@@ -1481,6 +1481,7 @@ export default function AdminStudyMaterials() {
             Curriculum:
           </span>
           {[
+            { id: "ANY", label: "All" },
             { id: "ALL", label: "All Curriculums" },
             { id: "CBSE", label: "CBSE" },
             { id: "ICSE", label: "ICSE / ISC" },
@@ -1489,7 +1490,9 @@ export default function AdminStudyMaterials() {
             { id: "3D_ANIMATION", label: "3D Animations" },
           ].map(sec => {
             const isSecActive = filterSection === sec.id;
-            const count = materials.filter((m: any) => (m.section || "ALL") === sec.id).length;
+            const count = sec.id === "ANY" 
+              ? materials.length 
+              : materials.filter((m: any) => (m.section || "ALL") === sec.id).length;
             return (
               <button
                 key={sec.id}
