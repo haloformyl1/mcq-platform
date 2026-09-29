@@ -43,8 +43,6 @@ export default function CurriculumLevelPage({
   const router = useRouter();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [disciplineFilter, setDisciplineFilter] = useState<"ALL" | "PHYSICAL" | "INORGANIC" | "ORGANIC">("ALL");
-
   const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
   const isPaid = student?.subscriptionStatus === "PAID" && (
     !student?.subscriptionExpiresAt || new Date(student?.subscriptionExpiresAt).getTime() > Date.now()
@@ -114,7 +112,6 @@ export default function CurriculumLevelPage({
 
   const filteredList = useMemo(() => {
     return levelMaterials.filter(item => {
-      if (disciplineFilter !== "ALL" && item.discipline !== disciplineFilter) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         return item.title.toLowerCase().includes(q) || 
@@ -123,7 +120,7 @@ export default function CurriculumLevelPage({
       }
       return true;
     });
-  }, [levelMaterials, disciplineFilter, searchQuery]);
+  }, [levelMaterials, searchQuery]);
 
   const levelFormatted = formatLevelLabel(level);
   const isEntranceExam = board === "ENTRANCE" || ["neet", "jee", "wbjee", "cuet"].includes(level.toLowerCase());
@@ -207,18 +204,6 @@ export default function CurriculumLevelPage({
                 className="pl-8 pr-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 w-48 sm:w-64"
               />
             </div>
-
-            <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/10 text-[11px] font-mono">
-              {(["ALL", "PHYSICAL", "INORGANIC", "ORGANIC"] as const).map(disc => (
-                <button
-                  key={disc}
-                  onClick={() => setDisciplineFilter(disc)}
-                  className={`px-2.5 py-1 rounded ${disciplineFilter === disc ? "bg-white/10 text-white font-bold" : "text-slate-400 hover:text-white"}`}
-                >
-                  {disc}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -250,7 +235,7 @@ export default function CurriculumLevelPage({
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.04] border border-white/10 text-slate-300">
-                          Chapter {String(item.chapterNumber).padStart(2, "0")} · {item.discipline}
+                          Chapter {String(item.chapterNumber).padStart(2, "0")}
                         </span>
                         {isLevelRestricted && (
                           <span 

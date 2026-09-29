@@ -43,7 +43,6 @@ export default function CurriculumCategoryPage({
   const router = useRouter();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [disciplineFilter, setDisciplineFilter] = useState<"ALL" | "PHYSICAL" | "INORGANIC" | "ORGANIC">("ALL");
   const [sortBy, setSortBy] = useState<"CHAPTER" | "AZ">("CHAPTER");
 
   const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
@@ -63,10 +62,6 @@ export default function CurriculumCategoryPage({
   const categoryItems = useMemo(() => {
     let items = levelMaterials.filter(categoryObj.matchFn);
 
-    if (disciplineFilter !== "ALL") {
-      items = items.filter(i => i.discipline === disciplineFilter);
-    }
-
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       items = items.filter(i => 
@@ -80,7 +75,7 @@ export default function CurriculumCategoryPage({
       if (sortBy === "CHAPTER") return (a.chapterNumber || 99) - (b.chapterNumber || 99);
       return a.title.localeCompare(b.title);
     });
-  }, [levelMaterials, categoryObj, disciplineFilter, searchQuery, sortBy]);
+  }, [levelMaterials, categoryObj, searchQuery, sortBy]);
 
   const levelFormatted = formatLevelLabel(level);
   const levelUrl = `/study-material/${board.toLowerCase()}/${level.toLowerCase().replace(/_/g, "-")}`;
@@ -181,17 +176,6 @@ export default function CurriculumCategoryPage({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/10 text-[11px] font-mono">
-              {(["ALL", "PHYSICAL", "INORGANIC", "ORGANIC"] as const).map(disc => (
-                <button
-                  key={disc}
-                  onClick={() => setDisciplineFilter(disc)}
-                  className={`px-2.5 py-1 rounded touch-manipulation select-none active:scale-[0.96] ${disciplineFilter === disc ? "bg-cyan-500/20 text-cyan-300 font-bold" : "text-slate-400 hover:text-white"}`}
-                >
-                  {disc}
-                </button>
-              ))}
-            </div>
 
             <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-lg border border-white/10 text-[11px] font-mono">
               <button
@@ -240,7 +224,7 @@ export default function CurriculumCategoryPage({
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/30 text-cyan-300">
-                          Chapter {String(item.chapterNumber).padStart(2, "0")} · {item.discipline}
+                          Chapter {String(item.chapterNumber).padStart(2, "0")}
                         </span>
                         {isLevelRestricted && (
                           <span 

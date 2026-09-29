@@ -1576,11 +1576,6 @@ export default function AdminStudyMaterials() {
                             </span>
                           )
                         )}
-                        {item.discipline && item.discipline !== "GENERAL" && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#222] text-gray-300 border border-[#333]">
-                            {item.discipline}
-                          </span>
-                        )}
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-900 text-slate-400">
                           {item.type}
                         </span>
@@ -1675,21 +1670,6 @@ export default function AdminStudyMaterials() {
                         </select>
                       </div>
 
-
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                        <span className="text-[10px] text-gray-400 font-bold uppercase shrink-0">Branch:</span>
-                        <select
-                          value={item.discipline || "GENERAL"}
-                          onChange={e => handleUpdateDiscipline(item.id, e.target.value)}
-                          disabled={isUpdatingThis}
-                          className="bg-[#1a1a1a] border border-[#333] text-gray-300 rounded px-2 py-1 text-[11px] focus:outline-none cursor-pointer w-full sm:w-auto"
-                        >
-                          <option value="GENERAL">General</option>
-                          <option value="PHYSICAL">Physical</option>
-                          <option value="INORGANIC">Inorganic</option>
-                          <option value="ORGANIC">Organic</option>
-                        </select>
-                      </div>
                     </div>
                     )}
                   </div>
