@@ -1063,7 +1063,7 @@ export default function AdminStudyMaterials() {
                         onChange={e => setBulkCategory(e.target.value as LibraryCategoryType)}
                         className="bg-[#111] border border-cyan-500/30 text-cyan-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
                       >
-                        {LIBRARY_CATEGORIES.map(c => (
+                        {LIBRARY_CATEGORIES.filter(c => c !== "3D animations").map(c => (
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
@@ -1247,7 +1247,7 @@ export default function AdminStudyMaterials() {
                             disabled={isDone || isUploading}
                             className="w-full bg-[#121212] border border-cyan-500/40 text-cyan-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
                           >
-                            {LIBRARY_CATEGORIES.map(c => (
+                            {LIBRARY_CATEGORIES.filter(c => c !== "3D animations").map(c => (
                               <option key={c} value={c}>{c}</option>
                             ))}
                           </select>

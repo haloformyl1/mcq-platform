@@ -130,6 +130,11 @@ export function parseMaterialMetadata(
           section = 'ICSE';
         }
       }
+
+      // STRICT VALIDATION: Only LINK types can be 3D animations
+      if (category === '3D animations' && type !== 'LINK') {
+        category = 'Chapter wise PDF Notes';
+      }
       cleanDescription = text.replace(META_TAG_REGEX, '').trim();
 
       if (!parsed.section) {
@@ -157,7 +162,7 @@ export function parseMaterialMetadata(
   }
 
   const lowerTitle = (title || '').toLowerCase();
-  const is3D = type === 'LINK' || lowerTitle.includes('3d') || lowerTitle.includes('bonding') || lowerTitle.includes('solid state') || lowerTitle.includes('model');
+  const is3D = type === 'LINK' && (lowerTitle.includes('3d') || lowerTitle.includes('bonding') || lowerTitle.includes('solid state') || lowerTitle.includes('model'));
 
   if (is3D) {
     category = '3D animations';
@@ -192,6 +197,11 @@ export function parseMaterialMetadata(
   }
 
   classSem = detectClassSem(`${title} ${cleanDescription}`, section);
+
+  // STRICT VALIDATION: Only LINK types can be 3D animations
+  if (category === '3D animations' && type !== 'LINK') {
+    category = 'Chapter wise PDF Notes';
+  }
 
   return { category, discipline, section, classSem, cleanDescription: cleanDescription.trim() };
 }
