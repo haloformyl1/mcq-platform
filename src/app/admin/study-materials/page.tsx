@@ -1485,7 +1485,8 @@ export default function AdminStudyMaterials() {
             { id: "CBSE", label: "CBSE" },
             { id: "ICSE", label: "ICSE / ISC" },
             { id: "WBCHSE", label: "WBCHSE" },
-            { id: "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS", label: "NEET / JEE & Entrance" },
+            { id: "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS", label: "Competitive" },
+            { id: "3D_ANIMATION", label: "3D Animations" },
           ].map(sec => {
             const isSecActive = filterSection === sec.id;
             const count = sec.id === "ALL" 
@@ -1512,39 +1513,7 @@ export default function AdminStudyMaterials() {
           })}
         </div>
 
-        {/* Shelf Category Tabs Filter */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-          <button
-            onClick={() => setFilterCategory("ALL")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shrink-0 border transition cursor-pointer ${
-              filterCategory === "ALL"
-                ? "bg-cyan-500 text-black border-cyan-400 shadow-md font-extrabold"
-                : "bg-[#141414] text-gray-400 border-[#2a2a2a] hover:text-white hover:border-[#3a3a3a]"
-            }`}
-          >
-            All Shelves ({materials.length})
-          </button>
-          {LIBRARY_CATEGORIES.map(cat => {
-            const count = materials.filter((m: any) => m.category === cat).length;
-            const isCatActive = filterCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setFilterCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shrink-0 border transition cursor-pointer flex items-center gap-1.5 ${
-                  isCatActive
-                    ? "bg-cyan-950 text-cyan-300 border-cyan-600 shadow"
-                    : "bg-[#141414] text-gray-400 border-[#2a2a2a] hover:text-white hover:border-[#3a3a3a]"
-                }`}
-              >
-                <span>{cat}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${isCatActive ? "bg-cyan-800/80 text-white" : "bg-[#222] text-gray-400"}`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+
 
         {/* Catalog Grid */}
         {filteredMaterials.length === 0 ? (
