@@ -803,6 +803,7 @@ export default function AdminStudyMaterials() {
                           <option value="CBSE">CBSE (Class XI & XII)</option>
                           <option value="ICSE">ICSE / ISC</option>
                           <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
+                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE (NEET/JEE/WBJEE/CUET & OTHERS)</option>
                           <option value="3D_ANIMATION">3D Animation</option>
                         </select>
                         <p className="text-[11px] text-gray-500">Assign this content to a specific board or competitive entrance exam.</p>
@@ -844,7 +845,7 @@ export default function AdminStudyMaterials() {
                               <option value="NEET">NEET</option>
                               <option value="JEE">JEE</option>
                               <option value="WBJEE">WBJEE</option>
-                              <option value="CUET">CUET</option>
+                              <option value="CUET">CUET & OTHERS</option>
                             </>
                           )}
                         </select>
@@ -1269,6 +1270,7 @@ export default function AdminStudyMaterials() {
                             <option value="CBSE">CBSE</option>
                             <option value="ICSE">ICSE / ISC</option>
                             <option value="WBCHSE">WBCHSE</option>
+                            <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE</option>
                             <option value="3D_ANIMATION">3D Animation</option>
                           </select>
                         </div>
@@ -1304,6 +1306,13 @@ export default function AdminStudyMaterials() {
                                 <option value="11">Class 11</option>
                                 <option value="12">Class 12</option>
                                 <option value="ALL">Both 11 & 12</option>
+                              </>
+                            ) : item.section === "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS" ? (
+                              <>
+                                <option value="NEET">NEET</option>
+                                <option value="JEE">JEE</option>
+                                <option value="WBJEE">WBJEE</option>
+                                <option value="CUET">CUET & OTHERS</option>
                               </>
                             ) : (
                               <>
@@ -1628,6 +1637,7 @@ export default function AdminStudyMaterials() {
                           <option value="CBSE">CBSE</option>
                           <option value="ICSE">ICSE / ISC</option>
                           <option value="WBCHSE">WBCHSE</option>
+                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE</option>
                           <option value="3D_ANIMATION">3D Animation</option>
                         </select>
                       </div>
