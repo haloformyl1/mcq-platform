@@ -157,6 +157,16 @@ export function parseMaterialMetadata(
         classSem = detectClassSem(`${title} ${cleanDescription}`, section);
       }
 
+      // STRICT VALIDATION: Only LINK types can be 3D animations
+      if (category === '3D animations' && type !== 'LINK') {
+        category = 'Chapter wise PDF Notes';
+      }
+
+      // Automatically fix legacy 3D animations to have the correct curriculum section
+      if (category === '3D animations') {
+        section = '3D_ANIMATION';
+      }
+
       return { category, discipline, section, classSem, cleanDescription };
     } catch {}
   }
@@ -201,6 +211,11 @@ export function parseMaterialMetadata(
   // STRICT VALIDATION: Only LINK types can be 3D animations
   if (category === '3D animations' && type !== 'LINK') {
     category = 'Chapter wise PDF Notes';
+  }
+
+  // Automatically fix legacy 3D animations to have the correct curriculum section
+  if (category === '3D animations') {
+    section = '3D_ANIMATION';
   }
 
   return { category, discipline, section, classSem, cleanDescription: cleanDescription.trim() };
