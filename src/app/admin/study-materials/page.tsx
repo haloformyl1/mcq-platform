@@ -791,15 +791,19 @@ export default function AdminStudyMaterials() {
                             } else if ((newSec === "CBSE" || newSec === "ICSE") && newSem.startsWith("SEM-")) {
                               newSem = (newSem === "SEM-III" || newSem === "SEM-IV") ? "12" : "11";
                             }
-                            setForm({ ...form, section: newSec, classSem: newSem });
+                            if (newSec === "3D_ANIMATION") {
+                              setForm({ ...form, section: newSec, classSem: newSem, type: "LINK", category: "3D animations" });
+                            } else {
+                              setForm({ ...form, section: newSec, classSem: newSem });
+                            }
                           }}
                           className="w-full bg-[#181818] border border-purple-500/40 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition cursor-pointer font-medium"
                         >
-                          <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE & Entrance)</option>
+                          <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE)</option>
                           <option value="CBSE">CBSE (Class XI & XII)</option>
                           <option value="ICSE">ICSE / ISC</option>
                           <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
-                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS</option>
+                          <option value="3D_ANIMATION">3D Animation</option>
                         </select>
                         <p className="text-[11px] text-gray-500">Assign this content to a specific board or competitive entrance exam.</p>
                       </div>
@@ -865,7 +869,8 @@ export default function AdminStudyMaterials() {
                         <select
                           value={form.type}
                           onChange={e => setForm({ ...form, type: e.target.value })}
-                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
+                          disabled={form.section === "3D_ANIMATION"}
+                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer disabled:opacity-50"
                         >
                           <option value="PDF">PDF Document</option>
                           <option value="LINK">External Link / 3D Simulation</option>
@@ -1264,7 +1269,7 @@ export default function AdminStudyMaterials() {
                             <option value="CBSE">CBSE</option>
                             <option value="ICSE">ICSE / ISC</option>
                             <option value="WBCHSE">WBCHSE</option>
-                            <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                            <option value="3D_ANIMATION">3D Animation</option>
                           </select>
                         </div>
 
@@ -1623,7 +1628,7 @@ export default function AdminStudyMaterials() {
                           <option value="CBSE">CBSE</option>
                           <option value="ICSE">ICSE / ISC</option>
                           <option value="WBCHSE">WBCHSE</option>
-                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                          <option value="3D_ANIMATION">3D Animation</option>
                         </select>
                       </div>
 

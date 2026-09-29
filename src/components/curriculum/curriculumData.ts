@@ -222,7 +222,7 @@ export function filterMaterialsForContext(
       } else if (b === "ICSE") {
         if (item.section && item.section !== "ALL" && item.section !== "ICSE") return false;
       } else if (b === "ENTRANCE" || b === "COMPETITIVE" || b.includes("NEET") || b.includes("JEE")) {
-        if (item.section && item.section !== "ALL" && item.section !== "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS") return false;
+        if (item.section && item.section !== "NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS") return false;
       }
     }
 

@@ -24,7 +24,8 @@ export const CURRICULUM_SECTIONS = [
   'CBSE',
   'ICSE',
   'WBCHSE',
-  'NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS'
+  'NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS',
+  '3D_ANIMATION'
 ] as const;
 
 export type CurriculumSectionType = typeof CURRICULUM_SECTIONS[number];
