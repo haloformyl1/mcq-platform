@@ -140,7 +140,6 @@ export default function StudyMaterialRepository({
 
   // Filtering & Search
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeDiscipline, setActiveDiscipline] = useState<"ALL" | "PHYSICAL" | "INORGANIC" | "ORGANIC">("ALL");
   const [sortBy, setSortBy] = useState<"CHAPTER" | "RECENT" | "AZ">("CHAPTER");
 
   // Upgrade Modal State
@@ -375,11 +374,6 @@ export default function StudyMaterialRepository({
       );
     }
 
-    // Apply Discipline Filter
-    if (activeDiscipline !== "ALL") {
-      items = items.filter(item => item.discipline === activeDiscipline);
-    }
-
     // Apply Sorting
     return items.sort((a, b) => {
       if (sortBy === "CHAPTER") {
@@ -390,7 +384,7 @@ export default function StudyMaterialRepository({
       }
       return 0;
     });
-  }, [contextMaterials, searchQuery, activeDiscipline, sortBy]);
+  }, [contextMaterials, searchQuery, sortBy]);
 
   // Format Level Label for Display
   const getBoardLabel = (board: string | null) => {
@@ -984,23 +978,6 @@ export default function StudyMaterialRepository({
               />
             </div>
 
-            {/* Discipline Pills */}
-            <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
-              <span className="text-[11px] font-mono text-slate-500 hidden lg:inline mr-1">Discipline:</span>
-              {(["ALL", "PHYSICAL", "INORGANIC", "ORGANIC"] as const).map(d => (
-                <button
-                  key={d}
-                  onClick={() => setActiveDiscipline(d)}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-medium transition-colors ${
-                    activeDiscipline === d 
-                      ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40" 
-                      : "text-slate-400 hover:text-white bg-white/[0.02] border border-white/[0.06]"
-                  }`}
-                >
-                  {d === "ALL" ? "All" : d.charAt(0) + d.slice(1).toLowerCase()}
-                </button>
-              ))}
-            </div>
 
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2 w-full md:w-auto justify-end">
@@ -1091,7 +1068,7 @@ export default function StudyMaterialRepository({
                           {item.title}
                         </h3>
                         <p className="text-[11px] font-mono text-slate-400 mt-1">
-                          {item.chapterTitle} · {item.discipline}
+                          {item.chapterTitle}
                         </p>
                       </div>
 

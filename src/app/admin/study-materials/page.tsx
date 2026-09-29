@@ -853,22 +853,7 @@ export default function AdminStudyMaterials() {
                         </p>
                       </div>
           
-                      {/* Chemistry Branch / Discipline Selector */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                          Subject Branch / Discipline
-                        </label>
-                        <select
-                          value={form.discipline}
-                          onChange={e => setForm({ ...form, discipline: e.target.value as SubjectDisciplineType })}
-                          className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 transition cursor-pointer"
-                        >
-                          <option value="GENERAL">General / All Branches</option>
-                          <option value="PHYSICAL">Physical Chemistry</option>
-                          <option value="INORGANIC">Inorganic Chemistry</option>
-                          <option value="ORGANIC">Organic Chemistry</option>
-                        </select>
-                      </div>
+
                       </>
                       )}
           
@@ -1263,22 +1248,6 @@ export default function AdminStudyMaterials() {
                           </select>
                         </div>
 
-                        {/* Subject Branch Dropdown */}
-                        <div className="w-full md:w-28 shrink-0">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
-                            Branch
-                          </span>
-                          <select
-                            value={item.discipline}
-                            onChange={e => handleUpdateStaged(item.id, { discipline: e.target.value as SubjectDisciplineType })}
-                            disabled={isDone || isUploading}
-                            className="w-full bg-[#121212] border border-[#333] text-gray-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none cursor-pointer"
-                          >
-                            {SUBJECT_DISCIPLINES.map(d => (
-                              <option key={d} value={d}>{d}</option>
-                            ))}
-                          </select>
-                        </div>
 
                         {/* Curriculum Section Dropdown */}
                         <div className="w-full md:w-44 shrink-0">
@@ -1888,22 +1857,7 @@ export default function AdminStudyMaterials() {
                   </select>
                 </div>
 
-                {/* Subject Branch */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-gray-300 uppercase tracking-wide">
-                    Subject Branch / Discipline
-                  </label>
-                  <select
-                    value={editForm.discipline}
-                    onChange={e => setEditForm({ ...editForm, discipline: e.target.value as SubjectDisciplineType })}
-                    className="w-full bg-[#181818] border border-[#333] focus:border-cyan-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
-                  >
-                    <option value="GENERAL">General / All Branches</option>
-                    <option value="PHYSICAL">Physical Chemistry</option>
-                    <option value="INORGANIC">Inorganic Chemistry</option>
-                    <option value="ORGANIC">Organic Chemistry</option>
-                  </select>
-                </div>
+
                 </>
                 )}
 
