@@ -247,19 +247,19 @@ export default function StudyMaterialRepository({
       // 2. Class / Semester filtering
       if (selectedLevel) {
         if (selectedLevel === "CLASS_XI") {
-          const isAllowedForClass11 = item.classSem === "11" || item.classSem === "SEM-I" || item.classSem === "SEM-II" || item.classSem === "ALL";
+          const isAllowedForClass11 = item.classSem === "11" || item.classSem === "SEM-I" || item.classSem === "SEM-II" || item.classSem === "ALL" || item.classSem === "ALL_11";
           if (item.classSem && !isAllowedForClass11) return false;
         } else if (selectedLevel === "CLASS_XII") {
-          const isAllowedForClass12 = item.classSem === "12" || item.classSem === "SEM-III" || item.classSem === "SEM-IV" || item.classSem === "ALL";
+          const isAllowedForClass12 = item.classSem === "12" || item.classSem === "SEM-III" || item.classSem === "SEM-IV" || item.classSem === "ALL" || item.classSem === "ALL_12";
           if (item.classSem && !isAllowedForClass12) return false;
         } else if (selectedLevel === "SEM_1") {
-          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-I") return false;
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "ALL_11" && item.classSem !== "SEM-I") return false;
         } else if (selectedLevel === "SEM_2") {
-          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-II") return false;
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "ALL_11" && item.classSem !== "SEM-II") return false;
         } else if (selectedLevel === "SEM_3") {
-          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-III") return false;
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "ALL_12" && item.classSem !== "SEM-III") return false;
         } else if (selectedLevel === "SEM_4") {
-          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "SEM-IV") return false;
+          if (item.classSem && item.classSem !== "ALL" && item.classSem !== "ALL_12" && item.classSem !== "SEM-IV") return false;
         } else if (selectedLevel === "NEET") {
           const isLegacyMatch = (item.title && item.title.toLowerCase().includes("neet")) || (item.originalCategory && item.originalCategory.toLowerCase().includes("neet"));
           const isNewMatch = item.classSem === "NEET" || item.classSem === "ALL";

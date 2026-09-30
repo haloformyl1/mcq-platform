@@ -824,6 +824,8 @@ export default function AdminStudyMaterials() {
                           {form.section === "ALL" ? (
                             <>
                               <option value="ALL">All (Class 11 + 12 / SEM-I to IV)</option>
+                              <option value="ALL_11">Sem-I + II / CLASS 11</option>
+                              <option value="ALL_12">Sem-III + IV / CLASS 12</option>
                               <option value="SEM-I">SEM-I (Semester I / Class 11)</option>
                               <option value="SEM-II">SEM-II (Semester II / Class 11)</option>
                               <option value="SEM-III">SEM-III (Semester III / Class 12)</option>
@@ -1103,6 +1105,8 @@ export default function AdminStudyMaterials() {
                         <option value="WBJEE">WBJEE</option>
                         <option value="CUET">CUET & OTHERS</option>
                         <option value="ALL">All Levels</option>
+                        <option value="ALL_11">Sem-I + II / CLASS 11</option>
+                        <option value="ALL_12">Sem-III + IV / CLASS 12</option>
                       </select>
                       <button
                         type="button"
@@ -1236,6 +1240,9 @@ export default function AdminStudyMaterials() {
                           >
                             {item.section === "ALL" || !item.section ? (
                               <>
+                                <option value="ALL">All (Class 11 + 12 / SEM-I to IV)</option>
+                                <option value="ALL_11">Sem-I + II / CLASS 11</option>
+                                <option value="ALL_12">Sem-III + IV / CLASS 12</option>
                                 <option value="SEM-I">SEM-I</option>
                                 <option value="SEM-II">SEM-II</option>
                                 <option value="SEM-III">SEM-III</option>
@@ -1742,6 +1749,8 @@ export default function AdminStudyMaterials() {
                     {editForm.section === "ALL" ? (
                       <>
                         <option value="ALL">All (Class 11 + 12 / SEM-I to IV)</option>
+                        <option value="ALL_11">Sem-I + II / CLASS 11</option>
+                        <option value="ALL_12">Sem-III + IV / CLASS 12</option>
                         <option value="SEM-I">SEM-I (Semester I / Class 11)</option>
                         <option value="SEM-II">SEM-II (Semester II / Class 11)</option>
                         <option value="SEM-III">SEM-III (Semester III / Class 12)</option>

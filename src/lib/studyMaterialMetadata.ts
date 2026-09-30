@@ -42,7 +42,9 @@ export const CLASS_SEM_OPTIONS = [
   'JEE',
   'WBJEE',
   'CUET',
-  'ALL'
+  'ALL',
+  'ALL_11',
+  'ALL_12'
 ] as const;
 
 export type ClassSemType = typeof CLASS_SEM_OPTIONS[number];
