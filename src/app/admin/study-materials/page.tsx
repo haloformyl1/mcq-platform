@@ -1056,28 +1056,6 @@ export default function AdminStudyMaterials() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    {/* Bulk Shelf Category */}
-                    <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
-                      <span className="text-gray-400 text-[11px] pl-1 font-semibold">Bulk Shelf:</span>
-                      <select
-                        value={bulkCategory}
-                        onChange={e => setBulkCategory(e.target.value as LibraryCategoryType)}
-                        className="bg-[#111] border border-cyan-500/30 text-cyan-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
-                      >
-                        {LIBRARY_CATEGORIES.filter(c => c !== "3D animations").map(c => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={handleApplyBulkCategory}
-                        disabled={batchUploading}
-                        className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded-lg text-xs font-bold transition cursor-pointer"
-                      >
-                        Apply to All
-                      </button>
-                    </div>
-
                     {/* Bulk Section */}
                     <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
                       <span className="text-purple-300 text-[11px] pl-1 font-semibold">Section:</span>
@@ -1117,6 +1095,10 @@ export default function AdminStudyMaterials() {
                         <option value="SEM-II">SEM-II</option>
                         <option value="SEM-III">SEM-III</option>
                         <option value="SEM-IV">SEM-IV</option>
+                        <option value="NEET">NEET</option>
+                        <option value="JEE">JEE</option>
+                        <option value="WBJEE">WBJEE</option>
+                        <option value="CUET">CUET & OTHERS</option>
                         <option value="ALL">All Levels</option>
                       </select>
                       <button
