@@ -198,10 +198,10 @@ export default function StudyMaterialRepository({
 
         // Map Category cleanly
         let category = mat.category || "Chapter-wise PDF Notes";
-        if (category === "Chapter wise PDF Notes") category = "Chapter-wise PDF Notes";
-        if (category === "Daily practice problems (DPPs)") category = "Daily Practice Problems (DPPs)";
+        if (category === "Chapter-wise PDF Notes") category = "Chapter-wise PDF Notes";
+        if (category === "Daily Practice Problems (DPPs)") category = "Daily Practice Problems (DPPs)";
         if (category.includes("Prev. 34 Years") || category.includes("Prev. Years")) category = "Previous Year Questions";
-        if (category === "Class Exams PDF") category = "Class / School Exams";
+        if (category === "Class / School Exams") category = "Class / School Exams";
 
         return {
           id: mat.id.startsWith("db-") ? mat.id : "db-" + mat.id,

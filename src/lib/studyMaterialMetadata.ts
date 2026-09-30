@@ -1,11 +1,12 @@
 export const LIBRARY_CATEGORIES = [
   '3D animations',
-  'Chapter wise PDF Notes',
-  'Daily practice problems (DPPs)',
-  'NEET Prev. 34 Years',
-  'JEE (MAINS) Prev. Years',
-  'WBJEE Prev. Years',
-  'Class Exams PDF'
+  'Chapter-wise PDF Notes',
+  'Daily Practice Problems (DPPs)',
+  'Previous Year Questions',
+  'Class / School Exams',
+  'Revision Material',
+  'Formula & Quick Reference',
+  'Suggestion Sets'
 ] as const;
 
 export type LibraryCategoryType = typeof LIBRARY_CATEGORIES[number];
@@ -58,7 +59,7 @@ const META_TAG_REGEX = /<!--\s*piechem-meta:\s*(\{[\s\S]*?\})\s*-->\r?\n?/;
 
 export function encodeMaterialMetadata(
   description: string = '',
-  category: string = 'Chapter wise PDF Notes',
+  category: string = 'Chapter-wise PDF Notes',
   discipline: string = 'GENERAL',
   section: string = 'ALL',
   classSem: string = 'ALL'
@@ -77,7 +78,7 @@ export function parseMaterialMetadata(
   const text = rawDescription || '';
   const match = text.match(META_TAG_REGEX);
 
-  let category: LibraryCategoryType = 'Chapter wise PDF Notes';
+  let category: LibraryCategoryType = 'Chapter-wise PDF Notes';
   let discipline: SubjectDisciplineType = 'GENERAL';
   let section: CurriculumSectionType = 'ALL';
   let classSem: ClassSemType = 'ALL';
@@ -133,7 +134,7 @@ export function parseMaterialMetadata(
 
       // STRICT VALIDATION: Only LINK types can be 3D animations
       if (category === '3D animations' && type !== 'LINK') {
-        category = 'Chapter wise PDF Notes';
+        category = 'Chapter-wise PDF Notes';
       }
       cleanDescription = text.replace(META_TAG_REGEX, '').trim();
 
@@ -159,7 +160,7 @@ export function parseMaterialMetadata(
 
       // STRICT VALIDATION: Only LINK types can be 3D animations
       if (category === '3D animations' && type !== 'LINK') {
-        category = 'Chapter wise PDF Notes';
+        category = 'Chapter-wise PDF Notes';
       }
 
       // Automatically fix legacy 3D animations to have the correct curriculum section
@@ -177,15 +178,15 @@ export function parseMaterialMetadata(
   if (is3D) {
     category = '3D animations';
   } else if (lowerTitle.includes('dpp') || lowerTitle.includes('practice problem')) {
-    category = 'Daily practice problems (DPPs)';
+    category = 'Daily Practice Problems (DPPs)';
   } else if (lowerTitle.includes('neet') || lowerTitle.includes('34 year') || lowerTitle.includes('aipmt')) {
-    category = 'NEET Prev. 34 Years';
+    category = 'Previous Year Questions';
   } else if (lowerTitle.includes('jee') || lowerTitle.includes('mains')) {
-    category = 'JEE (MAINS) Prev. Years';
+    category = 'Previous Year Questions';
   } else if (lowerTitle.includes('wbjee')) {
-    category = 'WBJEE Prev. Years';
+    category = 'Previous Year Questions';
   } else if (lowerTitle.includes('exam') || lowerTitle.includes('test') || lowerTitle.includes('paper')) {
-    category = 'Class Exams PDF';
+    category = 'Class / School Exams';
   }
 
   if (lowerTitle.includes('solid') || lowerTitle.includes('solution') || lowerTitle.includes('thermo') || lowerTitle.includes('kinetic') || lowerTitle.includes('electro')) {
@@ -210,7 +211,7 @@ export function parseMaterialMetadata(
 
   // STRICT VALIDATION: Only LINK types can be 3D animations
   if (category === '3D animations' && type !== 'LINK') {
-    category = 'Chapter wise PDF Notes';
+    category = 'Chapter-wise PDF Notes';
   }
 
   // Automatically fix legacy 3D animations to have the correct curriculum section

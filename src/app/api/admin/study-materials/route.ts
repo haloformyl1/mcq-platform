@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     let isPremium = false;
     let url = "";
     let fileSizeFormatted: string | null = null;
-    let category = "Chapter wise PDF Notes";
+    let category = "Chapter-wise PDF Notes";
     let discipline = "GENERAL";
     let section = "ALL";
     let classSem = "ALL";
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
       isPremium = Boolean(body.isPremium);
       url = body.url?.trim() || "";
       fileSizeFormatted = body.fileSize || null;
-      category = body.category || "Chapter wise PDF Notes";
+      category = body.category || "Chapter-wise PDF Notes";
       discipline = body.discipline || "GENERAL";
       section = body.section || "ALL";
       classSem = body.classSem || "ALL";
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       isPremium = formData.get("isPremium") === "true";
       url = (formData.get("url") as string)?.trim() || "";
       const file = formData.get("file") as Blob | null;
-      category = (formData.get("category") as string) || "Chapter wise PDF Notes";
+      category = (formData.get("category") as string) || "Chapter-wise PDF Notes";
       discipline = (formData.get("discipline") as string) || "GENERAL";
       section = (formData.get("section") as string) || "ALL";
       classSem = (formData.get("classSem") as string) || "ALL";

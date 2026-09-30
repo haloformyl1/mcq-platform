@@ -104,7 +104,7 @@ export default function AdminStudyMaterials() {
     percent: 0,
     currentFileName: ""
   });
-  const [bulkCategory, setBulkCategory] = useState<LibraryCategoryType>("Chapter wise PDF Notes");
+  const [bulkCategory, setBulkCategory] = useState<LibraryCategoryType>("Chapter-wise PDF Notes");
   const [bulkDiscipline, setBulkDiscipline] = useState<SubjectDisciplineType>("GENERAL");
   const [bulkSection, setBulkSection] = useState<CurriculumSectionType>("ALL");
   const [bulkClassSem, setBulkClassSem] = useState<ClassSemType>("11");
@@ -270,7 +270,7 @@ export default function AdminStudyMaterials() {
     title: "",
     description: "",
     type: "PDF",
-    category: "Chapter wise PDF Notes" as LibraryCategoryType,
+    category: "Chapter-wise PDF Notes" as LibraryCategoryType,
     discipline: "GENERAL" as SubjectDisciplineType,
     section: "ALL" as CurriculumSectionType,
     classSem: "11" as ClassSemType,
@@ -292,7 +292,7 @@ export default function AdminStudyMaterials() {
       title: item.title || "",
       description: rawDesc || "",
       type: item.type || "PDF",
-      category: item.category || "Chapter wise PDF Notes",
+      category: item.category || "Chapter-wise PDF Notes",
       discipline: item.discipline || "GENERAL",
       section: (item.section || "ALL") as CurriculumSectionType,
       classSem: (item.classSem || (item.section === "WBCHSE" ? "SEM-I" : "11")) as ClassSemType,
@@ -477,7 +477,7 @@ export default function AdminStudyMaterials() {
           title: "",
           description: "",
           type: "PDF",
-          category: "Chapter wise PDF Notes",
+          category: "Chapter-wise PDF Notes",
           discipline: "GENERAL",
           section: "ALL",
           classSem: "SEM-I",

@@ -1,12 +1,13 @@
 export type LibraryCategory = 
   | 'ALL'
   | '3D animations'
-  | 'Chapter wise PDF Notes'
-  | 'Daily practice problems (DPPs)'
-  | 'NEET Prev. 34 Years'
-  | 'JEE (MAINS) Prev. Years'
-  | 'WBJEE Prev. Years'
-  | 'Class Exams PDF';
+  | 'Chapter-wise PDF Notes'
+  | 'Daily Practice Problems (DPPs)'
+  | 'Previous Year Questions'
+  | 'Class / School Exams'
+  | 'Revision Material'
+  | 'Formula & Quick Reference'
+  | 'Suggestion Sets';
 
 export type SubjectDiscipline = 'ALL' | 'PHYSICAL' | 'INORGANIC' | 'ORGANIC';
 
