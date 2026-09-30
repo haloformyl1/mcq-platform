@@ -452,7 +452,7 @@ export default function StudyMaterialRepository({
                 onClick={handleResetBoard}
                 className="hover:text-cyan-300 transition-colors font-semibold text-cyan-400"
               >
-                All Curriculums
+                All Curriculums (CBSE, ICSE, WBCHSE)
               </button>
               <span className="text-slate-600">/</span>
               <button 

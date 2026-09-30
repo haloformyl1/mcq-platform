@@ -1086,11 +1086,12 @@ export default function AdminStudyMaterials() {
                         onChange={e => setBulkSection(e.target.value as CurriculumSectionType)}
                         className="bg-[#111] border border-[#444] text-purple-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
                       >
-                        <option value="ALL">All Curriculums</option>
-                        <option value="CBSE">CBSE</option>
+                        <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE)</option>
+                        <option value="CBSE">CBSE (Class XI & XII)</option>
                         <option value="ICSE">ICSE / ISC</option>
-                        <option value="WBCHSE">WBCHSE</option>
-                        <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE & Entrance</option>
+                        <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
+                        <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE (NEET/JEE/WBJEE/CUET & OTHERS)</option>
+                        <option value="3D_ANIMATION">3D Animation</option>
                       </select>
                       <button
                         type="button"
@@ -1123,28 +1124,6 @@ export default function AdminStudyMaterials() {
                         onClick={() => setStagedFiles(prev => prev.map(s => ({ ...s, classSem: bulkClassSem })))}
                         disabled={batchUploading}
                         className="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded-lg text-xs font-bold transition cursor-pointer"
-                      >
-                        Apply to All
-                      </button>
-                    </div>
-
-                    {/* Bulk Discipline */}
-                    <div className="flex items-center gap-1.5 bg-[#1a1a1a] p-1.5 rounded-xl border border-[#333]">
-                      <span className="text-gray-400 text-[11px] pl-1 font-semibold">Branch:</span>
-                      <select
-                        value={bulkDiscipline}
-                        onChange={e => setBulkDiscipline(e.target.value as SubjectDisciplineType)}
-                        className="bg-[#111] border border-[#444] text-gray-300 text-xs rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
-                      >
-                        {SUBJECT_DISCIPLINES.map(d => (
-                          <option key={d} value={d}>{d}</option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={handleApplyBulkDiscipline}
-                        disabled={batchUploading}
-                        className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition cursor-pointer"
                       >
                         Apply to All
                       </button>
@@ -1266,11 +1245,11 @@ export default function AdminStudyMaterials() {
                             disabled={isDone || isUploading}
                             className="w-full bg-[#121212] border border-purple-500/30 text-purple-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-purple-400 cursor-pointer font-medium"
                           >
-                            <option value="ALL">All Curriculums</option>
-                            <option value="CBSE">CBSE</option>
+                            <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE)</option>
+                            <option value="CBSE">CBSE (Class XI & XII)</option>
                             <option value="ICSE">ICSE / ISC</option>
-                            <option value="WBCHSE">WBCHSE</option>
-                            <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE</option>
+                            <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
+                            <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE (NEET/JEE/WBJEE/CUET & OTHERS)</option>
                             <option value="3D_ANIMATION">3D Animation</option>
                           </select>
                         </div>
@@ -1603,11 +1582,11 @@ export default function AdminStudyMaterials() {
                           disabled={isUpdatingThis}
                           className="bg-[#1a1a1a] border border-[#333] text-purple-300 rounded px-2 py-1 text-[11px] focus:outline-none cursor-pointer font-medium w-full sm:w-auto max-w-full sm:max-w-[190px]"
                         >
-                          <option value="ALL">All Curriculums</option>
-                          <option value="CBSE">CBSE</option>
+                          <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE)</option>
+                          <option value="CBSE">CBSE (Class XI & XII)</option>
                           <option value="ICSE">ICSE / ISC</option>
-                          <option value="WBCHSE">WBCHSE</option>
-                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE</option>
+                          <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
+                          <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE (NEET/JEE/WBJEE/CUET & OTHERS)</option>
                           <option value="3D_ANIMATION">3D Animation</option>
                         </select>
                       </div>
@@ -1772,11 +1751,12 @@ export default function AdminStudyMaterials() {
                     }}
                     className="w-full bg-[#181818] border border-purple-500/40 focus:border-purple-400 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
                   >
-                    <option value="ALL">All Curriculums (Universal)</option>
-                    <option value="CBSE">CBSE</option>
+                    <option value="ALL">All Curriculums (CBSE, ICSE, WBCHSE)</option>
+                    <option value="CBSE">CBSE (Class XI & XII)</option>
                     <option value="ICSE">ICSE / ISC</option>
-                    <option value="WBCHSE">WBCHSE</option>
-                    <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS</option>
+                    <option value="WBCHSE">WBCHSE (Semester I, II, III & IV)</option>
+                    <option value="NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS">COMPETITIVE (NEET/JEE/WBJEE/CUET & OTHERS)</option>
+                    <option value="3D_ANIMATION">3D Animation</option>
                   </select>
                 </div>
 
