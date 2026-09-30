@@ -823,6 +823,7 @@ export default function AdminStudyMaterials() {
                         >
                           {form.section === "ALL" ? (
                             <>
+                              <option value="ALL">All (Class 11 + 12 / SEM-I to IV)</option>
                               <option value="SEM-I">SEM-I (Semester I / Class 11)</option>
                               <option value="SEM-II">SEM-II (Semester II / Class 11)</option>
                               <option value="SEM-III">SEM-III (Semester III / Class 12)</option>
@@ -830,6 +831,7 @@ export default function AdminStudyMaterials() {
                             </>
                           ) : form.section === "WBCHSE" ? (
                             <>
+                              <option value="ALL">All Semesters (I, II, III, IV)</option>
                               <option value="SEM-I">Semester I (Class 11 Term 1)</option>
                               <option value="SEM-II">Semester II (Class 11 Term 2)</option>
                               <option value="SEM-III">Semester III (Class 12 Term 1)</option>
@@ -837,6 +839,7 @@ export default function AdminStudyMaterials() {
                             </>
                           ) : form.section === "CBSE" || form.section === "ICSE" ? (
                             <>
+                              <option value="ALL">All (Class 11 + 12)</option>
                               <option value="11">Class 11</option>
                               <option value="12">Class 12</option>
                             </>
@@ -1738,6 +1741,7 @@ export default function AdminStudyMaterials() {
                   >
                     {editForm.section === "ALL" ? (
                       <>
+                        <option value="ALL">All (Class 11 + 12 / SEM-I to IV)</option>
                         <option value="SEM-I">SEM-I (Semester I / Class 11)</option>
                         <option value="SEM-II">SEM-II (Semester II / Class 11)</option>
                         <option value="SEM-III">SEM-III (Semester III / Class 12)</option>
@@ -1745,17 +1749,17 @@ export default function AdminStudyMaterials() {
                       </>
                     ) : editForm.section === "WBCHSE" ? (
                       <>
+                        <option value="ALL">All Semesters (I, II, III, IV)</option>
                         <option value="SEM-I">Semester I (Class 11 Term 1)</option>
                         <option value="SEM-II">Semester II (Class 11 Term 2)</option>
                         <option value="SEM-III">Semester III (Class 12 Term 1)</option>
                         <option value="SEM-IV">Semester IV (Class 12 Term 2)</option>
-                        <option value="ALL">All Semesters</option>
                       </>
                     ) : editForm.section === "CBSE" || editForm.section === "ICSE" ? (
                       <>
+                        <option value="ALL">All (Class 11 + 12)</option>
                         <option value="11">Class 11</option>
                         <option value="12">Class 12</option>
-                        <option value="ALL">Both (11 & 12)</option>
                       </>
                     ) : (
                       <>
