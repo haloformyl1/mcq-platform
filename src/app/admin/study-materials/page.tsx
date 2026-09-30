@@ -1198,22 +1198,6 @@ export default function AdminStudyMaterials() {
                           />
                         </div>
 
-                        {/* Shelf Category Selector */}
-                        <div className="w-full md:w-56 shrink-0">
-                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
-                            Library Shelf *
-                          </span>
-                          <select
-                            value={item.category}
-                            onChange={e => handleUpdateStaged(item.id, { category: e.target.value as LibraryCategoryType })}
-                            disabled={isDone || isUploading}
-                            className="w-full bg-[#121212] border border-cyan-500/40 text-cyan-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
-                          >
-                            {LIBRARY_CATEGORIES.filter(c => c !== "3D animations").map(c => (
-                              <option key={c} value={c}>{c}</option>
-                            ))}
-                          </select>
-                        </div>
 
 
                         {/* Curriculum Section Dropdown */}
