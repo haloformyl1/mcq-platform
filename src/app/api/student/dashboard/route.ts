@@ -88,7 +88,8 @@ export async function GET(req: Request) {
         maximumAttempts: true,
         targetBoard: true,
         targetAcademicLevel: true,
-        isPremium: true
+        isPremium: true,
+        questionPaperUrl: true
       },
       orderBy: { createdAt: 'desc' }
     });
