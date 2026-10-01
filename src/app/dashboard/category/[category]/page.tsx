@@ -362,7 +362,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                   >
                     View Scorecard {maxAttempts > 1 ? `(${attemptsUsed}/${maxAttempts} Attempts Used)` : "(Completed)"}
                   </Link>
-                  {test.questionPaperUrl && (
+                  {isLiveStage && test.questionPaperUrl && (
                     <a 
                       href={test.questionPaperUrl}
                       download 
@@ -393,7 +393,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
                   <span>Start Test</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                {test.questionPaperUrl && (
+                {isLiveStage && test.questionPaperUrl && (
                   <button 
                     onClick={() => alert("Please attempt the test first to download the question paper.")}
                     className="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-900/30 hover:bg-emerald-900/50 hover:text-emerald-200 border border-emerald-800/50 transition flex items-center justify-center gap-2"
