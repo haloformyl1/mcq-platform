@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Download, AlertCircle, X, Loader2 } from "lucide-react";
-import { toast } from "react-hot-toast";
 
 interface DownloadLimitModalProps {
   isOpen: boolean;
@@ -35,13 +34,11 @@ export default function DownloadLimitModal({
       const data = await res.json();
       
       if (!res.ok || !data.allowed) {
-        toast.error(data.message || "Download limit reached");
+        alert(data.message || "Download limit reached");
         setIsProcessing(false);
         return;
       }
 
-      toast.success(data.message);
-      
       // Trigger the actual download
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -54,7 +51,7 @@ export default function DownloadLimitModal({
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to process download");
+      alert("Failed to process download");
     } finally {
       setIsProcessing(false);
     }
