@@ -453,179 +453,115 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
         </div>
       </header>
 
-      <main className="w-full max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6 flex-1">
-        {/* Top Action Row: Back Button + Announcement Ticker Banner */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+            <main className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-12 flex-1">
+        {/* Top Action Row: Back Button */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-2">
           <Link 
             href="/dashboard"
-            className="inline-flex items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm text-cyan-400 hover:text-cyan-300 font-semibold bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-cyan-500/40 px-4 py-2 sm:py-2.5 rounded-xl transition shadow-sm shrink-0"
+            className="inline-flex items-center justify-center sm:justify-start gap-2 text-sm text-slate-400 hover:text-white transition-colors group w-fit"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <div className="p-2 rounded-full bg-white/[0.03] group-hover:bg-white/[0.08] border border-white/5 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            <span className="font-medium">Back to Dashboard</span>
           </Link>
-
-          {/* Announcement Ticker Banner - ONLY for upcoming tests */}
-          {(() => {
-            if (categoryKey !== "upcoming") return null;
-
-            const rawItems: any[] = [];
-            (availableTests || []).forEach((t: any) => {
-              if (t.status === "UPCOMING") {
-                const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
-                if (unlock && now < unlock) {
-                  rawItems.push({
-                    type: "UPCOMING",
-                    test: t,
-                    message: `⏰ Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
-                  });
-                }
-              }
-            });
-
-            if (rawItems.length === 0) return null;
-
-            const cfg = data?.testAlertSettings || {
-              badgeText: "TEST ALERT",
-              bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
-              badgeColor: "bg-amber-500 text-black",
-              textColor: "text-amber-200",
-              marqueeSpeed: "normal"
-            };
-            const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-            return (
-              <div className={`flex-1 min-w-0 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2 px-3 sm:py-2.5 sm:px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
-                <div className="flex items-center gap-2 sm:gap-3 overflow-hidden w-full min-w-0">
-                  <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                    {cfg.badgeText || "TEST ALERT"}
-                  </span>
-                  <div className="flex-1 min-w-0 overflow-hidden relative">
-                    <div 
-                      className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
-                      style={{ animationDuration: speedDuration }}
-                    >
-                      {rawItems.map((item: any) => (
-                        <span
-                          key={item.test.id}
-                          className="mr-16"
-                          dangerouslySetInnerHTML={{ __html: item.message }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
         </div>
 
-        {/* Category Hero Box (Front Page Theme) */}
-        <div className={`relative overflow-hidden rounded-3xl border ${themeConfig.border} bg-gradient-to-br ${themeConfig.gradient} p-6 sm:p-8 backdrop-blur-2xl shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6`}>
-          {/* Subtle glowing radial ball */}
-          <div className={`absolute -right-8 -top-8 w-64 h-64 rounded-full blur-3xl pointer-events-none ${themeConfig.glow}`} />
-
-          <div className="flex items-center gap-4 sm:gap-5 min-w-0 z-10">
-            <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${themeConfig.iconBox} border ${themeConfig.iconBorder} flex items-center justify-center shrink-0 shadow-lg`}>
-              <PiechemLogo size="md" showText={false} isGoldMember={isGoldActive} />
-            </div>
-            <div className="min-w-0 space-y-1">
-              <div className="flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-widest uppercase border ${themeConfig.tagBorder} ${themeConfig.tagBg} ${themeConfig.tagText}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${themeConfig.tagDot} animate-pulse`} />
-                  {themeConfig.tagLabel}
-                </span>
-              </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-serif font-black text-white tracking-tight break-words">
-                {selectedTitle}
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-300 font-light">
-                {selectedSubtitle}
-              </p>
-            </div>
-          </div>
-
+        {/* Premium Hero Section */}
+        <div className="relative overflow-hidden rounded-[24px] bg-[#0a0a0a] border border-white/[0.08] p-8 sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:items-center justify-between gap-8 group">
+          {/* Subtle glowing ambient spots */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none group-hover:bg-cyan-500/15 transition-colors duration-700" />
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/3 pointer-events-none group-hover:bg-blue-500/15 transition-colors duration-700" />
           
+          <div className="relative z-10 max-w-2xl">
+            <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${themeConfig.tagBg} border ${themeConfig.tagBorder} ${themeConfig.tagText} text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-6 shadow-sm backdrop-blur-md`}>
+              <Sparkles className="w-3.5 h-3.5" />
+              {	hemeConfig.tagLabel}
+            </span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight mb-4 drop-shadow-sm font-sans">
+              {selectedTitle}
+            </h1>
+            <p className="text-slate-400 text-sm sm:text-base lg:text-lg leading-relaxed font-medium">
+              {selectedSubtitle}
+            </p>
+          </div>
+          
+          <div className="hidden md:flex items-center justify-center w-28 h-28 rounded-3xl bg-white/[0.02] border border-white/[0.05] shadow-inner shrink-0 relative overflow-hidden group-hover:border-white/10 transition-colors z-10">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <PiechemLogo size="lg" showText={false} isGoldMember={isGoldActive} className="relative z-10 drop-shadow-xl" />
+          </div>
         </div>
 
-        
-        <div className="space-y-6 mt-8">
+        {/* Curriculum Boards */}
+        <div className="space-y-16">
           {/* CBSE */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-blue-400 uppercase tracking-wider pl-1">CBSE</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Link href={`/dashboard/category/${categoryKey}/CBSE/11`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-blue-500/20 hover:border-blue-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-blue-950 border border-blue-600/50 text-blue-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-blue-300 transition-colors">Class 11</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/CBSE/12`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-blue-500/20 hover:border-blue-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-blue-950 border border-blue-600/50 text-blue-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-blue-300 transition-colors">Class 12</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
-              </Link>
+          <section>
+            <div className="flex items-center gap-4 mb-8">
+              <h2 className="text-2xl font-bold text-white tracking-tight">CBSE Curriculum</h2>
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
             </div>
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {['11', '12'].map((cls) => (
+                <Link key={cls} href={`/dashboard/category/${categoryKey}/CBSE/${cls}`} className="group relative bg-[#0a0a0a] hover:bg-[#111] border border-white/[0.08] hover:border-cyan-500/30 p-6 rounded-[24px] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+                    <FolderOpen className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-100 group-hover:text-white mb-2">Class {cls}</h3>
+                  <p className="text-sm text-slate-500 font-medium">Central Board of Secondary Education</p>
+                  <div className="mt-8 flex items-center text-cyan-400 text-sm font-bold gap-2 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                    View Tests <ArrowRight className="w-4 h-4" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           {/* ICSE */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-emerald-400 uppercase tracking-wider pl-1">ICSE</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <Link href={`/dashboard/category/${categoryKey}/ICSE/11`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-emerald-500/20 hover:border-emerald-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950 border border-emerald-600/50 text-emerald-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-emerald-300 transition-colors">Class 11</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/ICSE/12`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-emerald-500/20 hover:border-emerald-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-950 border border-emerald-600/50 text-emerald-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-emerald-300 transition-colors">Class 12</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-              </Link>
+          <section>
+            <div className="flex items-center gap-4 mb-8">
+              <h2 className="text-2xl font-bold text-white tracking-tight">ICSE Curriculum</h2>
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
             </div>
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {['11', '12'].map((cls) => (
+                <Link key={cls} href={`/dashboard/category/${categoryKey}/ICSE/${cls}`} className="group relative bg-[#0a0a0a] hover:bg-[#111] border border-white/[0.08] hover:border-emerald-500/30 p-6 rounded-[24px] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
+                    <FolderOpen className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-100 group-hover:text-white mb-2">Class {cls}</h3>
+                  <p className="text-sm text-slate-500 font-medium">Indian Certificate of Secondary Education</p>
+                  <div className="mt-8 flex items-center text-emerald-400 text-sm font-bold gap-2 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                    View Tests <ArrowRight className="w-4 h-4" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           {/* WBCHSE */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider pl-1">WBCHSE</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-I`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-I</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-II`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-II</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-III`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-III</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link href={`/dashboard/category/${categoryKey}/WBCHSE/SEM-IV`} className="bg-white/[0.02] hover:bg-white/[0.05] border border-amber-500/20 hover:border-amber-400/50 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] flex justify-between items-center group shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-950 border border-amber-600/50 text-amber-300 shadow group-hover:scale-110 transition-transform"><FolderOpen className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                  <span className="font-bold text-gray-200 group-hover:text-amber-300 transition-colors">SEM-IV</span>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </Link>
+          <section>
+            <div className="flex items-center gap-4 mb-8">
+              <h2 className="text-2xl font-bold text-white tracking-tight">WBCHSE Curriculum</h2>
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
             </div>
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {['SEM-I', 'SEM-II', 'SEM-III', 'SEM-IV'].map((sem) => (
+                <Link key={sem} href={`/dashboard/category/${categoryKey}/WBCHSE/${sem}`} className="group relative bg-[#0a0a0a] hover:bg-[#111] border border-white/[0.08] hover:border-amber-500/30 p-6 rounded-[24px] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition-transform">
+                    <FolderOpen className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-100 group-hover:text-white mb-2">{sem}</h3>
+                  <p className="text-sm text-slate-500 font-medium">West Bengal Council of Higher Secondary Education</p>
+                  <div className="mt-8 flex items-center text-amber-400 text-sm font-bold gap-2 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                    View Tests <ArrowRight className="w-4 h-4" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
     </div>
