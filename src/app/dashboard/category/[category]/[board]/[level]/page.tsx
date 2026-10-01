@@ -421,7 +421,7 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
       />
 
       {/* Top Header matching Front Page / Dashboard / Account */}
-      <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)] border-b border-white/[0.06]">
+      <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
         <div className="w-full py-2.5 sm:py-3 px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center gap-2 min-w-0">
             {/* Left: Logo & Attribution */}
