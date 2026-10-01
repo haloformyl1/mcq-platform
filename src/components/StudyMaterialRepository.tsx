@@ -2,10 +2,10 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useDownloadTracker } from "@/hooks/useDownloadTracker";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 import UpgradeModal from "./curriculum/UpgradeModal";
-import DownloadLimitModal from "./DownloadLimitModal";
 import { 
   BookOpen, 
   FileText, 
@@ -144,10 +144,10 @@ export default function StudyMaterialRepository({
   const [sortBy, setSortBy] = useState<"CHAPTER" | "RECENT" | "AZ">("CHAPTER");
 
   // Upgrade Modal State
+  const { handleDownload, isProcessing } = useDownloadTracker();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
 
   // Download Limit Modal State
-  const [downloadTarget, setDownloadTarget] = useState<{ id: string, url: string } | null>(null);
 
   // Check Subscription Status
   const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
@@ -1102,8 +1102,9 @@ export default function StudyMaterialRepository({
                           {item.url && (
                             <button
                               type="button"
-                              onClick={() => setDownloadTarget({ id: item.id.replace("db-", ""), url: item.url })}
-                              className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors"
+                              onClick={(e) => { e.preventDefault(); handleDownload(item.id.replace("db-", ""), item.url); }}
+                              disabled={isProcessing}
+                            className={`p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
                               title="Download PDF"
                             >
                               <Download className="w-3.5 h-3.5" />
@@ -1167,14 +1168,8 @@ export default function StudyMaterialRepository({
       {/* ============================================================ */}
       <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
 
-      {/* Download Limit Modal */}
-      <DownloadLimitModal 
-        isOpen={!!downloadTarget}
-        onClose={() => setDownloadTarget(null)}
-        studyMaterialId={downloadTarget?.id || ""}
-        downloadUrl={downloadTarget?.url || ""}
-        isPremiumUser={isGold}
-      />
+      
+      
     </div>
   );
 }

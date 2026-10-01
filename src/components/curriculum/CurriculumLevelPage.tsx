@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { useDownloadTracker } from "@/hooks/useDownloadTracker";
 import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
@@ -23,7 +24,6 @@ import {
   BoardType
 } from "./curriculumData";
 import UpgradeModal from "./UpgradeModal";
-import DownloadLimitModal from "@/components/DownloadLimitModal";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 
 interface CurriculumLevelPageProps {
@@ -42,8 +42,8 @@ export default function CurriculumLevelPage({
   basePath = "/study-material"
 }: CurriculumLevelPageProps) {
   const router = useRouter();
+  const { handleDownload, isProcessing } = useDownloadTracker();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
-  const [downloadTarget, setDownloadTarget] = useState<{ id: string, url: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
   const isPaid = student?.subscriptionStatus === "PAID" && (
@@ -300,8 +300,9 @@ export default function CurriculumLevelPage({
                         {item.url && item.url !== "#locked" && (
                           <button
                             type="button"
-                            onClick={() => setDownloadTarget({ id: item.id.replace("db-", ""), url: item.url })}
-                            className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors"
+                            onClick={(e) => { e.preventDefault(); handleDownload(item.id.replace("db-", ""), item.url); }}
+                            disabled={isProcessing}
+                            className={`p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
                             title="Download PDF"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -342,13 +343,7 @@ export default function CurriculumLevelPage({
 
       <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
 
-      <DownloadLimitModal 
-        isOpen={!!downloadTarget}
-        onClose={() => setDownloadTarget(null)}
-        studyMaterialId={downloadTarget?.id || ""}
-        downloadUrl={downloadTarget?.url || ""}
-        isPremiumUser={isGold}
-      />
+      
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDownloadTracker } from "@/hooks/useDownloadTracker";
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import PiechemLogo from "@/components/PiechemLogo";
@@ -7,7 +8,6 @@ import {
   Shield, FileText, Lock, Sparkles, ZoomIn, ZoomOut, 
   RotateCcw, Download, Maximize2, Minimize2 
 } from "lucide-react";
-import DownloadLimitModal from "@/components/DownloadLimitModal";
 
 interface PdfViewerClientProps {
   material: {
@@ -29,9 +29,9 @@ interface PdfViewerClientProps {
 
 export default function PdfViewerClient({ material, student }: PdfViewerClientProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const { handleDownload, isProcessing } = useDownloadTracker();
   const [zoom, setZoom] = useState<number>(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const zoomIn = useCallback(() => {
     setZoom((prev) => Math.min(prev + 15, 200));
@@ -185,8 +185,9 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
           {/* Download Button */}
           <button
             type="button"
-            onClick={() => setIsDownloadModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs transition shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer shrink-0"
+            onClick={(e) => { e.preventDefault(); handleDownload(material.id.replace("db-", ""), downloadUrl); }}
+            disabled={isProcessing}
+            className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs transition shadow-md shadow-emerald-500/20 shrink-0 ${isProcessing ? "opacity-50 cursor-not-allowed" : "active:scale-95 cursor-pointer"}`}
             title="Download PDF document"
           >
             <Download className="w-3.5 h-3.5" />
@@ -277,13 +278,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
         </div>
       </main>
 
-      <DownloadLimitModal 
-        isOpen={isDownloadModalOpen}
-        onClose={() => setIsDownloadModalOpen(false)}
-        studyMaterialId={material.id}
-        downloadUrl={downloadUrl}
-        isPremiumUser={student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
-      />
+      
     </div>
   );
 }
