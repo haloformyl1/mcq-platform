@@ -224,11 +224,11 @@ export default function PiechemLogo({
             <span
               className={
                 (size === 'sm'
-                  ? "text-[6px] sm:text-[7.5px] tracking-[0.04em] sm:tracking-[0.06em] "
+                  ? "text-[7.5px] sm:text-[9px] tracking-[0.04em] sm:tracking-[0.06em] "
                   : size === 'lg' || size === 'xl'
-                  ? "text-[8px] sm:text-[10px] tracking-[0.06em] sm:tracking-[0.08em] "
-                  : "text-[6.5px] sm:text-[8px] tracking-[0.05em] sm:tracking-[0.07em] ") +
-                "font-sans font-medium whitespace-nowrap truncate max-w-[130px] sm:max-w-none " +
+                  ? "text-[10px] sm:text-[12px] tracking-[0.06em] sm:tracking-[0.08em] "
+                  : "text-[8.5px] sm:text-[10.5px] tracking-[0.05em] sm:tracking-[0.07em] ") +
+                "font-sans font-medium whitespace-nowrap truncate max-w-[180px] sm:max-w-none " +
                 (theme === 'light' ? 'text-slate-600' : 'text-slate-400')
               }
             >
