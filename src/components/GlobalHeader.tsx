@@ -70,7 +70,7 @@ export default function GlobalHeader({
 
   return (
     <header
-      className={`dashboard-header sticky top-0 z-50 w-full bg-transparent border-b border-white/[0.06] ${className}`}
+      className={`dashboard-header sticky top-0 z-50 w-full bg-transparent ${className}`}
     >
       <div className="site-header-inner w-full px-2.5 sm:px-6 lg:px-8 py-2 sm:py-2.5">
         {children ? (
