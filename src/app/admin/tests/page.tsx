@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,51 @@ export default function AdminTests() {
   const [bulkTargetLevel, setBulkTargetLevel] = useState<string>("ALL");
   const [bulkTier, setBulkTier] = useState<string>("");
   const [isApplying, setIsApplying] = useState<boolean>(false);
+  const [uploadingTestId, setUploadingTestId] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleUploadClick = (testId: string) => {
+    setUploadingTestId(testId);
+    document.getElementById('questionPaperUpload')?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !uploadingTestId) return;
+
+    try {
+      setTests(tests.map(t => t.id === uploadingTestId ? { ...t, isUploading: true } : t));
+      
+      const resUrl = await fetch(`/api/admin/tests/${uploadingTestId}/question-paper/upload-url`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      });
+      const { uploadUrl, publicUrl, error } = await resUrl.json();
+      
+      if (error) throw new Error(error);
+
+      await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      await fetch(`/api/admin/tests/${uploadingTestId}/question-paper`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionPaperUrl: publicUrl }),
+      });
+
+      setTests(tests.map(t => t.id === uploadingTestId ? { ...t, isUploading: false, questionPaperUrl: publicUrl } : t));
+      alert("Question paper uploaded successfully!");
+    } catch (err: any) {
+      alert("Upload failed: " + err.message);
+      setTests(tests.map(t => t.id === uploadingTestId ? { ...t, isUploading: false } : t));
+    } finally {
+      if (e.target) e.target.value = '';
+    }
+  };
 
   const fetchTests = () => {
     fetch("/api/admin/tests")
@@ -632,8 +676,16 @@ export default function AdminTests() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-[#a6a6a6]">
                     {test._count.questions} / {test.totalQuestions}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-4">
                     <Link href={`/admin/tests/${test.id}`} className="text-[#3b82f6] hover:text-[#60a5fa] transition-colors">Edit</Link>
+                    <button 
+                      onClick={() => handleUploadClick(test.id)}
+                      disabled={test.isUploading}
+                      className="text-amber-500 hover:text-amber-400 transition-colors disabled:opacity-50"
+                      title={test.questionPaperUrl ? "Update Question Paper" : "Upload Question Paper"}
+                    >
+                      {test.isUploading ? "Uploading..." : test.questionPaperUrl ? "Update Q.Paper" : "Upload Q.Paper"}
+                    </button>
                   </td>
                 </tr>
               );
@@ -641,6 +693,14 @@ export default function AdminTests() {
           </tbody>
         </table>
       </div>
+      
+      <input 
+        type="file" 
+        id="questionPaperUpload" 
+        className="hidden" 
+        accept="application/pdf,image/*" 
+        onChange={handleFileChange} 
+      />
     </div>
   );
 }
