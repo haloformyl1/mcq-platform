@@ -7,6 +7,7 @@ import {
   Shield, FileText, Lock, Sparkles, ZoomIn, ZoomOut, 
   RotateCcw, Download, Maximize2, Minimize2 
 } from "lucide-react";
+import DownloadLimitModal from "@/components/DownloadLimitModal";
 
 interface PdfViewerClientProps {
   material: {
@@ -30,6 +31,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
   const [isLoading, setIsLoading] = useState(true);
   const [zoom, setZoom] = useState<number>(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const zoomIn = useCallback(() => {
     setZoom((prev) => Math.min(prev + 15, 200));
@@ -181,15 +183,15 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
           </button>
 
           {/* Download Button */}
-          <a
-            href={downloadUrl}
-            download={safeFilename}
+          <button
+            type="button"
+            onClick={() => setIsDownloadModalOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs transition shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer shrink-0"
             title="Download PDF document"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Download PDF</span>
-          </a>
+          </button>
         </div>
 
         {/* Right: Security & Student Info */}
@@ -274,6 +276,14 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
           />
         </div>
       </main>
+
+      <DownloadLimitModal 
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        studyMaterialId={material.id}
+        downloadUrl={downloadUrl}
+        isPremiumUser={student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
+      />
     </div>
   );
 }

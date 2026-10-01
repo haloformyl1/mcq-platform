@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 import UpgradeModal from "./curriculum/UpgradeModal";
+import DownloadLimitModal from "./DownloadLimitModal";
 import { 
   BookOpen, 
   FileText, 
@@ -144,6 +145,9 @@ export default function StudyMaterialRepository({
 
   // Upgrade Modal State
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
+
+  // Download Limit Modal State
+  const [downloadTarget, setDownloadTarget] = useState<{ id: string, url: string } | null>(null);
 
   // Check Subscription Status
   const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
@@ -1096,16 +1100,14 @@ export default function StudyMaterialRepository({
                             <span>Read</span>
                           </Link>
                           {item.url && (
-                            <a
-                              href={item.url}
-                              download
-                              target="_blank"
-                              rel="noreferrer"
+                            <button
+                              type="button"
+                              onClick={() => setDownloadTarget({ id: item.id.replace("db-", ""), url: item.url })}
                               className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors"
                               title="Download PDF"
                             >
                               <Download className="w-3.5 h-3.5" />
-                            </a>
+                            </button>
                           )}
                         </div>
                       ) : isLevelRestricted ? (
@@ -1164,6 +1166,15 @@ export default function StudyMaterialRepository({
       {/* PREVIEW & UPGRADE MODAL                                      */}
       {/* ============================================================ */}
       <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
+
+      {/* Download Limit Modal */}
+      <DownloadLimitModal 
+        isOpen={!!downloadTarget}
+        onClose={() => setDownloadTarget(null)}
+        studyMaterialId={downloadTarget?.id || ""}
+        downloadUrl={downloadTarget?.url || ""}
+        isPremiumUser={isGold}
+      />
     </div>
   );
 }

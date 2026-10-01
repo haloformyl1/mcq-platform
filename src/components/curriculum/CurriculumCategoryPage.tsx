@@ -21,6 +21,7 @@ import {
   formatLevelLabel 
 } from "./curriculumData";
 import UpgradeModal from "./UpgradeModal";
+import DownloadLimitModal from "@/components/DownloadLimitModal";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 
 interface CurriculumCategoryPageProps {
@@ -44,6 +45,7 @@ export default function CurriculumCategoryPage({
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"CHAPTER" | "AZ">("CHAPTER");
+  const [downloadTarget, setDownloadTarget] = useState<{ id: string, url: string } | null>(null);
 
   const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
   const isPaid = student?.subscriptionStatus === "PAID" && (
@@ -290,16 +292,14 @@ export default function CurriculumCategoryPage({
                           <span>Read</span>
                         </Link>
                         {item.url && item.url !== "#locked" && (
-                          <a
-                            href={item.url}
-                            download
-                            target="_blank"
-                            rel="noreferrer"
+                          <button
+                            type="button"
+                            onClick={() => setDownloadTarget({ id: item.id.replace("db-", ""), url: item.url })}
                             className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors"
                             title="Download PDF"
                           >
                             <Download className="w-3.5 h-3.5" />
-                          </a>
+                          </button>
                         )}
                       </div>
                     ) : isLevelRestricted ? (
@@ -339,6 +339,14 @@ export default function CurriculumCategoryPage({
       </div>
 
       <UpgradeModal item={upgradeItem} onClose={() => setUpgradeItem(null)} />
+
+      <DownloadLimitModal 
+        isOpen={!!downloadTarget}
+        onClose={() => setDownloadTarget(null)}
+        studyMaterialId={downloadTarget?.id || ""}
+        downloadUrl={downloadTarget?.url || ""}
+        isPremiumUser={isGold}
+      />
     </div>
   );
 }

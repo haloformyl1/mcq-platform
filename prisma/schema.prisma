@@ -37,6 +37,7 @@ model Student {
   proctoringWarnings ProctoringWarningLog[]
   sessions           StudentSession[]
   aiConversations    AiConversation[]
+  downloads          StudentDownload[]
 }
 
 model StudentSession {
@@ -236,6 +237,19 @@ model StudyMaterial {
   fileSize    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  downloads   StudentDownload[]
+}
+
+model StudentDownload {
+  id              String   @id @default(uuid())
+  studentId       String
+  studyMaterialId String
+  createdAt       DateTime @default(now())
+
+  student         Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studyMaterial   StudyMaterial @relation(fields: [studyMaterialId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, createdAt])
 }
 
 model TestAlertSetting {
