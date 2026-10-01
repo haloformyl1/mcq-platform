@@ -199,136 +199,134 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
     return (
       <div 
         key={test.id}
-        className="group relative rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#07131e]/90 via-[#040c14]/90 to-black/95 hover:from-[#0a1b2a]/95 border border-white/10 hover:border-cyan-400/50 backdrop-blur-xl p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1.5 shadow-xl hover:shadow-[0_20px_45px_rgba(6,182,212,0.18)] flex flex-col justify-between overflow-hidden"
+        className="group relative flex flex-col justify-between bg-[#0a0a0a] border border-white/10 hover:border-white/20 rounded-[24px] p-6 transition-all duration-300 hover:shadow-2xl overflow-hidden"
       >
-        {/* Ambient card top border highlight */}
-        <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent group-hover:via-cyan-400/60 transition-all" />
+        {/* Ambient Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-        <div className="space-y-3">
-          {/* Top row: Discipline Chip + Status Badge */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <span className="text-[10px] sm:text-xs font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold uppercase inline-block mb-2 shadow-sm">
-                {test.discipline || "CHEMISTRY"}
-              </span>
-              <h3 className="font-serif text-base sm:text-lg md:text-xl font-black text-white group-hover:text-cyan-200 transition-colors break-words leading-tight pr-2 drop-shadow-sm">
-                {test.title}
-              </h3>
-            </div>
+        <div className="relative z-10 flex flex-col flex-grow">
+          {/* Top section: Tag & Status */}
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <span className="text-[11px] font-semibold tracking-wider text-cyan-300 uppercase">
+              {test.discipline || "CHEMISTRY"}
+            </span>
 
             {isLiveStage && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                <span>LIVE NOW</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider bg-emerald-500/10 text-emerald-400 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>LIVE</span>
               </span>
             )}
             {isUpcomingStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-amber-950/90 border border-amber-500/50 text-amber-300 shrink-0 shadow-sm">
-                <Clock className="w-3 h-3 text-amber-400" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider bg-amber-500/10 text-amber-400 shrink-0">
+                <Clock className="w-3 h-3" />
                 <span>UPCOMING</span>
               </span>
             )}
             {isHoldingStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-orange-950/90 border border-orange-500/50 text-orange-300 shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider bg-orange-500/10 text-orange-400 shrink-0">
                 <span>HOLDING</span>
               </span>
             )}
             {isLockedStage && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-bold tracking-wider bg-red-950/90 border border-red-500/50 text-red-300 shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider bg-rose-500/10 text-rose-400 shrink-0">
                 <span>CONCLUDED</span>
               </span>
             )}
           </div>
           
-          {/* Stats Badges Grid */}
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <span className="font-bold text-white">{test.totalQuestions}</span>
-              <span className="text-slate-300 text-[10px] sm:text-xs">Questions</span>
+          {/* Title */}
+          <h3 className="text-lg sm:text-xl font-bold text-slate-100 group-hover:text-white transition-colors leading-snug mb-5 line-clamp-2">
+            {test.title}
+          </h3>
+          
+          {/* Stats Flex Row instead of heavy grid */}
+          <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-400 mb-6">
+            <div className="flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-slate-500" />
+              <span className="font-medium text-slate-200">{test.totalQuestions}</span> Qs
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-bold text-white">{test.durationMinutes}</span>
-              <span className="text-slate-300 text-[10px] sm:text-xs">mins</span>
+            <div className="w-1 h-1 rounded-full bg-slate-700"></div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-slate-500" />
+              <span className="font-medium text-slate-200">{test.durationMinutes}</span> mins
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-slate-300">
-              <Award className="w-3.5 h-3.5 text-amber-400" />
-              <span className="font-bold text-white">{test.totalQuestions * test.marksPerQuestion}</span>
-              <span className="text-slate-300 text-[10px] sm:text-xs">Marks</span>
+            <div className="w-1 h-1 rounded-full bg-slate-700"></div>
+            <div className="flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-slate-500" />
+              <span className="font-medium text-slate-200">{test.totalQuestions * test.marksPerQuestion}</span> marks
             </div>
-            {test.negativeMarking ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-[10px] sm:text-xs font-semibold">
-                <span>-{test.negativeMarks} wrong</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-[10px] sm:text-xs font-semibold">
-                <span>No negative</span>
-              </div>
-            )}
           </div>
           
-          {/* Status & Timing Capsule */}
-          <div className="text-xs bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] backdrop-blur-sm overflow-hidden">
-            {isUpcomingStage && test.unlockDate && (
-              <div className="text-amber-300 font-medium truncate flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Unlock At: <strong className="font-mono font-semibold">{formatDateTime(test.unlockDate)}</strong></span>
-              </div>
-            )}
-            {isLiveStage && test.lockState === "SCHEDULED_OPEN" && test.lockDate && (
-              <div className="text-emerald-400 font-medium truncate flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Available Until: <strong className="font-mono">{formatDateTime(test.lockDate)}</strong></span>
-              </div>
-            )}
-            {isLiveStage && (test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE") && (
-              <div className="flex items-center text-emerald-400 font-medium truncate gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                <span>Auto-Released Live Test (Open Anytime)</span>
-              </div>
-            )}
-            {isHoldingStage && test.autoLiveDate && (
-              <div className="text-orange-300 font-medium text-sm leading-tight space-y-0.5">
-                <div>Concluded at {formatDateTime(test.lockDate)}</div>
-                <div className="text-emerald-400 font-mono">Auto-lives: {formatDateTime(test.autoLiveDate)}</div>
-              </div>
-            )}
-            {isLockedStage && (
-              <div className="text-rose-400 font-medium truncate flex items-center gap-1.5">
-                <Lock className="w-4 h-4 text-rose-400 shrink-0" />
-                <span>Test window closed • Contact Admin for access</span>
-              </div>
-            )}
-            {activeAttempt && (
-              <div className="mt-1 flex items-center text-yellow-400 font-semibold gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-yellow-400 animate-ping shrink-0" />
-                <span>Active attempt in progress</span>
-              </div>
-            )}
+          {/* Status capsule */}
+          <div className="mt-auto mb-5">
+            <div className="text-xs bg-white/[0.03] px-4 py-3 rounded-xl border border-white/[0.05]">
+              {isUpcomingStage && test.unlockDate && (
+                <div className="text-amber-300 flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Unlocks <span className="font-medium">{formatDateTime(test.unlockDate)}</span></span>
+                </div>
+              )}
+              {isLiveStage && test.lockState === "SCHEDULED_OPEN" && test.lockDate && (
+                <div className="text-emerald-400 flex items-center gap-2">
+                  <Flame className="w-3.5 h-3.5" />
+                  <span>Available until <span className="font-medium">{formatDateTime(test.lockDate)}</span></span>
+                </div>
+              )}
+              {isLiveStage && (test.lockState === "PUBLISHED_ALWAYS" || test.lockState === "AUTO_RELEASED_LIVE") && (
+                <div className="flex items-center text-emerald-400 gap-2">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Always Available</span>
+                </div>
+              )}
+              {isHoldingStage && test.autoLiveDate && (
+                <div className="text-slate-300 space-y-1">
+                  <div className="flex items-center gap-2 text-rose-400">
+                     <Lock className="w-3.5 h-3.5" />
+                     <span>Concluded {formatDateTime(test.lockDate)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-emerald-400">
+                     <Clock className="w-3.5 h-3.5" />
+                     <span>Results on {formatDateTime(test.autoLiveDate)}</span>
+                  </div>
+                </div>
+              )}
+              {isLockedStage && (
+                <div className="text-rose-400 flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Test Window Closed</span>
+                </div>
+              )}
+              {activeAttempt && (
+                <div className="mt-2 pt-2 border-t border-white/5 flex items-center text-amber-400 gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span>Attempt in progress</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Action Button Section */}
-        <div className="pt-4 mt-4 border-t border-white/[0.08]">
+        <div className="relative z-10 pt-2">
           {isUpcomingStage ? (
-            <button disabled className="w-full text-center py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-700/60 cursor-not-allowed tracking-wide shadow flex items-center justify-center gap-1.5">
-              <Clock className="w-4 h-4 text-amber-400" />
-              <span>Available Soon • Prepare Your Syllabus</span>
+            <button disabled className="w-full text-center py-3 px-4 rounded-[14px] text-sm font-medium text-slate-400 bg-white/[0.02] border border-white/[0.05] cursor-not-allowed">
+              Available Soon
             </button>
           ) : activeAttempt ? (
             <Link 
               href={`/exam/start/${test.id}`}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold text-black bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] animate-pulse"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-bold text-black bg-white hover:bg-slate-200 transition-colors shadow-lg"
             >
-              <span>Resume Test Attempt</span>
+              <span>Resume Test</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           ) : isHoldingStage ? (
-            <button disabled className="w-full text-center py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-orange-300 bg-orange-950/60 border border-orange-800/80 cursor-not-allowed">
-              In Holding Period
-            </button>
+             <button disabled className="w-full text-center py-3 px-4 rounded-[14px] text-sm font-medium text-slate-400 bg-white/[0.02] border border-white/[0.05] cursor-not-allowed">
+               In Holding Period
+             </button>
           ) : isLockedStage ? (
-            <button disabled className="w-full text-center py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-rose-300 bg-rose-950/60 border border-rose-800/80 cursor-not-allowed">
+            <button disabled className="w-full text-center py-3 px-4 rounded-[14px] text-sm font-medium text-slate-400 bg-white/[0.02] border border-white/[0.05] cursor-not-allowed">
               Test Concluded
             </button>
           ) : submittedAttempt ? (
@@ -342,15 +340,15 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                   <div className="flex gap-2">
                     <Link 
                       href={`/exam/start/${test.id}`}
-                      className="flex-1 text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 transition shadow-md"
+                      className="flex-1 flex items-center justify-center text-center py-3 px-3 rounded-[14px] text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 transition-colors"
                     >
-                      Retake ({attemptsUsed}/${maxAttempts})
+                      Retake ({attemptsUsed}/{maxAttempts})
                     </Link>
                     <Link 
                       href={`/exam/result/${submittedAttempt.id}`}
-                      className="text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] hover:text-white border border-white/10 transition whitespace-nowrap"
+                      className="flex-1 flex items-center justify-center text-center py-3 px-3 rounded-[14px] text-sm font-semibold text-black bg-cyan-400 hover:bg-cyan-300 transition-colors"
                     >
-                      View Result
+                      Results
                     </Link>
                   </div>
                 );
@@ -360,9 +358,9 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                 <div className="flex flex-col gap-2 w-full">
                   <Link 
                     href={`/exam/result/${submittedAttempt.id}`}
-                    className="w-full block text-center py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] hover:text-white border border-white/10 transition"
+                    className="w-full flex items-center justify-center text-center py-3 px-4 rounded-[14px] text-sm font-semibold text-black bg-cyan-400 hover:bg-cyan-300 transition-colors shadow-[0_0_15px_rgba(34,211,238,0.2)]"
                   >
-                    View Scorecard {maxAttempts > 1 ? `(${attemptsUsed}/${maxAttempts} Attempts Used)` : "(Completed)"}
+                    View Result {maxAttempts > 1 ? `(${attemptsUsed}/${maxAttempts})` : ""}
                   </Link>
                   {isLiveStage && test.questionPaperUrl && (
                     <a 
@@ -370,10 +368,10 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                       download 
                       target="_blank" 
                       rel="noreferrer" 
-                      className="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-900/30 hover:bg-emerald-900/50 hover:text-emerald-200 border border-emerald-800/50 transition flex items-center justify-center gap-2"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-medium text-slate-300 bg-white/[0.03] hover:bg-white/[0.08] transition-colors"
                     >
                       <Download className="w-4 h-4" />
-                      Download Question Paper
+                      Question Paper
                     </a>
                   )}
                 </div>
@@ -382,15 +380,16 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
           ) : test.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
               <Link
                 href="/dashboard/account"
-                className="w-full block text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] tracking-wide uppercase"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-bold text-black bg-gradient-to-r from-amber-200 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 transition-colors shadow-lg"
               >
-                🔒 Unlock with Gold
+                <Lock className="w-4 h-4" />
+                <span>Unlock Premium</span>
               </Link>
             ) : (
               <div className="flex flex-col gap-2 w-full">
                 <Link 
                   href={`/exam/start/${test.id}`}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 transition shadow-[0_0_20px_rgba(6,182,212,0.35)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-bold text-black bg-cyan-400 hover:bg-cyan-300 transition-colors shadow-[0_0_20px_rgba(34,211,238,0.25)] hover:shadow-[0_0_25px_rgba(34,211,238,0.4)]"
                 >
                   <span>Start Test</span>
                   <ArrowRight className="w-4 h-4" />
@@ -398,10 +397,10 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                 {isLiveStage && test.questionPaperUrl && (
                   <button 
                     onClick={() => alert("Please attempt the test first to download the question paper.")}
-                    className="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-900/30 hover:bg-emerald-900/50 hover:text-emerald-200 border border-emerald-800/50 transition flex items-center justify-center gap-2"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-medium text-slate-300 bg-white/[0.03] hover:bg-white/[0.08] transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    Download Question Paper
+                    Question Paper
                   </button>
                 )}
               </div>
