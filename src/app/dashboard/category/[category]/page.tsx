@@ -476,7 +476,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
           <div className="relative z-10 max-w-2xl">
             <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${themeConfig.tagBg} border ${themeConfig.tagBorder} ${themeConfig.tagText} text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-6 shadow-sm backdrop-blur-md`}>
               <Sparkles className="w-3.5 h-3.5" />
-              {	hemeConfig.tagLabel}
+              {themeConfig.tagLabel}
             </span>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight mb-4 drop-shadow-sm font-sans">
               {selectedTitle}
