@@ -944,8 +944,14 @@ export default function StudentAccountPage() {
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-baseline gap-3">
                         {isGold ? (
-                          <div className="flex items-center mt-1">
-                            <PiechemLogo size="xl" isGoldMember={true} subtitle={null} showIcon={false} textWhiteOnly={true} />
+                          <div className="flex items-center gap-1">
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PieChem</h2>
+                            <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-1">
+                              <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
+                              <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
+                                Pro
+                              </span>
+                            </div>
                           </div>
                         ) : (
                           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">Basic Student Plan</h2>
@@ -1144,8 +1150,14 @@ export default function StudentAccountPage() {
                   <div className="p-6 sm:p-8 space-y-2">
                     <h3 className="text-2xl font-bold text-white tracking-tight">
                       {isGold ? (
-                        <div className="flex items-center transform scale-75 origin-left mt-1">
-                          <PiechemLogo size="lg" isGoldMember={true} subtitle={null} showIcon={false} textWhiteOnly={true} />
+                        <div className="flex items-center">
+                          <span>PieChem</span>
+                          <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
+                            <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
+                            <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
+                              Pro
+                            </span>
+                          </div>
                         </div>
                       ) : (
                         "Basic Student Plan"
@@ -2022,8 +2034,14 @@ export default function StudentAccountPage() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center transform scale-[0.85] origin-left mt-1">
-                        <PiechemLogo size="md" isGoldMember={true} subtitle={null} showIcon={false} textWhiteOnly={true} />
+                      <div className="flex items-center mt-1">
+                        <h3 className="text-2xl font-black text-white tracking-tight">PieChem</h3>
+                        <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
+                          <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
+                          <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
+                            Pro
+                          </span>
+                        </div>
                       </div>
                       <p className="text-xs text-white/80 mt-1">Full access to 50+ exams, 3D models & proctored rankings</p>
                     </div>
