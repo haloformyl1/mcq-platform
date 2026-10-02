@@ -944,16 +944,11 @@ export default function StudentAccountPage() {
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-baseline gap-3">
                         {isGold ? (
-                          <div className="flex items-center">
-                            <PiechemLogo size="xl" isGoldMember={true} subtitle=" " />
+                          <div className="flex items-center mt-1">
+                            <PiechemLogo size="xl" isGoldMember={true} subtitle={null} showIcon={false} textWhiteOnly={true} />
                           </div>
                         ) : (
                           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">Basic Student Plan</h2>
-                        )}
-                        {isGold && (
-                          <span className="text-xs font-bold text-amber-500 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 tracking-wide uppercase mt-1">
-                            {is30Day ? "30-Day Premium Access" : "Complimentary"}
-                          </span>
                         )}
                       </div>
 
@@ -1149,20 +1144,18 @@ export default function StudentAccountPage() {
                   <div className="p-6 sm:p-8 space-y-2">
                     <h3 className="text-2xl font-bold text-white tracking-tight">
                       {isGold ? (
-                        <div className="flex items-center transform scale-75 origin-left">
-                          <PiechemLogo size="lg" isGoldMember={true} subtitle=" " />
+                        <div className="flex items-center transform scale-75 origin-left mt-1">
+                          <PiechemLogo size="lg" isGoldMember={true} subtitle={null} showIcon={false} textWhiteOnly={true} />
                         </div>
                       ) : (
                         "Basic Student Plan"
                       )}
                     </h3>
-                    <p className="text-sm font-semibold text-amber-500">
-                      {!isGold
-                        ? "Free Tier"
-                        : is30Day
-                        ? "30-Day Premium Access"
-                        : "Complimentary"}
-                    </p>
+                    {!isGold && (
+                      <p className="text-sm font-semibold text-amber-500">
+                        Free Tier
+                      </p>
+                    )}
                     <p className="text-sm text-slate-400 pt-1 leading-relaxed max-w-2xl">
                       {isGold
                         ? "Full access to Chemistry exam test series, detailed answer explanations, and proctored ranking analytics."
@@ -2029,8 +2022,8 @@ export default function StudentAccountPage() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center transform scale-75 origin-left">
-                        <PiechemLogo size="md" isGoldMember={true} subtitle=" " />
+                      <div className="flex items-center transform scale-[0.85] origin-left mt-1">
+                        <PiechemLogo size="md" isGoldMember={true} subtitle={null} showIcon={false} textWhiteOnly={true} />
                       </div>
                       <p className="text-xs text-white/80 mt-1">Full access to 50+ exams, 3D models & proctored rankings</p>
                     </div>

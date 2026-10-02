@@ -10,7 +10,9 @@ interface PiechemLogoProps {
   href?: string;
   isGoldMember?: boolean;
   theme?: 'dark' | 'light';
-  subtitle?: string;
+  subtitle?: string | null;
+  showIcon?: boolean;
+  textWhiteOnly?: boolean;
 }
 
 export default function PiechemLogo({
@@ -20,7 +22,9 @@ export default function PiechemLogo({
   href,
   isGoldMember = false,
   theme = 'dark',
-  subtitle
+  subtitle,
+  showIcon = true,
+  textWhiteOnly = false
 }: PiechemLogoProps) {
   // Premium/Complimentary students get a "Pro" badge instead of a gold logo, per user request.
   const showProBadge = Boolean(isGoldMember);
@@ -38,7 +42,8 @@ export default function PiechemLogo({
   const logoContent = (
     <div className={"flex items-center " + current.gap + " select-none " + className}>
       {/* Icon with Dynamic Dual Golden-Blue Ambient Aura */}
-      <div className="relative group shrink-0 flex items-center justify-center">
+      {showIcon && (
+        <div className="relative group shrink-0 flex items-center justify-center">
         {isGold ? (
           // Ultra-Premium Golden-Electric Blue Aura Glow
           <div className="absolute -inset-1.5 bg-gradient-to-tr from-amber-500/70 via-cyan-400/60 to-yellow-400/80 rounded-2xl blur-md opacity-85 group-hover:opacity-100 transition duration-500 animate-pulse"></div>
@@ -192,16 +197,25 @@ export default function PiechemLogo({
           />
         </svg>
       </div>
+      )}
 
       {showText && (
         <div className="flex flex-col justify-center leading-none">
           <div className={"font-black tracking-wider font-sans uppercase flex items-center " + current.text}>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
-              PIE
-            </span>
-            <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' tracking-tight ml-0.5'}>
-              CHEM
-            </span>
+            {textWhiteOnly ? (
+              <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' drop-shadow-sm'}>
+                PIECHEM
+              </span>
+            ) : (
+              <>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
+                  PIE
+                </span>
+                <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' tracking-tight ml-0.5'}>
+                  CHEM
+                </span>
+              </>
+            )}
             {showProBadge && (
               <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center">
                 <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
@@ -225,7 +239,7 @@ export default function PiechemLogo({
                 (theme === 'light' ? 'text-slate-600' : 'text-slate-400')
               }
             >
-              {subtitle || (
+              {subtitle !== undefined ? subtitle : (
                 <>
                   An initiative by{" "}
                   <span className={theme === 'light' ? 'text-slate-900 font-semibold' : 'text-slate-200 font-semibold'}>
