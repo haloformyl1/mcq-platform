@@ -945,7 +945,7 @@ export default function StudentAccountPage() {
                       <div className="flex flex-wrap items-baseline gap-3">
                         {isGold ? (
                           <div className="flex items-center gap-1">
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PieChem</h2>
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIECHEM</h2>
                             <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-1">
                               <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
                               <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
@@ -1151,7 +1151,7 @@ export default function StudentAccountPage() {
                     <h3 className="text-2xl font-bold text-white tracking-tight">
                       {isGold ? (
                         <div className="flex items-center">
-                          <span>PieChem</span>
+                          <span>PIECHEM</span>
                           <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
                             <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
                             <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
@@ -2035,7 +2035,7 @@ export default function StudentAccountPage() {
                         )}
                       </div>
                       <div className="flex items-center mt-1">
-                        <h3 className="text-2xl font-black text-white tracking-tight">PieChem</h3>
+                        <h3 className="text-2xl font-black text-white tracking-tight">PIECHEM</h3>
                         <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
                           <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
                           <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
