@@ -275,18 +275,40 @@ export default function StudentDashboard() {
 
 
 
-  // Upcoming Alert Banner Items - ONLY for tests scheduled to go live in the future
+  // Upcoming Alert Banner Items - Track the complete UPCOMING workflow
   const bannerItems: any[] = [];
   (availableTests || []).forEach((t: any) => {
-    const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
+    const lockDate = t.lockAt ? new Date(t.lockAt) : null;
+    const unlockDate = t.unlockAt ? new Date(t.unlockAt) : null;
+    const holdMinutes = t.postLockHoldMinutes ?? 0;
+    const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
 
-    // Only show for future upcoming tests. Do not show for tests scheduled to expire, recently expired, or live.
-    if (t.status === "UPCOMING" && unlock && now < unlock) {
-      bannerItems.push({
-        type: "UPCOMING",
-        test: t,
-        message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt!`
-      });
+    if (t.status === "UPCOMING") {
+      if (unlockDate && now < unlockDate) {
+        bannerItems.push({
+          type: "UPCOMING",
+          test: t,
+          message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlockDate)}</strong>. Please prepare to attempt!`
+        });
+      } else if (!unlockDate && (!lockDate || now < lockDate)) {
+        bannerItems.push({
+          type: "UPCOMING",
+          test: t,
+          message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live soon. Please prepare to attempt!`
+        });
+      } else if (unlockDate && now >= unlockDate && (!lockDate || now < lockDate)) {
+        bannerItems.push({
+          type: "LIVE",
+          test: t,
+          message: `Live Now: <strong class="text-white bg-emerald-900/80 px-2 py-0.5 rounded border border-emerald-600/50">${t.title}</strong> is currently active. Attempt now before it concludes!`
+        });
+      } else if (lockDate && now >= lockDate && autoLiveDate && now < autoLiveDate) {
+        bannerItems.push({
+          type: "HOLDING",
+          test: t,
+          message: `Test <strong class="text-white bg-orange-900/80 px-2 py-0.5 rounded border border-orange-600/50">${t.title}</strong> has concluded. It will be released for all students on <strong class="text-orange-300 font-mono">${formatDateTime(autoLiveDate)}</strong>.`
+        });
+      }
     }
   });
 
@@ -323,10 +345,15 @@ export default function StudentDashboard() {
                 Test Alert
               </span>
               <div className="flex-1 overflow-hidden relative">
-                <div className="animate-marquee whitespace-nowrap inline-block text-xs sm:text-sm font-semibold text-amber-200">
-                  {bannerItems.map((item: any, idx: number) => (
-                    <span key={idx} className="mr-16" dangerouslySetInnerHTML={{ __html: item.message }} />
-                  ))}
+                <div className="animate-marquee whitespace-nowrap inline-block text-xs sm:text-sm font-semibold">
+                  {bannerItems.map((item: any, idx: number) => {
+                    let textColor = "text-amber-200";
+                    if (item.type === "LIVE") textColor = "text-emerald-200";
+                    else if (item.type === "HOLDING") textColor = "text-orange-200";
+                    return (
+                      <span key={idx} className={`mr-16 ${textColor}`} dangerouslySetInnerHTML={{ __html: item.message }} />
+                    );
+                  })}
                 </div>
               </div>
             </div>
