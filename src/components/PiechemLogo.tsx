@@ -22,9 +22,9 @@ export default function PiechemLogo({
   theme = 'dark',
   subtitle
 }: PiechemLogoProps) {
-  // STRICT RULE: Golden logo ONLY renders when explicitly verified as a logged-in Gold/Complimentary subscriber.
-  // Everywhere else (landing, public intro screen, login, free students, etc.) shows standard cyan/white logo.
-  const isGold = Boolean(isGoldMember);
+  // Premium/Complimentary students get a "Pro" badge instead of a gold logo, per user request.
+  const showProBadge = Boolean(isGoldMember);
+  const isGold = false;
 
   const dimensions = {
     sm: { icon: 24, text: "text-sm sm:text-lg", gap: "gap-1.5 sm:gap-2" },
@@ -196,26 +196,19 @@ export default function PiechemLogo({
       {showText && (
         <div className="flex flex-col justify-center leading-none">
           <div className={"font-black tracking-wider font-sans uppercase flex items-center " + current.text}>
-            {isGold ? (
-              <>
-                {/* Luminous Electric Cyan-to-Sky Blue for PIE */}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00F2FE] via-[#38BDF8] to-[#67E8F9] drop-shadow-[0_2px_12px_rgba(0,242,254,0.45)]">
-                  PIE
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
+              PIE
+            </span>
+            <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' tracking-tight ml-0.5'}>
+              CHEM
+            </span>
+            {showProBadge && (
+              <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center">
+                <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
+                <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
+                  Pro
                 </span>
-                {/* Gleaming 24K Gold for CHEM */}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FEF08A] via-[#FBBF24] to-[#F59E0B] tracking-tight ml-0.5 drop-shadow-[0_2px_12px_rgba(245,158,11,0.5)]">
-                  CHEM
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
-                  PIE
-                </span>
-                <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' tracking-tight ml-0.5'}>
-                  CHEM
-                </span>
-              </>
+              </div>
             )}
           </div>
           
