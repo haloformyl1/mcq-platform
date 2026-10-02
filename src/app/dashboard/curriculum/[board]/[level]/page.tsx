@@ -144,43 +144,6 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
     badge: "bg-blue-950/80 text-blue-300 border-blue-500/40 shadow-[0_0_15px_rgba(59,130,246,0.25)]",
     ambientColor: "rgba(59,130,246,0.15)"
   };
-  // Upcoming Alert Banner Items - Track the complete UPCOMING workflow
-  const bannerItems: any[] = [];
-  (availableTests || []).forEach((t: any) => {
-    const lockDate = t.lockAt ? new Date(t.lockAt) : null;
-    const unlockDate = t.unlockAt ? new Date(t.unlockAt) : null;
-    const holdMinutes = t.postLockHoldMinutes ?? 0;
-    const autoLiveDate = lockDate ? new Date(lockDate.getTime() + holdMinutes * 60 * 1000) : null;
-
-    if (t.status === "UPCOMING") {
-      if (unlockDate && now < unlockDate) {
-        bannerItems.push({
-          type: "UPCOMING",
-          test: t,
-          message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlockDate)}</strong>. Please prepare to attempt!`
-        });
-      } else if (!unlockDate && (!lockDate || now < lockDate)) {
-        bannerItems.push({
-          type: "UPCOMING",
-          test: t,
-          message: `Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live soon. Please prepare to attempt!`
-        });
-      } else if (unlockDate && now >= unlockDate && (!lockDate || now < lockDate)) {
-        bannerItems.push({
-          type: "LIVE",
-          test: t,
-          message: `Live Now: <strong class="text-white bg-emerald-900/80 px-2 py-0.5 rounded border border-emerald-600/50">${t.title}</strong> is currently active. Attempt now before it concludes!`
-        });
-      } else if (lockDate && now >= lockDate && autoLiveDate && now < autoLiveDate) {
-        bannerItems.push({
-          type: "HOLDING",
-          test: t,
-          message: `Test <strong class="text-white bg-orange-900/80 px-2 py-0.5 rounded border border-orange-600/50">${t.title}</strong> has concluded. It will be released for all students on <strong class="text-orange-300 font-mono">${formatDateTime(autoLiveDate)}</strong>.`
-        });
-      }
-    }
-  });
-
   let displayTests: any[] = [];
 
   displayTests = [...currentAvailableTests, ...upcomingTests, ...expiredTests];
