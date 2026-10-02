@@ -465,60 +465,7 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
             <span>Back to Dashboard</span>
           </Link>
 
-          {/* Announcement Ticker Banner - ONLY for upcoming tests */}
-          {(() => {
-            if (categoryKey !== "upcoming") return null;
 
-            const rawItems: any[] = [];
-            (availableTests || []).forEach((t: any) => {
-              if (t.status === "UPCOMING") {
-                const unlock = t.unlockAt ? new Date(t.unlockAt) : null;
-                if (unlock && now < unlock) {
-                  rawItems.push({
-                    type: "UPCOMING",
-                    test: t,
-                    message: `⏰ Upcoming Test <strong class="text-white bg-amber-900/80 px-2 py-0.5 rounded border border-amber-600/50">${t.title}</strong> is scheduled to go live on <strong class="text-amber-300 font-mono">${formatDateTime(unlock)}</strong>. Please prepare to attempt the test!`
-                  });
-                }
-              }
-            });
-
-            if (rawItems.length === 0) return null;
-
-            const cfg = data?.testAlertSettings || {
-              badgeText: "TEST ALERT",
-              bgGradient: "from-amber-950/90 via-yellow-900/70 to-amber-950/90",
-              badgeColor: "bg-amber-500 text-black",
-              textColor: "text-amber-200",
-              marqueeSpeed: "normal"
-            };
-            const speedDuration = cfg.marqueeSpeed === 'slow' ? '40s' : cfg.marqueeSpeed === 'fast' ? '12s' : '25s';
-
-            return (
-              <div className={`flex-1 min-w-0 bg-gradient-to-r ${cfg.bgGradient || "from-amber-950/90 via-yellow-900/70 to-amber-950/90"} border border-amber-500/50 rounded-xl overflow-hidden py-2 px-3 sm:py-2.5 sm:px-4 shadow-[0_0_20px_rgba(245,158,11,0.25)] flex items-center`}>
-                <div className="flex items-center gap-2 sm:gap-3 overflow-hidden w-full min-w-0">
-                  <span className={`shrink-0 text-xs font-bold ${cfg.badgeColor || "bg-amber-500 text-black"} px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5 shadow`}>
-                    <span className="w-2 h-2 rounded-full bg-black animate-ping"></span>
-                    {cfg.badgeText || "TEST ALERT"}
-                  </span>
-                  <div className="flex-1 min-w-0 overflow-hidden relative">
-                    <div 
-                      className={`animate-marquee whitespace-nowrap inline-block text-sm font-semibold ${cfg.textColor || "text-amber-200"}`}
-                      style={{ animationDuration: speedDuration }}
-                    >
-                      {rawItems.map((item: any) => (
-                        <span
-                          key={item.test.id}
-                          className="mr-16"
-                          dangerouslySetInnerHTML={{ __html: item.message }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
         </div>
 
         {/* Category Hero Box (Front Page Theme) */}
