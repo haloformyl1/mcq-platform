@@ -45,7 +45,7 @@ const SUPPORT_LINKS: FooterLink[] = [
 const SUPPORT_INFO = {
   phone: "9830507435 (Arghyadeep Roy)",
   phoneHref: "tel:9830507435",
-  whatsappHref: "https://wa.me/919830507435?text=Hello%20PIE%20CHEM%20Support",
+  whatsappHref: "https://wa.me/917595825568?text=Hello%20PIE%20CHEM%20Support",
   email: "mailarghyadeeproy@gmail.com",
   emailHref: "mailto:mailarghyadeeproy@gmail.com",
   tagline: "Need assistance with PIE CHEM?",
@@ -88,13 +88,14 @@ export default function GlobalFooter() {
               </div>
 
               <div className="mt-1 flex items-baseline justify-between gap-2">
-                <a
-                  href={SUPPORT_INFO.phoneHref}
-                  className="text-sm sm:text-base font-semibold tracking-wide text-white hover:text-slate-300 transition-colors"
-                  title="Call platform helpline"
-                >
-                  {SUPPORT_INFO.phone}
-                </a>
+                  <a
+                    href={SUPPORT_INFO.phoneHref}
+                    className="text-sm sm:text-base font-semibold tracking-wide text-white hover:text-slate-300 transition-colors flex items-center gap-2"
+                    title="Call platform helpline"
+                  >
+                    <Phone className="w-4 h-4 text-cyan-400" />
+                    {SUPPORT_INFO.phone}
+                  </a>
               </div>
 
               <div className="mt-3 flex items-center gap-2">
