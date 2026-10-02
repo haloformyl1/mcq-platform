@@ -1229,7 +1229,7 @@ export default function StudentAccountPage() {
                     <div className="p-6 sm:p-7 space-y-4">
                       {!upgradeReq ? (
                         <div className="text-sm font-medium text-slate-400">
-                          Not Applicable
+                          {isComplimentary ? "COMPLIMENTARY FROM PIECHEM ADMIN." : "Not Applicable"}
                         </div>
                       ) : (
                         <div className="space-y-3">
