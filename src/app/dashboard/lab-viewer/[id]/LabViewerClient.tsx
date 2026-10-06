@@ -29,18 +29,8 @@ export default function LabViewerClient({ material }: LabViewerClientProps) {
   const [isConcurrentRevoked, setIsConcurrentRevoked] = useState(false);
 
   useEffect(() => {
-    // Resolve lab target URL safely in memory on client mount
-    if (material.token) {
-      try {
-        const decoded = atob(material.token);
-        setFrameSrc(decoded);
-      } catch {
-        setFrameSrc(`/api/student/lab-proxy/${material.id}`);
-      }
-    } else {
-      setFrameSrc(`/api/student/lab-proxy/${material.id}`);
-    }
-  }, [material.token, material.id]);
+    setFrameSrc(`/api/student/lab-proxy/${material.id}`);
+  }, [material.id]);
 
   // Live session concurrency polling: kicks this device if student logs in on another device
   useEffect(() => {
