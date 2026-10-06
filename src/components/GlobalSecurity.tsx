@@ -60,10 +60,20 @@ export default function GlobalSecurity() {
     window.addEventListener("copy", handleCopy);
     window.addEventListener("keydown", handleKeyDown);
 
+    // DevTools Debugger Trap: Freezes the browser if DevTools is opened
+    // Uses an anonymous constructor to bypass simple string searches by adblockers
+    const devtoolsTrap = setInterval(() => {
+      // Use Function constructor to obscure the 'debugger' keyword slightly
+      (function () {
+        return false;
+      }["constructor"]("debugger")["call"]());
+    }, 100);
+
     return () => {
       window.removeEventListener("contextmenu", handleContextMenu);
       window.removeEventListener("copy", handleCopy);
       window.removeEventListener("keydown", handleKeyDown);
+      clearInterval(devtoolsTrap);
     };
   }, []);
 
