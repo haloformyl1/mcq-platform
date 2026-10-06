@@ -4,6 +4,7 @@ import "./globals.css";
 import "katex/dist/katex.min.css";
 
 import GlobalBackground from "@/components/GlobalBackground";
+import GlobalSecurity from "@/components/GlobalSecurity";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-[#02070B]`}
     >
       <body className="dark min-h-full flex flex-col bg-[#02070B] text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200">
+        <GlobalSecurity />
         <GlobalBackground />
         <div className="relative z-10 flex flex-col flex-1 min-h-full">
           {children}
