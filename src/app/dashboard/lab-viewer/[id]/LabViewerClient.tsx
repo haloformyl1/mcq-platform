@@ -164,7 +164,7 @@ export default function LabViewerClient({ material }: LabViewerClientProps) {
   return (
     <div 
       ref={containerRef}
-      className="relative h-screen w-screen bg-[#02060b] text-slate-100 overflow-hidden select-none"
+      className="relative w-full h-full bg-[#02060b] text-slate-100 overflow-hidden select-none"
       onContextMenu={(e) => e.preventDefault()}
     >
       {/* Dynamic Anti-Capture Print Protection */}

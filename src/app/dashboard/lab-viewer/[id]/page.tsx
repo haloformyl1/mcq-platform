@@ -2,6 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 import { decrypt } from "@/lib/auth";
 import { hasPremiumAccess } from "@/lib/subscription";
 import { validateStudentSession } from "@/lib/sessionService";
@@ -190,21 +192,35 @@ export default async function LabViewerPage({
   // Obfuscate the destination URL for secure in-app rendering
   const encodedUrl = Buffer.from(material.url).toString('base64');
 
+  const isGold = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
+
   return (
-    <LabViewerClient
-      material={{
-        id: material.id,
-        title: material.title,
-        description: material.description,
-        isPremium: material.isPremium,
-        token: encodedUrl
-      }}
-      student={{
-        id: student.id,
-        email: student.email,
-        name: student.name,
-        subscriptionStatus: student.subscriptionStatus
-      }}
-    />
+    <div className="min-h-screen flex flex-col bg-[#02060b]">
+      <GlobalHeader 
+        isGoldMember={isGold}
+        student={student}
+        logoHref="/dashboard"
+      />
+      <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+        <div className="w-full h-full min-h-[75vh] relative rounded-2xl overflow-hidden border border-slate-800/80 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+          <LabViewerClient
+            material={{
+              id: material.id,
+              title: material.title,
+              description: material.description,
+              isPremium: material.isPremium,
+              token: encodedUrl
+            }}
+            student={{
+              id: student.id,
+              email: student.email,
+              name: student.name,
+              subscriptionStatus: student.subscriptionStatus
+            }}
+          />
+        </div>
+      </main>
+      <GlobalFooter />
+    </div>
   );
 }
