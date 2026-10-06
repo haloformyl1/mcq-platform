@@ -214,7 +214,7 @@ export default async function LabViewerPage({
       
       <Link 
         href="/dashboard"
-        className="absolute top-4 left-4 z-[999999] bg-slate-900/60 hover:bg-slate-900 p-2.5 rounded-xl border border-slate-700/50 backdrop-blur-md text-white transition-all shadow-lg flex items-center gap-2 group"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[999999] bg-slate-900/80 hover:bg-slate-900 px-4 py-2.5 rounded-full border border-slate-700/50 backdrop-blur-md text-white transition-all shadow-xl flex items-center gap-2 group"
       >
         <ArrowLeft className="w-5 h-5 text-slate-300 group-hover:text-white" />
         <span className="text-sm font-semibold hidden sm:inline text-slate-300 group-hover:text-white">Exit Lab</span>
