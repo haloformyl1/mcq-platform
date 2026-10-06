@@ -195,32 +195,30 @@ export default async function LabViewerPage({
   const isGold = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#02060b]">
-      <GlobalHeader 
-        isGoldMember={isGold}
-        student={student}
-        logoHref="/dashboard"
+    <div className="fixed inset-0 w-screen h-screen z-[99999] bg-[#02060b] overflow-hidden">
+      <LabViewerClient
+        material={{
+          id: material.id,
+          title: material.title,
+          description: material.description,
+          isPremium: material.isPremium,
+          token: encodedUrl
+        }}
+        student={{
+          id: student.id,
+          email: student.email,
+          name: student.name,
+          subscriptionStatus: student.subscriptionStatus
+        }}
       />
-      <main className="flex-1 w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
-        <div className="w-full h-full min-h-[75vh] relative rounded-2xl overflow-hidden border border-slate-800/80 shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-          <LabViewerClient
-            material={{
-              id: material.id,
-              title: material.title,
-              description: material.description,
-              isPremium: material.isPremium,
-              token: encodedUrl
-            }}
-            student={{
-              id: student.id,
-              email: student.email,
-              name: student.name,
-              subscriptionStatus: student.subscriptionStatus
-            }}
-          />
-        </div>
-      </main>
-      <GlobalFooter />
+      
+      <Link 
+        href="/dashboard"
+        className="absolute top-4 left-4 z-[999999] bg-slate-900/60 hover:bg-slate-900 p-2.5 rounded-xl border border-slate-700/50 backdrop-blur-md text-white transition-all shadow-lg flex items-center gap-2 group"
+      >
+        <ArrowLeft className="w-5 h-5 text-slate-300 group-hover:text-white" />
+        <span className="text-sm font-semibold hidden sm:inline text-slate-300 group-hover:text-white">Exit Lab</span>
+      </Link>
     </div>
   );
 }
