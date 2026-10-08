@@ -597,29 +597,6 @@ export default function AiTutorDrawer({
             <PiechemAiLogo size="xs" />
             <span className="text-white font-semibold text-sm">PIECHEM AI</span>
           </div>
-
-          {/* Daily Usage Indicator - Desktop */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-950 border border-white/10 text-[11px] font-medium text-slate-300 shadow-sm shrink-0">
-            <span className="text-cyan-400 font-bold text-xs">✦</span>
-            {quota?.isUnlimited ? (
-              <span className="font-semibold text-amber-300 tracking-wide">GOLD UNLIMITED</span>
-            ) : (
-              <span>
-                <strong className="text-white font-bold">{quota?.remaining ?? 5}</strong>
-                <span className="text-slate-500 font-normal"> / {quota?.dailyLimit ?? quota?.totalLimit ?? 5} FREE LEFT</span>
-              </span>
-            )}
-          </div>
-
-          {/* Daily Usage Indicator - Mobile Compact */}
-          <div className="sm:hidden flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-950 border border-white/10 text-[10px] font-semibold text-slate-300 shrink-0">
-            <span className="text-cyan-400 text-xs">✦</span>
-            {quota?.isUnlimited ? (
-              <span className="text-amber-300 font-bold">GOLD</span>
-            ) : (
-              <span><strong className="text-white">{quota?.remaining ?? 5}</strong> <span className="text-slate-500">left</span></span>
-            )}
-          </div>
         </div>
 
         {/* Right: Controls (Language, Level, Exit) */}
@@ -771,131 +748,7 @@ export default function AiTutorDrawer({
                     Hi {studentName.split(' ')[0] || 'Scholar'}, what's the plan?
                   </h1>
                   
-                  {/* Centered input is hidden on mobile in empty state */}
-                  <div className="w-full max-w-3xl hidden md:block">
-                    
-          <div className="w-full pb-4 pt-1 z-20 ai-input-area">
-            <div className="max-w-4xl mx-auto w-full">
-              
-              {/* Main Rounded Input Console Container */}
-              <div className="relative rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-2.5 backdrop-blur-xl focus-within:border-zinc-600 focus-within:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all">
-                
-                {/* Embedded Context Pills (Subject & Difficulty) */}
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 px-1">
-                  {/* Model Selector Pill (PIECHEM AI, PIECHEM AI PRO, PIECHEM AI MAX) */}
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowModelMenu(prev => !prev)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-semibold text-slate-200 transition cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-cyan-400" />
-                      <span>{selectedModel}</span>
-                      <ChevronDown className="w-2.5 h-2.5 text-slate-500" />
-                    </button>
 
-                    {showModelMenu && (
-                      <div className="absolute left-0 bottom-full mb-1.5 w-44 rounded-xl bg-zinc-950 border border-zinc-800 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-bottom-1">
-                        {PIECHEM_AI_MODELS.map(m => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedModel(m.id);
-                              setShowModelMenu(false);
-                            }}
-                            className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center justify-between ${
-                              selectedModel === m.id ? 'bg-white/10 text-white font-bold' : 'text-slate-300 hover:bg-white/5'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{m.name}</span>
-                              {m.badge && (
-                                <span className="text-[9px] px-1 py-0.2 rounded font-bold uppercase bg-white/10 text-slate-300 border border-white/10">
-                                  {m.badge}
-                                </span>
-                              )}
-                            </div>
-                            {selectedModel === m.id && <Check className="w-3 h-3 text-cyan-400" />}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Level Pill */}
-                  <div className="flex items-center gap-1 text-[11px] text-slate-400 px-2 py-0.5 rounded-lg bg-black/40 border border-white/10">
-                    <GraduationCap className="w-3 h-3 text-slate-400" />
-                    <span className="capitalize">{level}</span>
-                  </div>
-                </div>
-
-                {/* Seamless Textarea */}
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  rows={1}
-                  placeholder="Ask Anything."
-                  className="w-full resize-none bg-transparent px-3 py-1 text-xs sm:text-sm text-white placeholder-slate-500 border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 leading-relaxed font-sans no-scrollbar"
-                  style={{ minHeight: "38px", maxHeight: "120px", scrollbarWidth: "none", msOverflowStyle: "none", outline: "none", boxShadow: "none" }}
-                />
-
-                {/* Bottom Controls Row inside Capsule */}
-                <div className="flex items-center justify-between pt-1 px-1 border-t border-white/[0.04] mt-1">
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                    <button 
-                      type="button" 
-                      onClick={handleNewChat} 
-                      title="New Conversation" 
-                      className="text-slate-500 hover:text-white transition cursor-pointer flex items-center"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                    </button>
-                    <span>{selectedModel} • <span className="capitalize">{level}</span></span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition cursor-pointer"
-                      title="Attach reference diagram/problem"
-                    >
-                      <Paperclip className="w-3.5 h-3.5" />
-                    </button>
-                    <input ref={fileInputRef} type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileUpload} />
-
-                    <button
-                      type="button"
-                      onClick={() => handleSendMessage()}
-                      disabled={!input.trim() || loading}
-                      className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 disabled:opacity-30 disabled:hover:bg-white flex items-center justify-center text-black shadow-lg shadow-white/10 transition active:scale-95 cursor-pointer"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Disclaimer + Security Tag */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-1 text-[10px] text-slate-500 px-2 pt-2 pb-safe text-center sm:text-left">
-                <span className="truncate max-w-full">PIECHEM AI • Verify critical formulas for board and competitive exams.</span>
-                <span className="flex items-center gap-1 text-slate-600 shrink-0">
-                  <Lock className="w-2.5 h-2.5" /> Secure Learning Portal
-                </span>
-              </div>
-
-            </div>
-          </div>
-                  </div>
                 </div>
               )}
               {/* CONVERSATION FLOW */}
@@ -1095,13 +948,13 @@ export default function AiTutorDrawer({
           </div>
 
                     {/* BOTTOM AI COMMAND CONSOLE */}
-          <div className={messages.length === 0 ? "block md:hidden" : "block"}>
+          <div className="block">
 
-          <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-4 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
+          <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-3 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">
               
               {/* Main Rounded Input Console Container */}
-              <div className="relative rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-2.5 backdrop-blur-xl focus-within:border-zinc-600 focus-within:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all">
+              <div className="relative rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-2 backdrop-blur-xl focus-within:border-zinc-600 focus-within:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all">
                 
                 {/* Embedded Context Pills (Subject & Difficulty) */}
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 px-1">
