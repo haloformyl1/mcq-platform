@@ -107,6 +107,9 @@ export async function POST(req: NextRequest) {
           }
         });
 
+        const hiddenMessages = oldMessages.filter(m => m.type === 'collaborator' || m.type === 'collab_request');
+        const finalMessages = [...hiddenMessages, ...taggedMessages];
+
         if (isOwner || isCollab) {
           const updated = await prisma.aiConversation.update({
             where: { id },
@@ -114,7 +117,7 @@ export async function POST(req: NextRequest) {
               title: finalTitle,
               subject: subject || existing.subject,
               level: level || existing.level,
-              messages: taggedMessages,
+              messages: finalMessages,
               updatedAt: new Date(),
             }
           });
