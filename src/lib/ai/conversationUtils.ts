@@ -32,6 +32,7 @@ export interface AiConversationMeta {
   updatedAt: string;
   lastMessagePreview?: string;
   messageCount?: number;
+  isPinned?: boolean;
 }
 
 export type DateGroupKey = 'CONVERSATION HISTORY' | 'TODAY' | 'YESTERDAY' | 'PREVIOUS 7 DAYS' | 'PREVIOUS 30 DAYS' | 'OLDER';

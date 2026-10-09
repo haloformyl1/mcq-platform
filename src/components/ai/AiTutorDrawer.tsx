@@ -11,7 +11,7 @@ import {
   Lightbulb, RotateCcw,
   Sparkles, Compass, Calculator, ChevronDown, ChevronRight,
   MessageSquare, Lock, Paperclip, ThumbsUp, ThumbsDown,
-  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff
+  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff, Pin
 } from "lucide-react";
 import { 
   generateConversationTitle, 
@@ -357,6 +357,46 @@ export default function AiTutorDrawer({
       });
     } catch (err) {
       console.error("Failed to delete conversation:", err);
+    }
+  };
+
+  // Toggle Pin
+  const handleTogglePin = async (convId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenMenuChatId(null);
+    
+    setConversations(prev => {
+      const chat = prev.find(c => c.id === convId);
+      if (!chat) return prev;
+      
+      const isCurrentlyPinned = !!chat.isPinned;
+      
+      if (!isCurrentlyPinned) {
+        // Enforce max 10 pinned chats
+        const pinnedCount = prev.filter(c => c.isPinned).length;
+        if (pinnedCount >= 10) {
+          alert("Maximum 10 chats can be pinned.");
+          return prev;
+        }
+      }
+      
+      const updatedList = prev.map(c => c.id === convId ? { ...c, isPinned: !isCurrentlyPinned } : c);
+      
+      // Sort pinned chats to top, keep unpinned sorted by updatedAt
+      return updatedList.sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      });
+    });
+    
+    // We optionally persist this to DB here if backend supports it.
+    try {
+      await fetch(`/api/ai/conversations/${convId}/pin`, {
+        method: 'POST',
+      });
+    } catch (err) {
+      console.log("Pin state not persisted to DB (maybe backend not ready)");
     }
   };
 
@@ -746,11 +786,20 @@ export default function AiTutorDrawer({
                         <span>Share conversation</span>
                       </button>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); alert("Chat unpinned"); setOpenMenuChatId(null); }}
+                        onClick={(e) => handleTogglePin(chat.id, e)}
                         className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer"
                       >
-                        <PinOff className="w-[18px] h-[18px] text-[#c4c7c5]" />
-                        <span>Unpin</span>
+                        {chat.isPinned ? (
+                          <>
+                            <PinOff className="w-[18px] h-[18px] text-[#c4c7c5]" />
+                            <span>Unpin</span>
+                          </>
+                        ) : (
+                          <>
+                            <Pin className="w-[18px] h-[18px] text-[#c4c7c5]" />
+                            <span>Pin to top</span>
+                          </>
+                        )}
                       </button>
                       <button 
                         onClick={(e) => handleStartRename(chat, e)}
