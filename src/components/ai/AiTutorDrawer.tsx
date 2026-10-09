@@ -1181,7 +1181,6 @@ export default function AiTutorDrawer({
                 </div>
               ))}
             </div>
-            </div>
           )}
 
           {/* Active Collab Banner (Owner only) */}
