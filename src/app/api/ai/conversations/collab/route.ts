@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         type: "collab_request",
         collabUserId: student.id,
         name: student.name || student.email || "Someone",
+        email: student.email,
         timestamp: new Date().toISOString(),
         content: `User ${student.name || student.email || student.id} requested to collaborate.`
       }
