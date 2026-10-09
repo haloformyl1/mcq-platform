@@ -11,7 +11,7 @@ import {
   Lightbulb, RotateCcw,
   Sparkles, Compass, Calculator, ChevronDown, ChevronRight,
   MessageSquare, Lock, Paperclip, ThumbsUp, ThumbsDown,
-  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff, Pin
+  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff, Pin, History
 } from "lucide-react";
 import { 
   generateConversationTitle, 
@@ -106,6 +106,8 @@ export default function AiTutorDrawer({
   // Active messages list (empty by default for clean new chat)
   const [messages, setMessages] = useState<Message[]>([]);
   const [pendingCollabRequests, setPendingCollabRequests] = useState<any[]>([]);
+  const [isChatOwner, setIsChatOwner] = useState(false);
+  const [hasActiveCollab, setHasActiveCollab] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -300,6 +302,9 @@ export default function AiTutorDrawer({
           // Only owner should see collab requests, but we don't return studentId from API.
           // Wait, we can safely set pending requests and only display them if they exist
           setPendingCollabRequests(allMsgs.filter((m: any) => m.type === 'collab_request'));
+          
+          setIsChatOwner(!!data.isOwner);
+          setHasActiveCollab(!!data.hasActiveCollab);
 
           if (conv.subject) {
             setSelectedSubject(conv.subject as any);
@@ -640,12 +645,35 @@ export default function AiTutorDrawer({
       const data = await res.json();
       if (data.success) {
         setPendingCollabRequests(prev => prev.filter(req => req.collabUserId !== collabUserId));
+        if (accept) setHasActiveCollab(true);
       } else {
         alert("Failed to respond: " + data.error);
       }
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
+    }
+  };
+
+  const handleRevertCollab = async () => {
+    if (!activeChatId) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/ai/conversations/${activeChatId}/revert`, {
+        method: "POST"
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Collaboration revoked. Third-party messages have been removed.");
+        handleSelectChat(activeChatId); // Reload chat
+      } else {
+        alert("Failed to revert: " + data.error);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+      setLoading(false);
     }
   };
 
@@ -864,6 +892,17 @@ export default function AiTutorDrawer({
                         <Trash2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
                         <span>Delete</span>
                       </button>
+                      
+                      {/* Back to where I was */}
+                      {chat.id === activeChatId && isChatOwner && hasActiveCollab && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleRevertCollab(); setOpenMenuChatId(null); }}
+                          className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-amber-400 hover:bg-amber-400/10 transition cursor-pointer border-t border-white/5 mt-1 pt-3"
+                        >
+                          <History className="w-[18px] h-[18px] text-amber-400" />
+                          <span>Back to where I was</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

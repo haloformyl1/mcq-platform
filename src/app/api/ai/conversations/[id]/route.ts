@@ -44,7 +44,9 @@ export async function GET(
         messages: conversation.messages,
         createdAt: conversation.createdAt.toISOString(),
         updatedAt: conversation.updatedAt.toISOString(),
-      }
+      },
+      isOwner,
+      hasActiveCollab: Array.isArray(conversation.messages) && (conversation.messages as any[]).some(m => m.type === 'collaborator')
     });
   } catch (error: any) {
     console.error('Error fetching conversation:', error);

@@ -93,6 +93,20 @@ export async function POST(req: NextRequest) {
         const isOwner = existing.studentId === student.id;
         const isCollab = Array.isArray(existing.messages) && (existing.messages as any[]).some(m => m.type === 'collaborator' && m.collabUserId === student.id);
 
+        const oldMessages = Array.isArray(existing.messages) ? existing.messages : [];
+        const newMessagesList = messages as any[];
+
+        const taggedMessages = newMessagesList.map(newMsg => {
+          const oldMsg = oldMessages.find((m: any) => m.id === newMsg.id);
+          if (oldMsg) {
+            // Preserve existing senderId, or default to owner if it was missing (legacy)
+            return { ...newMsg, senderId: oldMsg.senderId || existing.studentId };
+          } else {
+            // It's a brand new message added in this request!
+            return { ...newMsg, senderId: student.id };
+          }
+        });
+
         if (isOwner || isCollab) {
           const updated = await prisma.aiConversation.update({
             where: { id },
@@ -100,7 +114,7 @@ export async function POST(req: NextRequest) {
               title: finalTitle,
               subject: subject || existing.subject,
               level: level || existing.level,
-              messages: messages as any,
+              messages: taggedMessages,
               updatedAt: new Date(),
             }
           });
@@ -123,6 +137,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Otherwise create new conversation
+    const initialTaggedMessages = (messages as any[]).map(m => ({ ...m, senderId: student.id }));
     const created = await prisma.aiConversation.create({
       data: {
         id: id || undefined,
@@ -130,7 +145,7 @@ export async function POST(req: NextRequest) {
         title: finalTitle,
         subject: subject || 'stem',
         level: level || 'intermediate',
-        messages: messages as any,
+        messages: initialTaggedMessages,
       }
     });
 
