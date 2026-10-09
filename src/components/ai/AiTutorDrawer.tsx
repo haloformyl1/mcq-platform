@@ -655,8 +655,6 @@ export default function AiTutorDrawer({
               </div>
             )}
           </div>
-
-          </div>
         </div>
       </header>
 
