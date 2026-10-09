@@ -705,10 +705,28 @@ export default function AiTutorDrawer({
               conversations.map(chat => (
                 <div key={chat.id} className="relative group px-2" ref={openMenuChatId === chat.id ? menuContainerRef : null}>
                   <button
-                    onClick={() => handleSelectChat(chat.id)}
+                    onClick={() => {
+                      if (editingChatId !== chat.id) handleSelectChat(chat.id);
+                    }}
                     className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-full text-[13px] sm:text-[14px] transition cursor-pointer pr-10 ${activeChatId === chat.id ? 'bg-[#282a2c] text-[#e3e3e3] font-medium' : 'text-[#c4c7c5] hover:bg-[#282a2c] hover:text-[#e3e3e3]'}`}
                   >
-                    <span className="truncate flex-1">{chat.title}</span>
+                    {editingChatId === chat.id ? (
+                      <input
+                        type="text"
+                        autoFocus
+                        value={editTitleInput}
+                        onChange={(e) => setEditTitleInput(e.target.value)}
+                        onBlur={() => handleSaveRename(chat.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveRename(chat.id);
+                          if (e.key === 'Escape') setEditingChatId(null);
+                        }}
+                        className="flex-1 bg-transparent border-none outline-none text-[#e3e3e3]"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className="truncate flex-1">{chat.title}</span>
+                    )}
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setOpenMenuChatId(openMenuChatId === chat.id ? null : chat.id); }}
@@ -720,19 +738,31 @@ export default function AiTutorDrawer({
                   {/* Dropdown Menu */}
                   {openMenuChatId === chat.id && (
                     <div className="absolute left-6 top-10 mt-1 w-[200px] rounded-[16px] bg-[#282a2c] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
-                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.href); alert("Link copied to clipboard!"); setOpenMenuChatId(null); }}
+                        className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer"
+                      >
                         <Share2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
                         <span>Share conversation</span>
                       </button>
-                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); alert("Chat unpinned"); setOpenMenuChatId(null); }}
+                        className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer"
+                      >
                         <PinOff className="w-[18px] h-[18px] text-[#c4c7c5]" />
                         <span>Unpin</span>
                       </button>
-                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                      <button 
+                        onClick={(e) => handleStartRename(chat, e)}
+                        className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer"
+                      >
                         <Edit2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
                         <span>Rename</span>
                       </button>
-                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                      <button 
+                        onClick={(e) => handleDeleteChat(chat.id, e)}
+                        className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer"
+                      >
                         <Trash2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
                         <span>Delete</span>
                       </button>
