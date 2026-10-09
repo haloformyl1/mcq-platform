@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useRef, useEffect, useMemo } from "react";
 import FormattedAiMessage from "./FormattedAiMessage";
 import PiechemAiLogo from "./PiechemAiLogo";
@@ -903,15 +904,14 @@ export default function AiTutorDrawer({
                             <History className="w-[18px] h-[18px] text-amber-400" />
                             <span>Back to where I was</span>
                           </button>
-                          <a 
+                          <Link 
                             href="/revert-info"
                             target="_blank"
-                            rel="noopener noreferrer"
                             className="absolute right-3 top-1/2 -translate-y-1/2 mt-1.5 text-[10px] px-2 py-0.5 rounded-full border border-amber-400/20 text-amber-400/70 hover:text-amber-400 hover:bg-amber-400/10 transition z-10 opacity-0 group-hover:opacity-100 uppercase tracking-wider font-bold"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Know more
-                          </a>
+                          </Link>
                         </div>
                       )}
                     </div>
@@ -944,7 +944,7 @@ export default function AiTutorDrawer({
                     <PiechemAiLogo size="lg" animated />
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 mb-8 tracking-tight text-center">
-                    Hi {studentName.split(' ')[0] || 'Scholar'}, what's the plan?
+                    Hi {studentName.split(' ')[0] || 'Scholar'}, what&apos;s the plan?
                   </h1>
                   
 
@@ -1158,14 +1158,13 @@ export default function AiTutorDrawer({
                     <span className="font-semibold text-white">{req.name}</span> requested to collab on this chat
                   </div>
                   <div className="flex gap-2 self-end sm:self-auto">
-                    <a
+                    <Link
                       href="/collab-info"
                       target="_blank"
-                      rel="noopener noreferrer"
                       className="px-4 py-1.5 rounded-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700 text-slate-300 hover:text-white text-xs font-medium transition cursor-pointer flex items-center justify-center"
                     >
                       Know more
-                    </a>
+                    </Link>
                     <button
                       onClick={() => handleRespondCollab(req.collabUserId, false)}
                       className="px-4 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white text-xs font-medium transition cursor-pointer"

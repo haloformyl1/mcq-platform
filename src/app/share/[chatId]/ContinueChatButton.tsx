@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ContinueChatButton({ 
   originalConversationId, 
@@ -106,14 +107,13 @@ export default function ContinueChatButton({
               <span className="font-semibold">{req.name}</span> requested to collab
             </div>
             <div className="flex gap-2">
-              <a
+              <Link
                 href="/collab-info"
                 target="_blank"
-                rel="noopener noreferrer"
                 className="px-4 py-1.5 rounded-full bg-[#282a2c] hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-medium transition flex items-center justify-center"
               >
                 Know more
-              </a>
+              </Link>
               <button
                 onClick={() => handleRespondCollab(req.collabUserId, false)}
                 disabled={!!loading}
