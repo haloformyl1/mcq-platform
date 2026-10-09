@@ -658,16 +658,7 @@ export default function AiTutorDrawer({
             )}
           </div>
 
-          {/* Exit Button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center gap-1 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white text-xs font-semibold transition cursor-pointer touch-target"
-            title="Exit PIECHEM AI (Esc)"
-          >
-            <X className="h-4 w-4" />
-            <span className="hidden sm:inline">Exit</span>
-          </button>
+          </div>
         </div>
       </header>
 
@@ -683,7 +674,7 @@ export default function AiTutorDrawer({
         )}
 
                 {/* SIDEBAR */}
-        <div className={`absolute lg:relative z-40 lg:z-auto w-72 h-full bg-[#131314] lg:bg-[#0a0a0a]/90 backdrop-blur-xl border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className={`absolute lg:relative z-40 lg:z-auto w-72 h-full bg-[#1e1f20] lg:bg-[#1e1f20] border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <div className="flex items-center justify-between p-4 pt-4 lg:hidden border-b border-white/10">
             <div className="flex items-center gap-2">
               <PiechemAiLogo size="xs" />
