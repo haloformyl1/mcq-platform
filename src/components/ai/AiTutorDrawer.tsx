@@ -11,7 +11,7 @@ import {
   Lightbulb, RotateCcw,
   Sparkles, Compass, Calculator, ChevronDown, ChevronRight,
   MessageSquare, Lock, Paperclip, ThumbsUp, ThumbsDown,
-  Search, MoreVertical, Edit2, Trash2, Clock
+  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff
 } from "lucide-react";
 import { 
   generateConversationTitle, 
@@ -703,16 +703,41 @@ export default function AiTutorDrawer({
               <div className="text-[13px] text-slate-500 px-4 py-2">No recent chats</div>
             ) : (
               conversations.map(chat => (
-                <div key={chat.id} className="relative group px-2">
+                <div key={chat.id} className="relative group px-2" ref={openMenuChatId === chat.id ? menuContainerRef : null}>
                   <button
                     onClick={() => handleSelectChat(chat.id)}
                     className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-full text-[13px] sm:text-[14px] transition cursor-pointer pr-10 ${activeChatId === chat.id ? 'bg-[#282a2c] text-[#e3e3e3] font-medium' : 'text-[#c4c7c5] hover:bg-[#282a2c] hover:text-[#e3e3e3]'}`}
                   >
                     <span className="truncate flex-1">{chat.title}</span>
                   </button>
-                  <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-[#c4c7c5] hover:bg-white/10 opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setOpenMenuChatId(openMenuChatId === chat.id ? null : chat.id); }}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-[#c4c7c5] transition cursor-pointer ${openMenuChatId === chat.id ? 'bg-[#404346] opacity-100' : 'hover:bg-white/10 opacity-0 group-hover:opacity-100'}`}
+                  >
                     <MoreVertical className="w-[18px] h-[18px]" />
                   </button>
+
+                  {/* Dropdown Menu */}
+                  {openMenuChatId === chat.id && (
+                    <div className="absolute left-6 top-10 mt-1 w-[200px] rounded-[16px] bg-[#282a2c] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
+                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                        <Share2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
+                        <span>Share conversation</span>
+                      </button>
+                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                        <PinOff className="w-[18px] h-[18px] text-[#c4c7c5]" />
+                        <span>Unpin</span>
+                      </button>
+                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                        <Edit2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
+                        <span>Rename</span>
+                      </button>
+                      <button className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer">
+                        <Trash2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
