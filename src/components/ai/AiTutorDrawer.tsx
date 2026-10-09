@@ -1108,6 +1108,14 @@ export default function AiTutorDrawer({
                     <span className="font-semibold text-white">{req.name}</span> requested to collab on this chat
                   </div>
                   <div className="flex gap-2 self-end sm:self-auto">
+                    <a
+                      href="/collab-info"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-1.5 rounded-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700 text-slate-300 hover:text-white text-xs font-medium transition cursor-pointer flex items-center justify-center"
+                    >
+                      Know more
+                    </a>
                     <button
                       onClick={() => handleRespondCollab(req.collabUserId, false)}
                       className="px-4 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white text-xs font-medium transition cursor-pointer"
