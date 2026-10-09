@@ -895,13 +895,24 @@ export default function AiTutorDrawer({
                       
                       {/* Back to where I was */}
                       {chat.id === activeChatId && isChatOwner && hasActiveCollab && (
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); handleRevertCollab(); setOpenMenuChatId(null); }}
-                          className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-amber-400 hover:bg-amber-400/10 transition cursor-pointer border-t border-white/5 mt-1 pt-3"
-                        >
-                          <History className="w-[18px] h-[18px] text-amber-400" />
-                          <span>Back to where I was</span>
-                        </button>
+                        <div className="relative group border-t border-white/5 mt-1 pt-3">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleRevertCollab(); setOpenMenuChatId(null); }}
+                            className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-amber-400 hover:bg-amber-400/10 transition cursor-pointer"
+                          >
+                            <History className="w-[18px] h-[18px] text-amber-400" />
+                            <span>Back to where I was</span>
+                          </button>
+                          <a 
+                            href="/revert-info"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 mt-1.5 text-[10px] px-2 py-0.5 rounded-full border border-amber-400/20 text-amber-400/70 hover:text-amber-400 hover:bg-amber-400/10 transition z-10 opacity-0 group-hover:opacity-100 uppercase tracking-wider font-bold"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Know more
+                          </a>
+                        </div>
                       )}
                     </div>
                   )}

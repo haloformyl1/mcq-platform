@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Users, Shield, Zap } from "lucide-react";
+import { ArrowLeft, Users, Shield, Zap, History } from "lucide-react";
 
 export default function CollabInfoPage() {
   return (
@@ -56,6 +56,21 @@ export default function CollabInfoPage() {
                 <h3 className="text-xl font-medium text-white mb-2">Seamless Workflow</h3>
                 <p className="text-[#c4c7c5] leading-relaxed text-sm sm:text-base">
                   To get started, simply click "Accept" on the request banner. The chat will immediately be unlocked for the requesting user. You can start sending messages immediately—you'll see their name next to their messages, distinguishing them from your own.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#1e1f20] border border-amber-500/20 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                <History className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-medium text-white mb-2">Change Your Mind? Revert It.</h3>
+                <p className="text-[#c4c7c5] leading-relaxed text-sm sm:text-base">
+                  If the collaboration becomes too noisy or distracting, the chat owner has an exclusive <strong>"Back to where I was"</strong> option in the chat menu. Clicking this button instantly and permanently removes all third-party questions and their corresponding AI replies, flawlessly restoring the chat to your original, clean state.
                 </p>
               </div>
             </div>
