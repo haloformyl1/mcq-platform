@@ -54,7 +54,6 @@ interface AcademicContext {
 
 interface AiTutorDrawerProps {
   isOpen: boolean;
-  onClose: () => void;
   initialMode?: 'tutor' | 'practice' | 'doubt' | 'revision' | 'study_plan' | 'exam';
   initialContext?: AcademicContext;
   initialStudentName?: string;
@@ -63,7 +62,6 @@ interface AiTutorDrawerProps {
 
 export default function AiTutorDrawer({
   isOpen,
-  onClose,
   initialMode = "tutor",
   initialContext,
   initialStudentName = "Scholar"

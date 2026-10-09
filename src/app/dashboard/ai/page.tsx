@@ -1,11 +1,10 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import AiTutorDrawer from "@/components/ai/AiTutorDrawer";
 
 function AiTutorPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const mode = (searchParams.get("mode") as any) || "tutor";
@@ -14,18 +13,9 @@ function AiTutorPageContent() {
   const chapter = searchParams.get("chapter") || "Periodic Table";
   const topic = searchParams.get("topic") || "Ionisation Energy";
 
-  const handleClose = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/dashboard");
-    }
-  };
-
   return (
     <AiTutorDrawer
       isOpen={true}
-      onClose={handleClose}
       initialMode={mode}
       initialContext={{
         subject,
