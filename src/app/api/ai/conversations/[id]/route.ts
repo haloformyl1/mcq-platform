@@ -19,14 +19,18 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const conversation = await prisma.aiConversation.findFirst({
-      where: {
-        id,
-        studentId: student.id,
-      }
+    const conversation = await prisma.aiConversation.findUnique({
+      where: { id }
     });
 
     if (!conversation) {
+      return NextResponse.json({ success: false, error: 'Conversation not found' }, { status: 404 });
+    }
+
+    const isOwner = conversation.studentId === student.id;
+    const isCollab = Array.isArray(conversation.messages) && (conversation.messages as any[]).some(m => m.type === 'collaborator' && m.collabUserId === student.id);
+
+    if (!isOwner && !isCollab) {
       return NextResponse.json({ success: false, error: 'Conversation not found' }, { status: 404 });
     }
 
@@ -69,11 +73,18 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: 'Valid title is required' }, { status: 400 });
     }
 
-    const existing = await prisma.aiConversation.findFirst({
-      where: { id, studentId: student.id }
+    const existing = await prisma.aiConversation.findUnique({
+      where: { id }
     });
 
     if (!existing) {
+      return NextResponse.json({ success: false, error: 'Conversation not found' }, { status: 404 });
+    }
+
+    const isOwner = existing.studentId === student.id;
+    const isCollab = Array.isArray(existing.messages) && (existing.messages as any[]).some(m => m.type === 'collaborator' && m.collabUserId === student.id);
+
+    if (!isOwner && !isCollab) {
       return NextResponse.json({ success: false, error: 'Conversation not found' }, { status: 404 });
     }
 

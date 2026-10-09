@@ -21,7 +21,14 @@ export async function GET(req: NextRequest) {
 
     const conversations = await prisma.aiConversation.findMany({
       where: {
-        studentId: student.id,
+        OR: [
+          { studentId: student.id },
+          {
+            messages: {
+              array_contains: [{ type: 'collaborator', collabUserId: student.id }] as any
+            }
+          }
+        ],
         ...(search ? {
           title: { contains: search, mode: 'insensitive' }
         } : {})
@@ -78,33 +85,40 @@ export async function POST(req: NextRequest) {
 
     // If ID provided, check if existing
     if (id) {
-      const existing = await prisma.aiConversation.findFirst({
-        where: { id, studentId: student.id }
+      const existing = await prisma.aiConversation.findUnique({
+        where: { id }
       });
 
       if (existing) {
-        const updated = await prisma.aiConversation.update({
-          where: { id },
-          data: {
-            title: finalTitle,
-            subject: subject || existing.subject,
-            level: level || existing.level,
-            messages: messages as any,
-            updatedAt: new Date(),
-          }
-        });
+        const isOwner = existing.studentId === student.id;
+        const isCollab = Array.isArray(existing.messages) && (existing.messages as any[]).some(m => m.type === 'collaborator' && m.collabUserId === student.id);
 
-        return NextResponse.json({
-          success: true,
-          conversation: {
-            id: updated.id,
-            title: updated.title,
-            subject: updated.subject,
-            level: updated.level,
-            createdAt: updated.createdAt.toISOString(),
-            updatedAt: updated.updatedAt.toISOString(),
-          }
-        });
+        if (isOwner || isCollab) {
+          const updated = await prisma.aiConversation.update({
+            where: { id },
+            data: {
+              title: finalTitle,
+              subject: subject || existing.subject,
+              level: level || existing.level,
+              messages: messages as any,
+              updatedAt: new Date(),
+            }
+          });
+
+          return NextResponse.json({
+            success: true,
+            conversation: {
+              id: updated.id,
+              title: updated.title,
+              subject: updated.subject,
+              level: updated.level,
+              createdAt: updated.createdAt.toISOString(),
+              updatedAt: updated.updatedAt.toISOString(),
+            }
+          });
+        } else {
+          return NextResponse.json({ success: false, error: 'Unauthorized to update this conversation' }, { status: 403 });
+        }
       }
     }
 

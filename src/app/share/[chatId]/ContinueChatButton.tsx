@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ContinueChatButton({ originalConversationId }: { originalConversationId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<'duplicate' | 'collab' | null>(null);
   const router = useRouter();
 
   const handleContinue = async () => {
-    setLoading(true);
+    setLoading('duplicate');
     try {
       const res = await fetch("/api/ai/conversations/duplicate", {
         method: "POST",
@@ -20,22 +20,53 @@ export default function ContinueChatButton({ originalConversationId }: { origina
         router.push(`/dashboard/ai?chatId=${data.conversation.id}`);
       } else {
         alert("Failed to continue chat: " + data.error);
-        setLoading(false);
+        setLoading(null);
       }
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
-      setLoading(false);
+      setLoading(null);
+    }
+  };
+
+  const handleCollab = async () => {
+    setLoading('collab');
+    try {
+      const res = await fetch("/api/ai/conversations/collab", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ originalConversationId })
+      });
+      const data = await res.json();
+      if (data.success && data.conversation) {
+        router.push(`/dashboard/ai?chatId=${data.conversation.id}`);
+      } else {
+        alert("Failed to collab chat: " + data.error);
+        setLoading(null);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+      setLoading(null);
     }
   };
 
   return (
-    <button
-      onClick={handleContinue}
-      disabled={loading}
-      className="px-8 py-3 rounded-full bg-[#0b57d0] hover:bg-[#0b57d0]/90 disabled:opacity-70 text-white text-sm font-medium transition shadow-[0_4px_14px_0_rgba(11,87,208,0.39)] hover:shadow-[0_6px_20px_rgba(11,87,208,0.23)] hover:-translate-y-0.5 disabled:hover:translate-y-0 flex items-center gap-2"
-    >
-      {loading ? "Preparing..." : "Continue this chat"}
-    </button>
+    <div className="flex gap-4">
+      <button
+        onClick={handleContinue}
+        disabled={!!loading}
+        className="px-6 py-3 rounded-full bg-[#282a2c] hover:bg-white/10 disabled:opacity-70 border border-white/10 text-white text-sm font-medium transition flex items-center justify-center min-w-[200px]"
+      >
+        {loading === 'duplicate' ? "Preparing..." : "Duplicate to my account"}
+      </button>
+      <button
+        onClick={handleCollab}
+        disabled={!!loading}
+        className="px-6 py-3 rounded-full bg-[#0b57d0] hover:bg-[#0b57d0]/90 disabled:opacity-70 text-white text-sm font-medium transition shadow-[0_4px_14px_0_rgba(11,87,208,0.39)] hover:shadow-[0_6px_20px_rgba(11,87,208,0.23)] hover:-translate-y-0.5 disabled:hover:translate-y-0 flex items-center justify-center min-w-[200px]"
+      >
+        {loading === 'collab' ? "Joining..." : "Collab this chat"}
+      </button>
+    </div>
   );
 }
