@@ -121,6 +121,7 @@ export default function AiTutorDrawer({
   const [hasActiveCollab, setHasActiveCollab] = useState(false);
   const [activeCollaborators, setActiveCollaborators] = useState<any[]>([]);
   const [showCollabDetails, setShowCollabDetails] = useState(false);
+  const [chatOwnerInfo, setChatOwnerInfo] = useState<{name?: string; email?: string} | null>(null);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -284,6 +285,7 @@ export default function AiTutorDrawer({
     setActiveCollaborators([]);
     setHasActiveCollab(false);
     setShowCollabDetails(false);
+    setChatOwnerInfo(null);
     setInput("");
     setIsMobileSidebarOpen(false);
     if (typeof window !== 'undefined') {
@@ -321,6 +323,7 @@ export default function AiTutorDrawer({
           
           setIsChatOwner(!!data.isOwner);
           setHasActiveCollab(!!data.hasActiveCollab);
+          setChatOwnerInfo(data.owner || null);
 
           if (conv.subject) {
             setSelectedSubject(conv.subject as any);
@@ -1210,7 +1213,7 @@ export default function AiTutorDrawer({
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-amber-500/10 border border-amber-500/30 px-5 py-3 rounded-2xl shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95">
                 <div className="text-sm text-amber-200/90 flex items-center gap-2">
                   <Users className="w-4 h-4 text-amber-400" />
-                  <span>{activeCollaborators.length || 1} {activeCollaborators.length === 1 ? 'person is' : 'people are'} collaborating on this chat.</span>
+                  <span>{activeCollaborators.length + 1} {(activeCollaborators.length + 1) === 1 ? 'person is' : 'people are'} collaborating on this chat.</span>
                 </div>
                 <div className="flex gap-2 self-end sm:flex-auto sm:justify-end">
                   <button
@@ -1240,10 +1243,21 @@ export default function AiTutorDrawer({
                 </div>
               </div>
 
-              {showCollabDetails && activeCollaborators.length > 0 && (
+              {showCollabDetails && (activeCollaborators.length > 0 || chatOwnerInfo) && (
                 <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mt-1 animate-in slide-in-from-top-2 text-sm text-amber-200/80">
                   <h4 className="font-semibold text-amber-400 mb-2 border-b border-amber-500/20 pb-2">Active Collaborators</h4>
                   <ul className="space-y-2">
+                    {chatOwnerInfo && (
+                      <li className="flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-amber-200">{chatOwnerInfo.name || "Anonymous User"}</span>
+                          {chatOwnerInfo.email && <span className="text-xs text-amber-200/50">{maskEmail(chatOwnerInfo.email)}</span>}
+                        </div>
+                        <span className="text-xs bg-amber-500/20 px-2 py-1 rounded-md text-amber-400 font-semibold border border-amber-500/30">
+                          Owner
+                        </span>
+                      </li>
+                    )}
                     {activeCollaborators.map((c, i) => (
                       <li key={i} className="flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5">
                         <div className="flex flex-col">

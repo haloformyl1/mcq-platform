@@ -20,7 +20,15 @@ export async function GET(
     }
 
     const conversation = await prisma.aiConversation.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        student: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
+      }
     });
 
     if (!conversation) {
@@ -45,6 +53,7 @@ export async function GET(
         createdAt: conversation.createdAt.toISOString(),
         updatedAt: conversation.updatedAt.toISOString(),
       },
+      owner: conversation.student,
       isOwner,
       hasActiveCollab: Array.isArray(conversation.messages) && (conversation.messages as any[]).some(m => m.type === 'collaborator')
     });
