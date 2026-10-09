@@ -266,6 +266,9 @@ export default function AiTutorDrawer({
     setMessages([]);
     setInput("");
     setIsMobileSidebarOpen(false);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', window.location.pathname);
+    }
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -279,6 +282,10 @@ export default function AiTutorDrawer({
     setActiveChatId(convId);
     setIsMobileSidebarOpen(false);
     setLoading(true);
+    
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', "?chatId=" + convId);
+    }
 
     try {
       const res = await fetch(`/api/ai/conversations/${convId}`);
@@ -306,6 +313,18 @@ export default function AiTutorDrawer({
       }, 150);
     }
   };
+
+  // Check URL for chatId on initial load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const chatId = urlParams.get('chatId');
+      if (chatId) {
+        handleSelectChat(chatId);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Inline Rename
   const handleStartRename = (conv: AiConversationMeta, e: React.MouseEvent) => {
@@ -457,6 +476,10 @@ export default function AiTutorDrawer({
 
       // Realtime optimistic update: immediately place under TODAY at the top of the sidebar!
       setConversations(prev => [newConvMeta, ...prev.filter(c => c.id !== currentChatId)]);
+      
+      if (typeof window !== 'undefined') {
+        window.history.pushState(null, '', "?chatId=" + currentChatId);
+      }
     } else {
       // Update timestamp and lastMessagePreview of existing chat and move it to top of TODAY
       setConversations(prev => {
