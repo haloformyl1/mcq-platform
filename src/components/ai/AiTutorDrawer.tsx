@@ -731,12 +731,12 @@ export default function AiTutorDrawer({
           </button>
 
           <div className="flex items-center gap-2 min-w-0 pr-2 hidden sm:flex">
-            <PiechemLogo size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." />
+            <PiechemLogo href="/dashboard" size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." />
           </div>
-          <div className="flex items-center gap-2 min-w-0 pr-2 sm:hidden">
+          <Link href="/dashboard" className="flex items-center gap-2 min-w-0 pr-2 sm:hidden hover:opacity-90 transition-opacity">
             <PiechemAiLogo size="xs" />
             <span className="text-white font-semibold text-sm">PIECHEM AI</span>
-          </div>
+          </Link>
         </div>
 
         {/* Right: Controls (Language, Level, Exit) */}
