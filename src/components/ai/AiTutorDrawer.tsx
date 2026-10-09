@@ -1194,8 +1194,8 @@ export default function AiTutorDrawer({
             </div>
           )}
 
-          {/* Active Collab Banner (Owner only) */}
-          {isChatOwner && hasActiveCollab && pendingCollabRequests.length === 0 && (
+          {/* Active Collab Banner (Owner and Collaborators) */}
+          {hasActiveCollab && pendingCollabRequests.length === 0 && (
             <div className="px-3 sm:px-4 md:px-8 py-2 w-full max-w-4xl mx-auto flex flex-col gap-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-amber-500/10 border border-amber-500/30 px-5 py-3 rounded-2xl shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95">
                 <div className="text-sm text-amber-200/90 flex items-center gap-2">
@@ -1209,20 +1209,24 @@ export default function AiTutorDrawer({
                   >
                     View collaborators
                   </button>
-                  <Link
-                    href="/revert-info"
-                    target="_blank"
-                    className="px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-200 hover:text-amber-100 text-xs font-medium transition cursor-pointer flex items-center justify-center"
-                  >
-                    Know more
-                  </Link>
-                  <button
-                    onClick={handleRevertCollab}
-                    className="px-4 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-amber-950 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
-                  >
-                    <History className="w-3.5 h-3.5" />
-                    Back to where I was
-                  </button>
+                  {isChatOwner && (
+                    <>
+                      <Link
+                        href="/revert-info"
+                        target="_blank"
+                        className="px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-200 hover:text-amber-100 text-xs font-medium transition cursor-pointer flex items-center justify-center"
+                      >
+                        Know more
+                      </Link>
+                      <button
+                        onClick={handleRevertCollab}
+                        className="px-4 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-amber-950 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+                      >
+                        <History className="w-3.5 h-3.5" />
+                        Back to where I was
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
