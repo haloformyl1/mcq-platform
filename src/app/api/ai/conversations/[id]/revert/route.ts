@@ -5,8 +5,10 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
+    
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('session')?.value;
     const student = sessionCookie ? await decrypt(sessionCookie) : null;
@@ -14,8 +16,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     if (!student || !student.id) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { id } = params;
 
     const existing = await prisma.aiConversation.findUnique({
       where: { id }
