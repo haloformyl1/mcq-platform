@@ -105,6 +105,7 @@ export default function AiTutorDrawer({
 
   // Active messages list (empty by default for clean new chat)
   const [messages, setMessages] = useState<Message[]>([]);
+  const [pendingCollabRequests, setPendingCollabRequests] = useState<any[]>([]);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -293,7 +294,13 @@ export default function AiTutorDrawer({
         const data = await res.json();
         if (data.success && data.conversation) {
           const conv = data.conversation;
-          setMessages(Array.isArray(conv.messages) ? conv.messages : []);
+          const allMsgs = Array.isArray(conv.messages) ? conv.messages : [];
+          setMessages(allMsgs.filter((m: any) => m.type !== 'collab_request' && m.type !== 'collaborator'));
+          
+          // Only owner should see collab requests, but we don't return studentId from API.
+          // Wait, we can safely set pending requests and only display them if they exist
+          setPendingCollabRequests(allMsgs.filter((m: any) => m.type === 'collab_request'));
+
           if (conv.subject) {
             setSelectedSubject(conv.subject as any);
           }
@@ -622,6 +629,25 @@ export default function AiTutorDrawer({
   };
 
   if (!isOpen) return null;
+
+  const handleRespondCollab = async (collabUserId: string, accept: boolean) => {
+    try {
+      const res = await fetch("/api/ai/conversations/collab/respond", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversationId: activeChatId, collabUserId, accept })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPendingCollabRequests(prev => prev.filter(req => req.collabUserId !== collabUserId));
+      } else {
+        alert("Failed to respond: " + data.error);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <div 
@@ -1070,8 +1096,35 @@ export default function AiTutorDrawer({
             </div>
           </div>
 
-                    {/* BOTTOM AI COMMAND CONSOLE */}
+          {/* BOTTOM AI COMMAND CONSOLE */}
           <div className="block">
+
+          {/* Collab Requests (If Any) */}
+          {pendingCollabRequests.length > 0 && (
+            <div className="px-3 sm:px-4 md:px-8 py-2 w-full max-w-4xl mx-auto flex flex-col gap-2">
+              {pendingCollabRequests.map(req => (
+                <div key={req.collabUserId} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-zinc-950/80 border border-[#0b57d0]/30 px-5 py-3 rounded-2xl shadow-xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+                  <div className="text-sm text-[#e3e3e3]">
+                    <span className="font-semibold text-white">{req.name}</span> requested to collab on this chat
+                  </div>
+                  <div className="flex gap-2 self-end sm:self-auto">
+                    <button
+                      onClick={() => handleRespondCollab(req.collabUserId, false)}
+                      className="px-4 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white text-xs font-medium transition cursor-pointer"
+                    >
+                      Decline
+                    </button>
+                    <button
+                      onClick={() => handleRespondCollab(req.collabUserId, true)}
+                      className="px-4 py-1.5 rounded-full bg-[#0b57d0] hover:bg-[#0b57d0]/90 text-white text-xs font-medium transition cursor-pointer"
+                    >
+                      Accept
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-3 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">

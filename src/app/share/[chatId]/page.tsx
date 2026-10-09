@@ -32,11 +32,14 @@ export default async function SharedChatPage({ params }: { params: Promise<{ cha
   const sessionCookie = cookieStore.get("session")?.value;
   const student = sessionCookie ? await decrypt(sessionCookie) : null;
   const isLoggedIn = !!(student && student.id);
+  const isOwner = isLoggedIn && conversation.studentId === student?.id;
 
   const createdDate = new Date(conversation.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
   const createdTime = new Date(conversation.createdAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
   const messages = Array.isArray(conversation.messages) ? conversation.messages as any[] : [];
+  
+  const pendingRequests = isOwner ? messages.filter(m => m.type === 'collab_request') : [];
 
   return (
     <div className="min-h-screen bg-[#131314] text-slate-200 font-sans selection:bg-white/20">
@@ -118,7 +121,7 @@ export default async function SharedChatPage({ params }: { params: Promise<{ cha
               Sign in
             </Link>
           ) : (
-            <ContinueChatButton originalConversationId={conversation.id} />
+            <ContinueChatButton originalConversationId={conversation.id} isOwner={isOwner} pendingRequests={pendingRequests} />
           )}
         </div>
       </div>

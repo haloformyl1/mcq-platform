@@ -34,24 +34,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, conversation: { id: original.id } });
     }
 
-    // Check if they are already a collaborator
+    // Check if they are already a collaborator or requested
     const messages = Array.isArray(original.messages) ? original.messages : [];
     const isAlreadyCollab = messages.some((m: any) => m.type === 'collaborator' && m.collabUserId === student.id);
+    const hasPendingRequest = messages.some((m: any) => m.type === 'collab_request' && m.collabUserId === student.id);
 
-    if (isAlreadyCollab) {
-      return NextResponse.json({ success: true, conversation: { id: original.id } });
+    if (isAlreadyCollab || hasPendingRequest) {
+      return NextResponse.json({ success: true, status: isAlreadyCollab ? 'accepted' : 'pending', conversation: { id: original.id } });
     }
 
-    // Add them as a collaborator by pushing a hidden system message
+    // Add them as a pending collaborator by pushing a hidden system message
     const updatedMessages = [
       ...messages,
       {
-        id: `collab-${student.id}-${Date.now()}`,
+        id: `collab-req-${student.id}-${Date.now()}`,
         role: "system",
-        type: "collaborator",
+        type: "collab_request",
         collabUserId: student.id,
+        name: student.name || student.email || "Someone",
         timestamp: new Date().toISOString(),
-        content: `User ${student.name || student.id} joined the collaboration.`
+        content: `User ${student.name || student.email || student.id} requested to collaborate.`
       }
     ];
 
