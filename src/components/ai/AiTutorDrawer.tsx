@@ -1207,8 +1207,15 @@ export default function AiTutorDrawer({
                     onClick={() => setShowCollabDetails(!showCollabDetails)}
                     className="px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-200 hover:text-amber-100 text-xs font-medium transition cursor-pointer flex items-center justify-center"
                   >
-                    More detail
+                    View collaborators
                   </button>
+                  <Link
+                    href="/revert-info"
+                    target="_blank"
+                    className="px-4 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-200 hover:text-amber-100 text-xs font-medium transition cursor-pointer flex items-center justify-center"
+                  >
+                    Know more
+                  </Link>
                   <button
                     onClick={handleRevertCollab}
                     className="px-4 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-amber-950 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
