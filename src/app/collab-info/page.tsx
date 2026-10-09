@@ -55,7 +55,7 @@ export default function CollabInfoPage() {
               <div>
                 <h3 className="text-xl font-medium text-white mb-2">Seamless Workflow</h3>
                 <p className="text-[#c4c7c5] leading-relaxed text-sm sm:text-base">
-                  To get started, simply click "Accept" on the request banner. The chat will immediately be unlocked for the requesting user. You can start sending messages immediately—you'll see their name next to their messages, distinguishing them from your own.
+                  To get started, simply click &quot;Accept&quot; on the request banner. The chat will immediately be unlocked for the requesting user. You can start sending messages immediately—you&apos;ll see their name next to their messages, distinguishing them from your own.
                 </p>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function CollabInfoPage() {
               <div>
                 <h3 className="text-xl font-medium text-white mb-2">Change Your Mind? Revert It.</h3>
                 <p className="text-[#c4c7c5] leading-relaxed text-sm sm:text-base">
-                  If the collaboration becomes too noisy or distracting, the chat owner has an exclusive <strong>"Back to where I was"</strong> option in the chat menu. Clicking this button instantly and permanently removes all third-party questions and their corresponding AI replies, flawlessly restoring the chat to your original, clean state.
+                  If the collaboration becomes too noisy or distracting, the chat owner has an exclusive <strong>&quot;Back to where I was&quot;</strong> option in the chat menu. Clicking this button instantly and permanently removes all third-party questions and their corresponding AI replies, flawlessly restoring the chat to your original, clean state.
                 </p>
               </div>
             </div>

@@ -32,7 +32,7 @@ export default function RevertInfoPage() {
               <div>
                 <h3 className="text-xl font-medium text-white mb-2">Instant Scrubbing</h3>
                 <p className="text-[#c4c7c5] leading-relaxed text-sm sm:text-base">
-                  When you click <strong>"Back to where I was"</strong>, the system intelligently scans the entire chat history. It identifies and permanently deletes all third-party messages sent by your collaborators, as well as the AI's direct replies to those specific messages. Your own original queries and the AI's replies to you remain perfectly intact.
+                  When you click <strong>&quot;Back to where I was&quot;</strong>, the system intelligently scans the entire chat history. It identifies and permanently deletes all third-party messages sent by your collaborators, as well as the AI&apos;s direct replies to those specific messages. Your own original queries and the AI&apos;s replies to you remain perfectly intact.
                 </p>
               </div>
             </div>
@@ -60,7 +60,7 @@ export default function RevertInfoPage() {
               <div>
                 <h3 className="text-xl font-medium text-white mb-2">Isolated Read-Only Mode</h3>
                 <p className="text-[#c4c7c5] leading-relaxed text-sm sm:text-base">
-                  What happens to the other users? They won't be abruptly kicked out of their screen. Instead, their session silently forks. They can continue chatting with the AI locally on their device, but they lose all access to sync with your master copy. Their new messages will never appear on your screen, and they won't see anything new you type.
+                  What happens to the other users? They won&apos;t be abruptly kicked out of their screen. Instead, their session silently forks. They can continue chatting with the AI locally on their device, but they lose all access to sync with your master copy. Their new messages will never appear on your screen, and they won&apos;t see anything new you type.
                 </p>
               </div>
             </div>
