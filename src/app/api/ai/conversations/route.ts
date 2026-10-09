@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
         const isOwner = existing.studentId === student.id;
         const isCollab = Array.isArray(existing.messages) && (existing.messages as any[]).some(m => m.type === 'collaborator' && m.collabUserId === student.id);
 
-        const oldMessages = Array.isArray(existing.messages) ? existing.messages : [];
+        const oldMessages = (Array.isArray(existing.messages) ? existing.messages : []) as any[];
         const newMessagesList = messages as any[];
 
         const taggedMessages = newMessagesList.map(newMsg => {
