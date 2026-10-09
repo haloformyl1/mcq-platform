@@ -60,6 +60,16 @@ interface AiTutorDrawerProps {
   initialStudentName?: string;
 }
 
+const maskEmail = (email: string) => {
+  if (!email || !email.includes('@')) return email;
+  const [local, domain] = email.split('@');
+  const maskedLocal = local.length > 4 ? local.slice(0, 2) + '***' + local.slice(-1) : local.slice(0, 1) + '***';
+  const domainParts = domain.split('.');
+  const tld = domainParts.pop();
+  const domainName = domainParts.join('.');
+  const maskedDomainName = domainName.length > 2 ? domainName.slice(0, 1) + '***' + domainName.slice(-1) : '***';
+  return `${maskedLocal}@${maskedDomainName}.${tld}`;
+};
 
 export default function AiTutorDrawer({
   isOpen,
@@ -1238,7 +1248,7 @@ export default function AiTutorDrawer({
                       <li key={i} className="flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5">
                         <div className="flex flex-col">
                           <span className="font-medium text-amber-200">{c.name || "Anonymous User"}</span>
-                          {c.email && <span className="text-xs text-amber-200/50">{c.email}</span>}
+                          {c.email && <span className="text-xs text-amber-200/50">{maskEmail(c.email)}</span>}
                         </div>
                         <span className="text-xs bg-amber-500/20 px-2 py-1 rounded-md text-amber-400">
                           {c.timestamp ? new Date(c.timestamp).toLocaleDateString() : 'Active'}
