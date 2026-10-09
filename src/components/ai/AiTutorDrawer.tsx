@@ -802,7 +802,7 @@ export default function AiTutorDrawer({
                   {openMenuChatId === chat.id && (
                     <div className="absolute left-6 top-10 mt-1 w-[200px] rounded-[16px] bg-[#282a2c] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
                       <button 
-                        onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.href); alert("Link copied to clipboard!"); setOpenMenuChatId(null); }}
+                        onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.origin + "/share/" + chat.id); alert("Link copied to clipboard!"); setOpenMenuChatId(null); }}
                         className="w-full text-left flex items-center gap-3 px-4 py-2 text-[14px] text-[#e3e3e3] hover:bg-white/5 transition cursor-pointer"
                       >
                         <Share2 className="w-[18px] h-[18px] text-[#c4c7c5]" />
