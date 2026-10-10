@@ -228,13 +228,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
         }
       ` }} />
 
-      <main className="flex-1 relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-gradient-to-b from-[#05111f] via-[#020710] to-[#010306] overflow-hidden p-2 sm:p-4 md:p-6 flex justify-center items-center select-none">
-        {/* Subtle Ambient Radial Glow */}
-        <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-96 bg-cyan-500/10 blur-[120px] pointer-events-none z-0" 
-          aria-hidden="true" 
-        />
-
+      <main className="flex-1 relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-[#010306] overflow-hidden flex justify-center items-center select-none">
         {/* Anti-Piracy Watermark Overlay */}
         <div 
           className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-8 opacity-[0.035] overflow-hidden"
@@ -260,13 +254,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
 
         {/* Scalable Document Frame with Blackish-Blue Elevated Container */}
         <div 
-          style={{ 
-            width: `${Math.min(100, Math.max(70, zoom))}%`,
-            maxWidth: zoom > 100 ? `${zoom * 11}px` : "1100px",
-            height: "100%",
-            transition: "width 0.2s ease-out, max-width 0.2s ease-out"
-          }}
-          className="relative z-10 rounded-2xl border border-cyan-500/30 bg-[#091522] shadow-[0_0_60px_rgba(0,195,255,0.08),0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden flex flex-col"
+          className="relative z-10 w-full h-full bg-[#091522] overflow-hidden flex flex-col"
         >
           <iframe
             key={zoom}
