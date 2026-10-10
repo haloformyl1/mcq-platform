@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import PiechemLogo from '@/components/PiechemLogo';
 
 export default function AboutAiPage() {
   return (
@@ -7,11 +8,8 @@ export default function AboutAiPage() {
       
       {/* Header */}
       <header className="w-full flex items-center justify-between p-6 max-w-6xl mx-auto border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(34,211,238,0.4)]">
-            P
-          </div>
-          <span className="font-bold tracking-wider uppercase text-white">PIECHEM AI</span>
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <PiechemLogo size="md" showText={true} />
         </Link>
         <Link 
           href="/dashboard"
