@@ -960,6 +960,20 @@ export default function AiTutorDrawer({
              <span className="text-[14px] font-semibold text-[#e3e3e3]">PIECHEM AI</span>
              <div className="w-9"></div>
           </div>
+
+          {/* Desktop Floating Toggle (When Sidebar is Collapsed) */}
+          {isDesktopSidebarCollapsed && (
+            <div className="absolute top-4 left-4 z-50 hidden lg:block animate-in fade-in zoom-in-95 duration-200">
+              <button
+                type="button"
+                onClick={() => setIsDesktopSidebarCollapsed(false)}
+                className="p-2 rounded-lg bg-zinc-950 border border-white/10 shadow-lg text-slate-300 hover:text-white transition cursor-pointer hover:bg-zinc-900"
+                title="Expand sidebar"
+              >
+                <PanelLeftOpen className="w-5 h-5" />
+              </button>
+            </div>
+          )}
           
           {/* Messages & Workspace Container */}
           <div 
