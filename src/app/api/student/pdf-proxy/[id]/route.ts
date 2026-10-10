@@ -110,18 +110,32 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     // Apply Watermark if it's a Download request
     if (isDownload && pdfBuffer) {
       try {
-        const { PDFDocument, rgb, degrees } = await import('pdf-lib');
+        const { PDFDocument, rgb, degrees, StandardFonts } = await import('pdf-lib');
         const pdfDoc = await PDFDocument.load(pdfBuffer);
+        const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
         const pages = pdfDoc.getPages();
         const watermarkText = "PIECHEM - An Arghyadeep Roy Initiative.";
 
         pages.forEach(page => {
           const { width, height } = page.getSize();
-          const fontSize = 40;
+          
+          // Dynamic font size: about 4% of the diagonal size, max 36
+          const diagonal = Math.sqrt(width * width + height * height);
+          const fontSize = Math.min(36, diagonal * 0.04);
+          
+          const textWidth = helveticaFont.widthOfTextAtSize(watermarkText, fontSize);
+          const textHeight = helveticaFont.heightAtSize(fontSize);
+          
+          // Calculate exact starting coordinates to center the rotated text
+          const angleInRadians = (45 * Math.PI) / 180;
+          const xOffset = (textWidth / 2) * Math.cos(angleInRadians) - (textHeight / 2) * Math.sin(angleInRadians);
+          const yOffset = (textWidth / 2) * Math.sin(angleInRadians) + (textHeight / 2) * Math.cos(angleInRadians);
+          
           page.drawText(watermarkText, {
-            x: 50,
-            y: height / 2,
+            x: width / 2 - xOffset,
+            y: height / 2 - yOffset,
             size: fontSize,
+            font: helveticaFont,
             color: rgb(0.5, 0.5, 0.5),
             opacity: 0.3,
             rotate: degrees(45),
