@@ -14,7 +14,7 @@ import {
   Sparkles, Compass, Calculator, ChevronDown, ChevronRight,
   MessageSquare, Lock, Paperclip, ThumbsUp, ThumbsDown,
   Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff, Pin, History, Users,
-  PanelLeftClose, PanelLeftOpen
+  PanelLeftClose, PanelLeftOpen, Calendar, Brain, Target
 } from "lucide-react";
 import { 
   generateConversationTitle, 
@@ -899,41 +899,61 @@ export default function AiTutorDrawer({
               <X className="w-5 h-5" />
             </button>
           </div>
-          <div className="p-3 lg:p-4 pt-4 lg:pt-6 space-y-1">
+          <div className="p-3 lg:p-4 pt-4 lg:pt-6 space-y-2 flex-shrink-0">
+            {/* New Chat Button - Premium styling */}
             <button 
               onClick={handleNewChat}
-              className="w-full flex items-center justify-start gap-4 px-3 py-2.5 rounded-full text-[14px] font-medium text-slate-200 hover:bg-white/10 transition cursor-pointer"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-600/10 to-cyan-600/10 hover:from-blue-600/20 hover:to-cyan-600/20 border border-blue-500/20 hover:border-blue-400/40 text-[14px] font-semibold text-blue-100 transition-all shadow-[0_0_15px_rgba(0,150,255,0.05)] cursor-pointer group"
             >
-              <Edit2 className="w-5 h-5 text-slate-300" />
-              <span>New chat</span>
-            </button>
-            {isSearchActive ? (
-              <div className="w-full flex items-center justify-start gap-3 px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
-                <Search className="w-4 h-4 text-slate-400 shrink-0" />
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Search chats..."
-                  value={historySearch}
-                  onChange={(e) => setHistorySearch(e.target.value)}
-                  onBlur={() => {
-                    if (!historySearch.trim()) setIsSearchActive(false);
-                  }}
-                  className="bg-transparent text-[14px] text-white w-full focus:outline-none placeholder:text-slate-500"
-                />
-                <button onClick={() => { setIsSearchActive(false); setHistorySearch(""); }} className="p-1 hover:bg-white/10 rounded-full shrink-0">
-                  <X className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+              <div className="flex items-center gap-3">
+                <PiechemAiLogo size="xs" />
+                <span>New chat</span>
               </div>
-            ) : (
-              <button 
-                onClick={() => setIsSearchActive(true)}
-                className="w-full flex items-center justify-start gap-4 px-3 py-2.5 rounded-full text-[14px] font-medium text-slate-200 hover:bg-white/10 transition cursor-pointer"
-              >
-                <Search className="w-5 h-5 text-slate-300" />
-                <span>Search chats</span>
+              <Edit2 className="w-4 h-4 text-blue-300 group-hover:text-blue-200 transition-colors" />
+            </button>
+
+            <div className="space-y-0.5 pt-2">
+              <button onClick={() => alert('Study Planner coming soon!')} className="w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer group">
+                <Calendar className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span>Study Planner</span>
               </button>
-            )}
+              <button onClick={() => alert('Memory Vault coming soon!')} className="w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer group">
+                <Brain className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+                <span>Memory Vault</span>
+              </button>
+              <button onClick={() => alert('Exam Strategy coming soon!')} className="w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer group">
+                <Target className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+                <span>Exam Strategy</span>
+              </button>
+              
+              {isSearchActive ? (
+                <div className="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-xl bg-white/10 border border-white/20 mt-1">
+                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Search chats..."
+                    value={historySearch}
+                    onChange={(e) => setHistorySearch(e.target.value)}
+                    onBlur={() => {
+                      if (!historySearch.trim()) setIsSearchActive(false);
+                    }}
+                    className="bg-transparent text-[13px] text-white w-full focus:outline-none placeholder:text-slate-500"
+                  />
+                  <button onClick={() => { setIsSearchActive(false); setHistorySearch(""); }} className="p-1 hover:bg-white/20 rounded-full shrink-0">
+                    <X className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setIsSearchActive(true)}
+                  className="w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer group mt-1"
+                >
+                  <Search className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <span>Search chats</span>
+                </button>
+              )}
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
             <div className="text-[13px] font-medium text-slate-400 px-4 pb-2 pt-4">Recent</div>
