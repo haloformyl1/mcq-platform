@@ -1247,6 +1247,7 @@ export default function AiTutorDrawer({
               )}
 
             </div>
+            )}
           </div>
 
           {/* BOTTOM AI COMMAND CONSOLE */}
