@@ -5,8 +5,9 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import FormattedAiMessage from "./FormattedAiMessage";
 import PiechemAiLogo from "./PiechemAiLogo";
 import PiechemLogo from "@/components/PiechemLogo";
+import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 import { 
-  X, Send, User, ArrowRight, 
+  X, Send, User, ArrowRight, LogOut,
   Atom, BookOpen, Dna, 
   GraduationCap, Copy, Check, 
   Lightbulb, RotateCcw,
@@ -118,6 +119,7 @@ export default function AiTutorDrawer({
   const [messages, setMessages] = useState<Message[]>([]);
   const [pendingCollabRequests, setPendingCollabRequests] = useState<any[]>([]);
   const [isChatOwner, setIsChatOwner] = useState(false);
+  const [studentProfile, setStudentProfile] = useState<any>(null);
   const [hasActiveCollab, setHasActiveCollab] = useState(false);
   const [activeCollaborators, setActiveCollaborators] = useState<any[]>([]);
   const [showCollabDetails, setShowCollabDetails] = useState(false);
@@ -136,6 +138,15 @@ export default function AiTutorDrawer({
       window.dispatchEvent(new CustomEvent('piechem-language-changed', { detail: newLang }));
     }
   };
+
+  useEffect(() => {
+    fetch('/api/student/profile')
+      .then(r => r.json())
+      .then(data => {
+        if (data.student) setStudentProfile(data.student);
+      })
+      .catch(e => console.error(e));
+  }, []);
 
   // Lock body scroll
   useEffect(() => {
@@ -796,6 +807,51 @@ export default function AiTutorDrawer({
                 ))}
               </div>
             )}
+          </div>
+          
+          {/* Account & Logout */}
+          <div className="flex items-center gap-1.5 sm:gap-2 ml-1 sm:ml-2 border-l border-white/10 pl-2 sm:pl-3 shrink-0">
+            {studentProfile && (
+              <NotificationCenterDropdown
+                student={studentProfile}
+                upgradeReq={null}
+              />
+            )}
+            <Link
+              href="/dashboard/account"
+              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition-colors shadow-sm shrink-0"
+              title="My Profile & Settings"
+            >
+              <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600">
+                <img
+                  src={studentProfile?.avatarUrl || "/avatars/atom.jpg"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  onError={(e: any) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+                <User className="w-3 h-3 text-white" />
+              </div>
+              <span className="hidden md:inline">My Account</span>
+            </Link>
+            <button
+              onClick={async () => {
+                try {
+                  localStorage.removeItem("piechem_is_gold");
+                  localStorage.removeItem("piechem_gold_expires_at");
+                  localStorage.removeItem("piechem_is_complimentary");
+                  window.dispatchEvent(new Event("piechem_gold_status_changed"));
+                } catch {}
+                document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login';
+              }}
+              title="Logout"
+              className="p-1.5 sm:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 transition-colors group shrink-0 cursor-pointer shadow-sm"
+            >
+              <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-0.5 transition-transform" />
+            </button>
           </div>
         </div>
       </header>
