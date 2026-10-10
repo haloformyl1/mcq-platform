@@ -1206,3 +1206,14 @@ button:active:not(:disabled),
 
 
 
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 110%; /* Increase base font size by 10% on large screens */
+  }
+}
+@media (min-width: 1440px) {
+  html {
+    font-size: 125%; /* Increase base font size by 25% on ultra wide screens */
+  }
+}
