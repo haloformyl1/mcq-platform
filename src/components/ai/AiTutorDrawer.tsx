@@ -146,7 +146,12 @@ export default function AiTutorDrawer({
     fetch('/api/student/dashboard')
       .then(r => r.json())
       .then(data => {
-        if (data.student) setStudentProfile(data.student);
+        if (data.student) {
+          setStudentProfile(data.student);
+          if (data.student.name) {
+            setStudentName(data.student.name);
+          }
+        }
       })
       .catch(e => console.error(e));
   }, []);
