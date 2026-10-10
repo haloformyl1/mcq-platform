@@ -28,6 +28,7 @@ interface Message {
   detectedSubject?: string;
   role: 'user' | 'assistant';
   content: string;
+  senderName?: string;
   title?: string;
   keyConcepts?: string[];
   keyTakeaway?: string;
@@ -502,7 +503,8 @@ export default function AiTutorDrawer({
       id: userMsgId,
       role: "user",
       content: queryText,
-      timestamp: currentTimestamp
+      timestamp: currentTimestamp,
+      senderName: studentName
     };
 
     const newMessages = [...messages, userMsg];
@@ -1120,7 +1122,7 @@ export default function AiTutorDrawer({
                 const isUser = msg.role === "user";
 
                 if (isUser) {
-                  const senderName = studentName.split(' ')[0] || 'You';
+                  const senderName = msg.senderName || studentName || 'You';
                   return (
                     <div key={msg.id} className="flex justify-end pt-2 pb-4">
                       <div className="flex flex-col items-end gap-1 max-w-2xl">
