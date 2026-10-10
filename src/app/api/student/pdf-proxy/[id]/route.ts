@@ -135,7 +135,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       }
     }
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as any, {
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": `${disposition}; filename="${safeTitle}.pdf"`,
