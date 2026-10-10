@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -18,7 +18,7 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const conversationId = params.id;
+    const { id: conversationId } = await params;
 
     // Find the original conversation
     const original = await prisma.aiConversation.findUnique({
