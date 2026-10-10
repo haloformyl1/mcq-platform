@@ -927,8 +927,8 @@ export default function AiTutorDrawer({
               </button>
               
               {isSearchActive ? (
-                <div className="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-xl bg-white/10 border border-white/20 mt-1">
-                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                <div className="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-xl bg-black/40 border border-white/5 shadow-inner mt-1 transition-all">
+                  <Search className="w-4 h-4 text-amber-400/80 shrink-0" />
                   <input
                     type="text"
                     autoFocus
@@ -938,7 +938,7 @@ export default function AiTutorDrawer({
                     onBlur={() => {
                       if (!historySearch.trim()) setIsSearchActive(false);
                     }}
-                    className="bg-transparent text-[13px] text-white w-full focus:outline-none placeholder:text-slate-500"
+                    className="bg-transparent border-none focus:ring-0 p-0 text-[13px] text-white w-full outline-none placeholder:text-slate-500"
                   />
                   <button onClick={() => { setIsSearchActive(false); setHistorySearch(""); }} className="p-1 hover:bg-white/20 rounded-full shrink-0">
                     <X className="w-3.5 h-3.5 text-slate-400" />
@@ -981,7 +981,7 @@ export default function AiTutorDrawer({
                           if (e.key === 'Enter') handleSaveRename(chat.id);
                           if (e.key === 'Escape') setEditingChatId(null);
                         }}
-                        className="flex-1 bg-transparent border-none outline-none text-[#e3e3e3]"
+                        className="flex-1 bg-transparent border-none focus:ring-0 p-0 outline-none text-[#e3e3e3]"
                         onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
