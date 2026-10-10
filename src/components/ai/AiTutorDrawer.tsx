@@ -1356,9 +1356,11 @@ export default function AiTutorDrawer({
                       <li key={i} className="flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5">
                         <div className="flex flex-col">
                           <span className="font-medium text-amber-200">
-                            {c.name ? (c.name.includes('@') ? maskEmail(c.name) : c.name) : "Anonymous User"}
+                            {c.name && !c.name.includes('@') ? c.name : (c.email ? maskEmail(c.email) : "Anonymous User")}
                           </span>
-                          {c.email && <span className="text-xs text-amber-200/50">{maskEmail(c.email)}</span>}
+                          {c.email && c.name && c.name !== c.email && !c.name.includes('@') && (
+                            <span className="text-xs text-amber-200/50">{maskEmail(c.email)}</span>
+                          )}
                         </div>
                         <span className="text-xs bg-amber-500/20 px-2 py-1 rounded-md text-amber-400">
                           {c.timestamp ? new Date(c.timestamp).toLocaleDateString() : 'Active'}

@@ -15,6 +15,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Fetch the real student record from DB to get their actual name
+    const studentDb = await prisma.student.findUnique({
+      where: { id: student.id },
+      select: { name: true, email: true }
+    });
+
+    const realName = studentDb?.name || student.email || "Someone";
+
     const { originalConversationId } = await req.json();
     if (!originalConversationId) {
       return NextResponse.json({ success: false, error: 'Missing conversation ID' }, { status: 400 });
@@ -51,10 +59,10 @@ export async function POST(req: NextRequest) {
         role: "system",
         type: "collab_request",
         collabUserId: student.id,
-        name: student.name || student.email || "Someone",
+        name: realName,
         email: student.email,
         timestamp: new Date().toISOString(),
-        content: `User ${student.name || student.email || student.id} requested to collaborate.`
+        content: `User ${realName} requested to collaborate.`
       }
     ];
 
