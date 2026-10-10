@@ -877,7 +877,7 @@ export default function AiTutorDrawer({
         )}
 
                 {/* SIDEBAR */}
-        <div className={`absolute lg:relative z-40 lg:z-auto w-72 h-full bg-[#1e1f20] lg:bg-[#1e1f20] border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className={`absolute lg:relative z-40 lg:z-auto w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <div className="flex items-center justify-between p-4 pt-4 lg:hidden border-b border-white/10">
             <div className="flex items-center gap-2">
               <PiechemAiLogo size="xs" />
