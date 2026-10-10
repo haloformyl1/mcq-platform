@@ -24,6 +24,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ allowed: false, message: "Unauthorized" }, { status: 401 });
     }
 
+    // Bypass quotas and tracking for test question papers
+    if (studyMaterialId.startsWith("test-")) {
+      return NextResponse.json({ allowed: true, message: "Download approved" });
+    }
+
     const student = await prisma.student.findUnique({
       where: { id: payload.id },
       select: { 
@@ -86,13 +91,15 @@ export async function POST(req: Request) {
       });
     }
 
-    // Record the download
-    await prisma.studentDownload.create({
-      data: {
-        studentId: student.id,
-        studyMaterialId: cleanId,
-      }
-    });
+    // Record the download only if it's a valid StudyMaterial ID
+    if (!studyMaterialId.startsWith("test-")) {
+      await prisma.studentDownload.create({
+        data: {
+          studentId: student.id,
+          studyMaterialId: cleanId,
+        }
+      });
+    }
 
     return NextResponse.json({ 
       allowed: true, 
