@@ -13,7 +13,8 @@ import {
   Lightbulb, RotateCcw,
   Sparkles, Compass, Calculator, ChevronDown, ChevronRight,
   MessageSquare, Lock, Paperclip, ThumbsUp, ThumbsDown,
-  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff, Pin, History, Users
+  Search, MoreVertical, Edit2, Trash2, Clock, Share2, PinOff, Pin, History, Users,
+  PanelLeftClose, PanelLeftOpen
 } from "lucide-react";
 import { 
   generateConversationTitle, 
@@ -125,6 +126,7 @@ export default function AiTutorDrawer({
   const [showCollabDetails, setShowCollabDetails] = useState(false);
   const [chatOwnerInfo, setChatOwnerInfo] = useState<{name?: string; email?: string} | null>(null);
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -749,6 +751,16 @@ export default function AiTutorDrawer({
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
+          
+          {/* Desktop Toggle Sidebar */}
+          <button
+            type="button"
+            onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
+            className="hidden lg:flex p-1.5 -ml-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            title={isDesktopSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isDesktopSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+          </button>
 
           <div className="flex items-center gap-2 min-w-0 pr-2 hidden sm:flex">
             <PiechemLogo href="/dashboard" size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." isGoldMember={isPro} />
@@ -877,7 +889,7 @@ export default function AiTutorDrawer({
         )}
 
                 {/* SIDEBAR */}
-        <div className={`absolute lg:relative z-40 lg:z-auto w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className={`absolute lg:relative z-40 lg:z-auto ${isDesktopSidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden lg:border-none' : 'lg:w-72'} w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-all duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <div className="flex items-center justify-between p-4 pt-4 lg:hidden border-b border-white/10">
             <div className="flex items-center gap-2">
               <PiechemAiLogo size="xs" />
