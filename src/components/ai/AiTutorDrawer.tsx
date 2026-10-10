@@ -148,6 +148,14 @@ export default function AiTutorDrawer({
       .catch(e => console.error(e));
   }, []);
 
+  const isPro = useMemo(() => {
+    if (!studentProfile) return false;
+    const isComp = studentProfile.subscriptionStatus === "COMPLIMENTARY";
+    const isPaid = studentProfile.subscriptionStatus === "PAID" && 
+      (!studentProfile.subscriptionExpiresAt || new Date(studentProfile.subscriptionExpiresAt).getTime() > Date.now());
+    return isComp || isPaid;
+  }, [studentProfile]);
+
   // Lock body scroll
   useEffect(() => {
     if (isOpen) {
@@ -742,7 +750,7 @@ export default function AiTutorDrawer({
           </button>
 
           <div className="flex items-center gap-2 min-w-0 pr-2 hidden sm:flex">
-            <PiechemLogo href="/dashboard" size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." />
+            <PiechemLogo href="/dashboard" size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." isGoldMember={isPro} />
           </div>
           <Link href="/dashboard" className="flex items-center gap-2 min-w-0 pr-2 sm:hidden hover:opacity-90 transition-opacity">
             <PiechemAiLogo size="xs" />
@@ -1017,7 +1025,7 @@ export default function AiTutorDrawer({
                 <div className="flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in duration-300 w-full px-4 sm:px-8">
                   {/* Desktop Logo */}
                   <div className="mb-10 scale-[1.1] hidden md:block">
-                    <PiechemLogo size="xl" showText={true} subtitle="An initiative by Arghyadeep Roy." />
+                    <PiechemLogo size="xl" showText={true} subtitle="An initiative by Arghyadeep Roy." isGoldMember={isPro} />
                   </div>
                   {/* Mobile Logo */}
                   <div className="mb-6 md:hidden">
