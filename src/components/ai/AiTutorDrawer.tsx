@@ -1046,8 +1046,26 @@ export default function AiTutorDrawer({
               {messages.length === 0 && (
                 <div className="flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in duration-300 w-full px-4 sm:px-8">
                   {/* Desktop Logo */}
-                  <div className="mb-10 scale-[1.1] hidden md:block">
-                    <PiechemLogo size="xl" showText={true} subtitle="An initiative by Arghyadeep Roy." isGoldMember={isPro} />
+                  <div className="mb-10 scale-[1.1] hidden md:flex flex-col items-center">
+                    <div className="flex items-center gap-3.5 sm:gap-4 select-none">
+                      <PiechemLogo size="xl" showText={false} />
+                      <div className="font-black tracking-wider font-sans uppercase flex items-center text-3xl sm:text-5xl">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
+                          PIE
+                        </span>
+                        <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center">
+                          <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
+                          <span className="relative z-10 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-[#181c25] text-slate-100 text-[14px] sm:text-[20px] font-bold tracking-wide uppercase border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
+                            AI
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-2 select-none leading-none">
+                      <span className="text-[10px] sm:text-[12px] tracking-[0.06em] sm:tracking-[0.08em] font-sans font-medium text-slate-400">
+                        An initiative by <span className="text-slate-200 font-semibold">Arghyadeep Roy.</span>
+                      </span>
+                    </div>
                   </div>
                   {/* Mobile Logo */}
                   <div className="mb-6 md:hidden">
