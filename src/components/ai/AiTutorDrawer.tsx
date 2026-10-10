@@ -1115,14 +1115,18 @@ export default function AiTutorDrawer({
                 const isUser = msg.role === "user";
 
                 if (isUser) {
+                  const senderName = studentName.split(' ')[0] || 'You';
                   return (
                     <div key={msg.id} className="flex justify-end pt-2 pb-4">
-                      <div className="flex items-start gap-2.5 max-w-2xl">
-                        <div className="px-4 py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-slate-100 text-xs sm:text-sm leading-relaxed shadow-lg backdrop-blur-md">
-                          {msg.content}
-                        </div>
-                        <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 text-slate-300">
-                          <User className="w-3.5 h-3.5" />
+                      <div className="flex flex-col items-end gap-1 max-w-2xl">
+                        <span className="text-[11px] font-medium text-slate-400 px-1 mr-9">{senderName}</span>
+                        <div className="flex items-start gap-2.5">
+                          <div className="px-4 py-3 rounded-2xl rounded-tr-sm bg-zinc-900 border border-zinc-800 text-slate-100 text-xs sm:text-sm leading-relaxed shadow-lg backdrop-blur-md">
+                            {msg.content}
+                          </div>
+                          <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 text-slate-300 mt-1">
+                            <User className="w-3.5 h-3.5" />
+                          </div>
                         </div>
                       </div>
                     </div>
