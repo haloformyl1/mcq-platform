@@ -317,16 +317,14 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
                     </Link>
                     </div>
                     {isLiveStage && test.questionPaperUrl && (
-                      <a 
-                        href={test.questionPaperUrl}
-                        download 
+                      <Link 
+                        href={`/dashboard/pdf-viewer/test-${test.id}`}
                         target="_blank" 
-                        rel="noreferrer" 
                         className="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-900/30 hover:bg-emerald-900/50 hover:text-emerald-200 border border-emerald-800/50 transition flex items-center justify-center gap-2"
                       >
                         <Download className="w-4 h-4" />
                         Download Question Paper
-                      </a>
+                      </Link>
                     )}
                   </div>
                 );
@@ -341,16 +339,14 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
                     View Scorecard {maxAttempts > 1 ? `(${attemptsUsed}/${maxAttempts} Attempts Used)` : "(Completed)"}
                   </Link>
                   {isLiveStage && test.questionPaperUrl && (
-                    <a 
-                      href={test.questionPaperUrl}
-                      download 
+                    <Link 
+                      href={`/dashboard/pdf-viewer/test-${test.id}`}
                       target="_blank" 
-                      rel="noreferrer" 
                       className="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-emerald-300 bg-emerald-900/30 hover:bg-emerald-900/50 hover:text-emerald-200 border border-emerald-800/50 transition flex items-center justify-center gap-2"
                     >
                       <Download className="w-4 h-4" />
                       Download Question Paper
-                    </a>
+                    </Link>
                   )}
                 </div>
               );

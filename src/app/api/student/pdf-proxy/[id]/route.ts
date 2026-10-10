@@ -47,12 +47,35 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       return new NextResponse("Student profile not found", { status: 404 });
     }
 
-    const material = await prisma.studyMaterial.findUnique({
-      where: { id: cleanId }
-    });
+    const isTest = cleanId.startsWith("test-");
+    const actualId = isTest ? cleanId.replace("test-", "") : cleanId;
+
+    let material: any = null;
+
+    if (isTest) {
+      const test = await prisma.test.findUnique({
+        where: { id: actualId }
+      });
+      if (test && test.questionPaperUrl) {
+        material = {
+          id: `test-${test.id}`,
+          title: `${test.title} - Question Paper`,
+          description: test.description,
+          type: "DOCUMENT",
+          isPremium: test.isPremium,
+          url: test.questionPaperUrl,
+          section: "Question Paper",
+          classSem: test.targetAcademicLevel,
+        };
+      }
+    } else {
+      material = await prisma.studyMaterial.findUnique({
+        where: { id: actualId }
+      });
+    }
 
     if (!material) {
-      return new NextResponse("Study material not found", { status: 404 });
+      return new NextResponse("Document not found", { status: 404 });
     }
 
     // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)

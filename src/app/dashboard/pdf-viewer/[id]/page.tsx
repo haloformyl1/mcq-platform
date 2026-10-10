@@ -51,9 +51,33 @@ export default async function PdfViewerPage({
     redirect("/login");
   }
 
-  const material = await prisma.studyMaterial.findUnique({
-    where: { id: cleanId }
-  });
+  const isTest = cleanId.startsWith("test-");
+  const actualId = isTest ? cleanId.replace("test-", "") : cleanId;
+
+  let material: any = null;
+
+  if (isTest) {
+    const test = await prisma.test.findUnique({
+      where: { id: actualId }
+    });
+    if (test && test.questionPaperUrl) {
+      material = {
+        id: `test-${test.id}`,
+        title: `${test.title} - Question Paper`,
+        description: test.description,
+        type: "DOCUMENT",
+        isPremium: test.isPremium,
+        fileSize: null,
+        url: test.questionPaperUrl,
+        section: "Question Paper",
+        classSem: test.targetAcademicLevel,
+      };
+    }
+  } else {
+    material = await prisma.studyMaterial.findUnique({
+      where: { id: actualId }
+    });
+  }
 
   if (!material) {
     notFound();

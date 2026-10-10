@@ -363,16 +363,14 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                     View Result {maxAttempts > 1 ? `(${attemptsUsed}/${maxAttempts})` : ""}
                   </Link>
                   {isLiveStage && test.questionPaperUrl && (
-                    <a 
-                      href={test.questionPaperUrl}
-                      download 
+                    <Link 
+                      href={`/dashboard/pdf-viewer/test-${test.id}`}
                       target="_blank" 
-                      rel="noreferrer" 
                       className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-medium text-slate-300 bg-white/[0.03] hover:bg-white/[0.08] transition-colors"
                     >
                       <Download className="w-4 h-4" />
                       Question Paper
-                    </a>
+                    </Link>
                   )}
                 </div>
               );
