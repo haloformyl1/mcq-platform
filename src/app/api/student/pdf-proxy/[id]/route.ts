@@ -89,39 +89,62 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     const disposition = isDownload ? "attachment" : "inline";
     const safeTitle = (material.title || "document").replace(/[^a-zA-Z0-9_-]/g, "_");
 
+    // Fetch PDF Buffer from either S3/R2 or external URL
+    let pdfBuffer: Buffer | Uint8Array | null = null;
+    let contentType = "application/pdf";
+
     if (key) {
-      const command = new GetObjectCommand({
-        Bucket: R2_BUCKET,
-        Key: key,
-      });
+      const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
       const s3Response = await r2Client.send(command);
-      const stream = (s3Response.Body as any).transformToWebStream();
-
-      return new NextResponse(stream, {
-        headers: {
-          "Content-Type": s3Response.ContentType || "application/pdf",
-          "Content-Disposition": `${disposition}; filename="${safeTitle}.pdf"`,
-          "Cache-Control": isDownload ? "private, max-age=3600" : "private, no-cache, no-store, must-revalidate",
-          "Pragma": isDownload ? "cache" : "no-cache",
-          "X-Content-Type-Options": "nosniff",
-        },
-      });
+      pdfBuffer = await (s3Response.Body as any).transformToByteArray();
+      contentType = s3Response.ContentType || contentType;
+    } else {
+      const externalRes = await fetch(material.url);
+      if (!externalRes.ok) {
+        return new NextResponse("Failed to load document stream", { status: 502 });
+      }
+      pdfBuffer = new Uint8Array(await externalRes.arrayBuffer());
+      contentType = externalRes.headers.get("content-type") || contentType;
     }
 
-    // Legacy or direct link fallback streaming
-    const externalRes = await fetch(material.url);
-    if (!externalRes.ok) {
-      return new NextResponse("Failed to load document stream", { status: 502 });
+    // Apply Watermark if it's a Download request
+    if (isDownload && pdfBuffer) {
+      try {
+        const { PDFDocument, rgb, degrees } = await import('pdf-lib');
+        const pdfDoc = await PDFDocument.load(pdfBuffer);
+        const pages = pdfDoc.getPages();
+        const watermarkText = "PIECHEM - An Arghyadeep Roy Initiative.";
+
+        pages.forEach(page => {
+          const { width, height } = page.getSize();
+          const fontSize = 40;
+          page.drawText(watermarkText, {
+            x: 50,
+            y: height / 2,
+            size: fontSize,
+            color: rgb(0.5, 0.5, 0.5),
+            opacity: 0.3,
+            rotate: degrees(45),
+          });
+        });
+
+        pdfBuffer = await pdfDoc.save();
+      } catch (err) {
+        console.error("Failed to watermark PDF:", err);
+        // Fallback to original buffer if watermarking fails
+      }
     }
 
-    return new NextResponse(externalRes.body, {
+    return new NextResponse(pdfBuffer, {
       headers: {
-        "Content-Type": externalRes.headers.get("content-type") || "application/pdf",
-        "Content-Disposition": "inline; filename=\"material.pdf\"",
-        "Cache-Control": "private, no-cache, no-store",
+        "Content-Type": contentType,
+        "Content-Disposition": `${disposition}; filename="${safeTitle}.pdf"`,
+        "Cache-Control": isDownload ? "private, max-age=3600" : "private, no-cache, no-store, must-revalidate",
+        "Pragma": isDownload ? "cache" : "no-cache",
         "X-Content-Type-Options": "nosniff",
       },
     });
+
   } catch (error: any) {
     console.error("PDF Proxy error:", error);
     return new NextResponse(error?.message || "Internal server error streaming document", { status: 500 });
