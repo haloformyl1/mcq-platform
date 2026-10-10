@@ -324,3 +324,15 @@ model AiConversation {
 
   @@index([studentId, updatedAt(sort: Desc)])
 }
+
+model SubscriptionPlan {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Float    @default(99.0)
+  durationDays Int     @default(30)
+  benefits    Json     @default("[]")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

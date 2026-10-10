@@ -419,10 +419,20 @@ export default function StudentAccountPage() {
         }
         setLoading(false);
       })
+      })
       .catch(() => {
         router.push("/login");
       });
+
+    fetch("/api/admin/subscription-plans")
+      .then(res => res.json())
+      .then(d => {
+        if (Array.isArray(d)) setPlans(d.filter((p: any) => p.isActive));
+      })
+      .catch(() => {});
   }, [router]);
+  
+  const [plans, setPlans] = useState<any[]>([]);
   const fetchDevices = async () => {
     try {
       const res = await fetch("/api/student/devices");
@@ -2015,104 +2025,58 @@ export default function StudentAccountPage() {
                     </div>
                   </div>
 
-                  {/* Card 2: Premium Plan (Netflix-Inspired Crimson/Indigo Gradient) */}
-                  <div className="rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
-                    
-                    {/* Card Head (Vibrant Gradient Banner) */}
-                    <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
-                          RECOMMENDED
-                        </span>
-                        {isGold ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-black text-amber-300 bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-400/30">
-                            <Sparkles className="w-3.5 h-3.5" /> Current plan
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-xs font-black text-amber-300">
-                            <Sparkles className="w-3.5 h-3.5" /> 30-Day Pass
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center mt-1">
-                        <h3 className="text-2xl font-black text-white tracking-tight">PIECHEM</h3>
-                        <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
-                          <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
-                          <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
-                            Pro
+                  {/* Dynamic Active Plans */}
+                  {plans.map(plan => (
+                    <div key={plan.id} className="rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
+                      
+                      {/* Card Head (Vibrant Gradient Banner) */}
+                      <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
+                            PREMIUM
                           </span>
                         </div>
-                      </div>
-                      <p className="text-xs text-white/80 mt-1">Full access to 50+ exams, 3D models & proctored rankings</p>
-                    </div>
-
-                    {/* Features Comparison Rows */}
-                    <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-cyan-500/15">
-                      <div className="flex justify-between items-center pt-1">
-                        <span className="text-slate-300 font-medium">Monthly price</span>
-                        <div className="text-right">
-                          <span className="text-xl font-black text-amber-300 font-mono">₹{paymentSettings?.monthlyFee || 199}</span>
-                          <span className="text-xs text-slate-400 block">/ 30 days</span>
+                        <div className="flex items-center mt-1">
+                          <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
                         </div>
+                        <p className="text-xs text-white/80 mt-1">{plan.description}</p>
                       </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-300 font-medium">Chemistry Exam Tests</span>
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Unlimited
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-300 font-medium">AI Tutor & Doubt Solver</span>
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Unlimited AI Access
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-300 font-medium">Answer Explanations</span>
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Full Solutions & 3D Models
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-300 font-medium">Study Materials</span>
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Complete Digital Library
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-300 font-medium">Ranking & Analytics</span>
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Proctored National Percentile
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3">
-                        <span className="text-slate-300 font-medium">Supported Devices</span>
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> Mobile, Tablet, PC / Laptop (Max 2 devices)
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Card CTA Button */}
-                    <div className="p-6 pt-0 mt-auto">
-                      {!isGold ? (
+                      {/* Features Comparison Rows */}
+                      <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-cyan-500/15">
+                        <div className="flex justify-between items-center pt-1">
+                          <span className="text-slate-300 font-medium">Price</span>
+                          <div className="text-right">
+                            <span className="text-xl font-black text-amber-300 font-mono">₹{plan.price}</span>
+                            <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
+                          </div>
+                        </div>
+                        {plan.benefits?.map((benefit: string, i: number) => (
+                          <div key={i} className="flex justify-between items-center pt-3">
+                            <span className="text-slate-300 font-medium text-xs">{benefit}</span>
+                            <span className="font-bold text-white flex items-center gap-1.5 shrink-0">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Card CTA */}
+                      <div className="p-6 pt-0 mt-auto">
                         <button
                           onClick={() => {
+                            // Temporary update payment settings to match the selected plan for UI
+                            setPaymentSettings({ ...paymentSettings, monthlyFee: plan.price });
                             openModal("pay");
                           }}
-                          className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:shadow-[0_0_45px_rgba(229,9,20,0.65)] hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer flex items-center justify-center gap-2"
+                          className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] transition cursor-pointer flex items-center justify-center gap-2"
                         >
-                          <span>Upgrade to Premium</span>
+                          <span>Upgrade to {plan.name}</span>
                           <ChevronRight className="w-4 h-4" />
                         </button>
-                      ) : (
-                        <div className="w-full py-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2">
-                          <Check className="w-4 h-4 text-emerald-400" />
-                          <span>Enrolled ({isComplimentary ? "Complimentary" : "Active Pass"})</span>
-                        </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  ))}
 
                 </div>
 

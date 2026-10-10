@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { 
   CreditCard, Check, X, Clock, RefreshCw, Copy, CheckCheck, 
-  QrCode, Users, ShieldAlert, Sparkles, AlertCircle, ArrowUpRight, Search, FileSpreadsheet
+  QrCode, Users, ShieldAlert, Sparkles, AlertCircle, ArrowUpRight, Search, FileSpreadsheet,
+  Plus, Tag, Trash2, Edit2
 } from "lucide-react";
 
 function formatDateTime24(dateInput: string | Date | null | undefined): string {
@@ -69,6 +70,29 @@ export default function AdminPaymentsPage() {
 
   const [filterActiveSearch, setFilterActiveSearch] = useState("");
 
+  const [plans, setPlans] = useState<any[]>([]);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [planForm, setPlanForm] = useState({
+    id: "",
+    name: "",
+    description: "",
+    price: 99.0,
+    durationDays: 30,
+    benefits: "",
+    isActive: true
+  });
+  const [planSaving, setPlanSaving] = useState(false);
+
+  const fetchPlans = async () => {
+    try {
+      const res = await fetch("/api/admin/subscription-plans");
+      const data = await res.json();
+      if (res.ok) setPlans(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const fetchPaymentData = async () => {
     setLoading(true);
     setErrorMsg("");
@@ -95,7 +119,50 @@ export default function AdminPaymentsPage() {
 
   useEffect(() => {
     fetchPaymentData();
+    fetchPlans();
   }, []);
+
+  const handleSavePlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPlanSaving(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+    try {
+      const url = planForm.id ? `/api/admin/subscription-plans/${planForm.id}` : "/api/admin/subscription-plans";
+      const method = planForm.id ? "PUT" : "POST";
+      const body = {
+        ...planForm,
+        benefits: planForm.benefits.split("\\n").map(b => b.trim()).filter(b => b)
+      };
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save plan");
+      
+      setSuccessMsg("Plan saved successfully!");
+      setShowPlanModal(false);
+      fetchPlans();
+      setTimeout(() => setSuccessMsg(""), 3000);
+    } catch (err: any) {
+      setErrorMsg(err.message);
+    } finally {
+      setPlanSaving(false);
+    }
+  };
+
+  const handleDeletePlan = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this plan?")) return;
+    try {
+      await fetch(`/api/admin/subscription-plans/${id}`, { method: "DELETE" });
+      fetchPlans();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSubscriptionAction = async (requestId: string, action: "APPROVE" | "REJECT") => {
     setActionLoading(requestId);
@@ -774,6 +841,114 @@ export default function AdminPaymentsPage() {
           </div>
         </form>
       </section>
+      {/* SECTION 5: SUBSCRIPTION PLANS MANAGEMENT */}
+      <section className="bg-[#12161f]/90 border border-slate-800 p-6 sm:p-7 rounded-3xl shadow-xl space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-slate-900 rounded-xl border border-slate-700 text-white">
+              <Sparkles className="w-5 h-5 text-yellow-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-white tracking-wide">Subscription Plans</h2>
+              <p className="text-xs text-slate-400">Manage pricing tiers (max 5 active plans)</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setPlanForm({ id: "", name: "", description: "", price: 99, durationDays: 30, benefits: "", isActive: true });
+              setShowPlanModal(true);
+            }}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Add Plan
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {plans.map(plan => (
+            <div key={plan.id} className={`p-5 rounded-2xl border ${plan.isActive ? 'bg-slate-900 border-emerald-500/50' : 'bg-slate-950 border-slate-800 opacity-70'} relative`}>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
+                <div className="flex gap-2">
+                  <button onClick={() => {
+                    setPlanForm({ ...plan, benefits: plan.benefits?.join("\\n") || "" });
+                    setShowPlanModal(true);
+                  }} className="text-cyan-400 hover:text-cyan-300">
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDeletePlan(plan.id)} className="text-red-400 hover:text-red-300">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="text-2xl font-black text-emerald-400 mb-1">₹{plan.price} <span className="text-xs text-slate-400 font-normal">/ {plan.durationDays} days</span></div>
+              <p className="text-xs text-slate-400 mb-4">{plan.description}</p>
+              <ul className="space-y-2 mb-4">
+                {plan.benefits?.map((b: string, i: number) => (
+                  <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="text-[10px] font-mono text-slate-500 uppercase">
+                Status: {plan.isActive ? <span className="text-emerald-400 font-bold">Active</span> : <span className="text-slate-400">Inactive</span>}
+              </div>
+            </div>
+          ))}
+          {plans.length === 0 && (
+            <div className="col-span-full py-8 text-center text-slate-500 text-sm border border-dashed border-slate-700 rounded-xl">
+              No subscription plans configured yet.
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ADD/EDIT PLAN MODAL */}
+      {showPlanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#12161f] border border-slate-700 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl">
+            <div className="flex justify-between items-center p-4 border-b border-slate-800">
+              <h3 className="text-lg font-bold text-white">{planForm.id ? "Edit Plan" : "Add New Plan"}</h3>
+              <button onClick={() => setShowPlanModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSavePlan} className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Plan Name *</label>
+                <input required type="text" value={planForm.name} onChange={e => setPlanForm({...planForm, name: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="e.g. Gold Tier" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Description</label>
+                <input type="text" value={planForm.description} onChange={e => setPlanForm({...planForm, description: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="Short tagline" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Price (₹) *</label>
+                  <input required type="number" step="0.01" value={planForm.price} onChange={e => setPlanForm({...planForm, price: parseFloat(e.target.value) || 0})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono text-emerald-400 focus:border-cyan-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Duration (Days) *</label>
+                  <input required type="number" value={planForm.durationDays} onChange={e => setPlanForm({...planForm, durationDays: parseInt(e.target.value) || 30})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:border-cyan-500 outline-none" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Benefits (One per line)</label>
+                <textarea rows={4} value={planForm.benefits} onChange={e => setPlanForm({...planForm, benefits: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none resize-none" placeholder="Access to all mock tests\nPremium PDF downloads\nPriority support" />
+              </div>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="isActive" checked={planForm.isActive} onChange={e => setPlanForm({...planForm, isActive: e.target.checked})} className="w-4 h-4 accent-emerald-500" />
+                <label htmlFor="isActive" className="text-sm font-bold text-slate-300">Active Plan (Visible to users)</label>
+              </div>
+              <button type="submit" disabled={planSaving} className="w-full py-2.5 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg disabled:opacity-50">
+                {planSaving ? "Saving..." : "Save Plan"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
