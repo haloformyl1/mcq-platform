@@ -745,144 +745,7 @@ export default function AiTutorDrawer({
         </svg>
       </div>
 
-      {/* 1. TOP HEADER */}
-      <header className="h-14 shrink-0 px-3 sm:px-4 md:px-6 flex items-center justify-between border-b border-white/10 bg-transparent backdrop-blur-md z-30 gap-2">
-        
-        {/* Left: Brand + Status Pill + Usage Pill */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          {/* Mobile Hamburger Menu */}
-          <button
-            type="button"
-            onClick={() => setIsMobileSidebarOpen(true)}
-            className="lg:hidden p-1.5 -ml-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-          </button>
-          
-          {/* Desktop Toggle Sidebar */}
-          <button
-            type="button"
-            onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
-            className="hidden lg:flex p-1.5 -ml-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
-            title={isDesktopSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isDesktopSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
-          </button>
-
-          <div className="flex items-center gap-2 min-w-0 pr-2 hidden sm:flex">
-            <PiechemLogo href="/dashboard" size="sm" showText={true} subtitle="An initiative by Arghyadeep Roy." isGoldMember={isPro} />
-          </div>
-          <Link href="/dashboard" className="flex items-center gap-2 min-w-0 pr-2 sm:hidden hover:opacity-90 transition-opacity">
-            <PiechemAiLogo size="xs" />
-            <span className="text-white font-semibold text-sm">PIECHEM AI</span>
-          </Link>
-        </div>
-
-        {/* Right: Controls (Language, Level, Exit) */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Language Toggle */}
-          <div className="flex items-center p-0.5 rounded-xl bg-zinc-950 border border-white/10 text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => handleToggleLang('en')}
-              className={`px-2 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs ${
-                language === 'en' ? 'bg-white text-black font-bold shadow-sm' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToggleLang('bn')}
-              className={`px-2 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs ${
-                language === 'bn' ? 'bg-white text-black font-bold shadow-sm' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              বাংলা
-            </button>
-          </div>
-
-          {/* Difficulty Level Dropdown */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowLevelMenu(prev => !prev)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-white/10 text-xs font-semibold text-slate-300 transition cursor-pointer"
-              title={`Difficulty: ${level}`}
-            >
-              <GraduationCap className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-              <span className="capitalize hidden md:inline">{level}</span>
-              <ChevronDown className="h-3 w-3 text-slate-500 shrink-0" />
-            </button>
-
-            {showLevelMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-40 rounded-xl bg-zinc-950 border border-zinc-800 shadow-2xl p-1 z-50 animate-in fade-in slide-in-from-top-1">
-                {(['beginner', 'intermediate', 'advanced'] as const).map(lvl => (
-                  <button
-                    key={lvl}
-                    type="button"
-                    onClick={() => {
-                      setLevel(lvl);
-                      setShowLevelMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer capitalize flex items-center justify-between ${
-                      level === lvl ? 'bg-white/10 text-white font-bold' : 'text-slate-300 hover:bg-white/5'
-                    }`}
-                  >
-                    <span>{lvl}</span>
-                    {level === lvl && <Check className="h-3 w-3 text-cyan-400" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          {/* Account & Logout */}
-          <div className="flex items-center gap-1.5 sm:gap-2 ml-1 sm:ml-2 border-l border-white/10 pl-2 sm:pl-3 shrink-0">
-            {studentProfile && (
-              <NotificationCenterDropdown
-                student={studentProfile}
-                upgradeReq={null}
-              />
-            )}
-            <Link
-              href="/dashboard/account"
-              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition-colors shadow-sm shrink-0"
-              title="My Profile & Settings"
-            >
-              <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600">
-                <img
-                  src={studentProfile?.avatarUrl || "/avatars/atom.jpg"}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  onError={(e: any) => {
-                    e.target.style.display = "none";
-                  }}
-                />
-                <User className="w-3 h-3 text-white" />
-              </div>
-              <span className="hidden md:inline">My Account</span>
-            </Link>
-            <button
-              onClick={async () => {
-                try {
-                  localStorage.removeItem("piechem_is_gold");
-                  localStorage.removeItem("piechem_gold_expires_at");
-                  localStorage.removeItem("piechem_is_complimentary");
-                  window.dispatchEvent(new Event("piechem_gold_status_changed"));
-                } catch {}
-                document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                await fetch('/api/auth/logout', { method: 'POST' });
-                window.location.href = '/login';
-              }}
-              title="Logout"
-              className="p-1.5 sm:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 transition-colors group shrink-0 cursor-pointer shadow-sm"
-            >
-              <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-0.5 transition-transform" />
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Header removed to match Gemini Layout */}
 
       {/* MAIN BODY: SIDEBAR + CENTER WORKSPACE */}
       <div className="flex-1 flex flex-row overflow-hidden relative">
@@ -897,14 +760,24 @@ export default function AiTutorDrawer({
 
                 {/* SIDEBAR */}
         <div className={`absolute lg:relative z-40 lg:z-auto ${isDesktopSidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden lg:border-none' : 'lg:w-72'} w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-all duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-          <div className="flex items-center justify-between p-4 pt-4 lg:hidden border-b border-white/10">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between p-4 pt-6 pl-5 border-b border-white/5 lg:border-none">
+            <Link href="/dashboard" className="flex items-center gap-2 min-w-0 pr-2 hover:opacity-90 transition-opacity">
               <PiechemAiLogo size="xs" />
-              <span className="text-white font-semibold text-sm">PIECHEM AI</span>
+              <span className="text-white font-semibold text-[16px] tracking-wide">PIECHEM AI</span>
+            </Link>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setIsMobileSidebarOpen(false)} className="lg:hidden p-1.5 rounded-full bg-white/5 text-slate-300 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
+                className="hidden lg:flex p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+                title={isDesktopSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                <PanelLeftClose className="w-5 h-5" />
+              </button>
             </div>
-            <button onClick={() => setIsMobileSidebarOpen(false)} className="p-1.5 rounded-full bg-white/5 text-slate-300 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
           </div>
           <div className="p-3 lg:p-4 pt-4 lg:pt-6 space-y-2 flex-shrink-0">
             {/* New Chat Button - Premium styling */}
@@ -1033,10 +906,60 @@ export default function AiTutorDrawer({
               ))
             )}
           </div>
+
+          <div className="p-4 border-t border-white/5 flex items-center justify-between gap-2 shrink-0">
+            <Link href="/dashboard/account" className="flex items-center gap-3 flex-1 min-w-0 hover:bg-white/5 p-1.5 rounded-lg transition-colors">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600">
+                <img
+                  src={studentProfile?.avatarUrl || "/avatars/atom.jpg"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  onError={(e: any) => { e.target.style.display = "none"; }}
+                />
+                <User className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[13px] font-medium text-[#e3e3e3] truncate">{studentProfile?.name || 'My Account'}</span>
+                <span className="text-[11px] text-amber-400 font-semibold tracking-wide">
+                  {isPro ? 'Pro' : 'Free'}
+                </span>
+              </div>
+            </Link>
+            
+            <div className="flex items-center gap-1 shrink-0">
+              <button 
+                onClick={() => handleToggleLang(language === 'en' ? 'bn' : 'en')} 
+                className="px-1.5 py-1 rounded text-[10px] font-bold text-slate-400 hover:text-white bg-white/5 uppercase mr-1"
+                title="Toggle Language"
+              >
+                {language}
+              </button>
+              <button
+                onClick={async () => {
+                  document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                  await fetch('/api/auth/logout', { method: 'POST' });
+                  window.location.href = '/login';
+                }}
+                title="Logout"
+                className="p-2 rounded-full hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* CENTER MAIN WORKSPACE */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent">
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent relative">
+          
+          {/* Mobile Header (Only visible when sidebar closed on mobile) */}
+          <div className="lg:hidden flex items-center justify-between p-3 border-b border-white/5 shrink-0 z-20">
+             <button onClick={() => setIsMobileSidebarOpen(true)} className="p-2 hover:bg-white/10 rounded-lg text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+             </button>
+             <span className="text-[14px] font-semibold text-[#e3e3e3]">PIECHEM AI</span>
+             <div className="w-9"></div>
+          </div>
           
           {/* Messages & Workspace Container */}
           <div 
