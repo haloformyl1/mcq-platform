@@ -237,9 +237,40 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* ================================================================
    DASHBOARD
    ================================================================ */
+@media (max-width: 768px) {
+  .site-header-inner {
+    padding-inline:
+      max(clamp(10px, 2.5vw, 24px), var(--safe-left))
+      max(clamp(10px, 2.5vw, 24px), var(--safe-right));
+  }
+  .site-header-top-row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .site-header-brand {
+    flex: 0 1 auto;
+    max-width: calc(100% - 96px);
+  }
+  .site-header-navigation {
+    order: 3;
+    flex: 1 0 100%;
+    justify-content: flex-start;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-inline: 0 !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .site-header-navigation::-webkit-scrollbar { display: none; }
+  .site-header-navigation > * { flex-shrink: 0; }
+  .site-header-navigation-spacer { display: none; }
+  .site-header-actions {
+    order: 2;
+    margin-left: auto;
+  }
+}
+
 @media (max-width: 640px) {
-  .dashboard-header-inner > div:first-child { flex-wrap: wrap; row-gap: 8px; }
-  .dashboard-header-inner > div:first-child > div:first-child { min-width: 0; }
   .dashboard-hero h1 { overflow-wrap: anywhere; }
   .dashboard-hero-actions > div:first-child { flex-wrap: wrap; }
   .dashboard-hero-actions > div:first-child > a { min-width: min(100%, 150px); white-space: normal; }
@@ -267,7 +298,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 @media (max-width: 380px) {
-  .dashboard-header-inner { padding-inline: 8px; }
+  .site-header-inner {
+    padding-inline: max(8px, var(--safe-left)) max(8px, var(--safe-right));
+  }
+  .site-header-brand { max-width: calc(100% - 88px); }
+  .site-header-actions { gap: 4px !important; }
   .dashboard-hero-actions > div:first-child { flex-direction: column; }
   .dashboard-hero-actions > div:first-child > a { width: 100%; }
 }
@@ -1207,13 +1242,10 @@ button:active:not(:disabled),
 
 
 
-@media (min-width: 1024px) {
-  html {
-    font-size: 110%; /* Increase base font size by 10% on large screens */
-  }
-}
-@media (min-width: 1440px) {
-  html {
-    font-size: 125%; /* Increase base font size by 25% on ultra wide screens */
+@media (hover: none) and (pointer: coarse) {
+  .site-header-actions > a,
+  .site-header-actions > button {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

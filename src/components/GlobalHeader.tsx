@@ -78,9 +78,9 @@ export default function GlobalHeader({
         ) : (
           <div className="flex flex-col w-full">
             {/* TOP ROW: LOGO, CENTER CONTEXT, AND RIGHT ACTIONS */}
-            <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-4 w-full">
+            <div className="site-header-top-row flex min-w-0 items-center justify-between gap-1.5 sm:gap-4 w-full">
               {/* 1. FAR LEFT: PIE CHEM LOGO & CONTEXT */}
-              <div className="flex items-center gap-1.5 sm:gap-3.5 shrink-0 min-w-0">
+              <div className="site-header-brand flex items-center gap-1.5 sm:gap-3.5 shrink-0 min-w-0">
                 <PiechemLogo
                   size="md"
                   href={logoHref}
@@ -91,15 +91,15 @@ export default function GlobalHeader({
 
               {/* 2. CENTER: Context / Page Navigation (if custom passed) */}
               {navigation ? (
-                <div className="flex-1 flex items-center justify-center min-w-0 px-2">
+                <div className="site-header-navigation flex-1 flex items-center justify-center min-w-0 px-2">
                   {navigation}
                 </div>
               ) : (
-                <div className="flex-1 min-w-0" />
+                <div className="site-header-navigation-spacer flex-1 min-w-0" />
               )}
 
               {/* 3. FAR RIGHT: Desktop Curriculum, Notifications & Account */}
-              <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+              <div className="site-header-actions flex items-center gap-1.5 sm:gap-3 shrink-0">
                 {/* Custom actions slot if provided */}
                 {actions}
 
