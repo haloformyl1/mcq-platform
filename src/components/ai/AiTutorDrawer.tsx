@@ -968,7 +968,7 @@ export default function AiTutorDrawer({
                     onClick={() => {
                       if (editingChatId !== chat.id) handleSelectChat(chat.id);
                     }}
-                    className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-full text-[13px] sm:text-[14px] transition cursor-pointer pr-10 ${activeChatId === chat.id ? 'bg-[#282a2c] text-[#e3e3e3] font-medium' : 'text-[#c4c7c5] hover:bg-[#282a2c] hover:text-[#e3e3e3]'}`}
+                    className={`w-full text-left flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] transition cursor-pointer pr-8 ${activeChatId === chat.id ? 'bg-[#282a2c] text-[#e3e3e3] font-medium' : 'text-[#c4c7c5] hover:bg-[#282a2c] hover:text-[#e3e3e3]'}`}
                   >
                     {editingChatId === chat.id ? (
                       <input
@@ -990,9 +990,9 @@ export default function AiTutorDrawer({
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setOpenMenuChatId(openMenuChatId === chat.id ? null : chat.id); }}
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-[#c4c7c5] transition cursor-pointer ${openMenuChatId === chat.id ? 'bg-[#404346] opacity-100' : 'hover:bg-white/10 opacity-0 group-hover:opacity-100'}`}
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#c4c7c5] transition cursor-pointer ${openMenuChatId === chat.id ? 'bg-[#404346] opacity-100' : 'hover:bg-white/10 opacity-0 group-hover:opacity-100'}`}
                   >
-                    <MoreVertical className="w-[18px] h-[18px]" />
+                    <MoreVertical className="w-4 h-4" />
                   </button>
 
                   {/* Dropdown Menu */}
