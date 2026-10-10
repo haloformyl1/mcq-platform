@@ -48,7 +48,7 @@ export default async function SharedChatPage({ params }: { params: Promise<{ cha
           <PiechemLogo size="sm" showText={true} />
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white transition hidden sm:block">About PIECHEM AI</Link>
+          <Link href="/about-ai" className="text-sm font-medium text-slate-300 hover:text-white transition hidden sm:block">About PIECHEM AI</Link>
           {!isLoggedIn ? (
             <Link href={`/login?redirect=/share/${conversation.id}`} className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition shadow-lg shadow-blue-500/20">
               Sign in
