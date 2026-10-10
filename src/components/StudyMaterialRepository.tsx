@@ -518,7 +518,7 @@ export default function StudyMaterialRepository({
               {/* 1. CBSE */}
               <Link 
                 href="/study-material/cbse"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] h-full transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -553,7 +553,7 @@ export default function StudyMaterialRepository({
               {/* 2. ICSE / ISC */}
               <Link 
                 href="/study-material/icse"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] h-full transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -588,7 +588,7 @@ export default function StudyMaterialRepository({
               {/* 3. WBCHSE */}
               <Link 
                 href="/study-material/wbchse"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] h-full transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -623,7 +623,7 @@ export default function StudyMaterialRepository({
               {/* 4. NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS */}
               <Link 
                 href="/study-material/entrance"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between min-h-[300px] h-full transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">

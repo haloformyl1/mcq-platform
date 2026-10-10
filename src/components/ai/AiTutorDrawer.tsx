@@ -124,6 +124,8 @@ export default function AiTutorDrawer({
   const [activeCollaborators, setActiveCollaborators] = useState<any[]>([]);
   const [showCollabDetails, setShowCollabDetails] = useState(false);
   const [chatOwnerInfo, setChatOwnerInfo] = useState<{name?: string; email?: string} | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -140,7 +142,7 @@ export default function AiTutorDrawer({
   };
 
   useEffect(() => {
-    fetch('/api/student/profile')
+    fetch('/api/student/dashboard')
       .then(r => r.json())
       .then(data => {
         if (data.student) setStudentProfile(data.student);
@@ -155,6 +157,11 @@ export default function AiTutorDrawer({
       (!studentProfile.subscriptionExpiresAt || new Date(studentProfile.subscriptionExpiresAt).getTime() > Date.now());
     return isComp || isPaid;
   }, [studentProfile]);
+
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim()) return conversations;
+    return conversations.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [conversations, searchQuery]);
 
   // Lock body scroll
   useEffect(() => {
@@ -894,21 +901,42 @@ export default function AiTutorDrawer({
               <Edit2 className="w-5 h-5 text-slate-300" />
               <span>New chat</span>
             </button>
-            <button 
-              className="w-full flex items-center justify-start gap-4 px-3 py-2.5 rounded-full text-[14px] font-medium text-slate-200 hover:bg-white/10 transition cursor-pointer"
-            >
-              <Search className="w-5 h-5 text-slate-300" />
-              <span>Search chats</span>
-            </button>
+            {isSearchActive ? (
+              <div className="w-full flex items-center justify-start gap-3 px-3 py-1.5 rounded-full bg-white/10 border border-white/20">
+                <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Search chats..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onBlur={() => {
+                    if (!searchQuery.trim()) setIsSearchActive(false);
+                  }}
+                  className="bg-transparent text-[14px] text-white w-full focus:outline-none placeholder:text-slate-500"
+                />
+                <button onClick={() => { setIsSearchActive(false); setSearchQuery(""); }} className="p-1 hover:bg-white/10 rounded-full shrink-0">
+                  <X className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsSearchActive(true)}
+                className="w-full flex items-center justify-start gap-4 px-3 py-2.5 rounded-full text-[14px] font-medium text-slate-200 hover:bg-white/10 transition cursor-pointer"
+              >
+                <Search className="w-5 h-5 text-slate-300" />
+                <span>Search chats</span>
+              </button>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
             <div className="text-[13px] font-medium text-slate-400 px-4 pb-2 pt-4">Recent</div>
             {historyLoading ? (
               <div className="text-[13px] text-slate-500 px-4 py-2">Loading...</div>
-            ) : conversations.length === 0 ? (
-              <div className="text-[13px] text-slate-500 px-4 py-2">No recent chats</div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="text-[13px] text-slate-500 px-4 py-2">{searchQuery ? "No matches found" : "No recent chats"}</div>
             ) : (
-              conversations.map(chat => (
+              filteredConversations.map(chat => (
                 <div key={chat.id} className="relative group px-2" ref={openMenuChatId === chat.id ? menuContainerRef : null}>
                   <button
                     onClick={() => {
