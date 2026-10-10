@@ -933,33 +933,13 @@ export default function AiTutorDrawer({
                 <span>Exam Strategy</span>
               </button>
               
-              {isSearchActive ? (
-                <div className="w-full flex items-center justify-start gap-3 px-3 py-2 rounded-xl bg-black/40 border border-white/5 shadow-inner mt-1 transition-all">
-                  <Search className="w-4 h-4 text-amber-400/80 shrink-0" />
-                  <input
-                    type="text"
-                    autoFocus
-                    placeholder="Search chats..."
-                    value={historySearch}
-                    onChange={(e) => setHistorySearch(e.target.value)}
-                    onBlur={() => {
-                      if (!historySearch.trim()) setIsSearchActive(false);
-                    }}
-                    className="bg-transparent border-none focus:ring-0 p-0 text-[13px] text-white w-full outline-none placeholder:text-slate-500"
-                  />
-                  <button onClick={() => { setIsSearchActive(false); setHistorySearch(""); }} className="p-1 hover:bg-white/20 rounded-full shrink-0">
-                    <X className="w-3.5 h-3.5 text-slate-400" />
-                  </button>
-                </div>
-              ) : (
-                <button 
-                  onClick={() => setIsSearchActive(true)}
-                  className="w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer group mt-1"
-                >
-                  <Search className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
-                  <span>Search chats</span>
-                </button>
-              )}
+              <button 
+                onClick={() => { setIsSearchActive(!isSearchActive); if (isSearchActive) setHistorySearch(""); }}
+                className={`w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition cursor-pointer group mt-1 ${isSearchActive ? 'bg-[#282a2c] text-[#e3e3e3]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}
+              >
+                <Search className={`w-4 h-4 transition-transform ${isSearchActive ? 'text-amber-400' : 'text-amber-400 group-hover:scale-110'}`} />
+                <span>Search chats</span>
+              </button>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
@@ -977,23 +957,7 @@ export default function AiTutorDrawer({
                     }}
                     className={`w-full text-left flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] transition cursor-pointer pr-8 ${activeChatId === chat.id ? 'bg-[#282a2c] text-[#e3e3e3] font-medium' : 'text-[#c4c7c5] hover:bg-[#282a2c] hover:text-[#e3e3e3]'}`}
                   >
-                    {editingChatId === chat.id ? (
-                      <input
-                        type="text"
-                        autoFocus
-                        value={editTitleInput}
-                        onChange={(e) => setEditTitleInput(e.target.value)}
-                        onBlur={() => handleSaveRename(chat.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleSaveRename(chat.id);
-                          if (e.key === 'Escape') setEditingChatId(null);
-                        }}
-                        className="flex-1 bg-transparent border-none focus:ring-0 p-0 outline-none text-[#e3e3e3]"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span className="truncate flex-1">{chat.title}</span>
-                    )}
+                    <span className="truncate flex-1">{chat.title}</span>
                   </button>
                   <button 
                     onClick={(e) => { e.stopPropagation(); setOpenMenuChatId(openMenuChatId === chat.id ? null : chat.id); }}
@@ -1079,7 +1043,51 @@ export default function AiTutorDrawer({
             ref={chatContainerRef}
             className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6"
           >
-            <div className="max-w-5xl mx-auto w-full">
+            {isSearchActive ? (
+              <div className="flex flex-col items-center max-w-3xl mx-auto w-full pt-10 px-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-full relative mb-12">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input 
+                    type="text" 
+                    autoFocus 
+                    value={historySearch} 
+                    onChange={(e) => setHistorySearch(e.target.value)} 
+                    placeholder="Search chats" 
+                    className="w-full bg-[#1e1e1e] text-[#e3e3e3] pl-14 pr-6 py-4 rounded-full text-[16px] border border-transparent focus:border-white/10 outline-none focus:ring-0 shadow-lg placeholder:text-slate-500 transition-all" 
+                  />
+                  {historySearch && (
+                    <button onClick={() => setHistorySearch("")} className="absolute right-5 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded-full transition-colors">
+                      <X className="w-4 h-4 text-slate-400" />
+                    </button>
+                  )}
+                </div>
+                
+                <div className="w-full max-w-2xl text-left text-sm font-medium text-slate-400 mb-4 px-2">Recent</div>
+                <div className="w-full max-w-2xl space-y-1">
+                  {filteredConversations.length === 0 ? (
+                    <div className="text-[14px] text-slate-500 px-2 py-4">No chats found.</div>
+                  ) : (
+                    filteredConversations.map(chat => (
+                      <button
+                        key={chat.id}
+                        onClick={() => {
+                          handleSelectChat(chat.id);
+                          setIsSearchActive(false);
+                          setHistorySearch("");
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-[#282a2c] text-[#c4c7c5] hover:text-[#e3e3e3] transition cursor-pointer group"
+                      >
+                        <span className="truncate flex-1 text-left text-[14px] font-medium">{chat.title}</span>
+                        <span className="text-[12px] text-slate-500 group-hover:text-slate-400 shrink-0 ml-4">
+                          {new Date(chat.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-5xl mx-auto w-full">
 
                             {/* WELCOME STATE: When there are no messages */}
               {messages.length === 0 && (
@@ -1552,6 +1560,42 @@ export default function AiTutorDrawer({
 
       </div>
 
+      {/* Rename Chat Modal Overlay */}
+      {editingChatId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setEditingChatId(null)}>
+          <div 
+            className="bg-[#1e1e1e] w-full max-w-md rounded-3xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-[18px] font-medium text-[#e3e3e3]">Rename this chat</h2>
+            <input
+              type="text"
+              autoFocus
+              value={editTitleInput}
+              onChange={(e) => setEditTitleInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveRename(editingChatId);
+                if (e.key === 'Escape') setEditingChatId(null);
+              }}
+              className="w-full bg-transparent border border-white/20 rounded-2xl px-4 py-3 text-[15px] text-[#e3e3e3] focus:border-white/40 focus:outline-none focus:ring-0 transition-all"
+            />
+            <div className="flex items-center justify-end gap-2 mt-2">
+              <button 
+                onClick={() => setEditingChatId(null)}
+                className="px-5 py-2.5 rounded-full text-[14px] font-medium text-slate-300 hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleSaveRename(editingChatId)}
+                className="px-5 py-2.5 rounded-full text-[14px] font-medium text-white hover:bg-white/5 transition-colors"
+              >
+                Rename
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
