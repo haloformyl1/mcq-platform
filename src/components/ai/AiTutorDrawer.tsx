@@ -731,6 +731,29 @@ export default function AiTutorDrawer({
     }
   };
 
+  const handleExitCollab = async () => {
+    if (!activeChatId) return;
+    if (!confirm("Are you sure you want to exit this collaboration? You will lose access to this chat until invited again.")) return;
+    
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/ai/conversations/${activeChatId}/collab/exit`, {
+        method: "POST"
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = '/dashboard/ai';
+      } else {
+        alert("Failed to exit collab: " + data.error);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+      setLoading(false);
+    }
+  };
+
   return (
     <div 
       className="fixed inset-0 z-50 flex flex-col bg-transparent text-slate-100 font-sans select-text overflow-hidden animate-in fade-in duration-200 ai-workspace-root"
@@ -1333,6 +1356,15 @@ export default function AiTutorDrawer({
                         Back to where I was
                       </button>
                     </>
+                  )}
+                  {!isChatOwner && (
+                    <button
+                      onClick={handleExitCollab}
+                      className="px-4 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 hover:text-red-300 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      Exit collab
+                    </button>
                   )}
                 </div>
               </div>
