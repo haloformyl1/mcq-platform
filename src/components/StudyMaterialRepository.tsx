@@ -535,7 +535,7 @@ export default function StudyMaterialRepository({
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed font-light">
-                    Complete NCERT-aligned theory bibles, chapter derivations, competitive bridge problems, and Board exemplary sets.
+                    NCERT-aligned theory, derivations, bridge problems, and Board exemplary sets.
                   </p>
                 </div>
 
@@ -570,7 +570,7 @@ export default function StudyMaterialRepository({
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed font-light">
-                    In-depth organic reaction mechanisms, physical derivations, analytical laboratory guides, and Council specimen papers.
+                    Organic mechanisms, physical derivations, lab guides, and specimen papers.
                   </p>
                 </div>
 
@@ -605,7 +605,7 @@ export default function StudyMaterialRepository({
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed font-light">
-                    Newly calibrated Semester I, II, III & IV question patterns, bilingual notes (English & Bengali), and WBJEE high-frequency banks.
+                    Semester I-IV patterns, bilingual notes, and WBJEE high-frequency banks.
                   </p>
                 </div>
 
@@ -640,7 +640,7 @@ export default function StudyMaterialRepository({
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-300/80 leading-relaxed font-light">
-                    34-Year chapter-wise solved PYQ archives, high-yield DPP drill banks, NCERT booster formula digests, and national mock papers.
+                    34-Year PYQ archives, DPP drill banks, formula digests, and national mock papers.
                   </p>
                 </div>
 
