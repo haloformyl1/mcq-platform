@@ -101,30 +101,14 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
     >
       {/* 1. TOP NAVIGATION & INTERACTIVE TOOLBAR */}
       <header className="h-14 sm:h-16 px-3 sm:px-6 bg-[#040e1b]/95 backdrop-blur-xl flex items-center justify-between gap-2 sm:gap-4 z-30 shrink-0 shadow-lg shadow-black/40">
-        {/* Left: Logo & Material Title */}
+        {/* Left: Logo */}
         <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-          <div className="shrink-0 flex items-center pr-1.5 sm:pr-2.5 border-r border-slate-800/80">
+          <div className="shrink-0 flex items-center">
             <PiechemLogo 
               size="sm" 
               href="/dashboard" 
               isGoldMember={student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
             />
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 uppercase font-black shrink-0 tracking-wider">
-                {material.category || "Study Material"}
-              </span>
-              {material.isPremium && (
-                <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-500/40 uppercase font-bold shrink-0">
-                  Gold Premium
-                </span>
-              )}
-            </div>
-            <h1 className="text-xs sm:text-sm font-bold text-white truncate max-w-[140px] sm:max-w-xs md:max-w-md lg:max-w-lg">
-              {material.title}
-            </h1>
           </div>
         </div>
 
