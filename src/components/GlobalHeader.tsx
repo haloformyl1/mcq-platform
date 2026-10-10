@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen, User, ChevronDown, X, Check, LogOut } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
+import RealTimeClock from "@/components/RealTimeClock";
 
 export interface GlobalHeaderProps {
   isGoldMember?: boolean;
@@ -95,7 +96,9 @@ export default function GlobalHeader({
                   {navigation}
                 </div>
               ) : (
-                <div className="site-header-navigation-spacer flex-1 min-w-0" />
+                <div className="site-header-navigation-spacer flex-1 flex items-center justify-center min-w-0 px-2">
+                  <RealTimeClock />
+                </div>
               )}
 
               {/* 3. FAR RIGHT: Desktop Curriculum, Notifications & Account */}
