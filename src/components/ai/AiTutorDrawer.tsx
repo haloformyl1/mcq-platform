@@ -1122,7 +1122,8 @@ export default function AiTutorDrawer({
                 const isUser = msg.role === "user";
 
                 if (isUser) {
-                  const senderName = msg.senderName || studentName || 'You';
+                  const fallbackName = hasActiveCollab ? 'Student' : (isChatOwner ? studentName : chatOwnerInfo?.name || 'Student');
+                  const senderName = msg.senderName || fallbackName;
                   return (
                     <div key={msg.id} className="flex justify-end pt-2 pb-4">
                       <div className="flex flex-col items-end gap-1 max-w-2xl">
