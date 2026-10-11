@@ -159,14 +159,14 @@ export default async function PdfViewerPage({
             </div>
 
             <div className="space-y-2">
-              <span className="px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold">
-                GOLD MEMBERSHIP REQUIRED
+              <span className="px-3 py-1 rounded-full bg-blue-950/80 border border-blue-500/30 text-blue-300 text-xs font-mono font-bold">
+                PIE PRO / PIE ULTRA REQUIRED
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white">
                 Premium Vault Resource
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                <span className="font-semibold text-white">{material.title}</span> is restricted to active Gold members. Upgrade your account to unlock all official study materials, DPPs, and chapter notes.
+                <span className="font-semibold text-white">{material.title}</span> is restricted to active PIE Pro & Ultra subscribers. Upgrade your account to unlock official study materials, DPPs, and chapter notes.
               </p>
             </div>
 

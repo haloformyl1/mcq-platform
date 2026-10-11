@@ -831,6 +831,20 @@ export default function StudentAccountPage() {
   };
   const effectivePlanTier = resolveEffectivePlanTier();
 
+  const getRequestPlanName = (req: any): string => {
+    if (!req) return "PIE Pro";
+    if (req.planName) return req.planName;
+    const noteText = (req.note || "").toLowerCase();
+    if (noteText.includes("ultra")) return "PIE Ultra";
+    if (noteText.includes("basic")) return "PIE Basic";
+    if (noteText.includes("pro")) return "PIE Pro";
+    const amt = Number(req.amount);
+    if (amt === 499 || amt === 200) return "PIE Ultra";
+    if (amt === 299) return "PIE Pro";
+    if (amt === 0) return "PIE Basic";
+    return "PIE Pro";
+  };
+
   const activePayable = selectedCheckoutPlan?.payableAmount ?? (paymentSettings?.monthlyFee || 199.0);
   const activePlanName = selectedCheckoutPlan?.name || (activePayable >= 400 ? "PIE Ultra" : "PIE Pro");
   const isCheckoutUltra = activePlanName.toLowerCase().includes("ultra") || activePayable >= 400;
@@ -841,16 +855,9 @@ export default function StudentAccountPage() {
     : 0;
   const isPaymentPendingOver24h = paymentPendingHours >= 24;
 
-  // Check if student is currently at the highest plan available
-  // Currently, 1 paid plan exists: Gold Membership
-  // If admin ever provides multiple active plans, check if student has reached the top tier
-  const availablePlans = paymentSettings?.plans || [
-    { id: "free", name: "Basic Student Plan", tier: 0 },
-    { id: "gold", name: "Gold Membership", tier: 1 }
-  ];
-  const maxTier = Math.max(...availablePlans.map((p: any) => p.tier ?? 1), 1);
-  const studentTier = isGold ? 1 : 0;
-  const isAtHighestPlan = studentTier >= maxTier;
+  // The 3 platform plans are: PIE Basic, PIE Pro, PIE Ultra.
+  // Only students on PIE Ultra have reached the top tier.
+  const isAtHighestPlan = effectivePlanTier === "ultra";
 
   const handleChangePlanClick = () => {
     if (isPaymentPending) {
@@ -1002,7 +1009,7 @@ export default function StudentAccountPage() {
                       </div>
                       <div>
                         <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan</div>
-                        <div className="text-sm text-white font-medium">Gold Membership (Premium)</div>
+                        <div className="text-sm text-white font-medium">{getRequestPlanName(upgradeReq)}</div>
                       </div>
                       <div>
                         <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Amount</div>
@@ -1326,7 +1333,17 @@ export default function StudentAccountPage() {
                   
                   <div className="p-6 sm:p-8 space-y-2">
                     <h3 className="text-2xl font-bold text-white tracking-tight">
-                      {isGold ? (
+                      {effectivePlanTier === "ultra" ? (
+                        <div className="flex items-center">
+                          <div className="relative mr-2 sm:mr-3 inline-flex items-center justify-center mb-0.5">
+                            <div className="absolute inset-0 bg-red-600/60 blur-md rounded-full"></div>
+                            <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#180407] text-red-100 text-[9px] sm:text-[11px] font-black tracking-wide border border-red-600/60 shadow-[0_2px_10px_rgba(229,9,20,0.5)] leading-none flex items-center justify-center">
+                              Ultra
+                            </span>
+                          </div>
+                          <span>PIECHEM</span>
+                        </div>
+                      ) : isGold ? (
                         <div className="flex items-center">
                           <span>PIECHEM</span>
                           <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
@@ -1337,7 +1354,7 @@ export default function StudentAccountPage() {
                           </div>
                         </div>
                       ) : (
-                        "Basic Student Plan"
+                        "PIE Basic"
                       )}
                     </h3>
                     {!isGold && (
@@ -1472,29 +1489,35 @@ export default function StudentAccountPage() {
                   </div>
                 </div>
 
-                {/* What is included in Gold Membership Checklist */}
+                {/* What is included in Current Plan Checklist */}
                 <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-4">
-                  <h3 className="text-base font-bold text-white">What is included in Gold Membership</h3>
+                  <h3 className="text-base font-bold text-white">
+                    What is included in {effectivePlanTier === "ultra" ? "PIE Ultra" : isGold ? "PIE Pro" : "PIE Basic"}
+                  </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Full Access to All Chemistry Exam Tests</span>
+                      <span>{effectivePlanTier === "ultra" || isGold ? "Full Access to All 50+ Chemistry Exams" : "Selected Free Chemistry Practice Tests"}</span>
                     </div>
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Unlimited 24/7 AI Tutor & Doubt Solver</span>
+                      <span>{effectivePlanTier === "ultra" ? "Unlimited 24/7 PIE AI Tutor & Doubt Solver" : isGold ? "PIE AI Tutor (20 Queries / Day)" : "Basic AI Doubt Solver (5 Queries / Day)"}</span>
                     </div>
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Instant Step-by-Step Answer Explanations</span>
+                      <span>{effectivePlanTier === "ultra" || isGold ? "Instant Solutions with 3D Molecular Models" : "Standard Answer Key"}</span>
                     </div>
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Proctored Ranking & Percentile Analytics</span>
+                      <span>{effectivePlanTier === "ultra" ? "Digital Library with Unlimited Chapter Downloads" : isGold ? "Digital Library with 5 Downloads / Day" : "Selected Free Chapters with Limited Downloads"}</span>
                     </div>
                     <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
                       <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Direct Admin Activation & Phone Support</span>
+                      <span>{effectivePlanTier === "ultra" ? "PIE LAB: Included (Unlimited 3D Simulations)" : isGold ? "PIE LAB: Included (Basic Access)" : "PIE LAB: Not Included"}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>{effectivePlanTier === "ultra" || isGold ? "Proctored National Percentile Analytics" : "Basic Score Summary"}</span>
                     </div>
                   </div>
                 </div>
@@ -2101,7 +2124,7 @@ export default function StudentAccountPage() {
                       </div>
                       <div>
                         <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan</div>
-                        <div className="text-sm text-white font-medium">Gold Membership (Premium)</div>
+                        <div className="text-sm text-white font-medium">{getRequestPlanName(upgradeReq)}</div>
                       </div>
                       <div className="sm:col-span-2 pt-2 border-t border-slate-800">
                         <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Status</div>
@@ -3154,7 +3177,7 @@ export default function StudentAccountPage() {
                             {formatDateTime24(req.createdAt)}
                           </td>
                           <td className="py-4 px-4 text-white font-medium">
-                            30-Day Gold Pass
+                            {getRequestPlanName(req)}
                           </td>
                           <td className="py-4 px-4 text-slate-400 font-mono text-xs">
                             {req.utrNumber || "-"}
@@ -3246,7 +3269,7 @@ export default function StudentAccountPage() {
                 </span>
               </div>
               <p className="text-lg font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-500" /> {isComplimentary ? "Complimentary Premium Access" : "Gold Membership (Premium)"}
+                <Sparkles className="w-4 h-4 text-amber-500" /> {effectivePlanTier === "ultra" ? "PIE Ultra" : isComplimentary ? "PIE Pro (Lifetime Complimentary)" : "PIE Pro"}
               </p>
               <p className="text-sm text-slate-400 leading-relaxed">
                 You already have full access to all 50+ exams, 3D molecular models, full solutions, and proctored analytics.

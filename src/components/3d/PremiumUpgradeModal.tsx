@@ -129,9 +129,9 @@ export default function PremiumUpgradeModal({
           </div>
 
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-500/15 border border-amber-500/40 text-amber-300">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-red-600/15 border border-red-600/40 text-red-400">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>GOLD MEMBERSHIP EXCLUSIVE</span>
+              <span>PIE PRO & PIE ULTRA EXCLUSIVE</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -139,7 +139,7 @@ export default function PremiumUpgradeModal({
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              This interactive WebGL 3D spatial chemistry laboratory is curated exclusively for PIE CHEM Gold members.
+              This interactive WebGL 3D spatial chemistry laboratory is curated exclusively for PIE CHEM Pro & Ultra members.
             </p>
           </div>
 

@@ -121,9 +121,9 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
 </head>
 <body>
   <div class="card">
-    <h2>Gold Access Required</h2>
-    <p>This 3D Interactive Chemistry Lab is an exclusive feature of the Gold membership. Upgrade your subscription to unlock all 3D virtual simulations and premium vaults.</p>
-    <a href="/dashboard/account" target="_top">Upgrade to Gold Membership</a>
+    <h2>PIE Pro / Ultra Access Required</h2>
+    <p>This 3D Interactive Chemistry Lab is an exclusive feature of the PIE Pro and PIE Ultra subscriptions. Upgrade your subscription to unlock all 3D virtual simulations and chemistry vaults.</p>
+    <a href="/dashboard/account" target="_top">Upgrade to PIE Pro / Ultra</a>
   </div>
 </body>
 </html>`,

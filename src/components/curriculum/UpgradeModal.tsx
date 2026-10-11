@@ -129,9 +129,9 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
           </div>
 
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-amber-500/15 border border-amber-500/40 text-amber-300">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-blue-500/15 border border-blue-500/40 text-blue-300">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>GOLD MEMBERSHIP EXCLUSIVE</span>
+              <span>PIE PRO & PIE ULTRA EXCLUSIVE</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -139,7 +139,7 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              This chapter master resource is reserved exclusively for enrolled PIE CHEM Gold / Paid students. Upgrade your subscription or request complimentary batch access.
+              This chapter master resource is reserved exclusively for enrolled PIE Pro and PIE Ultra students. Upgrade your subscription or request complimentary batch access.
             </p>
           </div>
 

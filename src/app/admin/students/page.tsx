@@ -336,7 +336,7 @@ export default function AdminStudents() {
                           title={`Locked: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(student.subscriptionExpiresAt)}. Automatically reverts to FREE after expiry, after which admin can edit.`}
                         >
                           <span className="text-xs">🔒</span>
-                          <span className="font-extrabold tracking-wide">GOLD MEMBERSHIP (UPI)</span>
+                          <span className="font-extrabold tracking-wide">PAID SUBSCRIPTION (UPI)</span>
                         </div>
                       ) : (
                         <select

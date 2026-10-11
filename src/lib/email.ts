@@ -145,29 +145,29 @@ export async function sendSubscriptionUpgradeEmail(params: SubscriptionUpgradeEm
         <div style="background-color:#030811; color:#f8fafc; font-family:Arial,sans-serif; max-width:600px; margin:0 auto; padding:30px 20px; border-radius:16px; border:1px solid rgba(245,158,11,0.3);">
           <div style="text-align:center; padding-bottom:20px;">
             <h1 style="color:#ffffff; margin:0; font-size:24px; font-weight:900; letter-spacing:-0.5px;">PIECHEM EXAM PLATFORM</h1>
-            <p style="color:#f59e0b; font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:2px; margin-top:5px;">Gold Membership Activated</p>
+            <p style="color:#38bdf8; font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:2px; margin-top:5px;">PIE Subscription Activated</p>
           </div>
           
-          <div style="background-color:rgba(10,21,36,0.8); border:1px solid rgba(245,158,11,0.2); border-radius:12px; padding:24px; margin-bottom:24px;">
+          <div style="background-color:rgba(10,21,36,0.8); border:1px solid rgba(56,189,248,0.2); border-radius:12px; padding:24px; margin-bottom:24px;">
             <h2 style="color:#ffffff; font-size:18px; margin-top:0;">Hello ${studentName},</h2>
             <p style="color:#cbd5e1; font-size:14px; line-height:1.6;">
               Great news! Your payment of <strong>${formattedFee}</strong> has been officially verified by Administrator <strong>Arghyadeep Roy</strong>.
             </p>
             <p style="color:#cbd5e1; font-size:14px; line-height:1.6;">
-              Your <strong>30-Day All-Access Pass</strong> is now active and valid until <strong style="color:#fcd34d;">${validUntilStr}</strong>.
+              Your <strong>All-Access Pass</strong> is now active and valid until <strong style="color:#38bdf8;">${validUntilStr}</strong>.
             </p>
             
             <div style="background-color:#030811; border-left:4px solid #10b981; padding:12px 16px; margin:20px 0; border-radius:4px;">
-              <p style="color:#10b981; font-weight:bold; font-size:13px; margin:0;">Unlocked Gold Benefits:</p>
+              <p style="color:#10b981; font-weight:bold; font-size:13px; margin:0;">Unlocked Platform Benefits:</p>
               <ul style="color:#94a3b8; font-size:13px; margin:8px 0 0 0; padding-left:20px;">
-                <li>Unlimited attempts on all 50+ Chemistry Exams</li>
+                <li>Unlimited attempts on all Chemistry Exams</li>
                 <li>Full step-by-step solutions & 3D Molecular Models</li>
                 <li>Proctored national percentiles and chapter analytics</li>
               </ul>
             </div>
 
             <div style="text-align:center; margin-top:25px;">
-              <a href="https://piechem.vercel.app/dashboard" style="background:linear-gradient(to right, #f59e0b, #eab308); color:#020617; text-decoration:none; padding:14px 28px; border-radius:10px; font-weight:bold; font-size:14px; display:inline-block; text-transform:uppercase; letter-spacing:1px;">
+              <a href="https://piechem.vercel.app/dashboard" style="background:linear-gradient(to right, #0284c7, #2563eb); color:#ffffff; text-decoration:none; padding:14px 28px; border-radius:10px; font-weight:bold; font-size:14px; display:inline-block; text-transform:uppercase; letter-spacing:1px;">
                 Start Practicing Tests Now
               </a>
             </div>
@@ -183,7 +183,7 @@ export async function sendSubscriptionUpgradeEmail(params: SubscriptionUpgradeEm
       await transporter.sendMail({
         from: process.env.SMTP_FROM || `"PIECHEM Exam Platform" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: "🎉 Your PIECHEM Gold Membership is Active!",
+        subject: "🎉 Your PIECHEM Subscription is Active!",
         html: htmlContent,
       });
 
@@ -211,7 +211,7 @@ export async function sendSubscriptionUpgradeEmail(params: SubscriptionUpgradeEm
           student_name: studentName,
           amount: formattedFee,
           valid_until: validUntilStr,
-          message: `Hello ${studentName},\n\nYour payment of ${formattedFee} has been approved by Administrator Arghyadeep Roy.\nYour 30-Day Gold Membership is now active until ${validUntilStr}.\n\nAll 50+ Chemistry Exams, 3D Models, and proctored percentiles are unlocked.\n\nLogin at: https://piechem.vercel.app/dashboard`,
+          message: `Hello ${studentName},\n\nYour payment of ${formattedFee} has been approved by Administrator Arghyadeep Roy.\nYour PIE Subscription is now active until ${validUntilStr}.\n\nAll Chemistry Exams, 3D Models, and proctored percentiles are unlocked.\n\nLogin at: https://piechem.vercel.app/dashboard`,
         },
       };
       if (privateKey) data.accessToken = privateKey;
@@ -234,11 +234,11 @@ export async function sendSubscriptionUpgradeEmail(params: SubscriptionUpgradeEm
 
   // 3. Fallback dev console logging
   console.log("\n========================================");
-  console.log("[GOLD SUBSCRIPTION ACTIVATION EMAIL DISPATCH]");
+  console.log("[PIE SUBSCRIPTION ACTIVATION EMAIL DISPATCH]");
   console.log(`To: ${email} (${studentName})`);
   console.log(`Amount: ${formattedFee}`);
   console.log(`Valid Until: ${validUntilStr}`);
-  console.log("Status: Gold Membership Activated (30 Days)");
+  console.log("Status: PIE Subscription Activated");
   console.log("========================================\n");
 
   return true;

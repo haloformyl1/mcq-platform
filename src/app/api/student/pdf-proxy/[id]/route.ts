@@ -92,7 +92,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     if (material.isPremium) {
       const canAccess = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
       if (!canAccess) {
-        return new NextResponse("Forbidden: Gold membership required", { status: 403 });
+        return new NextResponse("Forbidden: Active subscription required", { status: 403 });
       }
     }
 

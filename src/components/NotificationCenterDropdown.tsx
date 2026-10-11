@@ -69,8 +69,8 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
     notifications.push({
       id: "gold_active_" + (student?.id || "user") + "_" + (student?.subscriptionExpiresAt || "active"),
       type: "gold_activated",
-      title: "🎉 Gold Membership Activated!",
-      description: "Payment verified by Admin Arghyadeep Roy. Your 30-Day All-Access Pass is active until " + validUntilStr + ". All 50+ Chemistry Exams unlocked.",
+      title: "🎉 PIE Subscription Activated!",
+      description: "Payment verified by Admin Arghyadeep Roy. Your All-Access Pass is active until " + validUntilStr + ". All 50+ Chemistry Exams unlocked.",
       badge: "ACTIVE",
       badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
       time: approvedDateStr,
@@ -93,10 +93,10 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
     notifications.push({
       id: "promo_upgrade",
       type: "upgrade_promo",
-      title: "⭐ Upgrade to Gold Membership",
+      title: "⭐ Upgrade to PIE Pro / Ultra",
       description: "Unlock all 50+ premium chemistry test modules, complete solutions, and 3D molecular models.",
       badge: "30-DAY PASS",
-      badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+      badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
       time: "Limited Offer",
       actionText: "View Plans →",
       actionHref: "/dashboard/account",

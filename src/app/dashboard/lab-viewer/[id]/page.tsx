@@ -76,19 +76,19 @@ export default async function LabViewerPage({
             </div>
 
             <div className="space-y-2">
-              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-950 text-amber-400 border border-amber-500/30">
-                Gold Membership Exclusive
+              <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-red-950/80 text-red-400 border border-red-500/30">
+                PIE Pro & PIE Ultra Exclusive
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white">
                 {material.title}
               </h2>
               <p className="text-xs sm:text-sm text-slate-300">
-                This interactive 3D virtual chemistry laboratory requires an active Gold membership.
+                This interactive 3D virtual chemistry laboratory requires an active PIE Pro or PIE Ultra subscription.
               </p>
             </div>
 
             <div className="bg-[#050e18] p-4 rounded-2xl border border-slate-800 text-left space-y-2">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">With Gold You Get:</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Included In PIE Pro & Ultra:</p>
               <ul className="text-xs text-slate-300 space-y-1.5">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />

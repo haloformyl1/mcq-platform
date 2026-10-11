@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     // Premium Test Verification: Free students cannot start Premium tests unless specifically overridden
     if (test.isPremium && !isPaidSubscriber && !override) {
       return NextResponse.json({
-        error: "This test is a Premium Resource and requires an active subscription or Gold membership to access.",
+        error: "This test is a Premium Resource and requires an active PIE Pro or PIE Ultra subscription to access.",
         requiresSubscription: true
       }, { status: 403 });
     }
