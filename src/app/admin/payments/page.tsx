@@ -70,18 +70,83 @@ export default function AdminPaymentsPage() {
 
   const [filterActiveSearch, setFilterActiveSearch] = useState("");
 
+  const PRESET_FEATURES = [
+    { feature: "Chemistry Exam Tests", placeholder: "e.g. Unlimited (or 'Selected tests are free')" },
+    { feature: "AI Tutor & Doubt Solver", placeholder: "e.g. Unlimited AI Access (or '5 queries / day')" },
+    { feature: "Answer Explanations", placeholder: "e.g. Full Solutions & 3D Models (or 'Standard Answer Key')" },
+    { feature: "Study Materials", placeholder: "e.g. Complete Digital Library (or 'Selected Free Chapters')" },
+    { feature: "Ranking & Analytics", placeholder: "e.g. Proctored National Percentile (or 'Basic Score Summary')" },
+    { feature: "Supported Devices", placeholder: "e.g. Mobile, Tablet, PC / Laptop (Max 2 devices)" },
+  ];
+
   const [plans, setPlans] = useState<any[]>([]);
   const [showPlanModal, setShowPlanModal] = useState(false);
-  const [planForm, setPlanForm] = useState({
+  const [planForm, setPlanForm] = useState<{
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    durationDays: number;
+    benefitsList: { feature: string; value: string; isCustom?: boolean }[];
+    isActive: boolean;
+  }>({
     id: "",
     name: "",
     description: "",
     price: 99.0,
     durationDays: 30,
-    benefits: "",
+    benefitsList: PRESET_FEATURES.map(f => ({ feature: f.feature, value: "", isCustom: false })),
     isActive: true
   });
   const [planSaving, setPlanSaving] = useState(false);
+
+  const handleOpenAddPlan = () => {
+    setPlanForm({
+      id: "",
+      name: "",
+      description: "",
+      price: 299,
+      durationDays: 30,
+      benefitsList: PRESET_FEATURES.map(f => ({ feature: f.feature, value: "", isCustom: false })),
+      isActive: true
+    });
+    setShowPlanModal(true);
+  };
+
+  const handleOpenEditPlan = (plan: any) => {
+    const rawBenefits: string[] = Array.isArray(plan.benefits) ? plan.benefits : [];
+    const list: { feature: string; value: string; isCustom?: boolean }[] = [];
+
+    rawBenefits.forEach((b: string) => {
+      const parts = b.split(":");
+      if (parts.length > 1) {
+        const feature = parts[0].trim();
+        const value = parts.slice(1).join(":").trim();
+        const isPreset = PRESET_FEATURES.some(pf => pf.feature.toLowerCase() === feature.toLowerCase());
+        list.push({ feature, value, isCustom: !isPreset });
+      } else {
+        list.push({ feature: b.trim(), value: "", isCustom: true });
+      }
+    });
+
+    // Ensure all standard preset features are pre-added if not already present
+    PRESET_FEATURES.forEach(pf => {
+      if (!list.some(item => item.feature.toLowerCase() === pf.feature.toLowerCase())) {
+        list.push({ feature: pf.feature, value: "", isCustom: false });
+      }
+    });
+
+    setPlanForm({
+      id: plan.id,
+      name: plan.name,
+      description: plan.description || "",
+      price: Number(plan.price) || 0,
+      durationDays: Number(plan.durationDays) || 30,
+      benefitsList: list,
+      isActive: plan.isActive !== undefined ? !!plan.isActive : true
+    });
+    setShowPlanModal(true);
+  };
 
   const fetchPlans = async () => {
     try {
@@ -130,9 +195,22 @@ export default function AdminPaymentsPage() {
     try {
       const url = planForm.id ? `/api/admin/subscription-plans/${planForm.id}` : "/api/admin/subscription-plans";
       const method = planForm.id ? "PUT" : "POST";
+
+      const formattedBenefits = planForm.benefitsList
+        .filter(item => item.feature.trim() && item.value.trim())
+        .map(item => `${item.feature.trim()}: ${item.value.trim()}`);
+
+      if (formattedBenefits.length === 0) {
+        throw new Error("Please enter descriptions/benefits for at least one feature.");
+      }
+
       const body = {
-        ...planForm,
-        benefits: planForm.benefits.split("\n").map(b => b.trim()).filter(Boolean)
+        name: planForm.name,
+        description: planForm.description,
+        price: planForm.price,
+        durationDays: planForm.durationDays,
+        benefits: formattedBenefits,
+        isActive: planForm.isActive
       };
 
       const res = await fetch(url, {
@@ -886,10 +964,7 @@ export default function AdminPaymentsPage() {
               <span>Reset Defaults</span>
             </button>
             <button
-              onClick={() => {
-                setPlanForm({ id: "", name: "", description: "", price: 299, durationDays: 30, benefits: "", isActive: true });
-                setShowPlanModal(true);
-              }}
+              onClick={handleOpenAddPlan}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-emerald-950/40"
             >
               <Plus className="w-4 h-4" /> Add Plan
@@ -943,13 +1018,7 @@ export default function AdminPaymentsPage() {
                     </div>
                     <div className="flex gap-2">
                       <button 
-                        onClick={() => {
-                          setPlanForm({ 
-                            ...plan, 
-                            benefits: Array.isArray(plan.benefits) ? plan.benefits.join("\n") : "" 
-                          });
-                          setShowPlanModal(true);
-                        }} 
+                        onClick={() => handleOpenEditPlan(plan)} 
                         className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 transition cursor-pointer"
                         title="Edit Plan"
                       >
@@ -1066,50 +1135,95 @@ export default function AdminPaymentsPage() {
 
       {/* ADD/EDIT PLAN MODAL */}
       {showPlanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#12161f] border border-slate-700 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl">
-            <div className="flex justify-between items-center p-4 border-b border-slate-800">
-              <h3 className="text-lg font-bold text-white">{planForm.id ? "Edit Plan" : "Add New Plan"}</h3>
-              <button onClick={() => setShowPlanModal(false)} className="text-slate-400 hover:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md">
+          <div className="bg-[#12161f] border border-slate-700/80 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-[#0d1117] shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-emerald-950/80 rounded-xl border border-emerald-500/40 text-emerald-400">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white">{planForm.id ? "Edit Subscription Plan" : "Add New Subscription Plan"}</h3>
+                  <p className="text-[11px] text-slate-400">Pre-added features are ready below. Enter benefits & descriptions for each.</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowPlanModal(false)} 
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleSavePlan} className="p-5 space-y-4 max-h-[85vh] overflow-y-auto">
-              <div>
-                <label className="block text-xs font-bold text-slate-400 mb-1">Plan Name *</label>
-                <input required type="text" value={planForm.name} onChange={e => setPlanForm({...planForm, name: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="e.g. PIECHEM Pro" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-400 mb-1">Description / Tagline</label>
-                <input type="text" value={planForm.description} onChange={e => setPlanForm({...planForm, description: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="e.g. Full access to 50+ exams, 3D models & proctored rankings" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+
+            {/* Modal Form Body */}
+            <form onSubmit={handleSavePlan} className="p-6 space-y-5 overflow-y-auto flex-1">
+              {/* Plan Name & Tagline */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1">Price (₹) *</label>
-                  <input required type="number" step="0.01" value={planForm.price} onChange={e => setPlanForm({...planForm, price: parseFloat(e.target.value) || 0})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono text-emerald-400 font-bold focus:border-cyan-500 outline-none" />
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Plan Name *</label>
+                  <input 
+                    required 
+                    type="text" 
+                    value={planForm.name} 
+                    onChange={e => setPlanForm({...planForm, name: e.target.value})} 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-sm focus:border-cyan-500 outline-none" 
+                    placeholder="e.g. PIECHEM Pro" 
+                  />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1">Duration (Days) *</label>
-                  <input required type="number" value={planForm.durationDays} onChange={e => setPlanForm({...planForm, durationDays: parseInt(e.target.value) || 30})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:border-cyan-500 outline-none" />
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Tagline / Short Summary</label>
+                  <input 
+                    type="text" 
+                    value={planForm.description} 
+                    onChange={e => setPlanForm({...planForm, description: e.target.value})} 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-sm focus:border-cyan-500 outline-none" 
+                    placeholder="e.g. Full access to exams, 3D models & proctored rankings" 
+                  />
                 </div>
               </div>
 
-              {/* Dynamic Live QR Code Regeneration Preview */}
-              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800">
+              {/* Price & Duration */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Price (₹) *</label>
+                  <input 
+                    required 
+                    type="number" 
+                    step="0.01" 
+                    value={planForm.price} 
+                    onChange={e => setPlanForm({...planForm, price: parseFloat(e.target.value) || 0})} 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-sm font-mono text-emerald-400 font-bold focus:border-cyan-500 outline-none" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Duration (Days) *</label>
+                  <input 
+                    required 
+                    type="number" 
+                    value={planForm.durationDays} 
+                    onChange={e => setPlanForm({...planForm, durationDays: parseInt(e.target.value) || 30})} 
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-sm font-mono focus:border-cyan-500 outline-none" 
+                  />
+                </div>
+              </div>
+
+              {/* Dynamic Live QR Code Preview */}
+              <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Live Dynamic QR Code Preview:</span>
                 {planForm.price > 0 ? (
                   <div className="flex items-center gap-4">
-                    <div className="p-2 bg-white rounded-lg shadow shrink-0">
+                    <div className="p-2 bg-white rounded-xl shadow shrink-0">
                       <img 
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || 'arg9830@axl'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${planForm.price}&cu=INR&tn=${encodeURIComponent((planForm.name || 'Subscription') + ' Plan Payment')}`)}`} 
                         alt="Dynamic QR preview" 
-                        className="w-20 h-20 object-contain"
+                        className="w-18 h-18 object-contain"
                       />
                     </div>
                     <div className="space-y-1">
                       <div className="text-xs font-bold text-emerald-400">QR for ₹{planForm.price} (Auto-updates with price)</div>
                       <div className="text-[11px] text-slate-400 font-mono">VPA: {paymentSettings?.upiId || 'arg9830@axl'}</div>
-                      <div className="text-[10px] text-slate-500">QR instantly regenerates whenever price is changed</div>
+                      <div className="text-[10px] text-slate-500">QR automatically updates live whenever price is edited</div>
                     </div>
                   </div>
                 ) : (
@@ -1117,16 +1231,167 @@ export default function AdminPaymentsPage() {
                 )}
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-400 mb-1">Benefits (One per line, e.g. "Feature: Value")</label>
-                <textarea rows={6} value={planForm.benefits} onChange={e => setPlanForm({...planForm, benefits: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-xs font-mono focus:border-cyan-500 outline-none resize-none leading-relaxed" placeholder="Chemistry Exam Tests: Unlimited&#10;AI Tutor & Doubt Solver: Unlimited AI Access&#10;Answer Explanations: Full Solutions & 3D Models&#10;Study Materials: Complete Digital Library&#10;Ranking & Analytics: Proctored National Percentile&#10;Supported Devices: Mobile, Tablet, PC / Laptop (Max 2 devices)" />
+              {/* PRE-ADDED FEATURES & BENEFITS LIST */}
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                  <div>
+                    <label className="block text-xs font-black text-white uppercase tracking-wider">
+                      Pre-Added Features & Benefits
+                    </label>
+                    <p className="text-[11px] text-slate-400">
+                      Standard features are pre-added. Enter the description or benefit for each (e.g., &quot;Unlimited&quot;).
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlanForm(prev => {
+                        const existing = [...prev.benefitsList];
+                        PRESET_FEATURES.forEach(pf => {
+                          if (!existing.some(item => item.feature.toLowerCase() === pf.feature.toLowerCase())) {
+                            existing.push({ feature: pf.feature, value: "", isCustom: false });
+                          }
+                        });
+                        return { ...prev, benefitsList: existing };
+                      });
+                    }}
+                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-bold underline cursor-pointer shrink-0"
+                  >
+                    + Restore All Standard Features
+                  </button>
+                </div>
+
+                <div className="space-y-2.5">
+                  {planForm.benefitsList.map((item, idx) => {
+                    const preset = PRESET_FEATURES.find(pf => pf.feature.toLowerCase() === item.feature.toLowerCase());
+                    const placeholder = preset ? preset.placeholder : "Enter benefit / description e.g. Included";
+
+                    return (
+                      <div 
+                        key={idx} 
+                        className="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 hover:border-slate-700/80 focus-within:border-cyan-500/60 transition space-y-2"
+                      >
+                        {/* Feature Title Row */}
+                        <div className="flex items-center justify-between gap-3">
+                          {item.isCustom ? (
+                            <div className="flex items-center gap-2 flex-1">
+                              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60 shrink-0">
+                                Custom Feature
+                              </span>
+                              <input
+                                type="text"
+                                value={item.feature}
+                                onChange={e => {
+                                  const updated = [...planForm.benefitsList];
+                                  updated[idx].feature = e.target.value;
+                                  setPlanForm({ ...planForm, benefitsList: updated });
+                                }}
+                                placeholder="Feature Name (e.g. Mentor Support)"
+                                className="bg-transparent border-b border-slate-700 focus:border-cyan-400 text-xs font-bold text-white px-1 py-0.5 outline-none flex-1"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
+                              <span className="text-xs font-bold text-slate-100">
+                                {item.feature}
+                              </span>
+                            </div>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = planForm.benefitsList.filter((_, i) => i !== idx);
+                              setPlanForm({ ...planForm, benefitsList: updated });
+                            }}
+                            className="p-1 text-slate-500 hover:text-red-400 hover:bg-slate-800 rounded-lg transition cursor-pointer"
+                            title="Remove feature"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Description / Benefit Input Field */}
+                        <div>
+                          <input
+                            type="text"
+                            value={item.value}
+                            onChange={e => {
+                              const updated = [...planForm.benefitsList];
+                              updated[idx].value = e.target.value;
+                              setPlanForm({ ...planForm, benefitsList: updated });
+                            }}
+                            placeholder={placeholder}
+                            className="w-full bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:border-cyan-500 outline-none font-medium"
+                          />
+                        </div>
+
+                        {/* Quick Fill Preset Chips */}
+                        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                          <span className="text-[10px] text-slate-500 font-semibold">Quick fill:</span>
+                          {["Unlimited", "Included", "Basic Access", "Full Solutions & 3D Models", "1 Active Device", "Max 2 devices"].map(chip => (
+                            <button
+                              key={chip}
+                              type="button"
+                              onClick={() => {
+                                const updated = [...planForm.benefitsList];
+                                updated[idx].value = chip;
+                                setPlanForm({ ...planForm, benefitsList: updated });
+                              }}
+                              className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-cyan-300 border border-slate-700/70 transition cursor-pointer"
+                            >
+                              {chip}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Add Custom Feature Button */}
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPlanForm({
+                          ...planForm,
+                          benefitsList: [
+                            ...planForm.benefitsList,
+                            { feature: "", value: "", isCustom: true }
+                          ]
+                        });
+                      }}
+                      className="w-full py-2.5 bg-slate-900 hover:bg-slate-850 text-cyan-400 hover:text-cyan-300 border border-dashed border-cyan-800/60 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add Custom Feature</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="isActive" checked={planForm.isActive} onChange={e => setPlanForm({...planForm, isActive: e.target.checked})} className="w-4 h-4 accent-emerald-500" />
-                <label htmlFor="isActive" className="text-sm font-bold text-slate-300">Active Plan (Visible to students)</label>
+
+              {/* Active Toggle */}
+              <div className="flex items-center gap-2.5 pt-2">
+                <input 
+                  type="checkbox" 
+                  id="isActive" 
+                  checked={planForm.isActive} 
+                  onChange={e => setPlanForm({...planForm, isActive: e.target.checked})} 
+                  className="w-4 h-4 accent-emerald-500 rounded cursor-pointer" 
+                />
+                <label htmlFor="isActive" className="text-xs font-bold text-slate-200 cursor-pointer">
+                  Active Plan (Visible to students on pricing and upgrade screens)
+                </label>
               </div>
-              <button type="submit" disabled={planSaving} className="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl disabled:opacity-50 transition shadow-lg shadow-emerald-950/40">
-                {planSaving ? "Saving..." : "Save Plan"}
+
+              {/* Submit Button */}
+              <button 
+                type="submit" 
+                disabled={planSaving} 
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-xl disabled:opacity-50 transition shadow-lg shadow-emerald-950/40 cursor-pointer"
+              >
+                {planSaving ? "Saving Plan..." : "Save Plan"}
               </button>
             </form>
           </div>
