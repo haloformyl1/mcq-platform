@@ -122,6 +122,7 @@ export default function AiTutorDrawer({
   const [pendingCollabRequests, setPendingCollabRequests] = useState<any[]>([]);
   const [isChatOwner, setIsChatOwner] = useState(false);
   const [studentProfile, setStudentProfile] = useState<any>(null);
+  const [upgradeReq, setUpgradeReq] = useState<any>(null);
   const [hasActiveCollab, setHasActiveCollab] = useState(false);
   const [activeCollaborators, setActiveCollaborators] = useState<any[]>([]);
   const [showCollabDetails, setShowCollabDetails] = useState(false);
@@ -149,6 +150,11 @@ export default function AiTutorDrawer({
       .then(data => {
         if (data.student) {
           setStudentProfile(data.student);
+          if (data.upgradeReq) {
+            setUpgradeReq(data.upgradeReq);
+          } else if (data.student.upgradeRequests?.[0]) {
+            setUpgradeReq(data.student.upgradeRequests[0]);
+          }
           if (data.student.name) {
             setStudentName(data.student.name);
           }
@@ -157,13 +163,33 @@ export default function AiTutorDrawer({
       .catch(e => console.error(e));
   }, []);
 
-  const isPro = useMemo(() => {
-    if (!studentProfile) return false;
-    const isComp = studentProfile.subscriptionStatus === "COMPLIMENTARY";
-    const isPaid = studentProfile.subscriptionStatus === "PAID" && 
+  const planTier = useMemo((): "ultra" | "pro" | "free" => {
+    if (!studentProfile) return "free";
+    const status = studentProfile.subscriptionStatus;
+    const isComp = Boolean(studentProfile.isComplimentary || status === "COMPLIMENTARY");
+    const isPaid = status === "PAID" && 
       (!studentProfile.subscriptionExpiresAt || new Date(studentProfile.subscriptionExpiresAt).getTime() > Date.now());
-    return isComp || isPaid;
-  }, [studentProfile]);
+    
+    if (!isComp && !isPaid) return "free";
+
+    // Resolve Ultra vs Pro
+    const req = upgradeReq || studentProfile?.upgradeRequests?.[0];
+    const planText = (
+      studentProfile?.subscriptionPlanName || 
+      studentProfile?.planName || 
+      req?.note || 
+      req?.purchasedClass || 
+      ""
+    ).toLowerCase();
+    const amount = Number(req?.amount) || 0;
+
+    if (planText.includes("ultra") || amount >= 400 || amount === 200) {
+      return "ultra";
+    }
+    return "pro";
+  }, [studentProfile, upgradeReq]);
+
+  const isPro = planTier !== "free";
 
   // Lock body scroll
   useEffect(() => {
@@ -941,9 +967,27 @@ export default function AiTutorDrawer({
               </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[13px] font-medium text-[#e3e3e3] truncate">{studentProfile?.name || 'My Account'}</span>
-                <span className="text-[11px] text-amber-400 font-semibold tracking-wide">
-                  {isPro ? 'Pro' : 'Free'}
-                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {planTier === 'ultra' ? (
+                    <div className="relative inline-flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[#e50914]/50 blur-xs rounded-full"></div>
+                      <span className="relative z-10 px-2 py-0.5 rounded-full bg-[#160406] text-red-100 text-[10px] font-bold tracking-wide normal-case border border-red-600/60 shadow-[0_2px_10px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
+                        Ultra
+                      </span>
+                    </div>
+                  ) : planTier === 'pro' ? (
+                    <div className="relative inline-flex items-center justify-center">
+                      <div className="absolute inset-0 bg-blue-600/50 blur-xs rounded-full"></div>
+                      <span className="relative z-10 px-2 py-0.5 rounded-full bg-[#0b162c] text-blue-100 text-[10px] font-bold tracking-wide normal-case border border-blue-500/50 shadow-[0_2px_10px_rgba(37,99,235,0.4)] leading-none flex items-center justify-center">
+                        Pro
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-medium border border-slate-700/60">
+                      Free
+                    </span>
+                  )}
+                </div>
               </div>
             </Link>
             

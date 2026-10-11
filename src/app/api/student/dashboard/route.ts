@@ -68,7 +68,6 @@ export async function GET(req: Request) {
         avatarUrl: true,
         createdAt: true,
         upgradeRequests: {
-          where: { status: "APPROVED" },
           orderBy: { createdAt: "desc" },
           take: 1
         }
