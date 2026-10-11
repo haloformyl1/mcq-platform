@@ -783,12 +783,29 @@ export default function AiTutorDrawer({
 
                 {/* SIDEBAR */}
         <div className={`absolute lg:relative z-40 lg:z-auto ${isDesktopSidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden lg:border-none' : 'lg:w-72'} w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-all duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-          <div className="flex items-center justify-between p-4 pt-6 pl-5 border-b border-white/5 lg:border-none">
-            <Link href="/dashboard" className="flex items-center gap-2 min-w-0 pr-2 hover:opacity-90 transition-opacity">
-              <PiechemAiLogo size="xs" />
-              <span className="text-white font-semibold text-[16px] tracking-wide">PIECHEM AI</span>
+          <div className="flex items-center justify-between p-4 pt-5 pl-4 border-b border-white/5 lg:border-none">
+            <Link href="/dashboard" className="flex flex-col min-w-0 pr-2 hover:opacity-95 transition-opacity group">
+              <div className="flex items-center gap-2 select-none">
+                <PiechemLogo size="sm" showText={false} />
+                <div className="font-black tracking-wider font-sans uppercase flex items-center text-lg leading-none">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_8px_rgba(0,242,254,0.3)]">
+                    PIE
+                  </span>
+                  <div className="relative ml-1.5 inline-flex items-center justify-center">
+                    <div className="absolute inset-0 bg-blue-500/50 blur-sm rounded-full"></div>
+                    <span className="relative z-10 px-2 py-0.5 rounded-full bg-[#181c25] text-slate-100 text-[10px] font-bold tracking-wide uppercase border border-white/10 shadow-[0_2px_6px_rgba(0,0,0,0.4)] leading-none flex items-center justify-center">
+                      AI
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-1 select-none leading-none">
+                <span className="text-[8.5px] tracking-[0.06em] font-sans font-medium text-slate-400 truncate block">
+                  An initiative by <span className="text-slate-200 font-semibold">Arghyadeep Roy.</span>
+                </span>
+              </div>
             </Link>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0">
               <button onClick={() => setIsMobileSidebarOpen(false)} className="lg:hidden p-1.5 rounded-full bg-white/5 text-slate-300 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
