@@ -252,6 +252,9 @@ export default function StudentAccountPage() {
         if (d.request) setUpgradeReq(d.request);
         if (d.allRequests) setAllUpgradeReqs(d.allRequests);
         if (d.paymentSettings) setPaymentSettings(d.paymentSettings);
+        if (d.plans && Array.isArray(d.plans) && d.plans.length > 0) {
+          setPlans(d.plans.filter((p: any) => p.isActive));
+        }
       })
       .catch(() => {});
   };
@@ -401,6 +404,9 @@ export default function StudentAccountPage() {
       })
       .then((resData) => {
         setData(resData);
+        if (resData.subscriptionPlans && Array.isArray(resData.subscriptionPlans) && resData.subscriptionPlans.length > 0) {
+          setPlans(resData.subscriptionPlans.filter((p: any) => p.isActive));
+        }
         if (resData.devices) {
           setDevicesList(resData.devices);
         }
@@ -424,13 +430,25 @@ export default function StudentAccountPage() {
         router.push("/login");
       });
 
-    fetch("/api/admin/subscription-plans")
+    fetch(`/api/subscription-plans?_t=${Date.now()}`, { cache: "no-store" })
       .then(res => res.json())
       .then(d => {
-        if (Array.isArray(d)) setPlans(d.filter((p: any) => p.isActive));
+        if (Array.isArray(d) && d.length > 0) setPlans(d.filter((p: any) => p.isActive));
       })
       .catch(() => {});
   }, [router]);
+
+  // Re-fetch subscription plans whenever user opens the Change Plan tab
+  useEffect(() => {
+    if (activeTab === "change-plan") {
+      fetch(`/api/subscription-plans?_t=${Date.now()}`, { cache: "no-store" })
+        .then(res => res.json())
+        .then(d => {
+          if (Array.isArray(d) && d.length > 0) setPlans(d.filter((p: any) => p.isActive));
+        })
+        .catch(() => {});
+    }
+  }, [activeTab]);
   
   const fetchDevices = async () => {
     try {

@@ -277,13 +277,19 @@ export async function GET(req: Request) {
       };
     }
 
+    const subscriptionPlans = await prisma.subscriptionPlan.findMany({
+      where: { isActive: true },
+      orderBy: { price: "asc" }
+    });
+
     return NextResponse.json({
       student,
       availableTests: availableTestsWithOverrides,
       testAlertSettings,
       allAttempts,
       lastExamTopStudents,
-      lastExamTitle
+      lastExamTitle,
+      subscriptionPlans
     });
   } catch (error) {
     console.error(error);

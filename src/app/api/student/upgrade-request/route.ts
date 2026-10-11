@@ -95,7 +95,7 @@ export async function GET(req: Request) {
 
     const studentId = payload.id as string;
 
-    const [latestRequest, allRequests] = await Promise.all([
+    const [latestRequest, allRequests, plans] = await Promise.all([
       prisma.subscriptionUpgradeRequest.findFirst({
         where: { studentId },
         orderBy: { createdAt: "desc" }
@@ -103,6 +103,10 @@ export async function GET(req: Request) {
       prisma.subscriptionUpgradeRequest.findMany({
         where: { studentId },
         orderBy: { createdAt: "desc" }
+      }),
+      prisma.subscriptionPlan.findMany({
+        where: { isActive: true },
+        orderBy: { price: "asc" }
       })
     ]);
 
@@ -113,7 +117,7 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.json({ request: latestRequest, allRequests, paymentSettings });
+    return NextResponse.json({ request: latestRequest, allRequests, paymentSettings, plans });
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch upgrade request" }, { status: 500 });
   }
