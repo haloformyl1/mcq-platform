@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { encrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
-import { validateStudentName } from "@/lib/nameValidation";
+import { validateStudentName, verifyNameWithAI } from "@/lib/nameValidation";
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +22,13 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
       }
       sanitizedName = validation.sanitizedName;
+
+      const aiCheck = await verifyNameWithAI(sanitizedName || name);
+      if (!aiCheck.isValid) {
+        return NextResponse.json({
+          error: aiCheck.reason || "Inappropriate or offensive names are strictly prohibited. Please enter your genuine student name."
+        }, { status: 400 });
+      }
     }
 
     const student = await prisma.student.findUnique({

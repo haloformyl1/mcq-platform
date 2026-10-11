@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendOTP } from "@/lib/email";
-import { validateStudentName } from "@/lib/nameValidation";
+import { validateStudentName, verifyNameWithAI } from "@/lib/nameValidation";
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +19,14 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
       }
       sanitizedName = validation.sanitizedName;
+
+      // Deep AI safety evaluation for slang and regional offensive words
+      const aiCheck = await verifyNameWithAI(sanitizedName || name);
+      if (!aiCheck.isValid) {
+        return NextResponse.json({
+          error: aiCheck.reason || "Inappropriate or offensive names are strictly prohibited. Please enter your genuine student name."
+        }, { status: 400 });
+      }
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();

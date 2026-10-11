@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
-import { validateStudentName } from "@/lib/nameValidation";
+import { validateStudentName, verifyNameWithAI } from "@/lib/nameValidation";
 
 export async function PUT(req: Request) {
   try {
@@ -28,6 +28,13 @@ export async function PUT(req: Request) {
         return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
       }
       sanitizedName = validation.sanitizedName;
+
+      const aiCheck = await verifyNameWithAI(sanitizedName || name);
+      if (!aiCheck.isValid) {
+        return NextResponse.json({
+          error: aiCheck.reason || "Inappropriate or offensive names are strictly prohibited. Please enter your genuine student name."
+        }, { status: 400 });
+      }
     }
 
     const updatedStudent = await prisma.student.update({
