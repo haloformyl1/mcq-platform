@@ -2078,14 +2078,7 @@ export default function StudentAccountPage() {
                               <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {plan.durationDays}-Day Pass
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
-                            {plan.name.toLowerCase().includes("pro") && (
-                              <span className="text-[11px] font-black px-2 py-0.5 rounded bg-black/40 text-amber-300 border border-amber-400/40">
-                                Pro
-                              </span>
-                            )}
-                          </div>
+                          <h3 className="text-2xl font-black text-white tracking-tight mt-1">{plan.name}</h3>
                           <p className="text-xs text-white/80 mt-1">{plan.description}</p>
                         </div>
 
