@@ -365,22 +365,27 @@ export default function StudentDashboard() {
 
       {/* ========================================================= */}
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
-      {/* Full Free Space Utilization - No Enclosing Box           */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-4 sm:py-8 transition-all duration-300 group">
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-6 sm:py-10 transition-all duration-300 group">
+        {/* Subtle Ambient Radial Lighting */}
+        <div className="pointer-events-none absolute -top-24 left-10 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/10 via-indigo-600/10 to-transparent blur-3xl" />
 
-        {/* Content Container - Utilizing Full Available Space */}
-        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between min-h-0 sm:min-h-[300px]">
+        {/* Content Container */}
+        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between">
           
-          <div className="space-y-4 max-w-3xl">
-            {/* Top Row: Icon */}
-            <div className="flex items-start">
-              <div className="p-3 sm:p-3.5 rounded-2xl border border-sky-500/30 bg-black text-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.2)] flex items-center justify-center">
-                <Atom className="w-6 h-6 sm:w-7 sm:h-7 text-sky-400 animate-spin [animation-duration:15s]" />
+          <div className="space-y-5 max-w-3xl">
+            {/* Top Row: Icon & Pill Badge */}
+            <div className="flex items-center gap-3">
+              <div className="p-3 sm:p-3.5 rounded-2xl border border-cyan-400/30 bg-gradient-to-b from-[#0e172a] to-black text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center">
+                <Atom className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400 animate-spin [animation-duration:18s]" />
               </div>
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                Interactive Lab
+              </span>
             </div>
 
-            {/* Title (Dominant Serif Heading) */}
+            {/* Title & Subtitle */}
             <div className="space-y-2 pt-1">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif">
                 3D animations
@@ -397,11 +402,11 @@ export default function StudentDashboard() {
               </p>
             </div>
 
-            {/* Far-Left Positioned OLED Black Button with Animated Arrow - Directly below description */}
-            <div className="pt-3 sm:pt-4 flex items-center justify-start">
+            {/* Positioned OLED Black Button with Animated Arrow */}
+            <div className="pt-2 sm:pt-3 flex items-center justify-start">
               <Link
                 href="/3d-animations"
-                className="group/cta inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 rounded-xl bg-black hover:bg-neutral-950 border border-cyan-500/50 hover:border-cyan-400 text-white hover:text-cyan-300 font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-[0_0_20px_rgba(0,217,255,0.18)] hover:shadow-[0_0_30px_rgba(0,217,255,0.35)] active:scale-95 whitespace-nowrap"
+                className="group/cta inline-flex items-center gap-3 px-7 sm:px-9 py-3.5 rounded-xl bg-black hover:bg-neutral-950 border border-cyan-500/50 hover:border-cyan-400 text-white hover:text-cyan-300 font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-[0_0_25px_rgba(0,217,255,0.25)] hover:shadow-[0_0_35px_rgba(0,217,255,0.45)] active:scale-95 whitespace-nowrap"
               >
                 <span>Explore All Animations</span>
                 <span className="inline-flex items-center justify-center animate-arrow-glide">

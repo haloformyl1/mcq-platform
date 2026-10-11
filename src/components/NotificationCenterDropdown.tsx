@@ -421,22 +421,22 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
       {/* Dropdown Panel */}
       {isOpen && (
         <div 
-          className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-16 sm:top-full mt-2 sm:w-[430px] max-w-[calc(100vw-1rem)] rounded-2xl bg-gradient-to-b from-[#101522]/98 via-[#0b0e18]/98 to-[#06080e]/99 backdrop-blur-2xl border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.95)] z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col"
+          className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-16 sm:top-full mt-2 sm:w-[440px] max-w-[calc(100vw-1rem)] rounded-3xl bg-gradient-to-b from-[#0e1422]/98 via-[#080c16]/98 to-[#03060c]/99 backdrop-blur-3xl border border-white/15 shadow-[0_35px_100px_rgba(0,0,0,0.95)] z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col ring-1 ring-white/10"
           role="region"
           aria-label="Notification Center"
         >
           {/* Top Notch Pointer (Desktop) */}
-          <div className="hidden sm:block absolute -top-2 right-4 w-4 h-4 bg-[#101522] border-t border-l border-white/15 rotate-45 z-10" />
+          <div className="hidden sm:block absolute -top-2 right-4 w-4 h-4 bg-[#0e1422] border-t border-l border-white/15 rotate-45 z-10" />
 
           {/* Header */}
           <div className="relative px-5 pt-4 pb-3 border-b border-white/10 bg-white/[0.02]">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-600 shadow-[0_0_10px_#e50914] animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-red-600 shadow-[0_0_12px_#e50914] animate-pulse" />
                 <h3 className="text-base font-black text-white tracking-tight flex items-center gap-2">
                   <span>Notifications</span>
                   {unreadCount > 0 && (
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-red-600/30 text-red-300 border border-red-500/40">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-red-600/30 text-red-300 border border-red-500/40 shadow-sm">
                       {unreadCount} new
                     </span>
                   )}
@@ -505,7 +505,7 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
           </div>
 
           {/* Notification Cards List */}
-          <div className="p-3 space-y-2.5 max-h-[420px] overflow-y-auto overscroll-contain pr-2 custom-scrollbar">
+          <div className="p-3 space-y-2.5 max-h-[440px] overflow-y-auto overscroll-contain pr-2 custom-scrollbar">
             {filteredNotifications.length === 0 ? (
               <div className="py-12 px-4 text-center space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-slate-400">
@@ -526,16 +526,16 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
                   <div
                     key={notif.id}
                     onClick={() => markSingleAsRead(notif.id)}
-                    className={"group relative rounded-xl p-3.5 border transition-all duration-200 cursor-pointer " + (
+                    className={"group relative rounded-2xl p-4 border transition-all duration-200 cursor-pointer backdrop-blur-md " + (
                       !isRead 
-                        ? "bg-gradient-to-br from-white/[0.07] to-white/[0.02] border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-white/35" 
+                        ? "bg-gradient-to-br from-white/[0.08] to-white/[0.02] border-white/20 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:border-white/35 hover:-translate-y-0.5" 
                         : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04] hover:border-white/15 opacity-80 hover:opacity-100"
                     )}
                   >
                     {/* Unread Glow Indicator */}
                     {!isRead && (
-                      <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-pulse" />
+                      <div className="absolute top-4 right-4 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444] animate-pulse" />
                       </div>
                     )}
 
@@ -641,9 +641,9 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
           </div>
 
           {/* VIP Concierge Footer */}
-          <div className="p-3 bg-[#070a12] border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="px-5 py-3.5 bg-[#060912]/95 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 backdrop-blur-md">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
               <span>Admin Helpline:</span>
               <a href="tel:9830507435" className="text-white font-mono font-bold hover:text-amber-400 transition">
                 9830507435

@@ -495,30 +495,38 @@ export default function StudyMaterialRepository({
       {/* STEP 1: BOARD SELECTION ("Choose your curriculum")            */}
       {/* ============================================================ */}
       {!selectedBoard && (
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 animate-in fade-in zoom-in-98 duration-400">
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
           
+          {/* Subtle Ambient Radial Lighting */}
+          <div className="pointer-events-none absolute top-12 left-1/2 -translate-x-1/2 w-[600px] h-72 bg-gradient-to-b from-cyan-500/10 via-indigo-500/5 to-transparent blur-3xl" />
+
           {/* Header */}
-          <div className="text-center max-w-3xl mx-auto space-y-6 pt-8 pb-12">
+          <div className="text-center max-w-3xl mx-auto space-y-4 pt-6 pb-10 relative z-10">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              Academic Digital Archives
+            </span>
+
             <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-serif italic drop-shadow-xl">
               Your Chemistry Knowledge Repository
             </h1>
-            <p className="text-base sm:text-lg text-slate-300 font-light leading-relaxed max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-slate-300/90 font-light leading-relaxed max-w-2xl mx-auto">
               Structured theory, derivations, DPPs, and previous year examination archives engineered for your specific board curriculum.
             </p>
           </div>
 
-          <div className="pt-2">
-            <h2 className="text-xs sm:text-sm font-mono tracking-[0.2em] text-slate-400 uppercase text-center mb-6">
+          <div className="pt-2 relative z-10">
+            <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-slate-400 uppercase text-center mb-7">
               Step 1: Choose your curriculum
             </h2>
 
-            {/* 3 Large Academic Portal Cards */}
+            {/* 4 Large Academic Portal Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
               
               {/* 1. CBSE */}
               <Link 
                 href="/study-material/cbse"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(0,217,255,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:scale-98 touch-manipulation rounded-3xl bg-gradient-to-b from-[#0a1424]/90 via-[#060c18]/90 to-[#03060c]/98 hover:from-[#0d1a30] hover:to-[#050a14] backdrop-blur-md border border-cyan-500/25 hover:border-cyan-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,217,255,0.22)] shadow-xl overflow-hidden"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -553,11 +561,11 @@ export default function StudyMaterialRepository({
               {/* 2. ICSE / ISC */}
               <Link 
                 href="/study-material/icse"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-amber-500/20 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(245,158,11,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:scale-98 touch-manipulation rounded-3xl bg-gradient-to-b from-[#181206]/90 via-[#0e0a03]/90 to-[#040301]/98 hover:from-[#241a08] hover:to-[#080501] backdrop-blur-md border border-amber-500/25 hover:border-amber-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(245,158,11,0.22)] shadow-xl overflow-hidden"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#F59E0B]" />
                   </div>
 
                   <div className="space-y-1">
@@ -588,11 +596,11 @@ export default function StudyMaterialRepository({
               {/* 3. WBCHSE */}
               <Link 
                 href="/study-material/wbchse"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-emerald-500/20 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(16,185,129,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:scale-98 touch-manipulation rounded-3xl bg-gradient-to-b from-[#061810]/90 via-[#030e09]/90 to-[#010503]/98 hover:from-[#092418] hover:to-[#020905] backdrop-blur-md border border-emerald-500/25 hover:border-emerald-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(16,185,129,0.22)] shadow-xl overflow-hidden"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10B981]" />
                   </div>
 
                   <div className="space-y-1">
@@ -623,11 +631,11 @@ export default function StudyMaterialRepository({
               {/* 4. NEET/JEE/WBJEE/CUET & OTHER ENTRANCE EXAMS */}
               <Link 
                 href="/study-material/entrance"
-                className="group relative cursor-pointer select-none active:bg-white/[0.08] active:border-white/30 touch-manipulation rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-rose-500/20 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_15px_40px_rgba(244,63,94,0.15)] shadow-md"
+                className="group relative cursor-pointer select-none active:scale-98 touch-manipulation rounded-3xl bg-gradient-to-b from-[#18040a]/90 via-[#0e0205]/90 to-[#040102]/98 hover:from-[#24060e] hover:to-[#080103] backdrop-blur-md border border-rose-500/25 hover:border-rose-400/60 p-6 sm:p-8 flex flex-col justify-between aspect-square h-auto transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(244,63,94,0.22)] shadow-xl overflow-hidden"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_#F43F5E]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_10px_#F43F5E]" />
                   </div>
 
                   <div className="space-y-1">
@@ -635,7 +643,7 @@ export default function StudyMaterialRepository({
                       NEET / JEE / WBJEE / CUET
                     </h3>
                     <p className="text-xs text-slate-400 font-medium">
-                      & Other Entrance Exams
+                      &amp; Other Entrance Exams
                     </p>
                   </div>
 

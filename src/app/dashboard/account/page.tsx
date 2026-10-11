@@ -1662,21 +1662,27 @@ export default function StudentAccountPage() {
             {activeTab === "profiles" && (
               <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
                 
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
-                  
-                  <div className=" pb-4">
-                    <h2 className="text-xl font-bold text-white">Student & Academic Profile</h2>
-                    <p className="text-xs text-slate-400 mt-1">
+                <div className="relative rounded-3xl bg-gradient-to-b from-[#0b1424]/95 via-[#060d18]/95 to-[#03060c]/98 border border-white/10 shadow-[0_20px_70px_rgba(0,0,0,0.8)] p-6 sm:p-9 space-y-7 backdrop-blur-2xl">
+                  {/* Subtle Top Ambient Glow */}
+                  <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-80 h-32 bg-cyan-500/10 rounded-full blur-3xl" />
+
+                  <div className="border-b border-white/10 pb-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest mb-2">
+                      <User className="w-3 h-3 text-cyan-400" />
+                      <span>Account Personalization</span>
+                    </div>
+                    <h2 className="text-2xl font-black text-white tracking-tight">Student &amp; Academic Profile</h2>
+                    <p className="text-xs sm:text-sm text-slate-300/80 mt-1">
                       Customize your display avatar and update your board details to receive personalized exam recommendations.
                     </p>
                   </div>
 
                   {/* Feedback Message */}
                   {profileMsg && (
-                    <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
+                    <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-3 border shadow-md animate-in fade-in duration-200 ${
                       profileMsg.type === "success"
-                        ? "bg-green-950/80 border-green-600/60 text-green-300"
-                        : "bg-red-950/80 border-red-600/60 text-red-300"
+                        ? "bg-green-950/80 border-green-500/50 text-green-300"
+                        : "bg-red-950/80 border-red-500/50 text-red-300"
                     }`}>
                       {profileMsg.type === "success" ? (
                         <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
@@ -1690,8 +1696,8 @@ export default function StudentAccountPage() {
                   <form onSubmit={handleProfileSave} className="space-y-6">
                     
                     {/* Avatar Picker */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
+                    <div className="space-y-3">
+                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest block">
                         Choose Avatar Icon
                       </label>
                       <div className="grid grid-cols-5 gap-3 max-w-sm">
@@ -1702,16 +1708,16 @@ export default function StudentAccountPage() {
                               key={av.id}
                               type="button"
                               onClick={() => setAvatarUrl(av.url)}
-                              className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${
+                              className={`relative rounded-2xl overflow-hidden aspect-square border-2 transition-all duration-200 cursor-pointer ${
                                 isSelected
-                                  ? "border-cyan-400 ring-2 ring-cyan-500/50 scale-105 shadow-[0_0_15px_rgba(6,182,212,0.5)]"
-                                  : "border-slate-800 hover:border-cyan-500/50 opacity-70 hover:opacity-100"
+                                  ? "border-cyan-400 ring-2 ring-cyan-500/60 scale-105 shadow-[0_0_20px_rgba(6,182,212,0.6)]"
+                                  : "border-white/10 hover:border-cyan-500/40 opacity-70 hover:opacity-100 bg-black/40"
                               }`}
                               title={av.name}
                             >
                               <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
                               {isSelected && (
-                                <span className="absolute top-1 right-1 w-4 h-4 bg-cyan-500 text-slate-950 rounded-full flex items-center justify-center text-[9px] font-black">
+                                <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-cyan-400 text-slate-950 rounded-full flex items-center justify-center text-[10px] font-black shadow-md">
                                   ✓
                                 </span>
                               )}
@@ -1721,7 +1727,7 @@ export default function StudentAccountPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                       
                       {/* Name */}
                       <div className="space-y-1.5">
@@ -1733,7 +1739,7 @@ export default function StudentAccountPage() {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Enter your name"
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
+                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 rounded-xl px-4 py-3 text-sm text-white outline-none transition shadow-inner placeholder:text-slate-600"
                         />
                       </div>
 
@@ -1747,7 +1753,7 @@ export default function StudentAccountPage() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="10-digit mobile number"
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white font-mono outline-none transition"
+                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 rounded-xl px-4 py-3 text-sm text-white font-mono outline-none transition shadow-inner placeholder:text-slate-600"
                         />
                       </div>
 
@@ -1760,7 +1766,7 @@ export default function StudentAccountPage() {
                           type="email"
                           value={email}
                           disabled
-                          className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-400 font-mono cursor-not-allowed"
+                          className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 text-sm text-slate-400 font-mono cursor-not-allowed select-none"
                         />
                       </div>
 
@@ -1772,7 +1778,7 @@ export default function StudentAccountPage() {
                         <select
                           value={gender}
                           onChange={(e) => setGender(e.target.value)}
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer"
+                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
                         >
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -1789,7 +1795,7 @@ export default function StudentAccountPage() {
                           type="date"
                           value={dob}
                           onChange={(e) => setDob(e.target.value)}
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition cursor-pointer"
+                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
                         />
                       </div>
 
@@ -1810,7 +1816,7 @@ export default function StudentAccountPage() {
                             }
                           }}
                           disabled={isGold}
-                          className={"w-full rounded-xl px-4 py-2.5 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-slate-900/50 border border-slate-800 text-slate-500 cursor-not-allowed" : "bg-slate-950/90 border border-slate-800 focus:border-cyan-400 text-cyan-300")}
+                          className={"w-full rounded-xl px-4 py-3 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-white/[0.03] border border-white/5 text-slate-500 cursor-not-allowed" : "bg-[#030712]/90 border border-white/10 focus:border-cyan-400 text-cyan-300")}
                         >
                           <option value="CBSE">CBSE</option>
                           <option value="ICSE">ICSE</option>
@@ -1828,7 +1834,7 @@ export default function StudentAccountPage() {
                             value={academicLevel}
                             onChange={(e) => setAcademicLevel(e.target.value)}
                             disabled={isGold}
-                            className={"w-full rounded-xl px-4 py-2.5 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-slate-900/50 border border-slate-800 text-slate-500 cursor-not-allowed" : "bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
+                            className={"w-full rounded-xl px-4 py-3 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-white/[0.03] border border-white/5 text-slate-500 cursor-not-allowed" : "bg-[#030712]/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
                           >
                             <option value="SEM-I">SEM-I</option>
                             <option value="SEM-II">SEM-II</option>
@@ -1840,7 +1846,7 @@ export default function StudentAccountPage() {
                             value={academicLevel}
                             onChange={(e) => setAcademicLevel(e.target.value)}
                             disabled={isGold}
-                            className={"w-full rounded-xl px-4 py-2.5 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-slate-900/50 border border-slate-800 text-slate-500 cursor-not-allowed" : "bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
+                            className={"w-full rounded-xl px-4 py-3 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-white/[0.03] border border-white/5 text-slate-500 cursor-not-allowed" : "bg-[#030712]/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
                           >
                             <option value="11">Class 11</option>
                             <option value="12">Class 12</option>
@@ -1849,20 +1855,20 @@ export default function StudentAccountPage() {
                       </div>
 
                       {isGold && (
-                        <div className="sm:col-span-2">
-                          <p className="text-xs text-amber-500/80 italic font-medium flex items-center gap-1.5">
-                            <AlertCircle className="w-3.5 h-3.5" />
+                        <div className="sm:col-span-2 pt-1">
+                          <p className="text-xs text-amber-400/90 italic font-medium flex items-center gap-1.5">
+                            <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
                             You cannot modify your board and {board === "WBCHSE" ? "semester" : "class"} while your current plan is active.
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div className="flex justify-end pt-2">
+                    <div className="flex justify-end pt-3 border-t border-white/10">
                       <button
                         type="submit"
                         disabled={profileLoading}
-                        className="px-6 py-3 bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 hover:from-teal-500 hover:to-blue-500 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider transition shadow-[0_0_20px_rgba(20,184,166,0.3)] disabled:opacity-50 cursor-pointer flex items-center gap-2 active:scale-98"
+                        className="px-8 py-3.5 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600 hover:brightness-110 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 shadow-[0_0_25px_rgba(6,182,212,0.4)] disabled:opacity-50 cursor-pointer flex items-center gap-2 active:scale-98"
                       >
                         {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                         <span>{profileLoading ? "Saving..." : "Save Profile Details"}</span>
@@ -2192,11 +2198,11 @@ export default function StudentAccountPage() {
                       // 1. FREE / BASIC TIER CARD
                       if (isPlanBasic) {
                         return (
-                          <div key={plan.id} className="flex-1 min-w-[300px] rounded-2xl border-2 border-indigo-500/30 bg-gradient-to-b from-[#0a1220]/95 via-[#060c14]/95 to-[#03060a]/95 shadow-[0_0_50px_rgba(99,102,241,0.12)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400/60 hover:shadow-[0_0_60px_rgba(99,102,241,0.22)]">
-                            {/* Card Head (Deep Obsidian Slate Banner) */}
-                            <div className="p-6 bg-gradient-to-r from-[#111e38] via-[#1e293b] to-[#334155] text-white relative">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-[11px] font-black tracking-widest uppercase bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-full text-slate-200 border border-white/10">
+                          <div key={plan.id} className="flex-1 min-w-[320px] rounded-3xl border border-white/10 bg-gradient-to-b from-[#0a1220]/95 via-[#060c14]/95 to-[#03060a]/98 shadow-[0_15px_50px_rgba(0,0,0,0.6)] flex flex-col justify-between overflow-hidden relative transition-all duration-300 hover:border-cyan-500/40 hover:shadow-[0_20px_60px_rgba(6,182,212,0.15)] hover:-translate-y-1">
+                            {/* Card Head (Obsidian Glass Banner) */}
+                            <div className="p-6 sm:p-7 bg-gradient-to-r from-[#0c1524] via-[#162032] to-[#1e293b] text-white relative border-b border-white/10">
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="text-[10px] font-black tracking-widest uppercase bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-slate-300 border border-white/15">
                                   FREE TIER
                                 </span>
                                 {!isGold && (
@@ -2342,25 +2348,28 @@ export default function StudentAccountPage() {
                       const ultraPayable = canUpgradeFor200 ? 200 : (Number(plan.price) || 499);
 
                       return (
-                        <div key={plan.id} className="flex-1 min-w-[300px] rounded-2xl border-2 border-red-600/70 bg-gradient-to-b from-[#180407]/95 via-[#0d0204]/95 to-[#060102]/95 shadow-[0_0_65px_rgba(229,9,20,0.38)] flex flex-col justify-between overflow-hidden relative transition hover:border-red-500 hover:shadow-[0_0_80px_rgba(229,9,20,0.55)]">
+                        <div key={plan.id} className="flex-1 min-w-[320px] rounded-3xl border-2 border-red-600/70 bg-gradient-to-b from-[#180407]/98 via-[#0e0204]/98 to-[#050102]/99 shadow-[0_20px_70px_rgba(229,9,20,0.35)] flex flex-col justify-between overflow-hidden relative transition-all duration-300 hover:border-red-500 hover:shadow-[0_25px_85px_rgba(229,9,20,0.55)] hover:-translate-y-1">
+                          {/* Ambient Crimson Halo */}
+                          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-red-600/20 blur-3xl pointer-events-none" />
+
                           {/* Card Head (Netflix Crimson Banner) */}
-                          <div className="p-6 bg-gradient-to-r from-[#1e0306] via-[#990a12] to-[#e50914] text-white relative">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-[11px] font-black tracking-widest uppercase bg-black/50 backdrop-blur-md px-2.5 py-0.5 rounded-full text-red-100 border border-red-500/40 flex items-center gap-1.5">
+                          <div className="p-6 sm:p-7 bg-gradient-to-r from-[#200307] via-[#8f0910] to-[#e50914] text-white relative border-b border-red-500/30">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-[10px] font-black tracking-widest uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-red-100 border border-red-400/40 flex items-center gap-1.5 shadow-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                                 TOP TIER • ULTIMATE
                               </span>
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-red-200 text-xs font-black shadow-sm">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-red-100 text-xs font-black shadow-sm">
                                 <Sparkles className="w-3.5 h-3.5 text-red-300" /> {plan.durationDays}-Day Pass
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="px-2 py-0.5 rounded-full bg-[#160406] border border-red-600/60 text-red-100 text-[10px] font-bold">
+                            <div className="flex items-center gap-2.5 mt-1.5">
+                              <div className="px-2.5 py-0.5 rounded-full bg-[#180305] border border-red-500/60 text-red-100 text-[10px] font-black uppercase tracking-wider shadow-sm">
                                 Ultra
                               </div>
-                              <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
+                              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-md">{plan.name}</h3>
                             </div>
-                            <p className="text-xs text-red-100/90 mt-1">{plan.description}</p>
+                            <p className="text-xs text-red-100/90 mt-1 font-medium">{plan.description}</p>
                           </div>
 
                           {/* Features Comparison Rows */}
@@ -3222,67 +3231,88 @@ export default function StudentAccountPage() {
             </div>
           </header>
 
-          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col items-center justify-center text-center space-y-6 my-auto">
+          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-6 py-12 flex flex-col items-center justify-center text-center my-auto relative">
             
-            {/* Glowing Trophy / Badge Icon */}
-            <div className="w-20 h-20 mx-auto rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-              <Sparkles className="w-10 h-10 text-amber-500" />
-            </div>
+            {/* Ambient Background Glow behind card */}
+            <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-tr from-red-600/20 via-amber-500/15 to-transparent blur-[120px]" />
 
-            {/* Top Tier Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
-              <span>Top Tier Enrolled</span>
-            </div>
-
-            {/* Heading & Exact Requested Message */}
-            <div className="space-y-2">
-              <h3 className="text-3xl font-bold text-white tracking-tight">
-                Highest Plan Active
-              </h3>
-              <p className="text-sm text-slate-400 leading-relaxed font-medium">
-                You are currently enrolled in the highest possible plan on PieChem.
-              </p>
-            </div>
-
-            {/* Current Plan Card */}
-            <div className="w-full bg-[#0b131e] border border-slate-800 rounded-2xl p-6 text-left space-y-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400 font-medium">Active Membership</span>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active
-                </span>
+            {/* Premium Card Frame */}
+            <div className="relative w-full rounded-3xl bg-gradient-to-b from-[#121824]/90 via-[#0a0f18]/95 to-[#05080f]/98 border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.85)] p-6 sm:p-9 space-y-7 backdrop-blur-2xl">
+              
+              {/* Emblem / Crown Badge */}
+              <div className="relative mx-auto flex items-center justify-center w-20 h-20">
+                <div className="absolute inset-0 rounded-2xl rotate-45 bg-gradient-to-tr from-amber-500/40 via-red-500/30 to-amber-300/20 blur-md animate-pulse" />
+                <div className="relative w-full h-full rounded-2xl rotate-45 flex items-center justify-center bg-gradient-to-b from-[#221808] to-[#0c0802] border border-amber-400/50 shadow-[0_0_25px_rgba(245,158,11,0.35)]">
+                  <div className="-rotate-45">
+                    <Sparkles className="w-9 h-9 text-amber-300 fill-amber-400/30 drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]" />
+                  </div>
+                </div>
               </div>
-              <p className="text-lg font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-500" /> {effectivePlanTier === "ultra" ? "PIE Ultra" : isComplimentary ? "PIE Pro (Lifetime Complimentary)" : "PIE Pro"}
-              </p>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                You already have full access to all 50+ exams, 3D molecular models, full solutions, and proctored analytics.
-              </p>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="w-full space-y-3 pt-2">
-              <button
-                type="button"
-                onClick={() => handleCloseModal()}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 cursor-pointer transition"
-              >
-                GOT IT, THANK YOU!
-              </button>
+              {/* Top Tier Badge & Heading */}
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-950/80 border border-amber-400/40 text-amber-300 text-[11px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span>Top Tier Enrolled</span>
+                </div>
 
-              {is30Day && (
+                <h3 className="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
+                  Highest Plan Active
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed max-w-md mx-auto font-normal">
+                  You are currently enrolled in the highest possible tier on <span className="text-white font-bold">PIECHEM</span>. All premium resources and exam simulators are fully unlocked for you.
+                </p>
+              </div>
+
+              {/* Current Plan Card Display */}
+              <div className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 sm:p-6 text-left space-y-3.5 shadow-inner backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400 uppercase font-black tracking-wider">Active Membership</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/40">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2.5 pt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <span className="text-xl font-black text-white tracking-tight">
+                    {effectivePlanTier === "ultra" ? "PIE Ultra" : isComplimentary ? "PIE Pro (Lifetime Complimentary)" : "PIE Pro"}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-300 leading-relaxed font-light pt-1">
+                  You already have full, unrestricted access to all 50+ exams, 3D molecular models, step-by-step AI solutions, and national proctored rankings.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="w-full space-y-3 pt-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    openModal("pay");
-                  }}
-                  className="text-xs text-slate-400 hover:text-cyan-300 transition underline cursor-pointer block mx-auto"
+                  onClick={() => handleCloseModal()}
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white font-black text-xs uppercase tracking-widest shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:brightness-110 active:scale-98 cursor-pointer transition-all"
                 >
-                  Need to renew or extend your 30-day pass instead?
+                  GOT IT, THANK YOU!
                 </button>
-              )}
-            </div>
 
+                {is30Day && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      openModal("pay");
+                    }}
+                    className="text-xs text-slate-400 hover:text-white transition underline cursor-pointer block mx-auto pt-1"
+                  >
+                    Need to renew or extend your 30-day pass instead?
+                  </button>
+                )}
+              </div>
+
+            </div>
           </main>
         </div>
       )}
