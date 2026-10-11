@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { X, Sparkles, ShieldCheck, Zap, BarChart3, Headphones, Crown, Flame } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { X, Sparkles, ShieldCheck, Zap, BarChart3, Headphones, Crown, Flame, ArrowLeft } from "lucide-react";
 
 interface StudentProps {
   id: string;
@@ -100,6 +101,8 @@ export default function GoldUpgradeCelebrationModal({
     };
   }, [hasAccess, student]);
 
+  const router = useRouter();
+
   const handleClose = () => {
     if (controlledOnClose) {
       controlledOnClose();
@@ -108,14 +111,13 @@ export default function GoldUpgradeCelebrationModal({
     }
   };
 
-  const handleStartPracticing = () => {
+  const handleBackToDashboard = () => {
     handleClose();
-    if (typeof window !== "undefined") {
-      const testsSection = document.getElementById("tests");
-      if (testsSection) {
-        testsSection.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.location.href = "/dashboard#tests";
+    try {
+      router.push("/dashboard");
+    } catch {
+      if (typeof window !== "undefined") {
+        window.location.href = "/dashboard";
       }
     }
   };
@@ -241,15 +243,15 @@ export default function GoldUpgradeCelebrationModal({
 
           {/* Action Button */}
           <button
-            onClick={handleStartPracticing}
+            onClick={handleBackToDashboard}
             className={"w-full group relative flex items-center justify-center gap-2 rounded-xl py-3.5 px-6 text-sm sm:text-base font-black transition-all cursor-pointer shadow-lg hover:brightness-110 active:scale-98 " + (
               isUltra 
                 ? "bg-gradient-to-r from-red-600 to-rose-700 text-white shadow-red-950/50" 
                 : "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-blue-950/50"
             )}
           >
-            Start Practicing Now
-            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1 shrink-0" />
+            <span>Back to Dashboard</span>
           </button>
         </div>
       </div>
