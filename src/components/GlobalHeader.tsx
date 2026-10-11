@@ -16,6 +16,7 @@ export interface GlobalHeaderProps {
   logoHref?: string;
   student?: any;
   upgradeReq?: any;
+  planTier?: "pro" | "ultra" | null;
   showNavLinks?: boolean;
   onCurriculumChange?: (board: string, level: string) => Promise<void> | void;
   updatingCurriculum?: boolean;
@@ -24,6 +25,7 @@ export interface GlobalHeaderProps {
 
 export default function GlobalHeader({
   isGoldMember = false,
+  planTier,
   contextBadge,
   navigation,
   actions,
@@ -43,6 +45,32 @@ export default function GlobalHeader({
     (student?.subscriptionStatus === "PAID" &&
       (!student?.subscriptionExpiresAt ||
         new Date(student.subscriptionExpiresAt).getTime() > Date.now()));
+
+  // Resolve plan tier ('ultra' vs 'pro')
+  const resolvePlanTier = (): "pro" | "ultra" | null => {
+    if (!isGold) return null;
+    if (planTier) return planTier;
+
+    // Check student subscription plan name or active upgrade requests
+    const latestReq = upgradeReq || (Array.isArray(student?.upgradeRequests) ? student.upgradeRequests[0] : null);
+    const planText = (
+      student?.subscriptionPlanName || 
+      student?.planName || 
+      student?.plan || 
+      latestReq?.note || 
+      latestReq?.purchasedClass || 
+      ""
+    ).toLowerCase();
+
+    const amount = Number(latestReq?.amount) || 0;
+
+    if (planText.includes("ultra") || amount >= 400) {
+      return "ultra";
+    }
+    return "pro";
+  };
+
+  const effectivePlanTier = resolvePlanTier();
 
   const isUpdating = updatingCurriculum || internalUpdating;
 
@@ -86,6 +114,7 @@ export default function GlobalHeader({
                   size="md"
                   href={logoHref}
                   isGoldMember={isGold}
+                  planTier={effectivePlanTier}
                 />
                 {contextBadge}
               </div>

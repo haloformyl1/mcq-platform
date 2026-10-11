@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const studentId = payload.id as string;
     const body = await req.json().catch(() => ({}));
-    const { utrNumber, studentUpiId, amount, purchasedBoard, purchasedClass } = body;
+    const { utrNumber, studentUpiId, amount, purchasedBoard, purchasedClass, planName } = body;
     const cleanUpi = studentUpiId ? String(studentUpiId).trim() : null;
     const cleanUtr = utrNumber ? String(utrNumber).trim() : null;
     const identifier = cleanUpi || cleanUtr;
@@ -61,11 +61,17 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    const resolvedPlan = planName || (finalAmount >= 400 ? "PIE Ultra" : "PIE Pro");
+    const noteText = [
+      resolvedPlan ? `Plan: ${resolvedPlan}` : null,
+      cleanUpi ? `Payer UPI ID: ${cleanUpi}` : null
+    ].filter(Boolean).join(" | ");
+
     const newRequest = await prisma.subscriptionUpgradeRequest.create({
       data: {
         studentId,
         utrNumber: identifier,
-        note: cleanUpi ? "Payer UPI ID: " + cleanUpi : null,
+        note: noteText,
         amount: finalAmount,
         purchasedBoard: purchasedBoard || "CBSE",
         purchasedClass: purchasedClass || "11",

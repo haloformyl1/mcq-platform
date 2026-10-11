@@ -65,7 +65,12 @@ export async function GET(req: Request) {
         subscriptionStartedAt: true,
         subscriptionExpiresAt: true,
         avatarUrl: true,
-        createdAt: true 
+        createdAt: true,
+        upgradeRequests: {
+          where: { status: "APPROVED" },
+          orderBy: { createdAt: "desc" },
+          take: 1
+        }
       }
     });
 
@@ -284,6 +289,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       student,
+      upgradeReq: student.upgradeRequests?.[0] || null,
       availableTests: availableTestsWithOverrides,
       testAlertSettings,
       allAttempts,

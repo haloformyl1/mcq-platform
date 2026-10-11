@@ -9,6 +9,7 @@ interface PiechemLogoProps {
   className?: string;
   href?: string;
   isGoldMember?: boolean;
+  planTier?: "pro" | "ultra" | null;
   theme?: 'dark' | 'light';
   subtitle?: string | null;
   showIcon?: boolean;
@@ -21,13 +22,16 @@ export default function PiechemLogo({
   className = "",
   href,
   isGoldMember = false,
+  planTier,
   theme = 'dark',
   subtitle,
   showIcon = true,
   textWhiteOnly = false
 }: PiechemLogoProps) {
-  // Premium/Complimentary students get a "Pro" badge instead of a gold logo, per user request.
-  const showProBadge = Boolean(isGoldMember);
+  // Ultra plan badge appears before the logo in Netflix reddish-black bracket.
+  // Pro plan badge appears after the logo in dark blue bracket.
+  const isUltra = planTier === "ultra";
+  const isPro = !isUltra && (planTier === "pro" || Boolean(isGoldMember));
   const isGold = false;
 
   const dimensions = {
@@ -202,6 +206,16 @@ export default function PiechemLogo({
       {showText && (
         <div className="flex flex-col justify-center leading-none">
           <div className={"font-black tracking-wider font-sans uppercase flex items-center " + current.text}>
+            {/* ULTRA BADGE: Placed just before the PIECHEM logo in Netflix reddish-black bracket */}
+            {isUltra && (
+              <div className="relative mr-2 sm:mr-2.5 inline-flex items-center justify-center shrink-0">
+                <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full"></div>
+                <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-[#160406] text-red-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
+                  Ultra
+                </span>
+              </div>
+            )}
+
             {textWhiteOnly ? (
               <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' drop-shadow-sm'}>
                 PIECHEM
@@ -216,10 +230,12 @@ export default function PiechemLogo({
                 </span>
               </>
             )}
-            {showProBadge && (
-              <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center">
-                <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
-                <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
+
+            {/* PRO BADGE: Placed just after the PIECHEM logo in dark blue colour bracket */}
+            {isPro && (
+              <div className="relative ml-2 sm:ml-2.5 inline-flex items-center justify-center shrink-0">
+                <div className="absolute inset-0 bg-blue-600/50 blur-md rounded-full"></div>
+                <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-[#0b162c] text-blue-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-blue-500/50 shadow-[0_2px_12px_rgba(37,99,235,0.4)] leading-none flex items-center justify-center">
                   Pro
                 </span>
               </div>
