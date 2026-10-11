@@ -814,7 +814,7 @@ export default function StudentAccountPage() {
         isGoldMember={isGold}
       />
       {/* 2. MAIN LAYOUT (FULL SCREEN NETFLIX ACCOUNT SETTINGS PAGE) */}
-      <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1">
+      <main className={`${activeTab === "change-plan" ? "max-w-[96vw] xl:max-w-[1600px]" : "max-w-6xl"} mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1 transition-all duration-300`}>
         
         {/* Top Navigation Row */}
         <div className="flex items-center justify-between">
@@ -1973,9 +1973,9 @@ export default function StudentAccountPage() {
                   </div>
                 ) : (
                   <>
-                {/* Plan Comparison Shelf (Strictly Side-by-Side - Max 5 Plans, No Wrapping to Down) */}
+                {/* Plan Comparison Shelf (Strictly Side-by-Side - Max 5 Plans, No Wrapping to Down, Full Space Utilized) */}
                 <div className="w-full overflow-x-auto pb-8 pt-2 scrollbar-thin scrollbar-thumb-slate-700/80 scrollbar-track-slate-900/40">
-                  <div className="flex flex-row flex-nowrap items-stretch gap-6 min-w-max mx-auto justify-center px-4">
+                  <div className="flex flex-row flex-nowrap items-stretch gap-5 sm:gap-6 w-full">
                     {(plans.length > 0 ? plans : [
                       {
                         id: "default-basic",
@@ -2012,7 +2012,7 @@ export default function StudentAccountPage() {
 
                       if (!isPaid) {
                         return (
-                          <div key={plan.id} className="w-[320px] sm:w-[350px] shrink-0 rounded-2xl border-2 border-indigo-500/40 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(99,102,241,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400 hover:shadow-[0_0_60px_rgba(99,102,241,0.28)]">
+                          <div key={plan.id} className="flex-1 min-w-[280px] rounded-2xl border-2 border-indigo-500/40 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(99,102,241,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400 hover:shadow-[0_0_60px_rgba(99,102,241,0.28)]">
                             {/* Card Head (Standard Blue/Purple Gradient Banner) */}
                             <div className="p-6 bg-gradient-to-r from-[#203a94] via-[#4338ca] to-[#723abb] text-white relative">
                               <div className="flex items-center justify-between mb-2">
@@ -2068,7 +2068,7 @@ export default function StudentAccountPage() {
 
                       // Paid Plan (e.g. PIECHEM Pro)
                       return (
-                        <div key={plan.id} className="w-[320px] sm:w-[350px] shrink-0 rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
+                        <div key={plan.id} className="flex-1 min-w-[280px] rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
                           {/* Card Head (Vibrant Gradient Banner) */}
                           <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
                             <div className="flex items-center justify-between mb-2">
