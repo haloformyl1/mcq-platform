@@ -132,7 +132,7 @@ export default function AdminPaymentsPage() {
       const method = planForm.id ? "PUT" : "POST";
       const body = {
         ...planForm,
-        benefits: planForm.benefits.split("\\n").map(b => b.trim()).filter(b => b)
+        benefits: planForm.benefits.split("\n").map(b => b.trim()).filter(Boolean)
       };
 
       const res = await fetch(url, {
@@ -149,6 +149,28 @@ export default function AdminPaymentsPage() {
       setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
       setErrorMsg(err.message);
+    } finally {
+      setPlanSaving(false);
+    }
+  };
+
+  const handleResetDefaultPlans = async () => {
+    if (!confirm("This will reset your plans to the 2 default plans (Basic and PIECHEM Pro). Continue?")) return;
+    setPlanSaving(true);
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/admin/subscription-plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "seed_defaults" })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to reset plans");
+      if (Array.isArray(data)) setPlans(data);
+      setSuccessMsg("Reset to default plans (Basic & PIECHEM Pro) successfully!");
+      setTimeout(() => setSuccessMsg(""), 3000);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to reset plans");
     } finally {
       setPlanSaving(false);
     }
@@ -843,62 +865,200 @@ export default function AdminPaymentsPage() {
       </section>
       {/* SECTION 5: SUBSCRIPTION PLANS MANAGEMENT */}
       <section className="bg-[#12161f]/90 border border-slate-800 p-6 sm:p-7 rounded-3xl shadow-xl space-y-5">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-slate-900 rounded-xl border border-slate-700 text-white">
               <Sparkles className="w-5 h-5 text-yellow-400" />
             </div>
             <div>
               <h2 className="text-lg font-black text-white tracking-wide">Subscription Plans</h2>
-              <p className="text-xs text-slate-400">Manage pricing tiers (max 5 active plans)</p>
+              <p className="text-xs text-slate-400">Manage pricing tiers (max 5 active plans) with auto-regenerating payment QR codes</p>
             </div>
           </div>
-          <button
-            onClick={() => {
-              setPlanForm({ id: "", name: "", description: "", price: 99, durationDays: 30, benefits: "", isActive: true });
-              setShowPlanModal(true);
-            }}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Add Plan
-          </button>
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <button
+              onClick={handleResetDefaultPlans}
+              disabled={planSaving}
+              className="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition cursor-pointer"
+              title="Reset to default Basic (₹0) and PIECHEM Pro (₹299) plans"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Reset Defaults</span>
+            </button>
+            <button
+              onClick={() => {
+                setPlanForm({ id: "", name: "", description: "", price: 299, durationDays: 30, benefits: "", isActive: true });
+                setShowPlanModal(true);
+              }}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-emerald-950/40"
+            >
+              <Plus className="w-4 h-4" /> Add Plan
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {plans.map(plan => (
-            <div key={plan.id} className={`p-5 rounded-2xl border ${plan.isActive ? 'bg-slate-900 border-emerald-500/50' : 'bg-slate-950 border-slate-800 opacity-70'} relative`}>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                <div className="flex gap-2">
-                  <button onClick={() => {
-                    setPlanForm({ ...plan, benefits: plan.benefits?.join("\\n") || "" });
-                    setShowPlanModal(true);
-                  }} className="text-cyan-400 hover:text-cyan-300">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDeletePlan(plan.id)} className="text-red-400 hover:text-red-300">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          {plans.map(plan => {
+            const hasFee = Number(plan.price) > 0;
+            const currentUpiId = paymentSettings?.upiId || "arg9830@axl";
+            const currentPayee = paymentSettings?.payeeName || "Arghyadeep Roy";
+            const upiUrl = hasFee 
+              ? `upi://pay?pa=${currentUpiId}&pn=${encodeURIComponent(currentPayee)}&am=${plan.price}&cu=INR&tn=${encodeURIComponent(plan.name + " Plan Payment")}`
+              : null;
+            const qrImageUrl = upiUrl 
+              ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`
+              : null;
+
+            return (
+              <div 
+                key={plan.id} 
+                className={`p-6 rounded-2xl border flex flex-col justify-between transition-all duration-200 ${
+                  plan.isActive 
+                    ? hasFee 
+                      ? 'bg-gradient-to-b from-[#101927] to-[#0a101a] border-cyan-500/40 shadow-lg shadow-cyan-950/20' 
+                      : 'bg-gradient-to-b from-[#131726] to-[#0a0d17] border-indigo-500/40 shadow-lg shadow-indigo-950/20'
+                    : 'bg-slate-950 border-slate-800 opacity-60'
+                }`}
+              >
+                <div>
+                  {/* Top Header: Badge + Actions */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded-full border ${
+                        hasFee 
+                          ? 'bg-rose-950/80 text-rose-300 border-rose-700/60' 
+                          : 'bg-indigo-950/80 text-indigo-300 border-indigo-700/60'
+                      }`}>
+                        {hasFee ? 'RECOMMENDED / PAID' : 'FREE TIER'}
+                      </span>
+                      {plan.isActive ? (
+                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-slate-400 bg-slate-900 border border-slate-700 px-2 py-0.5 rounded-full">
+                          Inactive
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          setPlanForm({ 
+                            ...plan, 
+                            benefits: Array.isArray(plan.benefits) ? plan.benefits.join("\n") : "" 
+                          });
+                          setShowPlanModal(true);
+                        }} 
+                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 hover:text-cyan-300 transition cursor-pointer"
+                        title="Edit Plan"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeletePlan(plan.id)} 
+                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-red-400 hover:text-red-300 transition cursor-pointer"
+                        title="Delete Plan"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Title & Tagline */}
+                  <h3 className="text-xl font-black text-white tracking-tight">{plan.name}</h3>
+                  <p className="text-xs text-slate-400 mt-1 mb-4 leading-relaxed">{plan.description}</p>
+
+                  {/* Price */}
+                  <div className="flex items-baseline gap-2 mb-5 pb-4 border-b border-slate-800/80">
+                    <span className="text-3xl font-black text-white font-mono">₹{plan.price}</span>
+                    <span className="text-xs text-slate-400 font-medium">/ {plan.durationDays} days</span>
+                  </div>
+
+                  {/* Plan QR Code (If Applicable) */}
+                  <div className="mb-5">
+                    {hasFee && qrImageUrl ? (
+                      <div className="p-4 rounded-xl bg-[#080d15] border border-cyan-500/20 flex flex-col sm:flex-row items-center gap-4">
+                        <div className="p-2.5 bg-white rounded-xl shadow-md shrink-0 border border-slate-200">
+                          <img 
+                            src={qrImageUrl} 
+                            alt={`${plan.name} Payment QR`} 
+                            className="w-28 h-28 object-contain"
+                          />
+                        </div>
+                        <div className="space-y-1.5 text-center sm:text-left">
+                          <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold text-white">
+                            <QrCode className="w-3.5 h-3.5 text-cyan-400" />
+                            <span>Live Student QR for ₹{plan.price}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 font-mono break-all">VPA: {currentUpiId}</p>
+                          <p className="text-[10px] text-slate-500">Scan with PhonePe, GPay, Paytm, BHIM</p>
+                          <a
+                            href={qrImageUrl}
+                            download={`${plan.name}_QR_₹${plan.price}.png`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-block text-[11px] text-cyan-400 hover:text-cyan-300 font-bold underline cursor-pointer mt-1"
+                          >
+                            Download QR
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 rounded-xl bg-[#0b0e17] border border-slate-800 text-center flex items-center justify-center gap-2 text-xs text-slate-400">
+                        <Check className="w-4 h-4 text-emerald-400" />
+                        <span>Free Plan — No payment QR code required</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Benefits List */}
+                  <div className="space-y-2 mb-4">
+                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Plan Benefits:</div>
+                    {plan.benefits?.map((b: string, i: number) => {
+                      const parts = b.split(":");
+                      const hasColon = parts.length > 1;
+                      const title = hasColon ? parts[0].trim() : null;
+                      const value = hasColon ? parts.slice(1).join(":").trim() : b;
+
+                      return (
+                        <div key={i} className="text-xs text-slate-300 flex items-start justify-between gap-3 py-1 border-b border-slate-800/40">
+                          {title ? (
+                            <>
+                              <span className="text-slate-400 font-medium">{title}</span>
+                              <span className="font-bold text-white text-right flex items-center gap-1.5">
+                                {hasFee && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                                <span>{value}</span>
+                              </span>
+                            </>
+                          ) : (
+                            <div className="flex items-start gap-2">
+                              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                              <span>{b}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                  <span>Duration: {plan.durationDays} Days</span>
+                  <span>ID: {plan.id.slice(0, 8)}...</span>
                 </div>
               </div>
-              <div className="text-2xl font-black text-emerald-400 mb-1">₹{plan.price} <span className="text-xs text-slate-400 font-normal">/ {plan.durationDays} days</span></div>
-              <p className="text-xs text-slate-400 mb-4">{plan.description}</p>
-              <ul className="space-y-2 mb-4">
-                {plan.benefits?.map((b: string, i: number) => (
-                  <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="text-[10px] font-mono text-slate-500 uppercase">
-                Status: {plan.isActive ? <span className="text-emerald-400 font-bold">Active</span> : <span className="text-slate-400">Inactive</span>}
-              </div>
-            </div>
-          ))}
+            );
+          })}
           {plans.length === 0 && (
-            <div className="col-span-full py-8 text-center text-slate-500 text-sm border border-dashed border-slate-700 rounded-xl">
-              No subscription plans configured yet.
+            <div className="col-span-full py-12 text-center text-slate-500 text-sm border border-dashed border-slate-700 rounded-2xl space-y-3">
+              <p>No subscription plans configured yet.</p>
+              <button
+                onClick={handleResetDefaultPlans}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition"
+              >
+                Generate Default Plans (Basic & PIECHEM Pro)
+              </button>
             </div>
           )}
         </div>
@@ -907,41 +1067,65 @@ export default function AdminPaymentsPage() {
       {/* ADD/EDIT PLAN MODAL */}
       {showPlanModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#12161f] border border-slate-700 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl">
+          <div className="bg-[#12161f] border border-slate-700 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl">
             <div className="flex justify-between items-center p-4 border-b border-slate-800">
               <h3 className="text-lg font-bold text-white">{planForm.id ? "Edit Plan" : "Add New Plan"}</h3>
               <button onClick={() => setShowPlanModal(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleSavePlan} className="p-5 space-y-4">
+            <form onSubmit={handleSavePlan} className="p-5 space-y-4 max-h-[85vh] overflow-y-auto">
               <div>
                 <label className="block text-xs font-bold text-slate-400 mb-1">Plan Name *</label>
-                <input required type="text" value={planForm.name} onChange={e => setPlanForm({...planForm, name: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="e.g. Gold Tier" />
+                <input required type="text" value={planForm.name} onChange={e => setPlanForm({...planForm, name: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="e.g. PIECHEM Pro" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-400 mb-1">Description</label>
-                <input type="text" value={planForm.description} onChange={e => setPlanForm({...planForm, description: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="Short tagline" />
+                <label className="block text-xs font-bold text-slate-400 mb-1">Description / Tagline</label>
+                <input type="text" value={planForm.description} onChange={e => setPlanForm({...planForm, description: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none" placeholder="e.g. Full access to 50+ exams, 3D models & proctored rankings" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-400 mb-1">Price (₹) *</label>
-                  <input required type="number" step="0.01" value={planForm.price} onChange={e => setPlanForm({...planForm, price: parseFloat(e.target.value) || 0})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono text-emerald-400 focus:border-cyan-500 outline-none" />
+                  <input required type="number" step="0.01" value={planForm.price} onChange={e => setPlanForm({...planForm, price: parseFloat(e.target.value) || 0})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono text-emerald-400 font-bold focus:border-cyan-500 outline-none" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-400 mb-1">Duration (Days) *</label>
                   <input required type="number" value={planForm.durationDays} onChange={e => setPlanForm({...planForm, durationDays: parseInt(e.target.value) || 30})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm font-mono focus:border-cyan-500 outline-none" />
                 </div>
               </div>
+
+              {/* Dynamic Live QR Code Regeneration Preview */}
+              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Live Dynamic QR Code Preview:</span>
+                {planForm.price > 0 ? (
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-white rounded-lg shadow shrink-0">
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${paymentSettings?.upiId || 'arg9830@axl'}&pn=${encodeURIComponent(paymentSettings?.payeeName || 'Arghyadeep Roy')}&am=${planForm.price}&cu=INR&tn=${encodeURIComponent((planForm.name || 'Subscription') + ' Plan Payment')}`)}`} 
+                        alt="Dynamic QR preview" 
+                        className="w-20 h-20 object-contain"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs font-bold text-emerald-400">QR for ₹{planForm.price} (Auto-updates with price)</div>
+                      <div className="text-[11px] text-slate-400 font-mono">VPA: {paymentSettings?.upiId || 'arg9830@axl'}</div>
+                      <div className="text-[10px] text-slate-500">QR instantly regenerates whenever price is changed</div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">Free Tier (₹0) — No payment QR code needed.</p>
+                )}
+              </div>
+
               <div>
-                <label className="block text-xs font-bold text-slate-400 mb-1">Benefits (One per line)</label>
-                <textarea rows={4} value={planForm.benefits} onChange={e => setPlanForm({...planForm, benefits: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-500 outline-none resize-none" placeholder="Access to all mock tests\nPremium PDF downloads\nPriority support" />
+                <label className="block text-xs font-bold text-slate-400 mb-1">Benefits (One per line, e.g. "Feature: Value")</label>
+                <textarea rows={6} value={planForm.benefits} onChange={e => setPlanForm({...planForm, benefits: e.target.value})} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-xs font-mono focus:border-cyan-500 outline-none resize-none leading-relaxed" placeholder="Chemistry Exam Tests: Unlimited&#10;AI Tutor & Doubt Solver: Unlimited AI Access&#10;Answer Explanations: Full Solutions & 3D Models&#10;Study Materials: Complete Digital Library&#10;Ranking & Analytics: Proctored National Percentile&#10;Supported Devices: Mobile, Tablet, PC / Laptop (Max 2 devices)" />
               </div>
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="isActive" checked={planForm.isActive} onChange={e => setPlanForm({...planForm, isActive: e.target.checked})} className="w-4 h-4 accent-emerald-500" />
-                <label htmlFor="isActive" className="text-sm font-bold text-slate-300">Active Plan (Visible to users)</label>
+                <label htmlFor="isActive" className="text-sm font-bold text-slate-300">Active Plan (Visible to students)</label>
               </div>
-              <button type="submit" disabled={planSaving} className="w-full py-2.5 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg disabled:opacity-50">
+              <button type="submit" disabled={planSaving} className="w-full py-3 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl disabled:opacity-50 transition shadow-lg shadow-emerald-950/40">
                 {planSaving ? "Saving..." : "Save Plan"}
               </button>
             </form>

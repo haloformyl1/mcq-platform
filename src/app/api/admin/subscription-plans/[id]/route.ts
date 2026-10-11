@@ -25,7 +25,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         description,
         price: price !== undefined ? parseFloat(price.toString()) : undefined,
         durationDays: durationDays !== undefined ? parseInt(durationDays.toString(), 10) : undefined,
-        benefits,
+        benefits: benefits !== undefined ? (Array.isArray(benefits) ? benefits : typeof benefits === "string" ? benefits.split("\n").filter(Boolean) : []) : undefined,
         isActive
       }
     });
