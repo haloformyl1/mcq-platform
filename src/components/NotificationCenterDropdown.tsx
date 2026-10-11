@@ -663,6 +663,8 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
             </a>
           </div>
         </div>
+      )}
+
       {/* Direct Celebration Modal Anchor */}
       {showCelebrationModal && (
         <GoldUpgradeCelebrationModal
