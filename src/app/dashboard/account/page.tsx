@@ -1052,19 +1052,19 @@ export default function StudentAccountPage() {
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-baseline gap-3">
                         {effectivePlanTier === "ultra" ? (
-                          <div className="flex items-center gap-1">
-                            <div className="relative mr-2 sm:mr-3 inline-flex items-center justify-center mb-1 shrink-0">
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIE Ultra</h2>
+                            <div className="relative inline-flex items-center justify-center mb-0.5 shrink-0">
                               <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full"></div>
                               <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#160406] text-red-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
                                 Ultra
                               </span>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIECHEM</h2>
                           </div>
                         ) : isGold ? (
-                          <div className="flex items-center gap-1">
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIECHEM</h2>
-                            <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-1 shrink-0">
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIE Pro</h2>
+                            <div className="relative inline-flex items-center justify-center mb-0.5 shrink-0">
                               <div className="absolute inset-0 bg-blue-600/50 blur-md rounded-full"></div>
                               <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#0b162c] text-blue-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-blue-500/50 shadow-[0_2px_12px_rgba(37,99,235,0.4)] leading-none flex items-center justify-center">
                                 Pro
@@ -1072,7 +1072,7 @@ export default function StudentAccountPage() {
                             </div>
                           </div>
                         ) : (
-                          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">Basic Student Plan</h2>
+                          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIE Basic</h2>
                         )}
                       </div>
 
@@ -1318,19 +1318,19 @@ export default function StudentAccountPage() {
                   <div className="p-6 sm:p-8 space-y-2">
                     <h3 className="text-2xl font-bold text-white tracking-tight">
                       {effectivePlanTier === "ultra" ? (
-                        <div className="flex items-center">
-                          <div className="relative mr-2 sm:mr-3 inline-flex items-center justify-center mb-0.5">
+                        <div className="flex items-center gap-2">
+                          <span>PIE Ultra</span>
+                          <div className="relative inline-flex items-center justify-center mb-0.5">
                             <div className="absolute inset-0 bg-red-600/60 blur-md rounded-full"></div>
                             <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#180407] text-red-100 text-[9px] sm:text-[11px] font-black tracking-wide border border-red-600/60 shadow-[0_2px_10px_rgba(229,9,20,0.5)] leading-none flex items-center justify-center">
                               Ultra
                             </span>
                           </div>
-                          <span>PIECHEM</span>
                         </div>
                       ) : isGold ? (
-                        <div className="flex items-center">
-                          <span>PIECHEM</span>
-                          <div className="relative ml-2 sm:ml-3 inline-flex items-center justify-center mb-0.5">
+                        <div className="flex items-center gap-2">
+                          <span>PIE Pro</span>
+                          <div className="relative inline-flex items-center justify-center mb-0.5">
                             <div className="absolute inset-0 bg-blue-500/60 blur-md rounded-full"></div>
                             <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#181c25] text-slate-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none flex items-center justify-center">
                               Pro
