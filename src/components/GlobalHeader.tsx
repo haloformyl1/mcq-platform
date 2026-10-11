@@ -6,6 +6,7 @@ import { BookOpen, User, ChevronDown, X, Check, LogOut } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 import RealTimeClock from "@/components/RealTimeClock";
+import { resolveEffectivePlanTier } from "@/lib/planTier";
 
 export interface GlobalHeaderProps {
   isGoldMember?: boolean;
@@ -46,31 +47,8 @@ export default function GlobalHeader({
       (!student?.subscriptionExpiresAt ||
         new Date(student.subscriptionExpiresAt).getTime() > Date.now()));
 
-  // Resolve plan tier ('ultra' vs 'pro')
-  const resolvePlanTier = (): "pro" | "ultra" | null => {
-    if (!isGold) return null;
-    if (planTier) return planTier;
-
-    // Check student subscription plan name or active upgrade requests
-    const latestReq = upgradeReq || (Array.isArray(student?.upgradeRequests) ? student.upgradeRequests[0] : null);
-    const planText = (
-      student?.subscriptionPlanName || 
-      student?.planName || 
-      student?.plan || 
-      latestReq?.note || 
-      latestReq?.purchasedClass || 
-      ""
-    ).toLowerCase();
-
-    const amount = Number(latestReq?.amount) || 0;
-
-    if (planText.includes("ultra") || amount >= 400) {
-      return "ultra";
-    }
-    return "pro";
-  };
-
-  const effectivePlanTier = resolvePlanTier();
+  // Resolve plan tier ('ultra' vs 'pro') using robust shared utility
+  const effectivePlanTier = resolveEffectivePlanTier(student, upgradeReq, planTier);
 
   const isUpdating = updatingCurriculum || internalUpdating;
 
@@ -115,6 +93,8 @@ export default function GlobalHeader({
                   href={logoHref}
                   isGoldMember={isGold}
                   planTier={effectivePlanTier}
+                  student={student}
+                  upgradeReq={upgradeReq}
                 />
                 {contextBadge}
               </div>

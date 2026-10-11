@@ -16,6 +16,7 @@ import PiFiringLoader from "@/components/PiFiringLoader";
 import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
 import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
 import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
+import { resolveEffectivePlanTier } from "@/lib/planTier";
 
 function formatDateTime24(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return "-";
@@ -812,24 +813,7 @@ export default function StudentAccountPage() {
   const isGold = isComplimentary || isPaidActive;
 
   // Resolve plan tier ('ultra' vs 'pro')
-  const resolveEffectivePlanTier = (): "pro" | "ultra" | null => {
-    if (!isGold) return null;
-    const latestReq = upgradeReq || (Array.isArray(student?.upgradeRequests) ? student.upgradeRequests[0] : null);
-    const planText = (
-      student?.subscriptionPlanName || 
-      student?.planName || 
-      student?.plan || 
-      latestReq?.note || 
-      latestReq?.purchasedClass || 
-      ""
-    ).toLowerCase();
-    const amount = Number(latestReq?.amount) || 0;
-    if (planText.includes("ultra") || amount >= 400) {
-      return "ultra";
-    }
-    return "pro";
-  };
-  const effectivePlanTier = resolveEffectivePlanTier();
+  const effectivePlanTier = resolveEffectivePlanTier(student, upgradeReq);
 
   const getRequestPlanName = (req: any): string => {
     if (!req) return "PIE Pro";

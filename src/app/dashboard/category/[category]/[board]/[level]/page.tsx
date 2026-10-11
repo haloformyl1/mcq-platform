@@ -424,7 +424,7 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
           <div className="flex justify-between items-center gap-2 min-w-0">
             {/* Left: Logo & Attribution */}
             <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">
-              <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} />
+              <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} student={student} upgradeReq={data?.upgradeReq} />
             </div>
 
             {/* Right: Notifications + Account Button matching Front Page */}

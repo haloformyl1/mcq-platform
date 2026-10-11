@@ -324,7 +324,7 @@ export default function StudentDashboard() {
       {/* 1. TOP NAVBAR (UNIFIED RESPONSIVE GLOBAL HEADER WITH MOBILE DRAWER) */}
       <GlobalHeader
         student={student}
-        upgradeReq={data?.upgradeReq}
+        upgradeReq={data?.upgradeReq || (Array.isArray(student?.upgradeRequests) ? student.upgradeRequests[0] : null)}
         onCurriculumChange={handleCurriculumChange}
         updatingCurriculum={updatingCurriculum}
         isGoldMember={

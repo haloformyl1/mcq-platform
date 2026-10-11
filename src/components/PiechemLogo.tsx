@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { resolveEffectivePlanTier } from "@/lib/planTier";
 
 interface PiechemLogoProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -10,6 +11,8 @@ interface PiechemLogoProps {
   href?: string;
   isGoldMember?: boolean;
   planTier?: "pro" | "ultra" | null;
+  student?: any;
+  upgradeReq?: any;
   theme?: 'dark' | 'light';
   subtitle?: string | null;
   showIcon?: boolean;
@@ -23,15 +26,18 @@ export default function PiechemLogo({
   href,
   isGoldMember = false,
   planTier,
+  student,
+  upgradeReq,
   theme = 'dark',
   subtitle,
   showIcon = true,
   textWhiteOnly = false
 }: PiechemLogoProps) {
-  // Ultra plan badge appears before the logo in Netflix reddish-black bracket.
+  // Ultra plan badge appears after the logo in Netflix reddish-black bracket, replacing the Pro badge.
   // Pro plan badge appears after the logo in dark blue bracket.
-  const isUltra = planTier === "ultra";
-  const isPro = !isUltra && (planTier === "pro" || Boolean(isGoldMember));
+  const effectiveTier = resolveEffectivePlanTier(student, upgradeReq, planTier);
+  const isUltra = effectiveTier === "ultra";
+  const isPro = !isUltra && (effectiveTier === "pro" || (planTier === "pro") || Boolean(isGoldMember));
   const isGold = false;
 
   const dimensions = {
@@ -206,16 +212,6 @@ export default function PiechemLogo({
       {showText && (
         <div className="flex flex-col justify-center leading-none">
           <div className={"font-black tracking-wider font-sans uppercase flex items-center " + current.text}>
-            {/* ULTRA BADGE: Placed just before the PIECHEM logo in Netflix reddish-black bracket */}
-            {isUltra && (
-              <div className="relative mr-2 sm:mr-2.5 inline-flex items-center justify-center shrink-0">
-                <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full"></div>
-                <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-[#160406] text-red-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
-                  Ultra
-                </span>
-              </div>
-            )}
-
             {textWhiteOnly ? (
               <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' drop-shadow-sm'}>
                 PIECHEM
@@ -229,6 +225,16 @@ export default function PiechemLogo({
                   CHEM
                 </span>
               </>
+            )}
+
+            {/* ULTRA BADGE: Placed after the PIECHEM logo in Netflix reddish-black bracket */}
+            {isUltra && (
+              <div className="relative ml-2 sm:ml-2.5 inline-flex items-center justify-center shrink-0">
+                <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full"></div>
+                <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-[#160406] text-red-100 text-[9px] sm:text-[11px] font-bold tracking-wide normal-case border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
+                  Ultra
+                </span>
+              </div>
             )}
 
             {/* PRO BADGE: Placed just after the PIECHEM logo in dark blue colour bracket */}

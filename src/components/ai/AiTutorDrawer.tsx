@@ -21,6 +21,7 @@ import {
   groupConversationsByDate, 
   AiConversationMeta 
 } from "@/lib/ai/conversationUtils";
+import { resolveEffectivePlanTier } from "@/lib/planTier";
 
 interface Message {
   id: string;
@@ -165,28 +166,14 @@ export default function AiTutorDrawer({
 
   const planTier = useMemo((): "ultra" | "pro" | "free" => {
     if (!studentProfile) return "free";
+    const tier = resolveEffectivePlanTier(studentProfile, upgradeReq);
+    if (tier) return tier;
     const status = studentProfile.subscriptionStatus;
     const isComp = Boolean(studentProfile.isComplimentary || status === "COMPLIMENTARY");
     const isPaid = status === "PAID" && 
       (!studentProfile.subscriptionExpiresAt || new Date(studentProfile.subscriptionExpiresAt).getTime() > Date.now());
-    
-    if (!isComp && !isPaid) return "free";
-
-    // Resolve Ultra vs Pro
-    const req = upgradeReq || studentProfile?.upgradeRequests?.[0];
-    const planText = (
-      studentProfile?.subscriptionPlanName || 
-      studentProfile?.planName || 
-      req?.note || 
-      req?.purchasedClass || 
-      ""
-    ).toLowerCase();
-    const amount = Number(req?.amount) || 0;
-
-    if (planText.includes("ultra") || amount >= 400 || amount === 200) {
-      return "ultra";
-    }
-    return "pro";
+    if (isComp || isPaid) return "pro";
+    return "free";
   }, [studentProfile, upgradeReq]);
 
   const isPro = planTier !== "free";
