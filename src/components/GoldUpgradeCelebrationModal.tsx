@@ -188,7 +188,7 @@ export default function GoldUpgradeCelebrationModal({
               : "bg-blue-950/80 border-blue-500/40 text-blue-200 shadow-[0_0_15px_rgba(37,99,235,0.3)]"
           )}>
             <span className={"w-1.5 h-1.5 rounded-full animate-pulse " + (isUltra ? "bg-red-400" : "bg-blue-400")} />
-            {isUltra ? "Netflix Ultra Activated" : isComp ? "Complimentary Lifetime Active" : "Pro Membership Active"}
+            {isUltra ? "PIE Ultra Activated" : isComp ? "Complimentary Lifetime Active" : "Pro Membership Active"}
           </div>
 
           <h2 id="upgrade-title" className="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">
