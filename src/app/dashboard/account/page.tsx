@@ -197,6 +197,7 @@ export default function StudentAccountPage() {
   const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
+  const [plans, setPlans] = useState<any[]>([]);
   const [studentUpiId, setStudentUpiId] = useState("");
   const [purchasedBoard, setPurchasedBoard] = useState("CBSE");
   const [purchasedClass, setPurchasedClass] = useState("11");
@@ -419,7 +420,6 @@ export default function StudentAccountPage() {
         }
         setLoading(false);
       })
-      })
       .catch(() => {
         router.push("/login");
       });
@@ -432,7 +432,6 @@ export default function StudentAccountPage() {
       .catch(() => {});
   }, [router]);
   
-  const [plans, setPlans] = useState<any[]>([]);
   const fetchDevices = async () => {
     try {
       const res = await fetch("/api/student/devices");
