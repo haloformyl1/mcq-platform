@@ -972,29 +972,30 @@ export default function AdminPaymentsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {plans.map(plan => {
-            const hasFee = Number(plan.price) > 0;
-            const currentUpiId = paymentSettings?.upiId || "arg9830@axl";
-            const currentPayee = paymentSettings?.payeeName || "Arghyadeep Roy";
-            const upiUrl = hasFee 
-              ? `upi://pay?pa=${currentUpiId}&pn=${encodeURIComponent(currentPayee)}&am=${plan.price}&cu=INR&tn=${encodeURIComponent(plan.name + " Plan Payment")}`
-              : null;
-            const qrImageUrl = upiUrl 
-              ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`
-              : null;
+        <div className="w-full overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-700/60 scrollbar-track-slate-900/40">
+          <div className="flex flex-row flex-nowrap items-stretch gap-6 min-w-max">
+            {plans.map(plan => {
+              const hasFee = Number(plan.price) > 0;
+              const currentUpiId = paymentSettings?.upiId || "arg9830@axl";
+              const currentPayee = paymentSettings?.payeeName || "Arghyadeep Roy";
+              const upiUrl = hasFee 
+                ? `upi://pay?pa=${currentUpiId}&pn=${encodeURIComponent(currentPayee)}&am=${plan.price}&cu=INR&tn=${encodeURIComponent(plan.name + " Plan Payment")}`
+                : null;
+              const qrImageUrl = upiUrl 
+                ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`
+                : null;
 
-            return (
-              <div 
-                key={plan.id} 
-                className={`p-6 rounded-2xl border flex flex-col justify-between transition-all duration-200 ${
-                  plan.isActive 
-                    ? hasFee 
-                      ? 'bg-gradient-to-b from-[#101927] to-[#0a101a] border-cyan-500/40 shadow-lg shadow-cyan-950/20' 
-                      : 'bg-gradient-to-b from-[#131726] to-[#0a0d17] border-indigo-500/40 shadow-lg shadow-indigo-950/20'
-                    : 'bg-slate-950 border-slate-800 opacity-60'
-                }`}
-              >
+              return (
+                <div 
+                  key={plan.id} 
+                  className={`w-[320px] sm:w-[360px] shrink-0 p-6 rounded-2xl border flex flex-col justify-between transition-all duration-200 ${
+                    plan.isActive 
+                      ? hasFee 
+                        ? 'bg-gradient-to-b from-[#101927] to-[#0a101a] border-cyan-500/40 shadow-lg shadow-cyan-950/20' 
+                        : 'bg-gradient-to-b from-[#131726] to-[#0a0d17] border-indigo-500/40 shadow-lg shadow-indigo-950/20'
+                      : 'bg-slate-950 border-slate-800 opacity-60'
+                  }`}
+                >
                 <div>
                   {/* Top Header: Badge + Actions */}
                   <div className="flex justify-between items-start mb-3">
@@ -1119,17 +1120,18 @@ export default function AdminPaymentsPage() {
               </div>
             );
           })}
-          {plans.length === 0 && (
-            <div className="col-span-full py-12 text-center text-slate-500 text-sm border border-dashed border-slate-700 rounded-2xl space-y-3">
-              <p>No subscription plans configured yet.</p>
-              <button
-                onClick={handleResetDefaultPlans}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition"
-              >
-                Generate Default Plans (Basic & PIECHEM Pro)
-              </button>
-            </div>
-          )}
+            {plans.length === 0 && (
+              <div className="w-full py-12 text-center text-slate-500 text-sm border border-dashed border-slate-700 rounded-2xl space-y-3">
+                <p>No subscription plans configured yet.</p>
+                <button
+                  onClick={handleResetDefaultPlans}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition"
+                >
+                  Generate Default Plans (Basic & PIECHEM Pro)
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 

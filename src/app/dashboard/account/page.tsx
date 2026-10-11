@@ -1973,66 +1973,124 @@ export default function StudentAccountPage() {
                   </div>
                 ) : (
                   <>
-                {/* Plan Comparison Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
-                  {(plans.length > 0 ? plans : [
-                    {
-                      id: "default-basic",
-                      name: "Basic",
-                      description: "Foundational practice tier for chemistry students",
-                      price: 0,
-                      durationDays: 30,
-                      benefits: [
-                        "Chemistry Exam Tests: Selected tests are free.",
-                        "AI Tutor & Doubt Solver: Basic Access (5 queries / day)",
-                        "Answer Explanations: Standard Answer Key",
-                        "Study Materials: Selected Free Chapters",
-                        "Ranking & Analytics: Basic Score Summary",
-                        "Supported Devices: 1 Active Device"
-                      ]
-                    },
-                    {
-                      id: "default-pro",
-                      name: "PIECHEM Pro",
-                      description: "Full access to 50+ exams, 3D models & proctored rankings",
-                      price: 299,
-                      durationDays: 30,
-                      benefits: [
-                        "Chemistry Exam Tests: Unlimited",
-                        "AI Tutor & Doubt Solver: Unlimited AI Access",
-                        "Answer Explanations: Full Solutions & 3D Models",
-                        "Study Materials: Complete Digital Library",
-                        "Ranking & Analytics: Proctored National Percentile",
-                        "Supported Devices: Mobile, Tablet, PC / Laptop (Max 2 devices)"
-                      ]
-                    }
-                  ]).map(plan => {
-                    const isPaid = Number(plan.price) > 0;
+                {/* Plan Comparison Shelf (Strictly Side-by-Side - Max 5 Plans, No Wrapping to Down) */}
+                <div className="w-full overflow-x-auto pb-8 pt-2 scrollbar-thin scrollbar-thumb-slate-700/80 scrollbar-track-slate-900/40">
+                  <div className="flex flex-row flex-nowrap items-stretch gap-6 min-w-max mx-auto justify-center px-4">
+                    {(plans.length > 0 ? plans : [
+                      {
+                        id: "default-basic",
+                        name: "Basic",
+                        description: "Foundational practice tier for chemistry students",
+                        price: 0,
+                        durationDays: 30,
+                        benefits: [
+                          "Chemistry Exam Tests: Selected tests are free.",
+                          "AI Tutor & Doubt Solver: Basic Access (5 queries / day)",
+                          "Answer Explanations: Standard Answer Key",
+                          "Study Materials: Selected Free Chapters",
+                          "Ranking & Analytics: Basic Score Summary",
+                          "Supported Devices: 1 Active Device"
+                        ]
+                      },
+                      {
+                        id: "default-pro",
+                        name: "PIECHEM Pro",
+                        description: "Full access to 50+ exams, 3D models & proctored rankings",
+                        price: 299,
+                        durationDays: 30,
+                        benefits: [
+                          "Chemistry Exam Tests: Unlimited",
+                          "AI Tutor & Doubt Solver: Unlimited AI Access",
+                          "Answer Explanations: Full Solutions & 3D Models",
+                          "Study Materials: Complete Digital Library",
+                          "Ranking & Analytics: Proctored National Percentile",
+                          "Supported Devices: Mobile, Tablet, PC / Laptop (Max 2 devices)"
+                        ]
+                      }
+                    ]).map(plan => {
+                      const isPaid = Number(plan.price) > 0;
 
-                    if (!isPaid) {
-                      return (
-                        <div key={plan.id} className="rounded-2xl border-2 border-indigo-500/40 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(99,102,241,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400 hover:shadow-[0_0_60px_rgba(99,102,241,0.28)]">
-                          {/* Card Head (Standard Blue/Purple Gradient Banner) */}
-                          <div className="p-6 bg-gradient-to-r from-[#203a94] via-[#4338ca] to-[#723abb] text-white relative">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
-                                FREE TIER
-                              </span>
-                              {!isGold && (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-cyan-300 text-xs font-black shadow-sm">
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Current plan
+                      if (!isPaid) {
+                        return (
+                          <div key={plan.id} className="w-[320px] sm:w-[350px] shrink-0 rounded-2xl border-2 border-indigo-500/40 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(99,102,241,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400 hover:shadow-[0_0_60px_rgba(99,102,241,0.28)]">
+                            {/* Card Head (Standard Blue/Purple Gradient Banner) */}
+                            <div className="p-6 bg-gradient-to-r from-[#203a94] via-[#4338ca] to-[#723abb] text-white relative">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
+                                  FREE TIER
                                 </span>
+                                {!isGold && (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-cyan-300 text-xs font-black shadow-sm">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Current plan
+                                  </span>
+                                )}
+                              </div>
+                              <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
+                              <p className="text-xs text-white/80 mt-1">{plan.description}</p>
+                            </div>
+
+                            {/* Features Comparison Rows */}
+                            <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-indigo-500/15">
+                              <div className="flex justify-between items-center pt-1">
+                                <span className="text-slate-300 font-medium">Monthly price</span>
+                                <span className="font-bold text-white font-mono text-base">₹0</span>
+                              </div>
+                              {plan.benefits?.map((benefit: string, i: number) => {
+                                const parts = benefit.split(":");
+                                const label = parts.length > 1 ? parts[0].trim() : benefit;
+                                const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
+
+                                return (
+                                  <div key={i} className="flex justify-between items-center pt-3">
+                                    <span className="text-slate-300 font-medium">{label}</span>
+                                    <span className="font-semibold text-slate-200 text-right">{val || "Included"}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Card CTA */}
+                            <div className="p-6 pt-0 mt-auto">
+                              {!isGold ? (
+                                <div className="w-full py-4 rounded-xl bg-gradient-to-r from-[#203a94]/40 via-[#4338ca]/30 to-[#723abb]/40 border border-indigo-500/40 text-indigo-200 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.2)]">
+                                  <Check className="w-4 h-4 text-cyan-400" />
+                                  <span>Enrolled (Current Plan)</span>
+                                </div>
+                              ) : (
+                                <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs font-semibold text-center select-none">
+                                  Standard Free Tier
+                                </div>
                               )}
                             </div>
-                            <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
+                          </div>
+                        );
+                      }
+
+                      // Paid Plan (e.g. PIECHEM Pro)
+                      return (
+                        <div key={plan.id} className="w-[320px] sm:w-[350px] shrink-0 rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
+                          {/* Card Head (Vibrant Gradient Banner) */}
+                          <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
+                                RECOMMENDED
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-amber-300 text-xs font-black shadow-sm">
+                                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {plan.durationDays}-Day Pass
+                              </span>
+                            </div>
+                            <h3 className="text-2xl font-black text-white tracking-tight mt-1">{plan.name}</h3>
                             <p className="text-xs text-white/80 mt-1">{plan.description}</p>
                           </div>
 
                           {/* Features Comparison Rows */}
-                          <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-indigo-500/15">
+                          <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-cyan-500/15">
                             <div className="flex justify-between items-center pt-1">
                               <span className="text-slate-300 font-medium">Monthly price</span>
-                              <span className="font-bold text-white font-mono text-base">₹0</span>
+                              <div className="text-right">
+                                <span className="text-2xl font-black text-amber-300 font-mono">₹{plan.price}</span>
+                                <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
+                              </div>
                             </div>
                             {plan.benefits?.map((benefit: string, i: number) => {
                               const parts = benefit.split(":");
@@ -2040,9 +2098,12 @@ export default function StudentAccountPage() {
                               const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
 
                               return (
-                                <div key={i} className="flex justify-between items-center pt-3">
-                                  <span className="text-slate-300 font-medium">{label}</span>
-                                  <span className="font-semibold text-slate-200 text-right">{val || "Included"}</span>
+                                <div key={i} className="flex justify-between items-center pt-3 gap-2">
+                                  <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
+                                  <div className="font-bold text-white flex items-center gap-1.5 shrink-0 text-right text-xs sm:text-sm">
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                    <span>{val || label}</span>
+                                  </div>
                                 </div>
                               );
                             })}
@@ -2050,80 +2111,21 @@ export default function StudentAccountPage() {
 
                           {/* Card CTA */}
                           <div className="p-6 pt-0 mt-auto">
-                            {!isGold ? (
-                              <div className="w-full py-4 rounded-xl bg-gradient-to-r from-[#203a94]/40 via-[#4338ca]/30 to-[#723abb]/40 border border-indigo-500/40 text-indigo-200 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.2)]">
-                                <Check className="w-4 h-4 text-cyan-400" />
-                                <span>Enrolled (Current Plan)</span>
-                              </div>
-                            ) : (
-                              <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs font-semibold text-center select-none">
-                                Standard Free Tier
-                              </div>
-                            )}
+                            <button
+                              onClick={() => {
+                                setPaymentSettings({ ...paymentSettings, monthlyFee: plan.price });
+                                openModal("pay");
+                              }}
+                              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] transition cursor-pointer flex items-center justify-center gap-2"
+                            >
+                              <span>UPGRADE TO {plan.name.toUpperCase()}</span>
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
                       );
-                    }
-
-                    // Paid Plan (e.g. PIECHEM Pro)
-                    return (
-                      <div key={plan.id} className="rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
-                        {/* Card Head (Vibrant Gradient Banner) */}
-                        <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
-                              RECOMMENDED
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-amber-300 text-xs font-black shadow-sm">
-                              <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {plan.durationDays}-Day Pass
-                            </span>
-                          </div>
-                          <h3 className="text-2xl font-black text-white tracking-tight mt-1">{plan.name}</h3>
-                          <p className="text-xs text-white/80 mt-1">{plan.description}</p>
-                        </div>
-
-                        {/* Features Comparison Rows */}
-                        <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-cyan-500/15">
-                          <div className="flex justify-between items-center pt-1">
-                            <span className="text-slate-300 font-medium">Monthly price</span>
-                            <div className="text-right">
-                              <span className="text-2xl font-black text-amber-300 font-mono">₹{plan.price}</span>
-                              <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
-                            </div>
-                          </div>
-                          {plan.benefits?.map((benefit: string, i: number) => {
-                            const parts = benefit.split(":");
-                            const label = parts.length > 1 ? parts[0].trim() : benefit;
-                            const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
-
-                            return (
-                              <div key={i} className="flex justify-between items-center pt-3 gap-2">
-                                <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
-                                <div className="font-bold text-white flex items-center gap-1.5 shrink-0 text-right text-xs sm:text-sm">
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                                  <span>{val || label}</span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Card CTA */}
-                        <div className="p-6 pt-0 mt-auto">
-                          <button
-                            onClick={() => {
-                              setPaymentSettings({ ...paymentSettings, monthlyFee: plan.price });
-                              openModal("pay");
-                            }}
-                            className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] transition cursor-pointer flex items-center justify-center gap-2"
-                          >
-                            <span>UPGRADE TO {plan.name.toUpperCase()}</span>
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                    })}
+                  </div>
                 </div>
 
                 {/* Footer Assurance Banner */}
