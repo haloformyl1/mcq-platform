@@ -66,11 +66,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
       if (subscriptionStatus === "COMPLIMENTARY") {
         // Admin Manual Upgrade: Full Premium Access for Free, NEVER EXPIRES!
+        updateData.isComplimentary = true;
         updateData.subscriptionStartedAt = new Date();
         updateData.subscriptionExpiresAt = null;
         if (board) updateData.board = board;
         if (academicLevel) updateData.academicLevel = academicLevel;
       } else if (subscriptionStatus === "FREE") {
+        updateData.isComplimentary = false;
         updateData.subscriptionStartedAt = null;
         updateData.subscriptionExpiresAt = null;
       }

@@ -20,7 +20,8 @@ model Student {
   otp       String?
   otpExpiry DateTime?
   status    String   @default("ACTIVE") // ACTIVE, SUSPENDED
-  subscriptionStatus String @default("FREE") // FREE, PAID
+  subscriptionStatus String @default("FREE") // FREE, PAID, COMPLIMENTARY
+  isComplimentary    Boolean @default(false)
   subscriptionStartedAt DateTime?
   subscriptionExpiresAt DateTime?
   aiQueriesToday        Int       @default(0)

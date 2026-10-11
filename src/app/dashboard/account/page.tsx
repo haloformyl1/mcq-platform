@@ -198,6 +198,19 @@ export default function StudentAccountPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
   const [plans, setPlans] = useState<any[]>([]);
+  const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState<{
+    id: string;
+    name: string;
+    price: number;
+    payableAmount: number;
+    durationDays: number;
+    description: string;
+    isUpgrade: boolean;
+    isComplimentaryUpgrade: boolean;
+    upgradeFrom: string;
+    originalPrice: number;
+    notes: string;
+  } | null>(null);
   const [studentUpiId, setStudentUpiId] = useState("");
   const [purchasedBoard, setPurchasedBoard] = useState("CBSE");
   const [purchasedClass, setPurchasedClass] = useState("11");
@@ -537,6 +550,53 @@ export default function StudentAccountPage() {
     setPaymentStep("notice");
   };
 
+  const handleSelectPlanToCheckout = (plan: any) => {
+    const planNameLower = String(plan.name || "").toLowerCase();
+    const isPlanUltra = planNameLower.includes("ultra") || Number(plan.price) >= 400;
+    const isPlanPro = planNameLower.includes("pro") || (Number(plan.price) > 0 && Number(plan.price) < 400);
+
+    let payable = Number(plan.price);
+    let isUpgrade = false;
+    let isComplimentaryUpgrade = false;
+    let upgradeFrom = "PIE Basic";
+
+    if (isPlanUltra) {
+      if (isComplimentary || effectivePlanTier === "pro") {
+        payable = 200; // Special ₹200 upgrade rate per user request
+        isUpgrade = true;
+        isComplimentaryUpgrade = isComplimentary;
+        upgradeFrom = isComplimentary ? "PIE Pro (Complimentary Lifetime)" : "PIE Pro";
+      } else {
+        payable = Number(plan.price) || 499;
+      }
+    } else if (isPlanPro) {
+      payable = Number(plan.price) || 299;
+      isUpgrade = !isGold;
+    }
+
+    const checkoutObj = {
+      id: plan.id,
+      name: plan.name,
+      price: Number(plan.price),
+      payableAmount: payable,
+      durationDays: plan.durationDays || 30,
+      description: plan.description,
+      isUpgrade,
+      isComplimentaryUpgrade,
+      upgradeFrom,
+      originalPrice: Number(plan.price),
+      notes: isComplimentaryUpgrade 
+        ? "Lifetime Complimentary Pro Member Credit Applied (-₹299)"
+        : isUpgrade 
+        ? "Pro Tier Upgrade Adjustment Applied (-₹299)" 
+        : ""
+    };
+
+    setSelectedCheckoutPlan(checkoutObj);
+    setPaymentSettings((prev: any) => ({ ...prev, monthlyFee: payable, selectedPlanName: plan.name }));
+    openModal("pay");
+  };
+
   const handleSendUpgradeRequest = async () => {
     const trimmedUpi = studentUpiId.trim();
     if (!trimmedUpi) {
@@ -550,16 +610,20 @@ export default function StudentAccountPage() {
     setRequestingUpgrade(true);
     setUpgradeMsg(null);
 
+    const activePayable = selectedCheckoutPlan?.payableAmount ?? (paymentSettings?.monthlyFee || 199.0);
+    const activePlanName = selectedCheckoutPlan?.name || (activePayable >= 400 ? "PIE Ultra" : "PIE Pro");
+
     try {
       const res = await fetch("/api/student/upgrade-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           studentUpiId: trimmedUpi, 
+          utrNumber: utrNumber.trim() || undefined,
           purchasedBoard,
           purchasedClass,
-          amount: paymentSettings?.monthlyFee || 199.0,
-          planName: paymentSettings?.selectedPlanName || (paymentSettings?.monthlyFee >= 400 ? "PIE Ultra" : "PIE Pro")
+          amount: activePayable,
+          planName: activePlanName
         })
       });
       const resData = await res.json();
@@ -766,6 +830,10 @@ export default function StudentAccountPage() {
     return "pro";
   };
   const effectivePlanTier = resolveEffectivePlanTier();
+
+  const activePayable = selectedCheckoutPlan?.payableAmount ?? (paymentSettings?.monthlyFee || 199.0);
+  const activePlanName = selectedCheckoutPlan?.name || (activePayable >= 400 ? "PIE Ultra" : "PIE Pro");
+  const isCheckoutUltra = activePlanName.toLowerCase().includes("ultra") || activePayable >= 400;
 
   const isPaymentPending = upgradeReq?.status === "PENDING";
   const paymentPendingHours = isPaymentPending && upgradeReq?.createdAt 
@@ -1043,6 +1111,56 @@ export default function StudentAccountPage() {
                         <span>Real-Time State Percentiles & Accuracy</span>
                       </div>
                     </div>
+
+                    {/* Tier Upgrade Banner for Pro Members (Complimentary or Paid) */}
+                    {effectivePlanTier === "pro" && (
+                      <div className="pt-4 border-t border-slate-800">
+                        <div className="p-4 rounded-xl bg-gradient-to-r from-[#180407]/90 via-[#2a070c]/90 to-[#0e0204]/90 border border-red-600/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_4px_25px_rgba(229,9,20,0.15)]">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-600/20 text-red-300 border border-red-600/40 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                Upgrade Available
+                              </span>
+                              <span className="text-xs font-bold text-white">Unlock PIE Ultra for ₹200</span>
+                            </div>
+                            <p className="text-xs text-slate-300">
+                              {isComplimentary 
+                                ? "As a lifetime Complimentary Pro member, unlock 30 days of PIE Ultra for just ₹200. Reverts to lifetime Pro afterward."
+                                : "Upgrade your current Pro membership to PIE Ultra for 30 days for just ₹200."}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const ultra = plans.find(p => p.name?.toLowerCase().includes("ultra")) || {
+                                id: "ultra", name: "PIE Ultra", price: 499, durationDays: 30, description: "All benefits of PIE Pro with unlimited AI and PIE LAB"
+                              };
+                              handleSelectPlanToCheckout(ultra);
+                            }}
+                            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#e50914] to-[#b81d24] hover:from-[#f40612] hover:to-[#e50914] text-white text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(229,9,20,0.4)] transition cursor-pointer shrink-0 flex items-center justify-center gap-1.5"
+                          >
+                            <span>Upgrade to Ultra (₹200)</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Active Ultra Status Callout */}
+                    {effectivePlanTier === "ultra" && (
+                      <div className="pt-4 border-t border-slate-800">
+                        <div className="p-4 rounded-xl bg-[#180407]/70 border border-red-600/30 flex items-center justify-between gap-3 text-xs text-slate-300">
+                          <div>
+                            <span className="font-bold text-white block mb-0.5">Top Tier: PIE Ultra 30-Day Pass Active</span>
+                            <span>
+                              {isComplimentary 
+                                ? `Active until ${nextPaymentFormatted}. Reverts safely to your infinite lifetime Complimentary PIE Pro afterward.`
+                                : `Active until ${nextPaymentFormatted}. Reverts to PIE Basic if not renewed.`}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* 30-Day Renewal & UPI Details */}
                     {is30Day && (
@@ -2011,61 +2129,84 @@ export default function StudentAccountPage() {
                     {(plans.length > 0 ? plans : [
                       {
                         id: "default-basic",
-                        name: "Basic",
+                        name: "PIE Basic",
                         description: "Foundational practice tier for chemistry students",
                         price: 0,
                         durationDays: 30,
                         benefits: [
                           "Chemistry Exam Tests: Selected tests are free.",
-                          "AI Tutor & Doubt Solver: Basic Access (5 queries / day)",
+                          "AI Tutor & Doubt Solver: 5 queries / day",
                           "Answer Explanations: Standard Answer Key",
-                          "Study Materials: Selected Free Chapters",
+                          "Study Materials: Selected Free Chapters with limited downloading option",
                           "Ranking & Analytics: Basic Score Summary",
-                          "Supported Devices: 1 Active Device"
+                          "Supported Devices: 1 Active Device",
+                          "PIE LAB: Not Included"
                         ]
                       },
                       {
                         id: "default-pro",
-                        name: "PIECHEM Pro",
-                        description: "Full access to 50+ exams, 3D models & proctored rankings",
+                        name: "PIE Pro",
+                        description: "Full access to all exams, 3D models, Boards & NEET/JEE Contents.",
                         price: 299,
                         durationDays: 30,
                         benefits: [
                           "Chemistry Exam Tests: Unlimited",
-                          "AI Tutor & Doubt Solver: Unlimited AI Access",
-                          "Answer Explanations: Full Solutions & 3D Models",
-                          "Study Materials: Complete Digital Library",
+                          "AI Tutor & Doubt Solver: 20 queries / day",
+                          "Answer Explanations: Full Solutions with PIE AI",
+                          "Study Materials: Complete Digital Library with 5 downloads / day",
                           "Ranking & Analytics: Proctored National Percentile",
-                          "Supported Devices: Mobile, Tablet, PC / Laptop (Max 2 devices)"
+                          "Supported Devices: 1 active device",
+                          "PIE LAB: Included (Basic Access)"
+                        ]
+                      },
+                      {
+                        id: "default-ultra",
+                        name: "PIE Ultra",
+                        description: "All benifits of PIE Pro along with unlimited access to PIE AI, PIE LAB",
+                        price: 499,
+                        durationDays: 30,
+                        benefits: [
+                          "Chemistry Exam Tests: Unlimited",
+                          "AI Tutor & Doubt Solver: Unlimited",
+                          "Answer Explanations: Full Solutions with PIE AI",
+                          "Study Materials: Complete Digital Library with unlimited downloads",
+                          "Ranking & Analytics: Proctored National Percentile",
+                          "Supported Devices: 1 Active Device",
+                          "PIE LAB: Included (Unlimited Access)"
                         ]
                       }
                     ]).map(plan => {
                       const isPaid = Number(plan.price) > 0;
+                      const planNameLower = String(plan.name || "").toLowerCase();
+                      const isPlanUltra = planNameLower.includes("ultra") || Number(plan.price) >= 400;
+                      const isPlanPro = !isPlanUltra && (planNameLower.includes("pro") || (Number(plan.price) > 0 && Number(plan.price) < 400));
+                      const isPlanBasic = !isPaid || planNameLower.includes("basic");
 
-                      if (!isPaid) {
+                      // 1. FREE / BASIC TIER CARD
+                      if (isPlanBasic) {
                         return (
-                          <div key={plan.id} className="flex-1 min-w-[280px] rounded-2xl border-2 border-indigo-500/40 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(99,102,241,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400 hover:shadow-[0_0_60px_rgba(99,102,241,0.28)]">
-                            {/* Card Head (Standard Blue/Purple Gradient Banner) */}
-                            <div className="p-6 bg-gradient-to-r from-[#203a94] via-[#4338ca] to-[#723abb] text-white relative">
+                          <div key={plan.id} className="flex-1 min-w-[300px] rounded-2xl border-2 border-indigo-500/30 bg-gradient-to-b from-[#0a1220]/95 via-[#060c14]/95 to-[#03060a]/95 shadow-[0_0_50px_rgba(99,102,241,0.12)] flex flex-col justify-between overflow-hidden relative transition hover:border-indigo-400/60 hover:shadow-[0_0_60px_rgba(99,102,241,0.22)]">
+                            {/* Card Head (Deep Obsidian Slate Banner) */}
+                            <div className="p-6 bg-gradient-to-r from-[#111e38] via-[#1e293b] to-[#334155] text-white relative">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
+                                <span className="text-[11px] font-black tracking-widest uppercase bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-full text-slate-200 border border-white/10">
                                   FREE TIER
                                 </span>
                                 {!isGold && (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-cyan-300 text-xs font-black shadow-sm">
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-xs font-black shadow-sm">
                                     <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Current plan
                                   </span>
                                 )}
                               </div>
                               <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
-                              <p className="text-xs text-white/80 mt-1">{plan.description}</p>
+                              <p className="text-xs text-slate-300/90 mt-1">{plan.description}</p>
                             </div>
 
                             {/* Features Comparison Rows */}
-                            <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-indigo-500/15">
+                            <div className="p-6 space-y-3.5 flex-1 text-sm divide-y divide-slate-800/60">
                               <div className="flex justify-between items-center pt-1">
                                 <span className="text-slate-300 font-medium">Monthly price</span>
-                                <span className="font-bold text-white font-mono text-base">₹0</span>
+                                <span className="font-bold text-white font-mono text-lg">₹0</span>
                               </div>
                               {plan.benefits?.map((benefit: string, i: number) => {
                                 const parts = benefit.split(":");
@@ -2073,9 +2214,9 @@ export default function StudentAccountPage() {
                                 const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
 
                                 return (
-                                  <div key={i} className="flex justify-between items-center pt-3">
-                                    <span className="text-slate-300 font-medium">{label}</span>
-                                    <span className="font-semibold text-slate-200 text-right">{val || "Included"}</span>
+                                  <div key={i} className="flex justify-between items-center pt-3 gap-2">
+                                    <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
+                                    <span className="font-semibold text-slate-200 text-right text-xs sm:text-sm">{val || "Included"}</span>
                                   </div>
                                 );
                               })}
@@ -2084,7 +2225,7 @@ export default function StudentAccountPage() {
                             {/* Card CTA */}
                             <div className="p-6 pt-0 mt-auto">
                               {!isGold ? (
-                                <div className="w-full py-4 rounded-xl bg-gradient-to-r from-[#203a94]/40 via-[#4338ca]/30 to-[#723abb]/40 border border-indigo-500/40 text-indigo-200 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.2)]">
+                                <div className="w-full py-4 rounded-xl bg-slate-800/50 border border-slate-700/60 text-cyan-300 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-inner">
                                   <Check className="w-4 h-4 text-cyan-400" />
                                   <span>Enrolled (Current Plan)</span>
                                 </div>
@@ -2098,30 +2239,144 @@ export default function StudentAccountPage() {
                         );
                       }
 
-                      // Paid Plan (e.g. PIECHEM Pro)
+                      // 2. PIE PRO TIER CARD (SAPPHIRE BLUE NETFLIX GRADE)
+                      if (isPlanPro) {
+                        const isStudentCurrentlyPro = effectivePlanTier === "pro";
+                        return (
+                          <div key={plan.id} className="flex-1 min-w-[300px] rounded-2xl border-2 border-blue-500/50 bg-gradient-to-b from-[#061226]/95 via-[#030b18]/95 to-[#02060e]/95 shadow-[0_0_55px_rgba(37,99,235,0.22)] flex flex-col justify-between overflow-hidden relative transition hover:border-blue-400 hover:shadow-[0_0_65px_rgba(37,99,235,0.35)]">
+                            {/* Card Head (Electric Sapphire Blue Banner) */}
+                            <div className="p-6 bg-gradient-to-r from-[#0d2554] via-[#1d4ed8] to-[#2563eb] text-white relative">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[11px] font-black tracking-widest uppercase bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-full text-blue-200 border border-blue-400/30">
+                                  RECOMMENDED
+                                </span>
+                                {isComplimentary ? (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 text-xs font-black shadow-sm">
+                                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Lifetime Pass
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-blue-200 text-xs font-black shadow-sm">
+                                    <Sparkles className="w-3.5 h-3.5 text-blue-300" /> {plan.durationDays}-Day Pass
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
+                                <div className="px-2 py-0.5 rounded-full bg-[#0b162c] border border-blue-500/50 text-blue-200 text-[10px] font-bold">
+                                  Pro
+                                </div>
+                              </div>
+                              <p className="text-xs text-blue-100/90 mt-1">{plan.description}</p>
+                            </div>
+
+                            {/* Features Comparison Rows */}
+                            <div className="p-6 space-y-3.5 flex-1 text-sm divide-y divide-blue-500/15">
+                              <div className="flex justify-between items-center pt-1">
+                                <span className="text-slate-300 font-medium">Monthly price</span>
+                                <div className="text-right">
+                                  {isComplimentary ? (
+                                    <>
+                                      <span className="text-2xl font-black text-emerald-400 font-mono">₹0</span>
+                                      <span className="text-[10px] font-bold text-emerald-400 block uppercase tracking-wider">Complimentary Active</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-2xl font-black text-blue-300 font-mono">₹{plan.price}</span>
+                                      <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                              {plan.benefits?.map((benefit: string, i: number) => {
+                                const parts = benefit.split(":");
+                                const label = parts.length > 1 ? parts[0].trim() : benefit;
+                                const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
+
+                                return (
+                                  <div key={i} className="flex justify-between items-center pt-3 gap-2">
+                                    <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
+                                    <div className="font-bold text-white flex items-center gap-1.5 shrink-0 text-right text-xs sm:text-sm">
+                                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                      <span>{val || label}</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Card CTA */}
+                            <div className="p-6 pt-0 mt-auto">
+                              {isStudentCurrentlyPro ? (
+                                <div className="w-full py-4 rounded-xl bg-blue-950/60 border border-blue-500/50 text-blue-200 font-black text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.25)]">
+                                  <Check className="w-4 h-4 text-blue-400" />
+                                  <span>{isComplimentary ? "Enrolled • Infinite Lifetime Pass" : "Enrolled (Current Plan)"}</span>
+                                </div>
+                              ) : effectivePlanTier === "ultra" ? (
+                                <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs font-semibold text-center select-none">
+                                  Included in PIE Ultra
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleSelectPlanToCheckout(plan)}
+                                  className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(37,99,235,0.45)] transition cursor-pointer flex items-center justify-center gap-2"
+                                >
+                                  <span>UPGRADE TO {plan.name.toUpperCase()} (₹{plan.price})</span>
+                                  <ChevronRight className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // 3. PIE ULTRA TIER CARD (NETFLIX CRIMSON RED GRADE)
+                      const isStudentCurrentlyUltra = effectivePlanTier === "ultra";
+                      const canUpgradeFor200 = isComplimentary || effectivePlanTier === "pro";
+                      const ultraPayable = canUpgradeFor200 ? 200 : (Number(plan.price) || 499);
+
                       return (
-                        <div key={plan.id} className="flex-1 min-w-[280px] rounded-2xl border-2 border-rose-500/50 bg-gradient-to-b from-[#0e1c2e]/95 via-[#081320]/95 to-[#03080e]/95 shadow-[0_0_50px_rgba(225,29,72,0.18)] flex flex-col justify-between overflow-hidden relative transition hover:border-rose-500 hover:shadow-[0_0_60px_rgba(225,29,72,0.28)]">
-                          {/* Card Head (Vibrant Gradient Banner) */}
-                          <div className="p-6 bg-gradient-to-r from-[#4338ca] via-[#6366f1] to-[#e50914] text-white relative">
+                        <div key={plan.id} className="flex-1 min-w-[300px] rounded-2xl border-2 border-red-600/70 bg-gradient-to-b from-[#180407]/95 via-[#0d0204]/95 to-[#060102]/95 shadow-[0_0_65px_rgba(229,9,20,0.38)] flex flex-col justify-between overflow-hidden relative transition hover:border-red-500 hover:shadow-[0_0_80px_rgba(229,9,20,0.55)]">
+                          {/* Card Head (Netflix Crimson Banner) */}
+                          <div className="p-6 bg-gradient-to-r from-[#1e0306] via-[#990a12] to-[#e50914] text-white relative">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-[11px] font-black tracking-widest uppercase bg-black/30 backdrop-blur-md px-2.5 py-0.5 rounded-full text-white border border-white/20">
-                                RECOMMENDED
+                              <span className="text-[11px] font-black tracking-widest uppercase bg-black/50 backdrop-blur-md px-2.5 py-0.5 rounded-full text-red-100 border border-red-500/40 flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                                TOP TIER • ULTIMATE
                               </span>
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-amber-300 text-xs font-black shadow-sm">
-                                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {plan.durationDays}-Day Pass
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-red-200 text-xs font-black shadow-sm">
+                                <Sparkles className="w-3.5 h-3.5 text-red-300" /> {plan.durationDays}-Day Pass
                               </span>
                             </div>
-                            <h3 className="text-2xl font-black text-white tracking-tight mt-1">{plan.name}</h3>
-                            <p className="text-xs text-white/80 mt-1">{plan.description}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="px-2 py-0.5 rounded-full bg-[#160406] border border-red-600/60 text-red-100 text-[10px] font-bold">
+                                Ultra
+                              </div>
+                              <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
+                            </div>
+                            <p className="text-xs text-red-100/90 mt-1">{plan.description}</p>
                           </div>
 
                           {/* Features Comparison Rows */}
-                          <div className="p-6 space-y-4 flex-1 text-sm divide-y divide-cyan-500/15">
+                          <div className="p-6 space-y-3.5 flex-1 text-sm divide-y divide-red-600/20">
                             <div className="flex justify-between items-center pt-1">
                               <span className="text-slate-300 font-medium">Monthly price</span>
                               <div className="text-right">
-                                <span className="text-2xl font-black text-amber-300 font-mono">₹{plan.price}</span>
-                                <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
+                                {canUpgradeFor200 ? (
+                                  <>
+                                    <div className="flex items-baseline justify-end gap-1.5">
+                                      <span className="text-xs line-through text-slate-500 font-mono">₹499</span>
+                                      <span className="text-2xl font-black text-red-400 font-mono">₹200</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-red-400 block uppercase tracking-wider">
+                                      {isComplimentary ? "Lifetime Pro Credit Applied" : "Pro Tier Upgrade Rate"}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-2xl font-black text-red-400 font-mono">₹{plan.price}</span>
+                                    <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
+                                  </>
+                                )}
                               </div>
                             </div>
                             {plan.benefits?.map((benefit: string, i: number) => {
@@ -2143,16 +2398,29 @@ export default function StudentAccountPage() {
 
                           {/* Card CTA */}
                           <div className="p-6 pt-0 mt-auto">
-                            <button
-                              onClick={() => {
-                                setPaymentSettings({ ...paymentSettings, monthlyFee: plan.price });
-                                openModal("pay");
-                              }}
-                              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#4338ca] hover:from-[#f40612] hover:to-[#4f46e5] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.45)] transition cursor-pointer flex items-center justify-center gap-2"
-                            >
-                              <span>UPGRADE TO {plan.name.toUpperCase()}</span>
-                              <ChevronRight className="w-4 h-4" />
-                            </button>
+                            {isStudentCurrentlyUltra ? (
+                              <div className="w-full py-4 rounded-xl bg-red-950/60 border border-red-600/60 text-red-200 font-black text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,9,20,0.35)]">
+                                <Check className="w-4 h-4 text-red-400" />
+                                <span>Enrolled (Active Ultra Pass)</span>
+                              </div>
+                            ) : (
+                              <div className="space-y-1.5">
+                                <button
+                                  onClick={() => handleSelectPlanToCheckout(plan)}
+                                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#990a12] hover:from-[#f40612] hover:to-[#b81d24] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_40px_rgba(229,9,20,0.55)] transition cursor-pointer flex items-center justify-center gap-2"
+                                >
+                                  <span>UPGRADE TO {plan.name.toUpperCase()} (₹{ultraPayable})</span>
+                                  <ChevronRight className="w-4 h-4" />
+                                </button>
+                                {canUpgradeFor200 && (
+                                  <p className="text-[10px] text-center text-slate-400 leading-tight">
+                                    {isComplimentary 
+                                      ? "30 days of Ultra. Reverts to lifetime Complimentary PIE Pro afterward."
+                                      : "30 days of Ultra. Reverts to Basic if not renewed afterward."}
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -2368,8 +2636,8 @@ export default function StudentAccountPage() {
               <div className="space-y-6 animate-in fade-in duration-300">
                 
                 <div className="space-y-1.5">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Confirm Payment</h2>
-                  <p className="text-sm text-slate-400">Review your details before initiating the payment.</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Confirm Payment & Upgrade</h2>
+                  <p className="text-sm text-slate-400">Review your plan selection before generating your secure UPI QR.</p>
                 </div>
                 
                 <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 shadow-sm space-y-6">
@@ -2377,22 +2645,54 @@ export default function StudentAccountPage() {
                   {/* Payment Details Recap */}
                   <div className="space-y-4 text-sm">
                     <div className="flex justify-between items-center py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Subscription Tier</span>
-                      <span className="font-bold text-slate-200">Gold Membership — 30 Days</span>
+                      <span className="text-slate-400">Selected Tier</span>
+                      <div className="flex items-center gap-2">
+                        {isCheckoutUltra ? (
+                          <div className="px-2 py-0.5 rounded-full bg-[#160406] border border-red-600/60 text-red-100 text-[10px] font-bold">
+                            Ultra
+                          </div>
+                        ) : (
+                          <div className="px-2 py-0.5 rounded-full bg-[#0b162c] border border-blue-500/50 text-blue-100 text-[10px] font-bold">
+                            Pro
+                          </div>
+                        )}
+                        <span className="font-bold text-white">{activePlanName} — 30 Days</span>
+                      </div>
+                    </div>
+
+                    {selectedCheckoutPlan?.isComplimentaryUpgrade && (
+                      <div className="flex justify-between items-center py-2 border-b border-slate-800 text-xs">
+                        <span className="text-emerald-400">Lifetime Complimentary Pro Credit</span>
+                        <span className="font-bold font-mono text-emerald-400">-₹299.00</span>
+                      </div>
+                    )}
+
+                    {selectedCheckoutPlan?.isUpgrade && !selectedCheckoutPlan?.isComplimentaryUpgrade && (
+                      <div className="flex justify-between items-center py-2 border-b border-slate-800 text-xs">
+                        <span className="text-cyan-400">Pro Tier Upgrade Adjustment</span>
+                        <span className="font-bold font-mono text-cyan-400">-₹299.00</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                      <span className="text-slate-400">Amount Payable</span>
+                      <span className="font-bold text-amber-400 font-mono text-lg">₹{activePayable}</span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Amount</span>
-                      <span className="font-bold text-amber-400 font-mono text-base">₹{paymentSettings?.monthlyFee || 199}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Registered UPI</span>
+                      <span className="text-slate-400">Payer UPI ID</span>
                       <span className="font-mono font-medium text-white">{studentUpiId}</span>
                     </div>
                     <div className="flex justify-between items-center py-2">
                       <span className="text-slate-400">Verification Timeline</span>
-                      <span className="text-slate-300">Up to 24 hours</span>
+                      <span className="text-slate-300">Instant upon UTR match or up to 24h</span>
                     </div>
                   </div>
+
+                  {selectedCheckoutPlan?.isComplimentaryUpgrade && (
+                    <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs leading-relaxed">
+                      💡 <strong>Complimentary VIP Protection:</strong> After 30 days of PIE Ultra, your account will safely revert back to your infinite lifetime Complimentary PIE Pro access.
+                    </div>
+                  )}
 
                   {/* Actions */}
                   <div className="space-y-3 pt-4 border-t border-slate-800">
@@ -2400,9 +2700,10 @@ export default function StudentAccountPage() {
                       type="button"
                       onClick={handleSendUpgradeRequest}
                       disabled={requestingUpgrade}
-                      className="w-full h-14 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+                      className="w-full h-14 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-amber-950 font-black text-sm uppercase tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
                     >
-                      <span>{requestingUpgrade ? "Initiating..." : "I Understand, Proceed to Pay"}</span>
+                      <span>{requestingUpgrade ? "Initiating..." : `Proceed to Pay ₹${activePayable}`}</span>
+                      <ChevronRight className="w-4 h-4" />
                     </button>
 
                     <button
@@ -2413,7 +2714,7 @@ export default function StudentAccountPage() {
                       }}
                       className="w-full py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer text-center"
                     >
-                      Change UPI ID
+                      Change UPI ID / Board
                     </button>
                   </div>
                 </div>
@@ -2426,7 +2727,7 @@ export default function StudentAccountPage() {
                 
                 <div className="space-y-1.5">
                   <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Complete Payment</h2>
-                  <p className="text-sm text-slate-400">Scan or tap to securely pay the subscription amount.</p>
+                  <p className="text-sm text-slate-400">Scan or tap to securely pay the exact subscription amount.</p>
                 </div>
 
                 <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 shadow-sm space-y-6">
@@ -2434,16 +2735,16 @@ export default function StudentAccountPage() {
                   {/* Status Banner */}
                   <div className="flex items-center justify-between p-4 rounded-xl bg-[#111a27] border border-slate-800/80">
                     <div>
-                      <span className="text-xs text-slate-400 block font-medium mb-0.5">UPI ID (VPA)</span>
+                      <span className="text-xs text-slate-400 block font-medium mb-0.5">Payer UPI ID</span>
                       <span className="text-sm font-semibold text-white font-mono flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         {studentUpiId}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs text-slate-400 block font-medium mb-0.5">Amount</span>
-                      <span className="text-lg font-bold text-amber-400 font-mono">
-                        ₹{paymentSettings?.monthlyFee || 199}
+                      <span className="text-xs text-slate-400 block font-medium mb-0.5">Exact Amount</span>
+                      <span className="text-2xl font-black text-amber-400 font-mono">
+                        ₹{activePayable}
                       </span>
                     </div>
                   </div>
@@ -2452,57 +2753,60 @@ export default function StudentAccountPage() {
                   <div className="grid grid-cols-1 gap-5">
                     
                     {/* OPTION 1: MOBILE APP DIRECT (Only on Mobile) */}
-                    <div className="block md:hidden border border-slate-800 rounded-xl p-5 space-y-4">
+                    <div className="block md:hidden border border-slate-800 rounded-xl p-5 space-y-4 bg-[#0d1624]">
                       <div className="flex items-center justify-between">
                         <div className="text-sm font-bold text-white flex items-center gap-2">
                           <MonitorSmartphone className="w-4 h-4 text-slate-400" />
-                          Pay via UPI App
+                          Pay via Mobile UPI App
                         </div>
-                        <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
                           Recommended
                         </span>
                       </div>
                       
                       <p className="text-xs text-slate-400 leading-relaxed">
-                        Tap below to launch GPay, PhonePe, or Paytm with the exact amount pre-filled.
+                        Tap below to launch GPay, PhonePe, or Paytm with ₹{activePayable} pre-filled.
                       </p>
 
                       <a
-                        href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student"))}
-                        className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold text-sm transition-colors text-center"
+                        href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + activePayable + "&cu=INR&tn=" + encodeURIComponent("PIECHEM " + activePlanName + " - " + (student.name || "Student"))}
+                        className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-amber-950 font-bold text-sm transition-all text-center shadow-lg shadow-amber-500/20"
                       >
                         <Sparkles className="w-4 h-4 shrink-0" />
-                        <span>Pay ₹{paymentSettings?.monthlyFee || 199} via UPI App</span>
+                        <span>Pay ₹{activePayable} via UPI App</span>
                       </a>
                     </div>
 
                     {/* OPTION 2: COMPUTER BROWSER (DYNAMIC QR) */}
-                    <div className="border border-slate-800 rounded-xl p-6 text-center space-y-4">
-                      <div className="flex items-center justify-center gap-2 text-sm font-bold text-white mb-2">
+                    <div className="border border-slate-800 rounded-xl p-6 text-center space-y-4 bg-[#0d1624]/60">
+                      <div className="flex items-center justify-center gap-2 text-sm font-bold text-white mb-1">
                         <Monitor className="w-4 h-4 text-slate-400" />
-                        Scan Dynamic UPI QR
+                        Scan Dynamic UPI QR (₹{activePayable})
                       </div>
                       <p className="text-xs text-slate-400">
-                        Scan with any phone UPI app to complete your payment.
+                        Scan with any phone UPI app (GPay, PhonePe, Paytm, CRED).
                       </p>
 
                       {/* QR Code Container */}
-                      <div className="inline-block p-4 bg-white rounded-xl shadow-sm border border-slate-200">
+                      <div className="inline-block p-4 bg-white rounded-2xl shadow-xl border border-slate-200 relative group">
                         <img
-                          src={"https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + (paymentSettings?.monthlyFee || 199) + "&cu=INR&tn=" + encodeURIComponent("PIECHEM Gold Pass - " + (student.name || "Student")))}
+                          src={"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + activePayable + "&cu=INR&tn=" + encodeURIComponent("PIECHEM " + activePlanName + " - " + (student.name || "Student")))}
                           alt="Dynamic UPI Payment QR"
-                          className="w-40 h-40 mx-auto object-contain"
+                          className="w-44 h-44 mx-auto object-contain"
                         />
+                        <div className="text-[11px] font-mono font-bold text-slate-700 mt-2 bg-slate-100 py-1 px-2 rounded">
+                          Pay ₹{activePayable} to 9830507435@upi
+                        </div>
                       </div>
                     </div>
 
                   </div>
 
-                  {/* Student Action: PAYMENT DONE */}
+                  {/* Student Action: Optional UTR & PAYMENT DONE */}
                   {!paymentDoneAcknowledged ? (
-                    <div className="pt-4 border-t border-slate-800 text-center space-y-3">
+                    <div className="pt-4 border-t border-slate-800 text-center space-y-4">
                       <p className="text-xs text-slate-400">
-                        After transferring the amount in your UPI app, please confirm below.
+                        After transferring in your UPI app, click below to confirm your payment.
                       </p>
                       <button
                         type="button"
@@ -2510,17 +2814,17 @@ export default function StudentAccountPage() {
                           setPaymentDoneAcknowledged(true);
                           openModal("payment-done");
                         }}
-                        className="w-full h-12 rounded-xl bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                        className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer"
                       >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span>I have completed the payment</span>
+                        <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                        <span>I have completed the payment (₹{activePayable})</span>
                       </button>
                     </div>
                   ) : (
                     <div className="pt-4 border-t border-slate-800 space-y-2 animate-in fade-in duration-300">
                       <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm mb-1">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Payment Confirmation Logged</span>
+                        <span>Payment Confirmation Recorded</span>
                       </div>
                       <p className="text-xs text-slate-300">
                         Your payment submission has been recorded. Admin verification usually takes up to 24 hours.
@@ -2549,7 +2853,7 @@ export default function StudentAccountPage() {
                 <div className="space-y-2 mb-8">
                   <h3 className="text-2xl font-bold text-white">Payment Verified</h3>
                   <p className="text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
-                    Your ₹{paymentSettings?.monthlyFee || 199} payment has been confirmed. All Chemistry Exams, solutions, and analytics are now unlocked for 30 days.
+                    Your ₹{activePayable} payment has been confirmed. All {activePlanName} features and analytics are now active!
                   </p>
                 </div>
 
@@ -2573,24 +2877,82 @@ export default function StudentAccountPage() {
               {/* RIGHT COLUMN: ORDER SUMMARY */}
               <div className="order-first lg:order-last space-y-6 lg:sticky lg:top-24">
                 {/* Plan & Pricing Box */}
-                <div className="bg-[#0b131e] border border-slate-800 rounded-2xl p-6 shadow-sm">
+                <div className={"border rounded-2xl p-6 shadow-xl relative overflow-hidden " + (
+                  isCheckoutUltra 
+                    ? "bg-gradient-to-b from-[#180407] to-[#0b0203] border-red-600/50 shadow-[0_0_40px_rgba(229,9,20,0.25)]" 
+                    : "bg-gradient-to-b from-[#08152e] to-[#040914] border-blue-500/50 shadow-[0_0_40px_rgba(37,99,235,0.2)]"
+                )}>
                   <div className="flex flex-col gap-4">
                     <div>
-                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase tracking-widest mb-2 bg-amber-500/10 px-2.5 py-1 rounded">
-                        <Sparkles className="w-3.5 h-3.5" /> Gold Membership
+                      <div className="flex items-center justify-between mb-2">
+                        {isCheckoutUltra ? (
+                          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-red-100 uppercase tracking-widest bg-[#160406] border border-red-600/60 px-2.5 py-1 rounded-full shadow-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                            Ultra All-Access Pass
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-100 uppercase tracking-widest bg-[#0b162c] border border-blue-500/50 px-2.5 py-1 rounded-full shadow-sm">
+                            <Sparkles className="w-3 h-3 text-blue-400" />
+                            Pro All-Access Pass
+                          </div>
+                        )}
+                        <span className="text-xs text-slate-400 font-mono">30 Days</span>
                       </div>
-                      <h3 className="text-xl font-bold text-white tracking-tight">30 Days All-Access</h3>
-                      <p className="text-sm text-slate-400 mt-2 leading-relaxed">
-                        Full access to all 50+ Chemistry Exams, 3D Molecular Models, Full Solutions & Proctored Analytics
+
+                      <h3 className="text-xl font-black text-white tracking-tight">{activePlanName}</h3>
+                      <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                        {isCheckoutUltra 
+                          ? "Unlimited Chemistry Exams, Unlimited PIE AI queries, 3D Molecular Models, Full Solutions & Unlimited Material Downloads with PIE LAB."
+                          : "Full access to Chemistry Exams, 3D Models, 20 AI queries/day & Proctored Percentile Analytics."}
                       </p>
                     </div>
-                    <div className="pt-4 border-t border-slate-800">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-amber-400 font-mono tracking-tight">
-                          ₹{paymentSettings?.monthlyFee || 199}
-                        </span>
-                        <span className="text-sm text-slate-500">/ 30 Days</span>
-                      </div>
+
+                    <div className="pt-4 border-t border-slate-800/80 space-y-2">
+                      {selectedCheckoutPlan?.isComplimentaryUpgrade ? (
+                        <>
+                          <div className="flex justify-between items-center text-xs text-slate-400">
+                            <span>Standard 30-Day Rate</span>
+                            <span className="line-through font-mono">₹499.00</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-emerald-400 font-semibold">
+                            <span>Complimentary Pro Credit</span>
+                            <span className="font-mono">-₹299.00</span>
+                          </div>
+                          <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline">
+                            <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Payable</span>
+                            <div className="text-right">
+                              <span className="text-3xl font-black text-red-400 font-mono tracking-tight">₹200</span>
+                              <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
+                            </div>
+                          </div>
+                        </>
+                      ) : selectedCheckoutPlan?.isUpgrade ? (
+                        <>
+                          <div className="flex justify-between items-center text-xs text-slate-400">
+                            <span>Standard 30-Day Rate</span>
+                            <span className="line-through font-mono">₹499.00</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-cyan-400 font-semibold">
+                            <span>Pro Member Upgrade Credit</span>
+                            <span className="font-mono">-₹299.00</span>
+                          </div>
+                          <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline">
+                            <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Payable</span>
+                            <div className="text-right">
+                              <span className="text-3xl font-black text-red-400 font-mono tracking-tight">₹200</span>
+                              <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex justify-between items-baseline">
+                          <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Payable</span>
+                          <div className="text-right">
+                            <span className="text-3xl font-black text-amber-400 font-mono tracking-tight">₹{activePayable}</span>
+                            <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

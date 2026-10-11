@@ -11,6 +11,7 @@ async function ensureMigration() {
   try {
     await prisma.$executeRawUnsafe(`ALTER TABLE "Student" ADD COLUMN IF NOT EXISTS "subscriptionStartedAt" TIMESTAMP(3);`);
     await prisma.$executeRawUnsafe(`ALTER TABLE "Student" ADD COLUMN IF NOT EXISTS "subscriptionExpiresAt" TIMESTAMP(3);`);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "Student" ADD COLUMN IF NOT EXISTS "isComplimentary" BOOLEAN DEFAULT FALSE;`);
     await prisma.$executeRawUnsafe(`ALTER TABLE "SubscriptionUpgradeRequest" ADD COLUMN IF NOT EXISTS "approvedAt" TIMESTAMP(3);`);
     await prisma.$executeRawUnsafe(`ALTER TABLE "SubscriptionUpgradeRequest" ADD COLUMN IF NOT EXISTS "expiresAt" TIMESTAMP(3);`);
   } catch (e) {
@@ -168,10 +169,12 @@ export async function PATCH(req: Request) {
         : now;
 
       // 1. Upgrade student subscription to PAID with exact Active Since and Expiry
+      const isAlreadyComp = upgradeReq.student?.subscriptionStatus === "COMPLIMENTARY" || Boolean((upgradeReq.student as any)?.isComplimentary);
       const studentUpdateData: any = {
         subscriptionStatus: "PAID",
         subscriptionStartedAt: activeSince,
-        subscriptionExpiresAt: expiresAt
+        subscriptionExpiresAt: expiresAt,
+        ...(isAlreadyComp ? { isComplimentary: true } : {})
       };
 
       if (upgradeReq.purchasedBoard) studentUpdateData.board = upgradeReq.purchasedBoard;
@@ -268,10 +271,12 @@ export async function POST(req: Request) {
         ? matchingReq.student.subscriptionStartedAt
         : now;
 
+      const isAlreadyComp = matchingReq.student?.subscriptionStatus === "COMPLIMENTARY" || Boolean((matchingReq.student as any)?.isComplimentary);
       const studentUpdateData: any = {
         subscriptionStatus: "PAID",
         subscriptionStartedAt: activeSince,
-        subscriptionExpiresAt: expiresAt
+        subscriptionExpiresAt: expiresAt,
+        ...(isAlreadyComp ? { isComplimentary: true } : {})
       };
 
       if (matchingReq.purchasedBoard) studentUpdateData.board = matchingReq.purchasedBoard;
@@ -333,10 +338,12 @@ export async function POST(req: Request) {
             ? req.student.subscriptionStartedAt
             : now;
 
+          const isAlreadyComp = req.student?.subscriptionStatus === "COMPLIMENTARY" || Boolean((req.student as any)?.isComplimentary);
           const studentUpdateData: any = {
             subscriptionStatus: "PAID",
             subscriptionStartedAt: activeSince,
-            subscriptionExpiresAt: expiresAt
+            subscriptionExpiresAt: expiresAt,
+            ...(isAlreadyComp ? { isComplimentary: true } : {})
           };
 
           if (req.purchasedBoard) studentUpdateData.board = req.purchasedBoard;

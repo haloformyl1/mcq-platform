@@ -17,8 +17,13 @@ export default function ComplimentaryModal({ isOpen, onClose, onConfirm }: Compl
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-[#111] border border-cyan-500/30 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-        <h3 className="text-xl font-bold text-white mb-2">Grant Complimentary Access</h3>
-        <p className="text-sm text-gray-400 mb-6">Select the curriculum this student will get access to.</p>
+        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+          <span>💎 Grant Complimentary Access</span>
+          <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">PIE Pro (Lifetime)</span>
+        </h3>
+        <p className="text-xs text-gray-300 mb-4 leading-relaxed">
+          Student receives <strong className="text-blue-400">PIE Pro (₹299/mo)</strong> access for <span className="text-emerald-400 font-bold">infinite time</span> (never expires). If they upgrade to <strong className="text-red-400">PIE Ultra</strong> for ₹200 (30 days), they will automatically revert back to PIE Pro upon expiry.
+        </p>
 
         <div className="space-y-4">
           <div>
