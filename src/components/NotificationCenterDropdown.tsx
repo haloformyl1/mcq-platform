@@ -24,6 +24,7 @@ import {
   Flame,
   ArrowRight
 } from "lucide-react";
+import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
 
 interface StudentProps {
   id: string;
@@ -73,6 +74,7 @@ export interface NotificationItem {
 
 export default function NotificationCenterDropdown({ student, upgradeReq }: NotificationCenterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const [activeCategory, setActiveCategory] = useState<NotificationCategory>("all");
   const [readIds, setReadIds] = useState<string[]>([]);
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
@@ -572,6 +574,7 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setIsOpen(false);
+                                  setShowCelebrationModal(true);
                                   window.dispatchEvent(new CustomEvent("piechem:show-celebration"));
                                 }}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-600 to-rose-700 hover:brightness-110 text-white text-[11px] font-bold shadow-md transition cursor-pointer"
@@ -660,6 +663,14 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
             </a>
           </div>
         </div>
+      {/* Direct Celebration Modal Anchor */}
+      {showCelebrationModal && (
+        <GoldUpgradeCelebrationModal
+          isOpen={true}
+          onClose={() => setShowCelebrationModal(false)}
+          student={student}
+          planName={activePlanTier === "ultra" ? "PIE Ultra" : "PIE Pro"}
+        />
       )}
     </div>
   );
