@@ -656,7 +656,7 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
               className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-bold hover:underline"
             >
               <MessageCircle className="w-3 h-3" />
-              <span>WhatsApp Roy Sir</span>
+              <span>WhatsApp</span>
             </a>
           </div>
         </div>
