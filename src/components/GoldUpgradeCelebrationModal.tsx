@@ -106,17 +106,16 @@ export default function GoldUpgradeCelebrationModal({
   const handleClose = () => {
     if (controlledOnClose) {
       controlledOnClose();
-    } else {
-      setInternalIsOpen(false);
     }
+    setInternalIsOpen(false);
   };
 
   const handleBackToDashboard = () => {
     handleClose();
-    try {
-      router.push("/dashboard");
-    } catch {
-      if (typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
+      if (window.location.pathname === "/dashboard") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
         window.location.href = "/dashboard";
       }
     }
