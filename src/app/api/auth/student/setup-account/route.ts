@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { encrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { validateStudentName } from "@/lib/nameValidation";
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,15 @@ export async function POST(req: Request) {
 
     if (!email || !otp || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    let sanitizedName = name;
+    if (name) {
+      const validation = validateStudentName(name);
+      if (!validation.isValid) {
+        return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
+      }
+      sanitizedName = validation.sanitizedName;
     }
 
     const student = await prisma.student.findUnique({
@@ -34,7 +44,7 @@ export async function POST(req: Request) {
         passwordHash,
         otp: null,
         otpExpiry: null,
-        ...(name ? { name } : {}),
+        ...(sanitizedName ? { name: sanitizedName } : {}),
       },
     });
 

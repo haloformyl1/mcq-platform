@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { decrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { validateStudentName } from "@/lib/nameValidation";
 
 export async function PUT(req: Request) {
   try {
@@ -20,10 +21,19 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { name, phone, gender, dob, board, academicLevel, avatarUrl } = body;
 
+    let sanitizedName = name;
+    if (name !== undefined) {
+      const validation = validateStudentName(name);
+      if (!validation.isValid) {
+        return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
+      }
+      sanitizedName = validation.sanitizedName;
+    }
+
     const updatedStudent = await prisma.student.update({
       where: { id: studentId },
       data: {
-        ...(name !== undefined && { name }),
+        ...(name !== undefined && { name: sanitizedName }),
         ...(phone !== undefined && { phone }),
         ...(gender !== undefined && { gender }),
         ...(dob !== undefined && { dob: dob ? new Date(dob) : null }),

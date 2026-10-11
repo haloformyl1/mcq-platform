@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import PiechemLogo from "@/components/PiechemLogo";
 import GlobalFooter from "@/components/GlobalFooter";
+import { formatStudentName, validateStudentName } from "@/lib/nameValidation";
 import {
   Atom,
   ChevronRight, 
@@ -154,6 +155,19 @@ export default function StudentLogin() {
   };
 
   const handleSendOTP = async (isReset = false) => {
+    // If setting up a new account, strictly validate the student name
+    if (step === "NEW_ACCOUNT_DETAILS") {
+      const validation = validateStudentName(name);
+      if (!validation.isValid) {
+        setError(validation.error || "Please enter a valid student name.");
+        return;
+      }
+      // Apply clean sanitized name
+      if (validation.sanitizedName) {
+        setName(validation.sanitizedName);
+      }
+    }
+
     setLoading(true);
     setError("");
     setSuccessMsg("");
@@ -161,7 +175,7 @@ export default function StudentLogin() {
       const res = await fetch("/api/auth/student/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), name }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), name: formatStudentName(name) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -520,10 +534,32 @@ export default function StudentLogin() {
                           id="name"
                           type="text"
                           required
+                          autoComplete="name"
                           placeholder=" "
                           className="peer w-full bg-[#040e1b] text-white border border-cyan-500/30 focus:border-cyan-400 rounded-xl pt-5 pb-2 px-4 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition text-sm sm:text-base font-sans"
                           value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            // Check for invalid input types
+                            if (/[0-9]/.test(val)) {
+                              setError("Numbers (0-9) are not allowed in student names.");
+                              return;
+                            }
+                            if (/[^\x00-\x7F]/.test(val)) {
+                              setError("Names must be entered in English alphabets only.");
+                              return;
+                            }
+                            if (/[^a-zA-Z\s]/.test(val)) {
+                              setError("Special characters are not allowed in student names.");
+                              return;
+                            }
+                            
+                            // Clear error if now typing valid characters
+                            if (error) setError("");
+
+                            // Automatically capitalize first letter of each word
+                            setName(formatStudentName(val));
+                          }}
                         />
                         <label 
                           htmlFor="name" 
