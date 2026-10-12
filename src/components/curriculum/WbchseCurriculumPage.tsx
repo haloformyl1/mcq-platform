@@ -47,20 +47,20 @@ export default function WbchseCurriculumPage({
   const sem4Materials = useMemo(() => filterMaterialsForContext(materials, "WBCHSE", "SEM_4"), [materials]);
 
   return (
-    <div className="w-full text-slate-100 font-sans selection:bg-emerald-500/20 selection:text-emerald-200">
+    <div className="w-full min-h-[calc(100vh-14rem)] flex flex-col items-center justify-center text-slate-100 font-sans selection:bg-emerald-500/20 selection:text-emerald-200 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
       {/* STEP 2: The 4-Semester Interactive System Grid */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
-        <div>
-          <h2 className="text-xs font-mono tracking-[0.2em] text-emerald-400 uppercase">
-            Select Academic Semester
+      <div className="w-full max-w-6xl mx-auto space-y-8 flex flex-col items-center">
+        <div className="text-center space-y-2">
+          <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-emerald-400 uppercase">
+            Step 2: Select Academic Semester
           </h2>
-          <p className="text-2xl font-bold text-white mt-1">
+          <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             WBCHSE 4-Semester Portals
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
           
           {/* Semester I */}
           <Link

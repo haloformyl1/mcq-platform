@@ -756,8 +756,8 @@ export default function StudyMaterialRepository({
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
             <div>
-              <span className="text-xs font-mono tracking-widest text-cyan-400 uppercase">
-                Step 2 · Academic Level
+              <span className="text-xs sm:text-sm font-mono tracking-[0.25em] text-cyan-400 uppercase">
+                {selectedBoard === "WBCHSE" ? "Step 2: Select Academic Semester" : selectedBoard === "ENTRANCE" ? "Step 2: Choose Target Examination" : "Step 2: Choose Academic Class"}
               </span>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-white font-serif tracking-tight mt-1">
                 {selectedBoard === "WBCHSE" ? "Select your semester" : selectedBoard === "ENTRANCE" ? "Select your target examination" : "Select your class"}

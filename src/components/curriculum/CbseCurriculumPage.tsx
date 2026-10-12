@@ -50,20 +50,20 @@ export default function CbseCurriculumPage({
   }, [materials]);
 
   return (
-    <div className="w-full text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-200">
+    <div className="w-full min-h-[calc(100vh-14rem)] flex flex-col items-center justify-center text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-200 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
       {/* STEP 2: Dedicated Dual Portals for Class XI & Class XII */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
-        <div>
-          <h2 className="text-xs font-mono tracking-[0.2em] text-cyan-400 uppercase">
-            Choose Academic Class
+      <div className="w-full max-w-4xl mx-auto space-y-8 flex flex-col items-center">
+        <div className="text-center space-y-2">
+          <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-cyan-400 uppercase">
+            Step 2: Choose Academic Class
           </h2>
-          <p className="text-2xl font-bold text-white mt-1">
+          <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             CBSE Chemistry Class Portals
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           
           {/* Class XI Card */}
           <Link
