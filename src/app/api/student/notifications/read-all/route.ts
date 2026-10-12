@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const studentId = payload.id;
     const result = await markAllNotificationsAsRead(studentId);
 
-    return NextResponse.json({ success: true, ...result });
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error("Notifications Read-All Error:", error?.message || error);
     return NextResponse.json({ error: "Failed to mark notifications as read" }, { status: 500 });
