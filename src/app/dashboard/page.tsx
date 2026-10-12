@@ -419,7 +419,7 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 4. CONTENT ROW 1: CHEMISTRY DIGITAL LIBRARY & 3D VAULT    */}
       {/* ========================================================= */}
-      <section className="w-full bg-transparent py-2">
+      <section className="dashboard-hero relative w-full overflow-hidden bg-transparent py-2 transition-all duration-300">
         <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
       </section>
 
