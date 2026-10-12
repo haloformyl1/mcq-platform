@@ -521,7 +521,7 @@ export default function StudyMaterialRepository({
       {/* STEP 1: BOARD SELECTION ("Choose your curriculum")            */}
       {/* ============================================================ */}
       {!selectedBoard && (
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
+        <section className="w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
 
           <div className="pt-2 relative z-10 space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/5 pb-4">
@@ -1026,7 +1026,7 @@ export default function StudyMaterialRepository({
       {/* STEP 3: RESOURCE LIST PAGE                                   */}
       {/* ============================================================ */}
       {selectedBoard && selectedLevel && activeCategoryObject && (
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 animate-in fade-in duration-300">
+        <section className="w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 animate-in fade-in duration-300">
           
           {/* Header & Back Link */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
