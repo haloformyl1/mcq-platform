@@ -46,13 +46,10 @@ export default function EntranceCurriculumPage({
 
       {/* STEP 2: The 4 Exam Stream Portals */}
       <div className="w-full max-w-6xl mx-auto space-y-8 flex flex-col items-center">
-        <div className="text-center space-y-2">
+        <div className="text-center">
           <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-rose-400 uppercase">
             Step 2: Choose Target Examination
           </h2>
-          <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Competitive Examination Tracks
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">

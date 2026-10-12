@@ -54,13 +54,10 @@ export default function CbseCurriculumPage({
 
       {/* STEP 2: Dedicated Dual Portals for Class XI & Class XII */}
       <div className="w-full max-w-4xl mx-auto space-y-8 flex flex-col items-center">
-        <div className="text-center space-y-2">
+        <div className="text-center">
           <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-cyan-400 uppercase">
             Step 2: Choose Academic Class
           </h2>
-          <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            CBSE Chemistry Class Portals
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">

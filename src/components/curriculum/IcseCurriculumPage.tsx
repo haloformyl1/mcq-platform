@@ -53,13 +53,10 @@ export default function IcseCurriculumPage({
 
       {/* Dual Portals for Class XI & Class XII ISC */}
       <div className="w-full max-w-4xl mx-auto space-y-8 flex flex-col items-center">
-        <div className="text-center space-y-2">
+        <div className="text-center">
           <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-amber-400 uppercase">
             Step 2: Choose Academic Class
           </h2>
-          <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            ISC Council Chemistry Portals
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
