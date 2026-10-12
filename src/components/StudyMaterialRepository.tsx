@@ -441,14 +441,14 @@ export default function StudyMaterialRepository({
       {/* ============================================================ */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-serif flex items-center gap-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif flex items-center gap-2">
             <span 
               onClick={selectedBoard ? handleResetBoard : undefined}
               className={selectedBoard ? "cursor-pointer hover:text-cyan-300 transition-colors" : ""}
             >
               Study Materials
             </span>
-          </h2>
+          </h1>
 
           {selectedBoard && (
             <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-transparent py-1">
