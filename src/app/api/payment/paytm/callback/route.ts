@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import PaytmChecksum from "paytmchecksum";
 
@@ -42,6 +42,28 @@ export async function POST(req: Request) {
             subscriptionExpiresAt: expiresAt
           }
         });
+
+        // Trigger automated verified payment & PIE Ultra activation notifications
+        try {
+          const { notifyPaymentSuccess, notifyMembershipActivated } = await import("@/lib/notificationService");
+          const amountNum = paytmResponse.TXNAMOUNT ? Number(paytmResponse.TXNAMOUNT) : (txnRecord && txnRecord[0]?.amount ? Number(txnRecord[0].amount) : 499);
+          await notifyPaymentSuccess({
+            studentId,
+            amount: amountNum,
+            planName: "PIE Ultra",
+            txnId,
+            paymentDate: paytmResponse.TXNDATE ? new Date(paytmResponse.TXNDATE) : new Date(),
+            orderId
+          });
+          await notifyMembershipActivated({
+            studentId,
+            planTier: "ultra",
+            expiresAt,
+            amount: amountNum
+          });
+        } catch (notifErr) {
+          console.error("Payment notification dispatch warning:", notifErr);
+        }
       }
 
       await prisma.$executeRawUnsafe(

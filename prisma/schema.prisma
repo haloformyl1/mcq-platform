@@ -39,6 +39,7 @@ model Student {
   sessions           StudentSession[]
   aiConversations    AiConversation[]
   downloads          StudentDownload[]
+  notifications      Notification[]
 }
 
 model StudentSession {
@@ -336,4 +337,27 @@ model SubscriptionPlan {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id          String    @id @default(uuid())
+  studentId   String
+  type        String    // payment_success, payment_failed, membership_activated, membership_renewed, content_published, exam_available, admin_announcement, system_alert
+  category    String    // payments, ultra, materials, exams, announcements, system
+  title       String
+  message     String
+  metadata    Json?
+  actionLabel String?
+  actionUrl   String?
+  priority    Boolean   @default(false)
+  readAt      DateTime?
+  eventKey    String?   @unique
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, createdAt(sort: Desc)])
+  @@index([studentId, readAt])
+  @@index([category])
 }

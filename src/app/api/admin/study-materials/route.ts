@@ -116,6 +116,22 @@ export async function POST(req: Request) {
 
     const meta = parseMaterialMetadata(material.description, material.title, material.type);
 
+    // Dispatch board-specific notifications to eligible students (non-blocking)
+    try {
+      const { notifyContentPublished } = await import("@/lib/notificationService");
+      notifyContentPublished({
+        materialId: material.id,
+        title: material.title,
+        board: meta.section,
+        academicLevel: meta.classSem,
+        discipline: meta.discipline,
+        category: meta.category,
+        isPremium: material.isPremium
+      }).catch(err => console.error("Content notification dispatch warning:", err));
+    } catch (notifErr) {
+      console.error("Content notification load error:", notifErr);
+    }
+
     return NextResponse.json({
       success: true,
       material: {

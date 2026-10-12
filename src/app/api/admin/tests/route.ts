@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
@@ -54,6 +54,22 @@ export async function POST(req: Request) {
         targetAcademicLevel: data.targetAcademicLevel || "ALL",
       },
     });
+
+    // Dispatch exam alert notification to eligible students (non-blocking)
+    try {
+      const { notifyExamAvailable } = await import("@/lib/notificationService");
+      notifyExamAvailable({
+        testId: test.id,
+        title: test.title,
+        targetBoard: test.targetBoard,
+        targetAcademicLevel: test.targetAcademicLevel,
+        durationMinutes: test.durationMinutes,
+        totalQuestions: test.totalQuestions
+      }).catch(err => console.error("Exam notification dispatch warning:", err));
+    } catch (notifErr) {
+      console.error("Exam notification load error:", notifErr);
+    }
+
     return NextResponse.json(test);
   } catch (error) {
     return NextResponse.json({ error: "Failed to create test" }, { status: 500 });

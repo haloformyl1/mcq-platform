@@ -206,6 +206,35 @@ export async function PATCH(req: Request) {
         }).catch(err => console.error("[Subscription Upgrade] Email error:", err));
       }
 
+      // Option 2: Dispatch in-app Payment & Membership Activation Notifications
+      try {
+        const { notifyPaymentSuccess, notifyMembershipActivated } = await import("@/lib/notificationService");
+        const isUltra = (upgradeReq.note || "").toLowerCase().includes("ultra") || upgradeReq.amount === 499 || upgradeReq.amount === 200;
+        const planTier = isUltra ? "ultra" : "pro";
+        const planName = isUltra ? "PIE Ultra" : "PIE Pro";
+
+        if (upgradeReq.utrNumber) {
+          await notifyPaymentSuccess({
+            studentId: upgradeReq.studentId,
+            amount: upgradeReq.amount || (isUltra ? 499 : 99),
+            planName,
+            txnId: upgradeReq.utrNumber,
+            paymentDate: upgradeReq.createdAt || new Date(),
+            orderId: upgradeReq.id
+          });
+        }
+
+        await notifyMembershipActivated({
+          studentId: upgradeReq.studentId,
+          planTier,
+          expiresAt,
+          amount: upgradeReq.amount || (isUltra ? 499 : 99),
+          isComplimentary: Boolean((upgradeReq.student as any)?.isComplimentary)
+        });
+      } catch (notifErr) {
+        console.error("[Subscription Upgrade] Notification error:", notifErr);
+      }
+
       return NextResponse.json({ 
         message: "Subscription upgraded to PAID successfully for 30 days!", 
         request: updatedReq,
