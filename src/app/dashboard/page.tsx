@@ -313,7 +313,7 @@ export default function StudentDashboard() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-black text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={data?.student} />
       <GoldUpgradeCelebrationModal student={student || data?.student} />
@@ -367,9 +367,6 @@ export default function StudentDashboard() {
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* ========================================================= */}
       <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-6 sm:py-8 transition-all duration-300 group">
-        {/* Subtle Ambient Radial Lighting */}
-        <div className="pointer-events-none absolute -top-24 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/10 via-indigo-600/10 to-transparent blur-3xl" />
-
         {/* Content Container - Far Left Aligned */}
         <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 flex flex-col justify-between">
           
