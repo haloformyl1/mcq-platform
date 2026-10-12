@@ -416,13 +416,15 @@ export default function StudentDashboard() {
         </div>
       </section>
 
+      {/* ========================================================= */}
+      {/* 4. CONTENT ROW 1: CHEMISTRY DIGITAL LIBRARY & 3D VAULT    */}
+      {/* ========================================================= */}
+      <section className="w-full bg-transparent py-2">
+        <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
+      </section>
+
       {/* Main Container */}
       <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10 flex-1">
-
-        {/* ========================================================= */}
-        {/* 4. CONTENT ROW 1: CHEMISTRY DIGITAL LIBRARY & 3D VAULT    */}
-        {/* ========================================================= */}
-        <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
 
         {/* ========================================================= */}
         {/* 5. CONTENT ROW 2: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}

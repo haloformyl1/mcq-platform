@@ -439,16 +439,32 @@ export default function StudyMaterialRepository({
       {/* ============================================================ */}
       {/* 1. SECTION TITLE & BREADCRUMB NAVIGATION                     */}
       {/* ============================================================ */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-3">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif flex items-center gap-2">
-            <span 
-              onClick={selectedBoard ? handleResetBoard : undefined}
-              className={selectedBoard ? "cursor-pointer hover:text-cyan-300 transition-colors" : ""}
-            >
-              Study Materials
-            </span>
-          </h1>
+      <div className="w-full px-3 sm:px-6 lg:px-8 pt-4 pb-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-1">
+          <div className="space-y-4">
+            {/* Top Row: Icon & Pill Badge */}
+            <div className="flex items-center gap-3">
+              <div className="p-3 sm:p-3.5 rounded-2xl border border-cyan-400/30 bg-gradient-to-b from-[#0e172a] to-black text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center">
+                <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400 animate-pulse" />
+              </div>
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                Academic Vault
+              </span>
+            </div>
+
+            {/* Title */}
+            <div className="space-y-2 pt-1">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif flex items-center gap-2">
+                <span 
+                  onClick={selectedBoard ? handleResetBoard : undefined}
+                  className={selectedBoard ? "cursor-pointer hover:text-cyan-300 transition-colors" : ""}
+                >
+                  Study Materials
+                </span>
+              </h1>
+            </div>
+          </div>
 
           {selectedBoard && (
             <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-slate-400 bg-transparent py-1">
