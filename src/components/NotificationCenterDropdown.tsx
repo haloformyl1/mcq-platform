@@ -35,6 +35,15 @@ export type NotificationCategory =
   | "announcements" 
   | "system";
 
+export interface NotificationMetadata {
+  amount?: string | number;
+  txnId?: string;
+  board?: string;
+  classSem?: string;
+  expiresAt?: string;
+  [key: string]: unknown;
+}
+
 export interface DbNotification {
   id: string;
   studentId: string;
@@ -42,7 +51,7 @@ export interface DbNotification {
   category: "payments" | "ultra" | "materials" | "exams" | "announcements" | "system";
   title: string;
   message: string;
-  metadata?: any;
+  metadata?: NotificationMetadata | null;
   actionLabel?: string | null;
   actionUrl?: string | null;
   priority?: boolean;
@@ -90,6 +99,22 @@ const CATEGORY_TABS: { id: NotificationCategory; label: string; icon: React.Elem
   { id: "system", label: "System", icon: ShieldCheck },
 ];
 
+// Format relative timestamp
+function formatTimeAgo(dateStr: string | Date) {
+  const d = new Date(dateStr);
+  const diffMs = Date.now() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
 export default function NotificationCenterDropdown({ student, upgradeReq }: NotificationCenterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NotificationCategory>("all");
@@ -129,9 +154,19 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
 
   // Initial fetch & initial unread count
   useEffect(() => {
+    let active = true;
     if (studentId) {
-      fetchNotifications("all");
+      fetch(`/api/student/notifications?category=all&limit=30`, { cache: "no-store" })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (!active || !data) return;
+          setNotifications(data.notifications || []);
+          setUnreadCount(Number(data.unreadCount) || 0);
+          setCategoryCounts(data.categoryCounts || {});
+        })
+        .catch(err => console.error("Failed to load notifications:", err));
     }
+    return () => { active = false; };
   }, [studentId]);
 
   // Periodic background check every 60 seconds when panel is closed
@@ -150,10 +185,19 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
     return () => clearInterval(interval);
   }, [studentId, isOpen]);
 
+  const notificationsRef = useRef(notifications);
+  useEffect(() => {
+    notificationsRef.current = notifications;
+  }, [notifications]);
+
   // 2. AUTOMATIC READ TRACKING ON PANEL OPENING:
   // "Whenever a user opens the notification panel, automatically mark all currently unread notifications belonging to that user as read."
   const markAllAsReadBackend = useCallback(async () => {
-    if (!studentId || unreadCount === 0) return;
+    if (!studentId) return;
+    const currentList = notificationsRef.current;
+    const visibleUnreadIds = currentList.filter(n => !n.readAt).map(n => n.id);
+    if (visibleUnreadIds.length === 0 && unreadCount === 0) return;
+
     try {
       setIsMarkingRead(true);
       // Optimistic update immediately in the UI
@@ -161,16 +205,14 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
       setUnreadCount(0);
 
       const res = await fetch(`/api/student/notifications/read-all`, {
-        method: "POST"
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          notificationIds: visibleUnreadIds.length > 0 ? visibleUnreadIds : undefined
+        })
       });
       if (res.ok) {
-        setCategoryCounts(prev => {
-          const updated = { ...prev };
-          Object.keys(updated).forEach(k => {
-            // Keep total counts intact, unread indicators cleared
-          });
-          return updated;
-        });
+        setCategoryCounts(prev => ({ ...prev }));
       }
     } catch (err) {
       console.error("Failed to mark all as read:", err);
@@ -262,22 +304,6 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
     } catch (err) {
       console.error("Failed to mark single read:", err);
     }
-  };
-
-  // Format relative timestamp
-  const formatTimeAgo = (dateStr: string | Date) => {
-    const d = new Date(dateStr);
-    const diffMs = Date.now() - d.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
   };
 
   return (
@@ -457,10 +483,10 @@ export default function NotificationCenterDropdown({ student, upgradeReq }: Noti
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm sm:text-base font-bold text-white">
-                    You're all caught up
+                    You&apos;re all caught up
                   </h3>
                   <p className="text-xs text-slate-400 font-light max-w-xs mx-auto leading-relaxed">
-                    No notifications in this category. We'll alert you the moment new study resources, exam schedules, or verified payments arrive.
+                    No notifications in this category. We&apos;ll alert you the moment new study resources, exam schedules, or verified payments arrive.
                   </p>
                 </div>
                 <button

@@ -1,18 +1,40 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
+async function verifyAdminSession() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session")?.value;
+  if (!session) return null;
+  const payload = await decrypt(session);
+  if (!payload || payload.role !== "admin") return null;
+  return payload;
+}
+
 export async function POST(req: Request) {
   try {
-    const { requestId, action } = await req.json(); // action = "APPROVE" | "REJECT"
-
-    if (!requestId || !action) {
-      return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+    const admin = await verifyAdminSession();
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid request payload" }, { status: 400 });
+    }
+
+    const { requestId, action } = body;
+
+    if (!requestId || typeof requestId !== "string" || !["APPROVE", "REJECT"].includes(action)) {
+      return NextResponse.json({ error: "Valid requestId and action ('APPROVE' or 'REJECT') are required" }, { status: 400 });
+    }
+
+    const cleanRequestId = requestId.trim();
     const accessReq = await prisma.testAccessRequest.findUnique({
-      where: { id: requestId },
+      where: { id: cleanRequestId },
       include: { test: true }
     });
 

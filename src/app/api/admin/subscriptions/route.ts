@@ -336,6 +336,35 @@ export async function POST(req: Request) {
         }).catch(err => console.error("[Subscription Upgrade] Email error:", err));
       }
 
+      // Option 2: Dispatch in-app Payment & Membership Activation Notifications
+      try {
+        const { notifyPaymentSuccess, notifyMembershipActivated } = await import("@/lib/notificationService");
+        const isUltra = (matchingReq.note || "").toLowerCase().includes("ultra") || matchingReq.amount === 499 || matchingReq.amount === 200;
+        const planTier = isUltra ? "ultra" : "pro";
+        const planName = isUltra ? "PIE Ultra" : "PIE Pro";
+
+        if (matchingReq.utrNumber) {
+          await notifyPaymentSuccess({
+            studentId: matchingReq.studentId,
+            amount: matchingReq.amount || (isUltra ? 499 : 99),
+            planName,
+            txnId: matchingReq.utrNumber,
+            paymentDate: matchingReq.createdAt || new Date(),
+            orderId: matchingReq.id
+          });
+        }
+
+        await notifyMembershipActivated({
+          studentId: matchingReq.studentId,
+          planTier,
+          expiresAt,
+          amount: matchingReq.amount || (isUltra ? 499 : 99),
+          isComplimentary: Boolean((matchingReq.student as { isComplimentary?: boolean })?.isComplimentary)
+        });
+      } catch (notifErr) {
+        console.error("[Single UTR Verify] Notification error:", notifErr);
+      }
+
       return NextResponse.json({
         success: true,
         message: `Verified! Student ${matchingReq.student.name || matchingReq.student.email} granted 30-Day Premium Pass.`
@@ -401,6 +430,35 @@ export async function POST(req: Request) {
               expiresAt: expiresAt,
               activeSince: activeSince,
             }).catch(err => console.error("[Subscription Upgrade] Email error:", err));
+          }
+
+          // Option 2: Dispatch in-app Payment & Membership Activation Notifications
+          try {
+            const { notifyPaymentSuccess, notifyMembershipActivated } = await import("@/lib/notificationService");
+            const isUltra = (req.note || "").toLowerCase().includes("ultra") || req.amount === 499 || req.amount === 200;
+            const planTier = isUltra ? "ultra" : "pro";
+            const planName = isUltra ? "PIE Ultra" : "PIE Pro";
+
+            if (req.utrNumber) {
+              await notifyPaymentSuccess({
+                studentId: req.studentId,
+                amount: req.amount || (isUltra ? 499 : 99),
+                planName,
+                txnId: req.utrNumber,
+                paymentDate: req.createdAt || new Date(),
+                orderId: req.id
+              });
+            }
+
+            await notifyMembershipActivated({
+              studentId: req.studentId,
+              planTier,
+              expiresAt,
+              amount: req.amount || (isUltra ? 499 : 99),
+              isComplimentary: Boolean((req.student as { isComplimentary?: boolean })?.isComplimentary)
+            });
+          } catch (notifErr) {
+            console.error("[Batch UTR Verify] Notification error:", notifErr);
           }
 
           approvedCount++;

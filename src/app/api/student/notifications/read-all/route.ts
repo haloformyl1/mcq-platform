@@ -19,11 +19,23 @@ export async function POST(req: Request) {
     }
 
     const studentId = payload.id;
-    const result = await markAllNotificationsAsRead(studentId);
+    let notificationIds: string[] | undefined = undefined;
+
+    try {
+      const body = await req.json();
+      if (body && Array.isArray(body.notificationIds)) {
+        notificationIds = body.notificationIds;
+      }
+    } catch {
+      // Body may be empty if called without payload; fallback to all unread
+    }
+
+    const result = await markAllNotificationsAsRead(studentId, notificationIds);
 
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("Notifications Read-All Error:", error?.message || error);
+  } catch (error: unknown) {
+    const errMessage = error instanceof Error ? error.message : String(error);
+    console.error("Notifications Read-All Error:", errMessage);
     return NextResponse.json({ error: "Failed to mark notifications as read" }, { status: 500 });
   }
 }
