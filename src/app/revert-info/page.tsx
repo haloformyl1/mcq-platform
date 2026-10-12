@@ -3,7 +3,7 @@ import { ArrowLeft, History, ShieldAlert, Sparkles, Trash2 } from "lucide-react"
 
 export default function RevertInfoPage() {
   return (
-    <div className="min-h-screen bg-[#131314] text-slate-200 font-sans selection:bg-white/20">
+    <div className="min-h-screen bg-black text-slate-200 font-sans selection:bg-white/20">
       <div className="max-w-3xl mx-auto px-6 py-16 sm:py-24">
         <div className="mb-12">
           <Link href="/" className="inline-flex items-center text-sm font-medium text-slate-400 hover:text-white transition group mb-8">

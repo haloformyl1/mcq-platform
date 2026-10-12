@@ -213,7 +213,7 @@ function ThreeDAnimationsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       
       {/* ========================================================= */}
       {/* 1. GLOBAL UNIFIED HEADER (PERMANENTLY ANCHORED LEFT LOGO) */}
@@ -228,10 +228,6 @@ function ThreeDAnimationsContent() {
       {/* 2. HERO SECTION WITH MOLECULAR ORBITAL CANVAS             */}
       {/* ========================================================= */}
       <section className="relative w-full pt-10 sm:pt-16 pb-14 sm:pb-20 overflow-hidden bg-transparent">
-
-        {/* Ambient Radial Lights */}
-        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-cyan-500/10 blur-[120px] rounded-full" />
-        <div className="pointer-events-none absolute top-1/2 right-10 w-[400px] h-[250px] bg-indigo-500/10 blur-[100px] rounded-full" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-6">
           
@@ -474,7 +470,7 @@ function ThreeDAnimationsContent() {
 export default function ThreeDAnimationsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-transparent flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
       </div>
     }>

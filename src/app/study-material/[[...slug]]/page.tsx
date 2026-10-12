@@ -161,7 +161,7 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-200">
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-200">
       {/* Top Header */}
       <GlobalHeader
         student={student}

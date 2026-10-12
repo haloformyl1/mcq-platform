@@ -8,8 +8,8 @@ interface PiFiringLoaderProps {
 
 export default function PiFiringLoader({ fullScreen = true }: PiFiringLoaderProps) {
   const containerClasses = fullScreen
-    ? 'fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#02070B] text-white select-none overflow-hidden transition-opacity duration-500'
-    : 'w-full py-16 sm:py-20 flex flex-col items-center justify-center bg-[#02070B]/95 rounded-2xl border border-white/[0.06] text-white select-none relative overflow-hidden backdrop-blur-md transition-opacity duration-500';
+    ? 'fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-white select-none overflow-hidden transition-opacity duration-500'
+    : 'w-full py-16 sm:py-20 flex flex-col items-center justify-center bg-black/95 rounded-2xl border border-white/[0.06] text-white select-none relative overflow-hidden backdrop-blur-md transition-opacity duration-500';
 
   return (
     <div className={containerClasses} role="status" aria-live="polite" aria-label="Loading PIE CHEM">

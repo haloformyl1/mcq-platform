@@ -882,7 +882,7 @@ export default function StudentAccountPage() {
                     rawPayerUpi.toLowerCase().endsWith("@axl")) : false;
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent text-white font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-black text-white font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden">
       <AdminPreviewBanner />
       <SubscriptionExpiredModal student={student} />
       <GoldUpgradeCelebrationModal student={student} />

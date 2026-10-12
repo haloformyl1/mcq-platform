@@ -89,7 +89,7 @@ export default async function PdfViewerPage({
 
   if (!eligibility.eligible) {
     return (
-      <div className="min-h-screen bg-[#040b12] text-slate-100 flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-black text-slate-100 flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full bg-[#081524] border border-rose-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-rose-950/40 text-center space-y-6">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-rose-500/20 to-red-500/20 border border-rose-500/40 flex items-center justify-center">
             <ShieldAlert className="w-8 h-8 text-rose-400" />
@@ -152,7 +152,7 @@ export default async function PdfViewerPage({
 
     if (!isAllowed) {
       return (
-        <div className="min-h-screen bg-[#040b12] text-slate-100 flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen bg-black text-slate-100 flex flex-col items-center justify-center p-4">
           <div className="max-w-md w-full bg-[#081524] border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-950/40 text-center space-y-6">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500/20 to-yellow-500/20 border border-amber-500/40 flex items-center justify-center">
               <Crown className="w-8 h-8 text-amber-400" />

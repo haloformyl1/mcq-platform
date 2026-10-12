@@ -42,7 +42,7 @@ export default async function SharedChatPage({ params }: { params: Promise<{ cha
   const pendingRequests = isOwner ? messages.filter(m => m.type === 'collab_request') : [];
 
   return (
-    <div className="min-h-screen bg-[#131314] text-slate-200 font-sans selection:bg-white/20">
+    <div className="min-h-screen bg-black text-slate-200 font-sans selection:bg-white/20">
       <header className="h-16 flex items-center justify-between px-6 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 transition hover:opacity-80">
           <PiechemLogo size="sm" showText={true} />

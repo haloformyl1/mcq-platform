@@ -4,7 +4,7 @@ import PiechemLogo from '@/components/PiechemLogo';
 
 export default function AboutAiPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 selection:bg-cyan-500/30 font-sans selection:text-white flex flex-col items-center">
+    <div className="min-h-screen bg-black text-slate-200 selection:bg-cyan-500/30 font-sans selection:text-white flex flex-col items-center">
       
       {/* Header */}
       <header className="w-full flex items-center justify-between p-6 max-w-6xl mx-auto border-b border-white/5">

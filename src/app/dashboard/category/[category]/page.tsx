@@ -408,14 +408,8 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-black text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 relative overflow-x-hidden">
       <AdminPreviewBanner />
-
-      {/* Chemistry Ambient Glow for this category */}
-      <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 pointer-events-none -z-10" 
-        style={{ background: `radial-gradient(ellipse 80% 50% at 50% -10%, ${themeConfig.ambientColor}, transparent 70%)` }}
-      />
 
       {/* Top Header matching Front Page / Dashboard / Account */}
       <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)] border-b border-white/[0.06]">

@@ -513,9 +513,6 @@ export default function StudyMaterialRepository({
       {!selectedBoard && (
         <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
           
-          {/* Subtle Ambient Radial Lighting */}
-          <div className="pointer-events-none absolute top-12 left-1/2 -translate-x-1/2 w-[800px] h-72 bg-gradient-to-b from-cyan-500/10 via-indigo-500/5 to-transparent blur-3xl" />
-
           {/* Header with Board Overview Stats Pill */}
           <div className="text-center max-w-3xl mx-auto space-y-4 pt-4 pb-6 relative z-10">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">

@@ -69,7 +69,7 @@ export default async function LabViewerPage({
 
     if (!isAllowed) {
       return (
-        <div className="min-h-screen bg-[#040b12] text-slate-100 flex flex-col items-center justify-center p-4">
+        <div className="min-h-screen bg-black text-slate-100 flex flex-col items-center justify-center p-4">
           <div className="max-w-md w-full bg-[#081524] border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-950/40 text-center space-y-6">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500/20 to-yellow-500/20 border border-amber-500/40 flex items-center justify-center">
               <Crown className="w-8 h-8 text-amber-400" />
@@ -134,7 +134,7 @@ export default async function LabViewerPage({
   const isGold = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
 
   return (
-    <div className="fixed inset-0 w-screen h-screen z-[99999] bg-[#02060b] overflow-hidden">
+    <div className="fixed inset-0 w-screen h-screen z-[99999] bg-black overflow-hidden">
       <LabViewerClient
         material={{
           id: material.id,
