@@ -366,9 +366,9 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-6 sm:py-8 transition-all duration-300 group">
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent mt-4 sm:mt-6 lg:mt-8 !pt-8 sm:!pt-12 lg:!pt-14 pb-6 sm:pb-8 transition-all duration-300 group">
         {/* Content Container - Far Left Aligned */}
-        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 flex flex-col justify-between">
+        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 flex flex-col justify-between pt-2 sm:pt-4">
           
           <div className="space-y-4 max-w-3xl">
             {/* Top Row: Icon & Pill Badge */}
