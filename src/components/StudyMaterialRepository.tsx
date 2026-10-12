@@ -453,8 +453,8 @@ export default function StudyMaterialRepository({
               </span>
             </div>
 
-            {/* Title */}
-            <div className="space-y-2 pt-1">
+            {/* Title & Introduction */}
+            <div className="space-y-2 pt-1 max-w-3xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif flex items-center gap-2">
                 <span 
                   onClick={selectedBoard ? handleResetBoard : undefined}
@@ -463,6 +463,16 @@ export default function StudyMaterialRepository({
                   Study Materials
                 </span>
               </h1>
+
+              {/* Subtitle - matching 3D animations */}
+              <p className="text-base sm:text-xl text-slate-200/95 font-semibold leading-relaxed drop-shadow">
+                Your Chemistry Knowledge Repository
+              </p>
+
+              {/* Description - matching 3D animations */}
+              <p className="text-xs sm:text-sm text-slate-400/90 font-light max-w-2xl leading-relaxed pt-0.5">
+                Structured theory, derivations, DPPs, and previous year examination archives engineered for your specific board curriculum.
+              </p>
             </div>
           </div>
 
@@ -511,22 +521,7 @@ export default function StudyMaterialRepository({
       {/* STEP 1: BOARD SELECTION ("Choose your curriculum")            */}
       {/* ============================================================ */}
       {!selectedBoard && (
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
-          
-          {/* Header with Board Overview Stats Pill */}
-          <div className="text-center max-w-3xl mx-auto space-y-4 pt-4 pb-6 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              Academic Digital Archives
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight font-serif italic drop-shadow-xl">
-              Your Chemistry Knowledge Repository
-            </h1>
-            <p className="text-sm sm:text-base text-slate-300/90 font-light leading-relaxed max-w-2xl mx-auto">
-              Structured theory, derivations, DPPs, and previous year examination archives engineered for your specific board curriculum.
-            </p>
-          </div>
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
 
           <div className="pt-2 relative z-10 space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/5 pb-4">
