@@ -366,14 +366,14 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-6 sm:py-10 transition-all duration-300 group">
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-6 sm:py-8 transition-all duration-300 group">
         {/* Subtle Ambient Radial Lighting */}
-        <div className="pointer-events-none absolute -top-24 left-10 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/10 via-indigo-600/10 to-transparent blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/10 via-indigo-600/10 to-transparent blur-3xl" />
 
-        {/* Content Container */}
-        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between">
+        {/* Content Container - Far Left Aligned */}
+        <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 flex flex-col justify-between">
           
-          <div className="space-y-5 max-w-3xl">
+          <div className="space-y-4 max-w-3xl">
             {/* Top Row: Icon & Pill Badge */}
             <div className="flex items-center gap-3">
               <div className="p-3 sm:p-3.5 rounded-2xl border border-cyan-400/30 bg-gradient-to-b from-[#0e172a] to-black text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center">
@@ -600,22 +600,80 @@ export default function StudentDashboard() {
           </div>
 
           {testsTaken === 0 ? (
-            /* Empty State Banner (Image 1) */
-            <div className="bg-transparent text-center space-y-4 py-8 sm:py-14 max-w-2xl mx-auto">
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/40 rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(0,195,255,0.25)]">
-                <Medal className="w-8 h-8 text-cyan-300 animate-pulse" />
+            /* Premium Full-Width Performance Onboarding Hero */
+            <div className="relative w-full rounded-3xl bg-gradient-to-b from-[#091524]/90 via-[#050c18]/90 to-[#02050a]/98 border border-white/10 p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-xl">
+              {/* Ambient Radial Backlight */}
+              <div className="pointer-events-none absolute -top-16 -right-16 w-80 h-80 rounded-full bg-cyan-500/10 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-blue-600/10 blur-3xl" />
+
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+                {/* Left: Heading & Call to Action */}
+                <div className="space-y-4 max-w-xl text-center lg:text-left">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    Analytics Awaiting First Test
+                  </div>
+
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                    Start Your Performance Journey
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed font-light">
+                    You haven't completed any exams yet. Attempt your first test from <Link href="/dashboard/category/available" className="text-cyan-300 font-bold hover:underline">Available Tests</Link> to unlock AI-powered accuracy trajectory, speed percentiles, score distribution, and leaderboard ranking!
+                  </p>
+
+                  <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
+                    <Link
+                      href="/dashboard/category/available"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-[0_0_25px_rgba(6,182,212,0.4)] active:scale-95"
+                    >
+                      <span>Take Available Test</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+
+                    <Link
+                      href="/dashboard/category/upcoming"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-slate-300 hover:text-white font-bold text-xs transition"
+                    >
+                      <Clock className="w-4 h-4 text-amber-400" />
+                      <span>View Upcoming Schedule</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Right: 3 Interactive Feature Benefit Highlights (Utilizing Empty Space) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3.5 w-full lg:max-w-md shrink-0">
+                  <div className="flex items-start gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-cyan-500/30 transition">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                      <TrendingUp className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-white">Accuracy Trajectory</h4>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">Real-time percentage curves plotted across every chapter test.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-amber-500/30 transition">
+                    <div className="w-10 h-10 rounded-xl bg-amber-950/80 border border-amber-500/30 flex items-center justify-center shrink-0">
+                      <Trophy className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-white">National Percentiles</h4>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">Automated benchmark comparison against state toppers.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-purple-500/30 transition">
+                    <div className="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-500/30 flex items-center justify-center shrink-0">
+                      <Target className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-white">Chapter-Wise Diagnostic</h4>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">Weakness identification in Physical, Inorganic &amp; Organic Chemistry.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white">Start Your Performance Journey</h3>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
-                You haven't completed any tests yet. Take your first exam from <Link href="/dashboard/category/available" className="text-cyan-300 font-bold hover:underline">Available Tests</Link> to unlock real-time accuracy, score graphs, and leaderboard insights!
-              </p>
-              <Link
-                href="/dashboard/category/available"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm transition shadow-lg shadow-cyan-950/50"
-              >
-                <span>View Available Tests</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
             </div>
           ) : (
             /* Active Analytics & Graph View */
