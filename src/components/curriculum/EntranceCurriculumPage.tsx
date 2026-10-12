@@ -44,44 +44,6 @@ export default function EntranceCurriculumPage({
   return (
     <div className="w-full text-slate-100 font-sans selection:bg-rose-500/20 selection:text-rose-200">
 
-      {/* Hero Banner: Entrance Radiant Rose Theme */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#24040d] via-[#330814] to-[#120106] border border-rose-500/30 p-8 sm:p-12 shadow-[0_20px_60px_rgba(244,63,94,0.12)]">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-red-600/10 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs font-mono tracking-widest uppercase">
-              <span className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_#F43F5E] animate-pulse" />
-              <span>COMPETITIVE ENTRANCE • ALL-INDIA ARCHIVES</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight font-serif italic">
-              Competitive Chemistry Rank Accelerator
-            </h1>
-
-            <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-2xl">
-              34-Year chapter-wise solved PYQ archives, high-yield DPP drill banks, NCERT booster formula digests, speed drills, and national mock papers for NEET, JEE, WBJEE & CUET.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-mono">
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-rose-400" />
-                <span>34-Year Solved PYQs</span>
-              </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Flame className="w-4 h-4 text-rose-400" />
-                <span>High-Yield DPP Drills</span>
-              </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-rose-400" />
-                <span>NCERT Formula Boosters</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* STEP 2: The 4 Exam Stream Portals */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
         <div>

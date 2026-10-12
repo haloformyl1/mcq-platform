@@ -231,12 +231,6 @@ function ThreeDAnimationsContent() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-6">
           
-          {/* Scientific Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-400/35 text-cyan-300 text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(0,217,255,0.15)]">
-            <Atom className="w-4 h-4 text-cyan-400 animate-spin-slow" />
-            <span>PIECHEM VIRTUAL MOLECULAR LAB</span>
-          </div>
-
           {/* Flagship Headline */}
           <div className="space-y-2">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">

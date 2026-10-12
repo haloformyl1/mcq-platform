@@ -49,44 +49,6 @@ export default function WbchseCurriculumPage({
   return (
     <div className="w-full text-slate-100 font-sans selection:bg-emerald-500/20 selection:text-emerald-200">
 
-      {/* Hero Banner: WBCHSE Emerald Mint Theme */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#021812] via-[#05281e] to-[#010c08] border border-emerald-500/30 p-8 sm:p-12 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-teal-600/10 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-mono tracking-widest uppercase">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse" />
-              <span>SEMESTER SYSTEM (NEW) • WBCHSE BOARD PORTAL</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight font-serif italic">
-              WBCHSE Chemistry Semester System Portal
-            </h1>
-
-            <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-2xl">
-              Calibrated for the new Higher Secondary 4-Semester credit structure. Featuring bilingual English & Bengali (বাংলা) chemistry notes, new pattern MCQ question banks, and WBJEE high-frequency problem sets.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-mono">
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Globe2 className="w-4 h-4 text-emerald-400" />
-                <span>Bilingual English & বাংলা Notes</span>
-              </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-emerald-400" />
-                <span>4-Semester Credit Structure</span>
-              </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-emerald-400" />
-                <span>WBJEE Integration</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* STEP 2: The 4-Semester Interactive System Grid */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
         <div>

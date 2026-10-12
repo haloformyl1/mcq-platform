@@ -291,17 +291,6 @@ export default function CurriculumCategoryPage({
                           <Eye className="w-3.5 h-3.5" />
                           <span>Read</span>
                         </Link>
-                        {item.url && item.url !== "#locked" && (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); handleDownload(item.id.replace("db-", ""), item.url); }}
-                            disabled={isProcessing}
-                            className={`p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] text-slate-300 hover:text-white transition-colors ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
-                            title="Download PDF"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                          </button>
-                        )}
                       </div>
                     ) : isLevelRestricted ? (
                         <button

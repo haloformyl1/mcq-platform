@@ -51,39 +51,6 @@ export default function IcseCurriculumPage({
   return (
     <div className="w-full text-slate-100 font-sans selection:bg-amber-500/20 selection:text-amber-200">
 
-      {/* Hero Banner: ICSE / ISC Imperial Gold / Amber Theme */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a1303] via-[#2a1d06] to-[#0c0902] border border-amber-500/30 p-8 sm:p-12 shadow-[0_20px_60px_rgba(245,158,11,0.12)]">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-orange-600/10 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-6 pt-6 pb-10">
-            <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-serif italic drop-shadow-xl">
-              ICSE / ISC Council Chemistry Archive
-            </h1>
-
-            <p className="text-base sm:text-lg text-slate-300 font-light leading-relaxed max-w-2xl mx-auto md:mx-0">
-              In-depth organic reaction mechanisms, physical derivations, analytical laboratory guides, and Council specimen papers engineered for ISC Class XI & XII.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-mono">
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <FlaskConical className="w-4 h-4 text-amber-400" />
-                <span>Analytical Lab Guides</span>
-              </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-amber-400" />
-                <span>Council Specimen Papers</span>
-              </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-slate-300 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Reaction Mechanisms</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Dual Portals for Class XI & Class XII ISC */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
         <div>
