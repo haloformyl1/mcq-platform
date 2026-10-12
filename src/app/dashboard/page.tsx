@@ -423,23 +423,43 @@ export default function StudentDashboard() {
         <ChemistryLibraryVault studyMaterials={studyMaterials} student={data?.student} />
       </section>
 
-      {/* Main Container */}
-      <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10 flex-1">
+      {/* ========================================================= */}
+      {/* 5. CONTENT ROW 2: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
+      {/* ========================================================= */}
+      <section id="tests" className="dashboard-hero relative w-full overflow-hidden bg-transparent py-4 sm:py-6 transition-all duration-300">
+        <div className="w-full px-3 sm:px-6 lg:px-8 space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-1">
+            <div className="space-y-4 max-w-3xl">
+              {/* Top Row: Icon & Pill Badge */}
+              <div className="flex items-center gap-3">
+                <div className="p-3 sm:p-3.5 rounded-2xl border border-cyan-400/30 bg-gradient-to-b from-[#0e172a] to-black text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center">
+                  <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400 animate-pulse" />
+                </div>
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  Examination Arena
+                </span>
+              </div>
 
-        {/* ========================================================= */}
-        {/* 5. CONTENT ROW 2: TESTS & SCHEDULED MOCKS (NETFLIX RAILS) */}
-        {/* ========================================================= */}
-        <section id="tests" className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>Available Tests & Exam Series</span>
-                
-              </h2>
-              <p className="text-xs text-slate-400">Timed, AI-proctored mock exams aligned to your curriculum</p>
+              {/* Title & Introduction */}
+              <div className="space-y-2 pt-1">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)] font-serif flex items-center gap-2">
+                  <span>Available Tests &amp; Exam Series</span>
+                </h1>
+
+                {/* Subtitle - matching 3D animations & Study Materials */}
+                <p className="text-base sm:text-xl text-slate-200/95 font-semibold leading-relaxed drop-shadow">
+                  Timed, AI-proctored mock exams aligned to your curriculum
+                </p>
+
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-slate-400/90 font-light max-w-2xl leading-relaxed pt-0.5">
+                  Real-time exam hall simulation with instant ranking, detailed diagnostic analytics, and negative marking enforcement.
+                </p>
+              </div>
             </div>
 
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 font-mono bg-white/[0.03] border border-white/10 px-3 py-1.5 rounded-xl">
               Curriculum: <strong className="text-cyan-300">{student.board}</strong>
             </span>
           </div>
@@ -514,7 +534,11 @@ export default function StudentDashboard() {
             </Link>
 
           </div>
-        </section>
+        </div>
+      </section>
+
+      {/* Main Container */}
+      <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10 flex-1">
 
                 {/* ========================================================= */}
         {/* 6. CONTENT ROW 3: HALL OF FAME / TOP PERFORMERS          */}
