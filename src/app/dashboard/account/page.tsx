@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
   User, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertCircle, 
-  RefreshCw, ChevronRight, Phone, Calendar, Lock
+  RefreshCw, ChevronRight, Phone, Calendar, Lock,
+  MessageCircle, PhoneCall, X, ExternalLink
 } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
@@ -43,6 +44,7 @@ export default function StudentAccountPage() {
   // Security & Password Form States
   const [passwordOtp, setPasswordOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [showContactModal, setShowContactModal] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [sendingOtp, setSendingOtp] = useState(false);
   const [otpSentMsg, setOtpSentMsg] = useState<string | null>(null);
@@ -351,9 +353,17 @@ export default function StudentAccountPage() {
                         </div>
                       </div>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider">
-                        <span>🔓 FREE ACCOUNT</span>
-                      </span>
+                      <div className="inline-flex items-center gap-2 select-none leading-none">
+                        <span className="font-sans font-black tracking-wider uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)] text-sm sm:text-base leading-none inline-flex items-center">
+                          PIE
+                        </span>
+                        <div className="relative inline-flex items-center justify-center shrink-0">
+                          <div className="absolute inset-0 bg-blue-600/40 blur-md rounded-full pointer-events-none" />
+                          <span className="relative z-10 h-5 px-2.5 rounded-full bg-[#081528] text-blue-100 text-[10.5px] font-bold tracking-wide border border-blue-500/50 shadow-[0_2px_12px_rgba(37,99,235,0.4)] leading-none inline-flex items-center justify-center">
+                            basic
+                          </span>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -372,7 +382,7 @@ export default function StudentAccountPage() {
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1">
                     {isUltra
                       ? "Your account has full VIP access to all chemistry exam series, 3D molecular spatial models, DPPs, chapter derivations, and instant AI tutoring."
-                      : "You are currently on standard free access. Free tier includes access to baseline practice exams and chapter notes."}
+                      : "You are currently on standard basic access. Basic tier includes access to baseline practice exams and chapter notes."}
                   </p>
                 </div>
 
@@ -388,31 +398,16 @@ export default function StudentAccountPage() {
                         To unlock unlimited test attempts, 3D spatial chemistry simulations, and full NCERT answer bibles, contact your teacher or administrator to upgrade your account to PIE Ultra.
                       </p>
                     </div>
-                    <div className="shrink-0 px-3.5 py-2 rounded-xl bg-red-950/80 border border-red-600/40 text-red-300 text-xs font-bold text-center select-none whitespace-nowrap">
-                      Admin Upgrade Only
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowContactModal(true)}
+                      className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-950 via-red-900/90 to-red-950 border border-red-500/50 hover:border-red-400 text-red-200 hover:text-white text-xs font-bold transition duration-200 active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(229,9,20,0.3)] flex items-center justify-center gap-2 group whitespace-nowrap"
+                    >
+                      <span>Admin Upgrade Only</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                   </div>
                 )}
-
-                {/* Perks Showcase Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80 text-xs sm:text-sm text-slate-300">
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
-                    <span>Live Test Series & Speed Mock Examinations</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
-                    <span>Interactive 3D Spatial Chemistry Simulations</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
-                    <span>Chapter DPPs, Formula Bibles & Solution Sets</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
-                    <span>Real-Time State Percentiles & Detailed Analytics</span>
-                  </div>
-                </div>
 
               </div>
             </div>
@@ -829,6 +824,113 @@ export default function StudentAccountPage() {
         )}
 
       </main>
+
+      {/* Admin Upgrade Contact Modal */}
+      {showContactModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setShowContactModal(false)}
+        >
+          <div 
+            className="relative w-full max-w-md rounded-3xl bg-[#09101c] border border-red-500/40 p-6 sm:p-7 shadow-[0_0_50px_rgba(229,9,20,0.25)] text-slate-100 space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-3 border-b border-slate-800/80 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-950/80 border border-red-600/50 flex items-center justify-center text-red-400 shrink-0">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white tracking-tight">
+                    Upgrade to PIE Ultra
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Direct Administrator Upgrade Verification
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowContactModal(false)}
+                className="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Explanatory Message */}
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              PIE Ultra membership is granted exclusively by institutional administrators. Please connect directly through any of the verified channels below to activate your access:
+            </p>
+
+            {/* Official Contact Channels */}
+            <div className="space-y-3">
+              {/* WhatsApp Support */}
+              <a
+                href={`https://wa.me/917595825568?text=${encodeURIComponent(`Hello, I would like to request a PIE Ultra account upgrade for student: ${student?.name || ""} (${student?.email || ""}).`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full p-4 rounded-2xl bg-[#0a1a16] hover:bg-[#0f2620] border border-emerald-500/40 hover:border-emerald-400 transition flex items-center justify-between group text-left cursor-pointer shadow-md"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+                    <MessageCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">
+                      Message on WhatsApp
+                    </div>
+                    <div className="text-sm font-extrabold text-white font-mono mt-0.5">
+                      +91 75958 25568
+                    </div>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              </a>
+
+              {/* Direct Phone Call */}
+              <a
+                href="tel:+919830507435"
+                className="w-full p-4 rounded-2xl bg-[#121326] hover:bg-[#1a1c36] border border-indigo-500/40 hover:border-indigo-400 transition flex items-center justify-between group text-left cursor-pointer shadow-md"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-950/80 border border-indigo-500/50 flex items-center justify-center text-indigo-400 shrink-0">
+                    <PhoneCall className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-indigo-400 font-bold uppercase tracking-wider">
+                      Call Administrator
+                    </div>
+                    <div className="text-sm font-extrabold text-white font-mono mt-0.5">
+                      +91 98305 07435
+                    </div>
+                  </div>
+                </div>
+                <Phone className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              </a>
+            </div>
+
+            {/* Expedited Verification Note */}
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-[11px] text-slate-400 leading-normal flex items-start gap-2.5">
+              <span className="text-cyan-400 shrink-0 mt-0.5">ℹ️</span>
+              <span>
+                Please reference your registered email <strong className="text-slate-200 font-mono">{student?.email}</strong> when reaching out so the administrator can verify and upgrade your profile promptly.
+              </span>
+            </div>
+
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setShowContactModal(false)}
+              className="w-full py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <GlobalFooter />
     </div>
