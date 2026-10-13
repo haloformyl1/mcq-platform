@@ -3154,6 +3154,10 @@ export default function StudentAccountPage() {
               </div>
             </div>
 
+            <p className="text-xs text-slate-400 px-1">
+              We only show 24 months of payment history
+            </p>
+
           </main>
         </div>
       )}
