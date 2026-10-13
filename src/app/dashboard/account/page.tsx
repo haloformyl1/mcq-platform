@@ -339,13 +339,13 @@ export default function StudentAccountPage() {
 
                   <div>
                     {isUltra ? (
-                      <div className="inline-flex items-center gap-2 select-none">
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)] font-black tracking-wider text-sm sm:text-base">
+                      <div className="inline-flex items-center gap-2 select-none leading-none">
+                        <span className="font-sans font-black tracking-wider uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)] text-sm sm:text-base leading-none inline-flex items-center">
                           PIE
                         </span>
                         <div className="relative inline-flex items-center justify-center shrink-0">
                           <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full pointer-events-none" />
-                          <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-[#160406] text-red-100 text-[10px] sm:text-[11px] font-bold tracking-wide border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
+                          <span className="relative z-10 h-5 px-2.5 rounded-full bg-[#160406] text-red-100 text-[10.5px] font-bold tracking-wide border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none inline-flex items-center justify-center">
                             ultra
                           </span>
                         </div>
