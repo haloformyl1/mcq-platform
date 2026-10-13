@@ -114,7 +114,6 @@ export default function StudentAccountPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
           phone,
           gender,
           dob,
@@ -304,7 +303,7 @@ export default function StudentAccountPage() {
           </h1>
           <p className="text-sm font-medium text-slate-400 mt-1">
             {activeTab === "profiles"
-              ? "Update your student name, avatar, education board, and academic cohort."
+              ? "Update your avatar, contact details, education board, and academic cohort."
               : activeTab === "security"
               ? "Update your account password with email verification."
               : "View your student identity details and current PIE Chem membership status."}
@@ -570,17 +569,17 @@ export default function StudentAccountPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   
-                  {/* Name */}
+                  {/* Name (Read-only) */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      Student Name
+                      Student Name (Read-only)
                     </label>
                     <input
                       type="text"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition"
+                      disabled
+                      readOnly
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed select-none"
                     />
                   </div>
 

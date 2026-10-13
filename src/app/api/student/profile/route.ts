@@ -21,26 +21,43 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { name, phone, gender, dob, board, academicLevel, avatarUrl } = body;
 
-    let sanitizedName = name;
-    if (name !== undefined) {
-      const validation = validateStudentName(name);
-      if (!validation.isValid) {
-        return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
-      }
-      sanitizedName = validation.sanitizedName;
+    const existingStudent = await prisma.student.findUnique({
+      where: { id: studentId },
+      select: { id: true, name: true }
+    });
 
-      const aiCheck = await verifyNameWithAI(sanitizedName || name);
-      if (!aiCheck.isValid) {
-        return NextResponse.json({
-          error: aiCheck.reason || "Inappropriate or offensive names are strictly prohibited. Please enter your genuine student name."
-        }, { status: 400 });
+    if (!existingStudent) {
+      return NextResponse.json({ error: "Student not found" }, { status: 404 });
+    }
+
+    let sanitizedName: string | undefined = undefined;
+    if (name !== undefined) {
+      if (existingStudent.name && existingStudent.name.trim() !== "") {
+        if (name.trim() !== existingStudent.name.trim()) {
+          return NextResponse.json({
+            error: "Student name cannot be modified after initial registration. Please contact administration for assistance."
+          }, { status: 400 });
+        }
+      } else {
+        const validation = validateStudentName(name);
+        if (!validation.isValid) {
+          return NextResponse.json({ error: validation.error || "Invalid student name." }, { status: 400 });
+        }
+        sanitizedName = validation.sanitizedName;
+
+        const aiCheck = await verifyNameWithAI(sanitizedName || name);
+        if (!aiCheck.isValid) {
+          return NextResponse.json({
+            error: aiCheck.reason || "Inappropriate or offensive names are strictly prohibited. Please enter your genuine student name."
+          }, { status: 400 });
+        }
       }
     }
 
     const updatedStudent = await prisma.student.update({
       where: { id: studentId },
       data: {
-        ...(name !== undefined && { name: sanitizedName }),
+        ...(sanitizedName !== undefined && { name: sanitizedName }),
         ...(phone !== undefined && { phone }),
         ...(gender !== undefined && { gender }),
         ...(dob !== undefined && { dob: dob ? new Date(dob) : null }),
