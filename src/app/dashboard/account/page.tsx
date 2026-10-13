@@ -340,7 +340,9 @@ export default function StudentAccountPage() {
                   <div>
                     {isUltra ? (
                       <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-950/80 via-[#26050a]/90 to-black border border-red-500/60 shadow-[0_0_20px_rgba(229,9,20,0.35)]">
-                        <span className="text-white font-black tracking-wider text-xs">PIE</span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)] font-black tracking-wider text-xs">
+                          PIE
+                        </span>
                         <span className="px-2.5 py-0.5 rounded-full bg-[#160406] text-red-100 text-[10px] sm:text-[11px] font-bold tracking-wide border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none">
                           ultra
                         </span>
