@@ -347,6 +347,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       <header className="exam-session-header mcq-panel rounded-none border-t-0 border-x-0 p-2.5 sm:p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 sm:gap-3 shrink-0 shadow-md">
         <div className="flex items-center justify-between w-full md:w-auto gap-2 sm:gap-4">
           <PiechemLogo size="sm" showText={false} isGoldMember={
+            examData?.student?.subscriptionStatus === "ULTRA" ||
             examData?.student?.subscriptionStatus === "COMPLIMENTARY" ||
             (examData?.student?.subscriptionStatus === "PAID" && (!examData?.student?.subscriptionExpiresAt || new Date(examData.student.subscriptionExpiresAt).getTime() > Date.now()))
           } />

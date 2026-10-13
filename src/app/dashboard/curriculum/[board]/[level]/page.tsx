@@ -65,9 +65,9 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
   };
 
   const { student, availableTests = [], allAttempts = [] } = data;
-    const isComplimentary = student?.subscriptionStatus === "COMPLIMENTARY";
+  const isUltra = student?.subscriptionStatus === "ULTRA" || student?.subscriptionStatus === "COMPLIMENTARY";
   const isPaidActive = student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
-  const isGoldActive = isComplimentary || isPaidActive;
+  const isGoldActive = isUltra || isPaidActive;
 
   const currentAvailableTests: any[] = [];
   const upcomingTests: any[] = [];
@@ -351,13 +351,12 @@ export default function CurriculumTestsPage({ params }: { params: Promise<{ boar
                 </div>
               );
             })()
-          ) : test.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
-              <Link
-                href="/dashboard/account"
-                className="w-full block text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 transition shadow-[0_0_20px_rgba(245,158,11,0.4)] tracking-wide uppercase"
+          ) : test.isPremium && !isGoldActive ? (
+              <div
+                className="w-full text-center py-3 px-4 rounded-xl text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/40 border border-amber-500/30 tracking-wide select-none"
               >
-                🔒 Unlock with Gold
-              </Link>
+                🔒 PIE Ultra Exclusive — Contact your teacher or admin to upgrade your account
+              </div>
             ) : (
               <div className="flex flex-col gap-2 w-full">
                 <Link 

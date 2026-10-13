@@ -42,6 +42,7 @@ export default function GlobalHeader({
 
   const isGold =
     isGoldMember ||
+    student?.subscriptionStatus === "ULTRA" ||
     student?.subscriptionStatus === "COMPLIMENTARY" ||
     (student?.subscriptionStatus === "PAID" &&
       (!student?.subscriptionExpiresAt ||

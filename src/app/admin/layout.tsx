@@ -53,22 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [pendingPaymentCount, setPendingPaymentCount] = useState(0);
 
   useEffect(() => {
-    const checkPendingPayments = async () => {
-      try {
-        const res = await fetch("/api/admin/subscriptions");
-        if (res.ok) {
-          const data = await res.json();
-          const pending = (data.requests || []).filter((r: { status?: string }) => r.status === "PENDING").length;
-          setPendingPaymentCount(pending);
-        }
-      } catch {
-        // Ignore network polling errors
-      }
-    };
-    checkPendingPayments();
-
-    const interval = setInterval(checkPendingPayments, 30000);
-    return () => clearInterval(interval);
+    setPendingPaymentCount(0);
   }, []);
 
   const fetchPaymentSettings = async () => {

@@ -60,7 +60,7 @@ function ThreeDAnimationsContent() {
           const dashData = await dashRes.json();
           if (dashData?.student && mounted) {
             setStudent(dashData.student);
-            const isComp = dashData.student.subscriptionStatus === "COMPLIMENTARY";
+            const isComp = dashData.student.subscriptionStatus === "COMPLIMENTARY" || dashData.student.subscriptionStatus === "ULTRA";
             const isPaid = 
               dashData.student.subscriptionStatus === "PAID" && 
               (!dashData.student.subscriptionExpiresAt || new Date(dashData.student.subscriptionExpiresAt).getTime() > Date.now());

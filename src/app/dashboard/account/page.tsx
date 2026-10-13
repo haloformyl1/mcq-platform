@@ -1,182 +1,34 @@
 "use client";
-import GlobalFooter from "@/components/GlobalFooter";
-import GlobalHeader from "@/components/GlobalHeader";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
-  Copy, Check, X, User, Mail, ShieldCheck, 
-  ArrowLeft, KeyRound, CheckCircle2, AlertCircle, LogOut, Sparkles, 
-  Clock, RefreshCw, CreditCard, MonitorSmartphone, ChevronRight, 
-  ChevronDown, Layers, Laptop, Shield, CheckCircle, Smartphone, Tablet, Monitor, Receipt, Tag, History, Phone
+  User, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertCircle, Sparkles, 
+  RefreshCw, ChevronRight, Shield, Phone, Calendar, Lock
 } from "lucide-react";
+import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
-import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
-import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
-import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
-import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 import { resolveEffectivePlanTier } from "@/lib/planTier";
 
-function formatDateTime24(dateInput: string | Date | null | undefined): string {
-  if (!dateInput) return "-";
-  const d = new Date(dateInput);
-  if (isNaN(d.getTime())) return "-";
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  const day = pad(d.getDate());
-  const month = pad(d.getMonth() + 1);
-  const year = d.getFullYear();
-  const hours = pad(d.getHours());
-  const minutes = pad(d.getMinutes());
-  const seconds = pad(d.getSeconds());
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-}
-
-
-const POPULAR_UPI_HANDLES = [
-  "@oksbi", "@okhdfcbank", "@okaxis", "@okicici",
-  "@ybl", "@ibl", "@axl", "@paytm", "@upi",
-  "@sbi", "@icici", "@hdfcbank", "@axisbank",
-  "@kotak", "@indus", "@barodampay", "@federal", "@postbank"
+// Unisex Avatar Options
+const AVATAR_OPTIONS = [
+  { id: "atom", name: "Quantum Atom", url: "/avatars/atom.jpg" },
+  { id: "beaker", name: "Magic Beaker", url: "/avatars/beaker.jpg" },
+  { id: "dna", name: "Bio Helix", url: "/avatars/dna.jpg" },
+  { id: "scholar", name: "Cyber Scholar", url: "/avatars/scholar.jpg" },
+  { id: "crystal", name: "Solid Crystal", url: "/avatars/crystal.jpg" },
 ];
 
-function isValidUpiId(upi: string): boolean {
-  if (!upi || typeof upi !== "string") return false;
-  const clean = upi.trim().toLowerCase();
-  const upiRegex = /^[a-zA-Z0-9][a-zA-Z0-9._-]{1,48}[a-zA-Z0-9]@[a-zA-Z]{2,30}$/;
-  if (!upiRegex.test(clean)) return false;
-  if (clean.includes("..") || clean.includes("--") || clean.includes("__")) return false;
-  return true;
-}
-
 export default function StudentAccountPage() {
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [now, setNow] = useState(new Date());
+  const [activeTab, setActiveTab] = useState<"overview" | "profiles" | "security">("overview");
 
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-  const [activeTab, setActiveTab] = useState<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan">("overview");
-
-  const validTabs: Array<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan"> = [
-    "overview", "membership", "security", "devices", "profiles", "change-plan"
-  ];
-
-  const lastBaseTabRef = useRef<"overview" | "membership" | "security" | "devices" | "profiles" | "change-plan">("overview");
-
-  type ModalType = "pay" | "promo" | "billing-history" | "plan-status" | "payment-done";
-
-  const closeAllModals = () => {
-    setShowPaymentModal(false);
-    setShowPromoModal(false);
-    setShowHistoryModal(false);
-    setShowHighestPlanModal(false);
-    setShowPaymentDoneDialog(false);
-    setPaymentStep("input");
-    setUpgradeMsg(null);
-  };
-
-  const openModal = (modalName: ModalType) => {
-    if (typeof window !== "undefined") {
-      const targetHash = `#${modalName}`;
-      if (window.location.hash !== targetHash) {
-        window.history.pushState({ modal: modalName, fromTab: activeTab }, "", `${window.location.pathname}${targetHash}`);
-      }
-    }
-    if (modalName === "pay") {
-      setShowPaymentModal(true);
-      setShowPromoModal(false);
-      setShowHistoryModal(false);
-      setShowHighestPlanModal(false);
-      setShowPaymentDoneDialog(false);
-      fetchUpgradeRequest();
-    } else if (modalName === "promo") {
-      setShowPromoModal(true);
-      setShowPaymentModal(false);
-      setShowHistoryModal(false);
-      setShowHighestPlanModal(false);
-      setShowPaymentDoneDialog(false);
-    } else if (modalName === "billing-history") {
-      setShowHistoryModal(true);
-      setShowPaymentModal(false);
-      setShowPromoModal(false);
-      setShowHighestPlanModal(false);
-      setShowPaymentDoneDialog(false);
-    } else if (modalName === "plan-status") {
-      setShowHighestPlanModal(true);
-      setShowPaymentModal(false);
-      setShowPromoModal(false);
-      setShowHistoryModal(false);
-      setShowPaymentDoneDialog(false);
-    } else if (modalName === "payment-done") {
-      setShowPaymentDoneDialog(true);
-    }
-  };
-
-  const handleCloseModal = (fallbackTab?: "overview" | "membership" | "security" | "devices" | "profiles" | "change-plan") => {
-    if (typeof window !== "undefined") {
-      const currentHash = window.location.hash.replace(/^#/, "").toLowerCase();
-      const modalHashes = ["pay", "renew", "promo", "redeem-promo", "billing-history", "history", "plan-status", "highest-plan", "payment-done"];
-      if (modalHashes.includes(currentHash)) {
-        if (window.history.length > 1) {
-          window.history.back();
-          setTimeout(() => {
-            const checkHash = window.location.hash.replace(/^#/, "").toLowerCase();
-            if (modalHashes.includes(checkHash)) {
-              closeAllModals();
-              navigateToTab(fallbackTab || lastBaseTabRef.current || "overview", true);
-            }
-          }, 150);
-          return;
-        }
-      }
-    }
-    closeAllModals();
-    navigateToTab(fallbackTab || lastBaseTabRef.current || "overview", true);
-  };
-
-  const navigateToTab = (tab: "overview" | "membership" | "security" | "devices" | "profiles" | "change-plan", replace = false) => {
-    setActiveTab(tab);
-    lastBaseTabRef.current = tab;
-    closeAllModals();
-    if (typeof window !== "undefined") {
-      const targetHash = tab === "overview" ? "" : `#${tab}`;
-      const targetUrl = targetHash ? `${window.location.pathname}${targetHash}` : window.location.pathname;
-      if (window.location.hash !== targetHash) {
-        if (replace) {
-          window.history.replaceState({ tab }, "", targetUrl);
-        } else {
-          window.history.pushState({ tab }, "", targetUrl);
-        }
-      }
-    }
-  };
-
-  const handleBackNavigation = () => {
-    if (typeof window !== "undefined") {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        navigateToTab("overview");
-      }
-    } else {
-      setActiveTab("overview");
-    }
-  };
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-
-  // Unisex Avatar Options
-  const AVATAR_OPTIONS = [
-    { id: "atom", name: "Quantum Atom", url: "/avatars/atom.jpg" },
-    { id: "beaker", name: "Magic Beaker", url: "/avatars/beaker.jpg" },
-    { id: "dna", name: "Bio Helix", url: "/avatars/dna.jpg" },
-    { id: "scholar", name: "Cyber Scholar", url: "/avatars/scholar.jpg" },
-    { id: "crystal", name: "Solid Crystal", url: "/avatars/crystal.jpg" },
-  ];
-
-  // Profile Details Form States
+  // Profile Form States
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -188,60 +40,17 @@ export default function StudentAccountPage() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Upgrade Request State
-  const [upgradeReq, setUpgradeReq] = useState<any>(null);
-  const [allUpgradeReqs, setAllUpgradeReqs] = useState<any[]>([]);
-  const [showPromoModal, setShowPromoModal] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [promoCodeInput, setPromoCodeInput] = useState("");
-  const [promoMsg, setPromoMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [paymentSettings, setPaymentSettings] = useState<any>({ upiId: "9830507435@upi", payeeName: "Arghyadeep Roy", monthlyFee: 199.0 });
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showHighestPlanModal, setShowHighestPlanModal] = useState(false);
-  const [plans, setPlans] = useState<any[]>([]);
-  const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState<{
-    id: string;
-    name: string;
-    price: number;
-    payableAmount: number;
-    durationDays: number;
-    description: string;
-    isUpgrade: boolean;
-    isComplimentaryUpgrade: boolean;
-    upgradeFrom: string;
-    originalPrice: number;
-    notes: string;
-  } | null>(null);
-  const [studentUpiId, setStudentUpiId] = useState("");
-  const [purchasedBoard, setPurchasedBoard] = useState("CBSE");
-  const [purchasedClass, setPurchasedClass] = useState("11");
-  const [paymentStep, setPaymentStep] = useState<"input" | "notice" | "waiting" | "success">("input");
-  const [utrNumber, setUtrNumber] = useState("");
-  const [copiedUpi, setCopiedUpi] = useState(false);
-  const [requestingUpgrade, setRequestingUpgrade] = useState(false);
-  const [upgradeMsg, setUpgradeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [paymentDoneAcknowledged, setPaymentDoneAcknowledged] = useState(false);
-  const [showPaymentDoneDialog, setShowPaymentDoneDialog] = useState(false);
-
-  // Netflix-style Manage Access and Devices States
-  const [devicesList, setDevicesList] = useState<any[]>([]);
-  const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
-  const [expandedDeviceIds, setExpandedDeviceIds] = useState<Record<string, boolean>>({});
-  const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
-  const [revokingAll, setRevokingAll] = useState(false);
-  const [deviceActionMsg, setDeviceActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
-
-  // Password Change Form States
+  // Security & Password Form States
+  const [passwordOtp, setPasswordOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordOtp, setPasswordOtp] = useState("");
   const [sendingOtp, setSendingOtp] = useState(false);
   const [otpSentMsg, setOtpSentMsg] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [passLoading, setPassLoading] = useState(false);
   const [passMsg, setPassMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Security Policy Requirements
+  // Password Policy Checks
   const reqLength = newPassword.length >= 8;
   const reqUpper = /[A-Z]/.test(newPassword);
   const reqLower = /[a-z]/.test(newPassword);
@@ -257,159 +66,7 @@ export default function StudentAccountPage() {
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
-  const router = useRouter();
-
-  const fetchUpgradeRequest = () => {
-    fetch("/api/student/upgrade-request")
-      .then((res) => res.json())
-      .then((d) => {
-        if (d.request) setUpgradeReq(d.request);
-        if (d.allRequests) setAllUpgradeReqs(d.allRequests);
-        if (d.paymentSettings) setPaymentSettings(d.paymentSettings);
-        if (d.plans && Array.isArray(d.plans) && d.plans.length > 0) {
-          setPlans(d.plans.filter((p: any) => p.isActive));
-        }
-      })
-      .catch(() => {});
-  };
-
-  useEffect(() => {
-    const handleUrlChange = () => {
-      if (typeof window === "undefined") return;
-      const rawHash = window.location.hash.replace(/^#/, "").toLowerCase();
-
-      if (rawHash === "pay" || rawHash === "renew") {
-        setShowPaymentModal(true);
-        setShowPromoModal(false);
-        setShowHistoryModal(false);
-        setShowHighestPlanModal(false);
-        setShowPaymentDoneDialog(false);
-        if (rawHash === "renew") {
-          setActiveTab("membership");
-          lastBaseTabRef.current = "membership";
-        }
-        return;
-      }
-
-      if (rawHash === "payment-done") {
-        setShowPaymentDoneDialog(true);
-        setShowPromoModal(false);
-        setShowHistoryModal(false);
-        setShowHighestPlanModal(false);
-        return;
-      }
-
-      if (rawHash === "promo" || rawHash === "redeem-promo") {
-        setShowPromoModal(true);
-        setShowPaymentModal(false);
-        setShowHistoryModal(false);
-        setShowHighestPlanModal(false);
-        setShowPaymentDoneDialog(false);
-        return;
-      }
-
-      if (rawHash === "billing-history" || rawHash === "history") {
-        setShowHistoryModal(true);
-        setShowPaymentModal(false);
-        setShowPromoModal(false);
-        setShowHighestPlanModal(false);
-        setShowPaymentDoneDialog(false);
-        return;
-      }
-
-      if (rawHash === "plan-status" || rawHash === "highest-plan") {
-        setShowHighestPlanModal(true);
-        setShowPaymentModal(false);
-        setShowPromoModal(false);
-        setShowHistoryModal(false);
-        setShowPaymentDoneDialog(false);
-        return;
-      }
-
-      // Base tab navigation: Close all modals and show active tab
-      setShowPaymentModal(false);
-      setShowPromoModal(false);
-      setShowHistoryModal(false);
-      setShowHighestPlanModal(false);
-      setShowPaymentDoneDialog(false);
-      setPaymentStep("input");
-
-      if (validTabs.includes(rawHash as any)) {
-        setActiveTab(rawHash as any);
-        lastBaseTabRef.current = rawHash as any;
-      } else {
-        setActiveTab("overview");
-        lastBaseTabRef.current = "overview";
-      }
-    };
-
-    handleUrlChange();
-
-    window.addEventListener("popstate", handleUrlChange);
-    window.addEventListener("hashchange", handleUrlChange);
-
-    fetchUpgradeRequest();
-
-    return () => {
-      window.removeEventListener("popstate", handleUrlChange);
-      window.removeEventListener("hashchange", handleUrlChange);
-    };
-  }, []);
-
-  // Prevent background body scroll when any full-screen modal/window is open (eliminates double scrollbars)
-  useEffect(() => {
-    const isModalOpen = showPaymentModal || showPromoModal || showHistoryModal || showHighestPlanModal || showPaymentDoneDialog;
-    if (typeof document !== "undefined") {
-      if (isModalOpen) {
-        document.body.style.overflow = "hidden";
-      } else {
-        document.body.style.overflow = "";
-      }
-    }
-    return () => {
-      if (typeof document !== "undefined") {
-        document.body.style.overflow = "";
-      }
-    };
-  }, [showPaymentModal, showPromoModal, showHistoryModal, showHighestPlanModal, showPaymentDoneDialog]);
-
-  // Auto-polling when payment modal is open in "waiting" step to detect approval in real-time
-  useEffect(() => {
-    if (!showPaymentModal || paymentStep !== "waiting") return;
-
-    const interval = setInterval(async () => {
-      try {
-        const [dashRes, upgRes] = await Promise.all([
-          fetch("/api/student/dashboard"),
-          fetch("/api/student/upgrade-request")
-        ]);
-
-        if (dashRes.ok) {
-          const dashData = await dashRes.json();
-          if (dashData?.student?.subscriptionStatus === "PAID" || dashData?.student?.subscriptionStatus === "COMPLIMENTARY") {
-            setData(dashData);
-            setPaymentStep("success");
-            return;
-          }
-        }
-
-        if (upgRes.ok) {
-          const upgData = await upgRes.json();
-          if (upgData?.request) {
-            setUpgradeReq(upgData.request);
-            if (upgData.request.status === "APPROVED") {
-              setPaymentStep("success");
-            }
-          }
-        }
-      } catch (err) {
-        // silent
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [showPaymentModal, paymentStep]);
-
+  // Load student dashboard data
   useEffect(() => {
     fetch("/api/student/dashboard")
       .then((res) => {
@@ -418,15 +75,6 @@ export default function StudentAccountPage() {
       })
       .then((resData) => {
         setData(resData);
-        if (resData.subscriptionPlans && Array.isArray(resData.subscriptionPlans) && resData.subscriptionPlans.length > 0) {
-          setPlans(resData.subscriptionPlans.filter((p: any) => p.isActive));
-        }
-        if (resData.devices) {
-          setDevicesList(resData.devices);
-        }
-        if (resData.currentDeviceId) {
-          setCurrentDeviceId(resData.currentDeviceId);
-        }
         if (resData.student) {
           setName(resData.student.name || "");
           setPhone(resData.student.phone || "");
@@ -438,211 +86,24 @@ export default function StudentAccountPage() {
           setAcademicLevel(resData.student.academicLevel || (b === "WBCHSE" ? "SEM-I" : "11"));
           setAvatarUrl(resData.student.avatarUrl || "/avatars/atom.jpg");
         }
+      })
+      .catch((err) => {
+        console.error("Failed to load student account:", err);
+      })
+      .finally(() => {
         setLoading(false);
-      })
-      .catch(() => {
-        router.push("/login");
       });
+  }, []);
 
-    fetch(`/api/subscription-plans?_t=${Date.now()}`, { cache: "no-store" })
-      .then(res => res.json())
-      .then(d => {
-        if (Array.isArray(d) && d.length > 0) setPlans(d.filter((p: any) => p.isActive));
-      })
-      .catch(() => {});
-  }, [router]);
+  const student = data?.student;
+  const subStatus = (student?.subscriptionStatus || "").trim().toUpperCase();
+  const isUltra = subStatus === "ULTRA" || subStatus === "COMPLIMENTARY" || (subStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > Date.now()));
 
-  // Re-fetch subscription plans whenever user opens the Change Plan tab
-  useEffect(() => {
-    if (activeTab === "change-plan") {
-      fetch(`/api/subscription-plans?_t=${Date.now()}`, { cache: "no-store" })
-        .then(res => res.json())
-        .then(d => {
-          if (Array.isArray(d) && d.length > 0) setPlans(d.filter((p: any) => p.isActive));
-        })
-        .catch(() => {});
-    }
-  }, [activeTab]);
-  
-  const fetchDevices = async () => {
-    try {
-      const res = await fetch("/api/student/devices");
-      if (res.ok) {
-        const d = await res.json();
-        if (d.devices) setDevicesList(d.devices);
-        if (d.currentDeviceId) setCurrentDeviceId(d.currentDeviceId);
-      }
-    } catch (e) {
-      // silent
-    }
-  };
+  const memberSinceFormatted = student?.createdAt
+    ? new Date(student.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })
+    : "Recently";
 
-  useEffect(() => {
-    if (activeTab === "devices") {
-      fetchDevices();
-      const interval = setInterval(fetchDevices, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [activeTab]);
-
-  const toggleDeviceExpand = (id: string) => {
-    setExpandedDeviceIds(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleSignOutDevice = async (id: string) => {
-    setRevokingDeviceId(id);
-    setDeviceActionMsg(null);
-    try {
-      const res = await fetch("/api/student/devices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "signout_device", targetId: id }),
-      });
-      const resData = await res.json();
-      if (!res.ok) throw new Error(resData.error || "Failed to sign out device");
-      if (resData.signedOutCurrent) {
-        router.push("/login");
-        return;
-      }
-      if (resData.devices) {
-        setDevicesList(resData.devices);
-      } else {
-        setDevicesList(prev => prev.filter(d => d.id !== id && d.deviceId !== id));
-      }
-      setDeviceActionMsg({ type: "success", text: "Signed out of device successfully." });
-    } catch (err: any) {
-      setDeviceActionMsg({ type: "error", text: err.message || "Failed to sign out device." });
-    } finally {
-      setRevokingDeviceId(null);
-    }
-  };
-
-  const handleSignOutAllDevices = async () => {
-    if (!confirm("Are you sure you want to sign out of all devices? You will need to sign in again.")) return;
-    setRevokingAll(true);
-    setDeviceActionMsg(null);
-    try {
-      const res = await fetch("/api/student/devices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "signout_all" }),
-      });
-      if (res.ok) {
-        router.push("/login");
-      }
-    } catch (err) {
-      setDeviceActionMsg({ type: "error", text: "Failed to sign out of all devices." });
-    } finally {
-      setRevokingAll(false);
-    }
-  };
-
-  
-  const handleProceedClick = () => {
-    const trimmedUpi = studentUpiId.trim().toLowerCase();
-    if (!isValidUpiId(trimmedUpi)) {
-      setUpgradeMsg({ 
-        type: "error", 
-        text: "Please enter a valid UPI ID (e.g. 9830507435@upi or name@oksbi). Only strictly valid UPI formats can proceed." 
-      });
-      return;
-    }
-    setUpgradeMsg(null);
-    setPaymentStep("notice");
-  };
-
-  const handleSelectPlanToCheckout = (plan: any) => {
-    const planNameLower = String(plan.name || "").toLowerCase();
-    const isPlanUltra = planNameLower.includes("ultra") || Number(plan.price) >= 400;
-    const isPlanPro = planNameLower.includes("pro") || (Number(plan.price) > 0 && Number(plan.price) < 400);
-
-    let payable = Number(plan.price);
-    let isUpgrade = false;
-    let isComplimentaryUpgrade = false;
-    let upgradeFrom = "PIE Basic";
-
-    if (isPlanUltra) {
-      if (isComplimentary || effectivePlanTier === "pro") {
-        payable = 200; // Special ₹200 upgrade rate per user request
-        isUpgrade = true;
-        isComplimentaryUpgrade = isComplimentary;
-        upgradeFrom = isComplimentary ? "PIE Pro (Complimentary Lifetime)" : "PIE Pro";
-      } else {
-        payable = Number(plan.price) || 499;
-      }
-    } else if (isPlanPro) {
-      payable = Number(plan.price) || 299;
-      isUpgrade = !isGold;
-    }
-
-    const checkoutObj = {
-      id: plan.id,
-      name: plan.name,
-      price: Number(plan.price),
-      payableAmount: payable,
-      durationDays: plan.durationDays || 30,
-      description: plan.description,
-      isUpgrade,
-      isComplimentaryUpgrade,
-      upgradeFrom,
-      originalPrice: Number(plan.price),
-      notes: isComplimentaryUpgrade 
-        ? "Lifetime Complimentary Pro Member Credit Applied (-₹299)"
-        : isUpgrade 
-        ? "Pro Tier Upgrade Adjustment Applied (-₹299)" 
-        : ""
-    };
-
-    setSelectedCheckoutPlan(checkoutObj);
-    setPaymentSettings((prev: any) => ({ ...prev, monthlyFee: payable, selectedPlanName: plan.name }));
-    openModal("pay");
-  };
-
-  const handleSendUpgradeRequest = async () => {
-    const trimmedUpi = studentUpiId.trim();
-    if (!trimmedUpi) {
-      setUpgradeMsg({ type: "error", text: "Please enter the UPI ID from which you will initiate the payment." });
-      return;
-    }
-    if (!trimmedUpi.includes("@") || trimmedUpi.startsWith("@") || trimmedUpi.endsWith("@")) {
-      setUpgradeMsg({ type: "error", text: "Please enter a valid UPI ID format (e.g. username@okhdfcbank or 9830507435@upi)." });
-      return;
-    }
-    setRequestingUpgrade(true);
-    setUpgradeMsg(null);
-
-    const activePayable = selectedCheckoutPlan?.payableAmount ?? (paymentSettings?.monthlyFee || 199.0);
-    const activePlanName = selectedCheckoutPlan?.name || (activePayable >= 400 ? "PIE Ultra" : "PIE Pro");
-
-    try {
-      const res = await fetch("/api/student/upgrade-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          studentUpiId: trimmedUpi, 
-          utrNumber: utrNumber.trim() || undefined,
-          purchasedBoard,
-          purchasedClass,
-          amount: activePayable,
-          planName: activePlanName
-        })
-      });
-      const resData = await res.json();
-
-      if (res.ok) {
-        setUpgradeMsg({ type: "success", text: resData.message || "Payment request sent successfully!" });
-        setUpgradeReq(resData.request);
-        setPaymentStep("waiting");
-      } else {
-        setUpgradeMsg({ type: "error", text: resData.error || "Failed to initiate payment request." });
-      }
-    } catch (err) {
-      setUpgradeMsg({ type: "error", text: "Network error initiating payment request." });
-    } finally {
-      setRequestingUpgrade(false);
-    }
-  };
-
+  // Handle Profile Save
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileMsg(null);
@@ -680,13 +141,14 @@ export default function StudentAccountPage() {
       } else {
         setProfileMsg({ type: "error", text: resData.error || "Failed to save profile details." });
       }
-    } catch (err) {
+    } catch {
       setProfileMsg({ type: "error", text: "Something went wrong saving profile details." });
     } finally {
       setProfileLoading(false);
     }
   };
 
+  // Handle Send Password OTP
   const handleSendPasswordOtp = async () => {
     setSendingOtp(true);
     setOtpSentMsg(null);
@@ -701,18 +163,19 @@ export default function StudentAccountPage() {
       const resData = await res.json();
 
       if (res.ok) {
-        setOtpSentMsg(`Verification OTP sent to ${email}. Please check your inbox.`);
+        setOtpSentMsg(`Verification code sent to ${email}. Please check your inbox.`);
         setResendCooldown(30);
       } else {
         setPassMsg({ type: "error", text: resData.error || "Failed to send OTP to email." });
       }
-    } catch (err) {
+    } catch {
       setPassMsg({ type: "error", text: "Network error sending OTP code." });
     } finally {
       setSendingOtp(false);
     }
   };
 
+  // Handle Password Change
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPassMsg(null);
@@ -754,150 +217,29 @@ export default function StudentAccountPage() {
       } else {
         setPassMsg({ type: "error", text: resData.error || "Failed to update password." });
       }
-    } catch (err) {
+    } catch {
       setPassMsg({ type: "error", text: "Something went wrong while updating password." });
     } finally {
       setPassLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("piechem_is_gold");
-        localStorage.removeItem("piechem_gold_expires_at");
-        localStorage.removeItem("piechem_is_complimentary");
-        window.dispatchEvent(new Event("piechem_gold_status_changed"));
-      } catch {}
-    }
-    document.cookie = "session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/";
-  };
-
-  // Reactively synchronize localStorage to active subscription state (must be before early return)
-  useEffect(() => {
-    const student = data?.student;
-    if (!student) return;
-    const isComp = student.subscriptionStatus === "COMPLIMENTARY";
-    const isPaid = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
-    const isGoldStatus = isComp || isPaid;
-
-    if (typeof window !== "undefined") {
-      try {
-        if (isGoldStatus) {
-          localStorage.setItem("piechem_is_gold", "true");
-          if (isComp) {
-            localStorage.setItem("piechem_is_complimentary", "true");
-            localStorage.removeItem("piechem_gold_expires_at");
-          } else if (student.subscriptionExpiresAt) {
-            localStorage.setItem("piechem_gold_expires_at", new Date(student.subscriptionExpiresAt).toISOString());
-            localStorage.removeItem("piechem_is_complimentary");
-          }
-        } else {
-          localStorage.removeItem("piechem_is_gold");
-          localStorage.removeItem("piechem_gold_expires_at");
-          localStorage.removeItem("piechem_is_complimentary");
-        }
-        window.dispatchEvent(new Event("piechem_gold_status_changed"));
-      } catch {}
-    }
-  }, [data?.student, now]);
-
-  if (loading || !data) return <PiFiringLoader fullScreen={true} />;
-
-  const { student, allAttempts = [] } = data;
-  const completedAttempts = allAttempts.filter((a: any) => a.status === "SUBMITTED");
-  const isComplimentary = student.subscriptionStatus === "COMPLIMENTARY" || (!student.subscriptionExpiresAt && student.subscriptionStatus === "PAID");
-  const isPaidActive = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
-  const isGold = isComplimentary || isPaidActive;
-
-  // Resolve plan tier ('ultra' vs 'pro')
-  const effectivePlanTier = resolveEffectivePlanTier(student, upgradeReq);
-
-  const getRequestPlanName = (req: any): string => {
-    if (!req) return "PIE Pro";
-    if (req.planName) return req.planName;
-    const noteText = (req.note || "").toLowerCase();
-    if (noteText.includes("ultra")) return "PIE Ultra";
-    if (noteText.includes("basic")) return "PIE Basic";
-    if (noteText.includes("pro")) return "PIE Pro";
-    const amt = Number(req.amount);
-    if (amt === 499 || amt === 200) return "PIE Ultra";
-    if (amt === 299) return "PIE Pro";
-    if (amt === 0) return "PIE Basic";
-    return "PIE Pro";
-  };
-
-  const activePayable = selectedCheckoutPlan?.payableAmount ?? (paymentSettings?.monthlyFee || 199.0);
-  const activePlanName = selectedCheckoutPlan?.name || (activePayable >= 400 ? "PIE Ultra" : "PIE Pro");
-  const isCheckoutUltra = activePlanName.toLowerCase().includes("ultra") || activePayable >= 400;
-
-  const isPaymentPending = upgradeReq?.status === "PENDING";
-  const paymentPendingHours = isPaymentPending && upgradeReq?.createdAt 
-    ? (now.getTime() - new Date(upgradeReq.createdAt).getTime()) / (1000 * 60 * 60) 
-    : 0;
-  const isPaymentPendingOver24h = paymentPendingHours >= 24;
-
-  // The 3 platform plans are: PIE Basic, PIE Pro, PIE Ultra.
-  // Only students on PIE Ultra have reached the top tier.
-  const isAtHighestPlan = effectivePlanTier === "ultra";
-
-  const handleChangePlanClick = () => {
-    if (isPaymentPending) {
-      navigateToTab("overview");
-      return;
-    }
-    if (isAtHighestPlan) {
-      openModal("plan-status");
-    } else {
-      navigateToTab("change-plan");
-    }
-  };
-
-  const memberSinceFormatted = (() => {
-    if (!student.createdAt) return "-";
-    const d = new Date(student.createdAt);
-    if (isNaN(d.getTime())) return "-";
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-  })();
-
-  const nextPaymentFormatted = student.subscriptionExpiresAt
-    ? new Date(student.subscriptionExpiresAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-    : "Never (Complimentary Pass)";
-
-  const isLifetime = isComplimentary;
-  const is30Day = isGold && !!student.subscriptionExpiresAt;
-
-  const latestApprovedReq = (data?.allRequests || []).find((r: any) => r.status === "APPROVED" && r.utrNumber?.includes("@"));
-  const rawPayerUpi = latestApprovedReq?.utrNumber || null;
-
-  const displayUpiId = rawPayerUpi ? (() => {
-    const [user, domain] = rawPayerUpi.split("@");
-    return `${user.slice(0, 1)}•••@${domain}`;
-  })() : null;
-
-  const isPhonePe = rawPayerUpi ? (rawPayerUpi.toLowerCase().endsWith("@ybl") || 
-                    rawPayerUpi.toLowerCase().endsWith("@ibl") || 
-                    rawPayerUpi.toLowerCase().endsWith("@axl")) : false;
+  if (loading) {
+    return <PiFiringLoader fullScreen />;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-[#02050a] text-slate-100 flex flex-col font-sans selection:bg-red-500/30 selection:text-red-200">
       <AdminPreviewBanner />
-      <SubscriptionExpiredModal student={student} />
-      <GoldUpgradeCelebrationModal student={student} />
-
-      {/* 1. TOP NAVBAR (UNIFIED RESPONSIVE GLOBAL HEADER WITH MOBILE DRAWER) */}
+      
       <GlobalHeader
         student={student}
-        upgradeReq={upgradeReq}
-        isGoldMember={isGold}
-        planTier={effectivePlanTier}
+        isGoldMember={isUltra}
       />
-      {/* 2. MAIN LAYOUT (FULL SCREEN NETFLIX ACCOUNT SETTINGS PAGE) */}
-      <main className={`${activeTab === "change-plan" ? "max-w-[96vw] xl:max-w-[1600px]" : "max-w-6xl"} mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 flex-1 transition-all duration-300`}>
+
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
         
-        {/* Top Navigation Row */}
+        {/* Navigation Bar */}
         <div className="flex items-center justify-between">
           {activeTab === "overview" ? (
             <Link
@@ -909,7 +251,7 @@ export default function StudentAccountPage() {
             </Link>
           ) : (
             <button
-              onClick={handleBackNavigation}
+              onClick={() => setActiveTab("overview")}
               className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-cyan-400 hover:text-cyan-300 transition group cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 text-cyan-400 group-hover:-translate-x-1 transition-transform" />
@@ -917,2364 +259,610 @@ export default function StudentAccountPage() {
             </button>
           )}
 
-          {activeTab !== "overview" && (
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/60 hover:bg-cyan-950/80 border border-slate-800 hover:border-cyan-500/30 text-slate-400 hover:text-cyan-300 text-xs font-bold transition cursor-pointer"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === "overview"
+                  ? "bg-slate-800 text-white border border-slate-700"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
             >
-              <span>Exit to Dashboard</span>
-            </Link>
-          )}
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab("profiles")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === "profiles"
+                  ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveTab("security")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === "security"
+                  ? "bg-cyan-950 text-cyan-300 border border-cyan-500/40"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              Password
+            </button>
+          </div>
         </div>
 
-        {/* Header Titles */}
+        {/* Header Title */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            {activeTab === "change-plan"
-              ? "Change plan"
-              : activeTab === "devices"
-              ? "Manage Access and Devices"
+            {activeTab === "profiles"
+              ? "Student Profile & Curriculum"
               : activeTab === "security"
               ? "Security & Password"
-              : activeTab === "profiles"
-              ? "Student Profile & Curriculum"
-              : activeTab === "membership"
-              ? "Membership"
-              : "Account"}
+              : "Account Overview"}
           </h1>
           <p className="text-sm font-medium text-slate-400 mt-1">
-            {activeTab === "change-plan" ? (
-              "Choose the plan that's right for you. Upgrade anytime to unlock all chemistry exams and features."
-            ) : activeTab === "devices" ? (
-              <>
-                These signed-in devices have recently been active on this account. You can sign out any unfamiliar devices or{" "}
-                <button
-                  onClick={() => navigateToTab("security")}
-                  className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
-                >
-                  change your password
-                </button>{" "}
-                for added security.
-              </>
-            ) : activeTab === "security" ? (
-              "Update your account credentials to protect your proctored exam history."
-            ) : activeTab === "profiles" ? (
-              "Customize your display avatar, personal details, and academic board."
-            ) : activeTab === "membership" ? (
-              "Plan Details"
-            ) : (
-              "Membership details"
-            )}
+            {activeTab === "profiles"
+              ? "Update your student name, avatar, education board, and academic cohort."
+              : activeTab === "security"
+              ? "Update your account password with email verification."
+              : "View your student identity details and current PIE Chem membership status."}
           </p>
         </div>
 
-            {/* VIEW A: OVERVIEW TAB (Ultra-Premium Luxury Suite) */}
-            {activeTab === "overview" && (
-              <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-200">
+        {/* ========================================================= */}
+        {/* VIEW 1: OVERVIEW TAB                                      */}
+        {/* ========================================================= */}
+        {activeTab === "overview" && (
+          <div className="space-y-8 animate-in fade-in duration-200">
+            
+            {/* VIP Passport Card */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0b131e] via-[#070c14] to-black border border-slate-800/90 p-6 sm:p-9 shadow-xl">
+              <div className="relative z-10 space-y-6">
                 
-                {isPaymentPending && (
-                  <div className="rounded-2xl bg-[#0b131e] border border-amber-500/20 p-6 sm:p-8 space-y-5 shadow-sm">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-                        <Clock className="w-6 h-6 text-amber-500" />
-                      </div>
-                      <div className="space-y-1 flex-1">
-                        <h2 className="text-xl font-bold text-white">Payment Verification In Progress</h2>
-                        <p className="text-sm text-slate-400 leading-relaxed">
-                          Your payment has been submitted and is awaiting verification by the PIECHEM administration team.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-[#111a27] rounded-xl p-4 sm:p-5 border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Payment ID</div>
-                        <div className="text-sm text-white font-mono">{upgradeReq.id}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan</div>
-                        <div className="text-sm text-white font-medium">{getRequestPlanName(upgradeReq)}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Amount</div>
-                        <div className="text-sm text-amber-500 font-bold font-mono">₹{upgradeReq.amount || paymentSettings?.monthlyFee || 199.0}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Submitted</div>
-                        <div className="text-sm text-slate-300 font-mono">{formatDateTime24(upgradeReq.createdAt)}</div>
-                      </div>
-                      <div className="sm:col-span-2 pt-2 border-t border-slate-800">
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Status</div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                          <span>Pending Admin Verification</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {isPaymentPendingOver24h && (
-                      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 mt-4 space-y-3">
-                        <p className="text-sm text-slate-300 font-medium">
-                          Your payment has been awaiting verification for more than 24 hours. If your payment status has still not been verified, please contact PIECHEM support.
-                        </p>
-                        <div className="flex flex-wrap items-center gap-4 text-sm font-medium">
-                          <a href="tel:9830507435" className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5">
-                            <Phone className="w-4 h-4" /> Call / WhatsApp: 9830507435
-                          </a>
-                          <a href="mailto:mailarghyadeeproy@gmail.com" className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5">
-                            <Mail className="w-4 h-4" /> Email: mailarghyadeeproy@gmail.com
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* 1. Ultra-Luxury VIP Membership Passport Card */}
-                <div className="relative overflow-hidden rounded-2xl bg-[#0b131e] border border-slate-800 p-7 sm:p-9 shadow-sm transition-all duration-300">
-                  <div className="relative z-10 space-y-6">
-                    {/* Top Meta: Member Since Pill + VIP Status Badge */}
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="inline-flex items-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-wider">
-                        <Sparkles className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>Member since {memberSinceFormatted}</span>
-                      </div>
-
-                      {isGold && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-500/10 text-xs font-bold tracking-wider uppercase border border-emerald-500/20 text-emerald-400">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          <span>ACTIVE ACCESS</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Plan Name & VIP Perks Header */}
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-baseline gap-3">
-                        {effectivePlanTier === "ultra" ? (
-                          <div className="flex items-center gap-2">
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIE</h2>
-                            <div className="relative inline-flex items-center justify-center mb-0.5 shrink-0">
-                              <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full"></div>
-                              <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#160406] text-red-100 text-[10px] sm:text-[12px] font-bold tracking-wide normal-case border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
-                                Ultra
-                              </span>
-                            </div>
-                          </div>
-                        ) : isGold ? (
-                          <div className="flex items-center gap-2">
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIE</h2>
-                            <div className="relative inline-flex items-center justify-center mb-0.5 shrink-0">
-                              <div className="absolute inset-0 bg-blue-600/50 blur-md rounded-full"></div>
-                              <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#0b162c] text-blue-100 text-[10px] sm:text-[12px] font-bold tracking-wide normal-case border border-blue-500/50 shadow-[0_2px_12px_rgba(37,99,235,0.4)] leading-none flex items-center justify-center">
-                                Pro
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">PIE Basic</h2>
-                        )}
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-slate-300/80 font-light max-w-xl leading-relaxed">
-                        {isGold 
-                          ? "Full VIP entitlement to chemistry exam series, 3D molecular simulations, comprehensive study material repositories, and instant proctored analytics."
-                          : "Standard access to open practice tests and fundamental chemistry modules."}
-                      </p>
-                    </div>
-
-                    {/* Plan Perks Showcase Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                      <div className="flex items-center gap-3 text-sm text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>All Live Examination Series & Speed Tests</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Interactive 3D Chemistry Simulations</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Curriculum Notes, DPPs & Suggestion Sets</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Real-Time State Percentiles & Accuracy</span>
-                      </div>
-                    </div>
-
-                    {/* Tier Upgrade Banner for Pro Members (Complimentary or Paid) */}
-                    {effectivePlanTier === "pro" && (
-                      <div className="pt-4 border-t border-slate-800">
-                        <div className="p-4 rounded-xl bg-gradient-to-r from-[#180407]/90 via-[#2a070c]/90 to-[#0e0204]/90 border border-red-600/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_4px_25px_rgba(229,9,20,0.15)]">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-600/20 text-red-300 border border-red-600/40 flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                                Upgrade Available
-                              </span>
-                              <span className="text-xs font-bold text-white">Unlock PIE Ultra for ₹200</span>
-                            </div>
-                            <p className="text-xs text-slate-300">
-                              {isComplimentary 
-                                ? "As a lifetime Complimentary Pro member, unlock 30 days of PIE Ultra for just ₹200. Reverts to lifetime Pro afterward."
-                                : "Upgrade your current Pro membership to PIE Ultra for 30 days for just ₹200."}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => {
-                              const ultra = plans.find(p => p.name?.toLowerCase().includes("ultra")) || {
-                                id: "ultra", name: "PIE Ultra", price: 499, durationDays: 30, description: "All benefits of PIE Pro with unlimited AI and PIE LAB"
-                              };
-                              handleSelectPlanToCheckout(ultra);
-                            }}
-                            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#e50914] to-[#b81d24] hover:from-[#f40612] hover:to-[#e50914] text-white text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(229,9,20,0.4)] transition cursor-pointer shrink-0 flex items-center justify-center gap-1.5"
-                          >
-                            <span>Upgrade to Ultra (₹200)</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Active Ultra Status Callout */}
-                    {effectivePlanTier === "ultra" && (
-                      <div className="pt-4 border-t border-slate-800">
-                        <div className="p-4 rounded-xl bg-[#180407]/70 border border-red-600/30 flex items-center justify-between gap-3 text-xs text-slate-300">
-                          <div>
-                            <span className="font-bold text-white block mb-0.5">Top Tier: PIE Ultra 30-Day Pass Active</span>
-                            <span>
-                              {isComplimentary 
-                                ? `Active until ${nextPaymentFormatted}. Reverts safely to your infinite lifetime Complimentary PIE Pro afterward.`
-                                : `Active until ${nextPaymentFormatted}. Reverts to PIE Basic if not renewed.`}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 30-Day Renewal & UPI Details */}
-                    {is30Day && (
-                      <div className="pt-4 text-sm text-slate-300 font-medium space-y-2 border-t border-slate-800">
-                        <p>
-                          <span className="text-slate-400">Next renewal: </span>
-                          <span className="font-bold text-white">{nextPaymentFormatted}</span>
-                        </p>
-                        <div className="flex items-center gap-2 pt-0.5">
-                          {isPhonePe ? (
-                            <div className="w-6 h-6 rounded bg-[#5f259f] flex items-center justify-center text-white text-[11px] font-bold shadow-sm select-none shrink-0">
-                              पे
-                            </div>
-                          ) : (
-                            <div className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-300 font-mono shrink-0">
-                              UPI
-                            </div>
-                          )}
-                          <span className="text-sm font-medium text-slate-300 font-mono">
-                            {displayUpiId}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Divider & Manage Membership Link Row */}
-                    <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                      <button
-                        onClick={() => navigateToTab("membership")}
-                        className="w-full flex items-center justify-between text-sm font-bold text-slate-300 hover:text-white transition group cursor-pointer text-left py-1"
-                      >
-                        <span className="flex items-center gap-2">
-                          <ShieldCheck className="w-4 h-4 text-slate-400" />
-                          <span>Manage membership details & subscriptions</span>
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. State-of-the-Art Luxury Quick Action Bento Grid */}
-                <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                      <span>Quick links</span>
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-
-                    {/* 3. Edit Student Profile & Curriculum */}
-                    <button
-                      onClick={() => navigateToTab("profiles")}
-                      className="group p-5 sm:p-6 rounded-2xl bg-[#0b131e] hover:bg-[#111a27] border border-slate-800 transition-colors cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="text-slate-400 group-hover:text-amber-400 transition-colors">
-                          <User className="w-5 h-5" />
-                        </div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          {student.board || "CBSE"} • {student.academicLevel || "11"}
-                        </span>
-                      </div>
-
-                      <div className="pt-4">
-                        <div className="flex items-center justify-between text-base font-bold text-white">
-                          <span>Edit student & academic profile</span>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                        <p className="text-sm text-slate-400 mt-1">
-                          Change avatar, update student name, phone, board
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* 4. Update Password & Security */}
-                    <button
-                      onClick={() => navigateToTab("security")}
-                      className="group p-5 sm:p-6 rounded-2xl bg-[#0b131e] hover:bg-[#111a27] border border-slate-800 transition-colors cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="text-slate-400 group-hover:text-amber-400 transition-colors">
-                          <KeyRound className="w-5 h-5" />
-                        </div>
-                      </div>
-
-                      <div className="pt-4">
-                        <div className="flex items-center justify-between text-base font-bold text-white">
-                          <span>Security & credentials</span>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                        <p className="text-sm text-slate-400 mt-1">
-                          Set a new strong password
-                        </p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-
-
-              </div>
-            )}
-
-            {/* VIEW B: MEMBERSHIP TAB */}
-            {activeTab === "membership" && (
-              <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
-                
-                {/* 1. Plan Details Card */}
-                <div className="bg-[#0b131e] rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
-                  <div className="h-1 w-full bg-amber-500" />
-                  
-                  <div className="p-6 sm:p-8 space-y-2">
-                    <h3 className="text-2xl font-bold text-white tracking-tight">
-                      {effectivePlanTier === "ultra" ? (
-                        <div className="flex items-center gap-2">
-                          <span>PIE</span>
-                          <div className="relative inline-flex items-center justify-center mb-0.5">
-                            <div className="absolute inset-0 bg-[#e50914]/50 blur-md rounded-full"></div>
-                            <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#160406] text-red-100 text-[10px] sm:text-[12px] font-black tracking-wide border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none flex items-center justify-center">
-                              Ultra
-                            </span>
-                          </div>
-                        </div>
-                      ) : isGold ? (
-                        <div className="flex items-center gap-2">
-                          <span>PIE</span>
-                          <div className="relative inline-flex items-center justify-center mb-0.5">
-                            <div className="absolute inset-0 bg-blue-600/50 blur-md rounded-full"></div>
-                            <span className="relative z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#0b162c] text-blue-100 text-[10px] sm:text-[12px] font-bold tracking-wide normal-case border border-blue-500/50 shadow-[0_2px_12px_rgba(37,99,235,0.4)] leading-none flex items-center justify-center">
-                              Pro
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        "PIE Basic"
-                      )}
-                    </h3>
-                    {!isGold && (
-                      <p className="text-sm font-semibold text-amber-500">
-                        Free Tier
-                      </p>
-                    )}
-                    <p className="text-sm text-slate-400 pt-1 leading-relaxed max-w-2xl">
-                      {isGold
-                        ? "Full access to Chemistry exam test series, detailed answer explanations, and proctored ranking analytics."
-                        : "Standard access to chemistry practice tests with instant automated grading."}
-                    </p>
-
-                    {!isPaymentPending && (
-                      <div className="border-t border-slate-800 mt-6 pt-2">
-                        <button
-                          onClick={handleChangePlanClick}
-                          className="w-full py-4 flex items-center justify-between text-left hover:bg-[#111a27] transition-colors rounded-xl px-4 -mx-4 group cursor-pointer"
-                        >
-                          <span className="text-sm font-bold text-white">
-                            Change plan
-                          </span>
-                          <ChevronRight className="w-5 h-5 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 2. Payment Info Section */}
-                <div className="space-y-4 pt-2">
-                  <h3 className="text-lg font-bold text-white tracking-tight">
-                    Payment info
-                  </h3>
-
-                  <div className="bg-[#0b131e] rounded-2xl border border-slate-800 divide-y divide-slate-800 overflow-hidden shadow-sm">
-                    
-                    {/* Next Renewal / Payment Handle Row */}
-                    <div className="p-6 sm:p-7 space-y-1">
-                      <h4 className="text-base font-bold text-white">
-                        {is30Day ? "Next renewal" : isLifetime ? "Membership" : "Payment status"}
-                      </h4>
-                      <p className="text-sm text-slate-400">
-                        {is30Day ? nextPaymentFormatted : isComplimentary ? "Complimentary Pass" : "No payment method on file"}
-                      </p>
-
-                      {is30Day && displayUpiId && (
-                        <div className="flex items-center gap-2 pt-2">
-                          {isPhonePe ? (
-                            <div className="w-6 h-6 rounded bg-[#5f259f] flex items-center justify-center text-white text-xs font-bold shadow-sm select-none shrink-0">
-                              पे
-                            </div>
-                          ) : (
-                            <div className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-bold text-slate-300 font-mono shrink-0">
-                              UPI
-                            </div>
-                          )}
-                          <span className="text-sm font-medium text-slate-300 font-mono">
-                            {displayUpiId}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Detailed Payment Status Row */}
-                    <div className="p-6 sm:p-7 space-y-4">
-                      {!upgradeReq ? (
-                        <div className="text-sm font-medium text-slate-400">
-                          {isComplimentary ? "COMPLIMENTARY FROM PIECHEM ADMIN." : "Not Applicable"}
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {upgradeReq.status === "PENDING" && (
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                              <span>Under Verification by Admin</span>
-                            </div>
-                          )}
-                          {upgradeReq.status === "APPROVED" && (
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Payment Accepted</span>
-                            </div>
-                          )}
-                          {upgradeReq.status === "REJECTED" && (
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider">
-                              <AlertCircle className="w-3.5 h-3.5" />
-                              <span>Payment Rejected</span>
-                            </div>
-                          )}
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-                            <div>
-                              <span className="block text-slate-500 mb-0.5">Submitted On:</span>
-                              <span className="text-slate-300">{formatDateTime24(upgradeReq.createdAt)}</span>
-                            </div>
-                            {upgradeReq.status !== "PENDING" && (
-                              <div>
-                                <span className="block text-slate-500 mb-0.5">Admin Verified On:</span>
-                                <span className="text-slate-300">
-                                  {upgradeReq.approvedAt 
-                                    ? formatDateTime24(upgradeReq.approvedAt) 
-                                    : formatDateTime24(upgradeReq.updatedAt)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="pt-2">
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                              After payment, please allow us up to 24 hours to check and verify your payment. If you don't receive any resolution from us within this timeframe, please contact our support helpline:<br/>
-                              <a href="tel:9830507435" className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors mt-1 inline-block">
-                                📞 9830507435
-                              </a>
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* View Payment History Link */}
-                    <button
-                      onClick={() => openModal("billing-history")}
-                      className="w-full px-6 sm:px-7 py-4 flex items-center justify-between text-left hover:bg-cyan-950/30 transition group cursor-pointer"
-                    >
-                      <span className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
-                        View payment history
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-
-                  </div>
-                </div>
-
-                {/* What is included in Current Plan Checklist */}
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-4">
-                  <h3 className="text-base font-bold text-white">
-                    What is included in {effectivePlanTier === "ultra" ? "PIE Ultra" : isGold ? "PIE Pro" : "PIE Basic"}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>{effectivePlanTier === "ultra" || isGold ? "Full Access to All 50+ Chemistry Exams" : "Selected Free Chemistry Practice Tests"}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>{effectivePlanTier === "ultra" ? "Unlimited 24/7 PIE AI Tutor & Doubt Solver" : isGold ? "PIE AI Tutor (20 Queries / Day)" : "Basic AI Doubt Solver (5 Queries / Day)"}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>{effectivePlanTier === "ultra" || isGold ? "Instant Solutions with 3D Molecular Models" : "Standard Answer Key"}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>{effectivePlanTier === "ultra" ? "Digital Library with Unlimited Chapter Downloads" : isGold ? "Digital Library with 5 Downloads / Day" : "Selected Free Chapters with Limited Downloads"}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>{effectivePlanTier === "ultra" ? "PIE LAB: Included (Unlimited 3D Simulations)" : isGold ? "PIE LAB: Included (Basic Access)" : "PIE LAB: Not Included"}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>{effectivePlanTier === "ultra" || isGold ? "Proctored National Percentile Analytics" : "Basic Score Summary"}</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            )}
-            {/* VIEW C: SECURITY TAB */}
-            {activeTab === "security" && (
-              <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
-                
-                <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/30 shadow-xl p-6 sm:p-7 space-y-6">
-                  
-                  <div className=" pb-4">
-                    <h2 className="text-xl font-bold text-white">Security & Password</h2>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Update your account credentials to protect your proctored exam history.
-                    </p>
-                  </div>
-
-                  {/* Email OTP Verification Section */}
-                  <div className="bg-slate-950/80 p-4 sm:p-5 rounded-xl border border-cyan-500/30 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">
-                          Email OTP Verification Required
-                        </h4>
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          To change your password, send a 6-digit code to <strong className="text-white font-mono">{email}</strong>
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleSendPasswordOtp}
-                        disabled={sendingOtp || resendCooldown > 0}
-                        className="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white rounded-xl text-xs font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
-                      >
-                        {sendingOtp ? "Sending OTP..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Send Email OTP"}
-                      </button>
-                    </div>
-
-                    {otpSentMsg && (
-                      <div className="p-3 rounded-lg bg-green-950/80 border border-green-600/50 text-green-300 text-xs font-semibold flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
-                        <span>{otpSentMsg}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Feedback Message */}
-                  {passMsg && (
-                    <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
-                      passMsg.type === "success"
-                        ? "bg-green-950/80 border-green-600/60 text-green-300"
-                        : "bg-red-950/80 border-red-600/60 text-red-300"
-                    }`}>
-                      {passMsg.type === "success" ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-                      )}
-                      <span>{passMsg.text}</span>
-                    </div>
-                  )}
-
-                  {/* Password Form */}
-                  <form onSubmit={handlePasswordChange} className="space-y-5">
-                    {/* OTP Input */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
-                        <span>Verification OTP *</span>
-                        <span className="text-[11px] text-slate-500 font-normal">6 digits</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={passwordOtp}
-                        onChange={(e) => setPasswordOtp(e.target.value)}
-                        placeholder="Enter 6-digit OTP"
-                        className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white font-mono tracking-wider outline-none transition focus:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      
-                      {/* New Password */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          New Password *
-                        </label>
-                        <input
-                          type="password"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="Create strong password"
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
-                        />
-                      </div>
-
-                      {/* Confirm New Password */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
-                          <span>Confirm New Password *</span>
-                          {confirmPassword && (
-                            <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-emerald-400" : "text-red-400"}`}>
-                              {newPassword === confirmPassword ? "✓ Match" : "✗ Mismatch"}
-                            </span>
-                          )}
-                        </label>
-                        <input
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Repeat new password"
-                          className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Password Policy Checklist */}
-                    <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                        Security Requirements:
-                      </span>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                        <div className={`flex items-center gap-1.5 ${reqLength ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
-                          <span>{reqLength ? "✓" : "○"}</span> 8+ Characters
-                        </div>
-                        <div className={`flex items-center gap-1.5 ${reqUpper ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
-                          <span>{reqUpper ? "✓" : "○"}</span> 1 Uppercase (A-Z)
-                        </div>
-                        <div className={`flex items-center gap-1.5 ${reqLower ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
-                          <span>{reqLower ? "✓" : "○"}</span> 1 Lowercase (a-z)
-                        </div>
-                        <div className={`flex items-center gap-1.5 ${reqNumber ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
-                          <span>{reqNumber ? "✓" : "○"}</span> 1 Number (0-9)
-                        </div>
-                        <div className={`flex items-center gap-1.5 ${reqSpecial ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
-                          <span>{reqSpecial ? "✓" : "○"}</span> 1 Special Char
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-2">
-                      <button
-                        type="submit"
-                        disabled={passLoading || !passwordOtp || !allReqsMet || newPassword !== confirmPassword}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        {passLoading ? "Updating Password..." : "Update Password"}
-                      </button>
-                    </div>
-                  </form>
-
-                </div>
-
-              </div>
-            )}
-            {/* VIEW D: PROFILES TAB */}
-            {activeTab === "profiles" && (
-              <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
-                
-                <div className="relative rounded-3xl bg-gradient-to-b from-[#0b1424]/95 via-[#060d18]/95 to-[#03060c]/98 border border-white/10 shadow-[0_20px_70px_rgba(0,0,0,0.8)] p-6 sm:p-9 space-y-7 backdrop-blur-2xl">
-                  {/* Subtle Top Ambient Glow */}
-                  <div className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-80 h-32 bg-cyan-500/10 rounded-full blur-3xl" />
-
-                  <div className="border-b border-white/10 pb-5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest mb-2">
-                      <User className="w-3 h-3 text-cyan-400" />
-                      <span>Account Personalization</span>
-                    </div>
-                    <h2 className="text-2xl font-black text-white tracking-tight">Student &amp; Academic Profile</h2>
-                    <p className="text-xs sm:text-sm text-slate-300/80 mt-1">
-                      Customize your display avatar and update your board details to receive personalized exam recommendations.
-                    </p>
-                  </div>
-
-                  {/* Feedback Message */}
-                  {profileMsg && (
-                    <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-3 border shadow-md animate-in fade-in duration-200 ${
-                      profileMsg.type === "success"
-                        ? "bg-green-950/80 border-green-500/50 text-green-300"
-                        : "bg-red-950/80 border-red-500/50 text-red-300"
-                    }`}>
-                      {profileMsg.type === "success" ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-                      )}
-                      <span>{profileMsg.text}</span>
-                    </div>
-                  )}
-
-                  <form onSubmit={handleProfileSave} className="space-y-6">
-                    
-                    {/* Avatar Picker */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest block">
-                        Choose Avatar Icon
-                      </label>
-                      <div className="grid grid-cols-5 gap-3 max-w-sm">
-                        {AVATAR_OPTIONS.map((av) => {
-                          const isSelected = avatarUrl === av.url;
-                          return (
-                            <button
-                              key={av.id}
-                              type="button"
-                              onClick={() => setAvatarUrl(av.url)}
-                              className={`relative rounded-2xl overflow-hidden aspect-square border-2 transition-all duration-200 cursor-pointer ${
-                                isSelected
-                                  ? "border-cyan-400 ring-2 ring-cyan-500/60 scale-105 shadow-[0_0_20px_rgba(6,182,212,0.6)]"
-                                  : "border-white/10 hover:border-cyan-500/40 opacity-70 hover:opacity-100 bg-black/40"
-                              }`}
-                              title={av.name}
-                            >
-                              <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
-                              {isSelected && (
-                                <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-cyan-400 text-slate-950 rounded-full flex items-center justify-center text-[10px] font-black shadow-md">
-                                  ✓
-                                </span>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                      
-                      {/* Name */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Student Name
-                        </label>
-                        <input
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="Enter your name"
-                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 rounded-xl px-4 py-3 text-sm text-white outline-none transition shadow-inner placeholder:text-slate-600"
-                        />
-                      </div>
-
-                      {/* Phone */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Phone Number
-                        </label>
-                        <input
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="10-digit mobile number"
-                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 rounded-xl px-4 py-3 text-sm text-white font-mono outline-none transition shadow-inner placeholder:text-slate-600"
-                        />
-                      </div>
-
-                      {/* Mail ID (Read-only) */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Registered Email (Read-only)
-                        </label>
-                        <input
-                          type="email"
-                          value={email}
-                          disabled
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 text-sm text-slate-400 font-mono cursor-not-allowed select-none"
-                        />
-                      </div>
-
-                      {/* Gender */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Gender
-                        </label>
-                        <select
-                          value={gender}
-                          onChange={(e) => setGender(e.target.value)}
-                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
-                        >
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Others">Others</option>
-                        </select>
-                      </div>
-
-                      {/* Date of Birth */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Date of Birth
-                        </label>
-                        <input
-                          type="date"
-                          value={dob}
-                          onChange={(e) => setDob(e.target.value)}
-                          className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
-                        />
-                      </div>
-
-                      {/* Board */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Education Board
-                        </label>
-                        <select
-                          value={board}
-                          onChange={(e) => {
-                            const newBoard = e.target.value;
-                            setBoard(newBoard);
-                            if (newBoard === "WBCHSE") {
-                              setAcademicLevel("SEM-I");
-                            } else {
-                              setAcademicLevel("11");
-                            }
-                          }}
-                          disabled={isGold}
-                          className={"w-full rounded-xl px-4 py-3 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-white/[0.03] border border-white/5 text-slate-500 cursor-not-allowed" : "bg-[#030712]/90 border border-white/10 focus:border-cyan-400 text-cyan-300")}
-                        >
-                          <option value="CBSE">CBSE</option>
-                          <option value="ICSE">ICSE</option>
-                          <option value="WBCHSE">WBCHSE</option>
-                        </select>
-                      </div>
-
-                      {/* Dynamic Academic Level (Class or Semester) */}
-                      <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
-                          {board === "WBCHSE" ? "Semester (WBCHSE Curriculum)" : `Class (${board})`}
-                        </label>
-                        {board === "WBCHSE" ? (
-                          <select
-                            value={academicLevel}
-                            onChange={(e) => setAcademicLevel(e.target.value)}
-                            disabled={isGold}
-                            className={"w-full rounded-xl px-4 py-3 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-white/[0.03] border border-white/5 text-slate-500 cursor-not-allowed" : "bg-[#030712]/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
-                          >
-                            <option value="SEM-I">SEM-I</option>
-                            <option value="SEM-II">SEM-II</option>
-                            <option value="SEM-III">SEM-III</option>
-                            <option value="SEM-IV">SEM-IV</option>
-                          </select>
-                        ) : (
-                          <select
-                            value={academicLevel}
-                            onChange={(e) => setAcademicLevel(e.target.value)}
-                            disabled={isGold}
-                            className={"w-full rounded-xl px-4 py-3 text-sm font-bold outline-none transition cursor-pointer " + (isGold ? "bg-white/[0.03] border border-white/5 text-slate-500 cursor-not-allowed" : "bg-[#030712]/90 border border-cyan-500/40 focus:border-cyan-400 text-cyan-300")}
-                          >
-                            <option value="11">Class 11</option>
-                            <option value="12">Class 12</option>
-                          </select>
-                        )}
-                      </div>
-
-                      {isGold && (
-                        <div className="sm:col-span-2 pt-1">
-                          <p className="text-xs text-amber-400/90 italic font-medium flex items-center gap-1.5">
-                            <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                            You cannot modify your board and {board === "WBCHSE" ? "semester" : "class"} while your current plan is active.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex justify-end pt-3 border-t border-white/10">
-                      <button
-                        type="submit"
-                        disabled={profileLoading}
-                        className="px-8 py-3.5 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600 hover:brightness-110 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 shadow-[0_0_25px_rgba(6,182,212,0.4)] disabled:opacity-50 cursor-pointer flex items-center gap-2 active:scale-98"
-                      >
-                        {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                        <span>{profileLoading ? "Saving..." : "Save Profile Details"}</span>
-                      </button>
-                    </div>
-                  </form>
-
-                </div>
-
-              </div>
-            )}
-
-            {/* VIEW E: DEVICES TAB */}
-            {activeTab === "devices" && (
-              <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
-                
-                {/* Global Status Notification */}
-                {deviceActionMsg && (
-                  <div
-                    className={`p-4 rounded-xl text-xs font-medium border flex items-center justify-between gap-3 ${
-                      deviceActionMsg.type === "success"
-                        ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300"
-                        : "bg-red-950/80 border-red-500/40 text-red-300"
-                    }`}
-                  >
-                    <span>{deviceActionMsg.text}</span>
-                    <button onClick={() => setDeviceActionMsg(null)} className="cursor-pointer text-slate-400 hover:text-white">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-
-                {/* Sign out of all devices header card */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 p-4 sm:p-5 rounded-2xl border border-cyan-500/25 shadow-md">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 shadow-sm">
-                      <ShieldCheck className="w-5 h-5" />
+                {/* Top Meta: Avatar + Status Badge */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-cyan-500/40 shadow-lg bg-black/50 shrink-0">
+                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white">Signed-in Devices ({devicesList.length || 1})</h3>
-                      <p className="text-xs text-slate-400">
-                        Active web browsers and device sessions authenticated with {student.email}
-                      </p>
+                      <div className="text-lg font-bold text-white leading-tight">
+                        {student?.name || "Student"}
+                      </div>
+                      <div className="text-xs text-slate-400 font-mono mt-0.5">{student?.email}</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        Member since {memberSinceFormatted}
+                      </div>
                     </div>
                   </div>
 
-                  <button
-                    onClick={handleSignOutAllDevices}
-                    disabled={revokingAll}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-red-400 hover:text-red-300 text-xs font-bold transition self-start sm:self-auto cursor-pointer disabled:opacity-50 shadow-sm"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>{revokingAll ? "Signing out..." : "Sign out of all devices"}</span>
-                  </button>
+                  <div>
+                    {isUltra ? (
+                      <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-950 via-[#26050a] to-black border border-red-500/60 text-red-200 text-xs font-extrabold uppercase tracking-wider shadow-[0_0_20px_rgba(229,9,20,0.35)]">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                        <span>⚡ PIE ULTRA (ACTIVE VIP)</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider">
+                        <span>🔓 FREE ACCOUNT</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Device Cards List (Netflix inspired) */}
-                <div className="space-y-3.5">
-                  {devicesList.length === 0 ? (
-                    <div className="bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 rounded-2xl border border-cyan-500/20 p-6 text-center text-slate-400 text-xs">
-                      <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin mx-auto mb-2" />
-                      Loading signed-in devices...
-                    </div>
-                  ) : (
-                    devicesList.map((dev: any, idx: number) => {
-                      const devKey = dev.id || dev.deviceId || String(idx);
-                      const isExpanded = !!expandedDeviceIds[devKey];
-                      const isCurrent = Boolean(dev.isCurrent || (idx === 0 && devicesList.length === 1));
+                {/* Tier Description & Curriculum Badge */}
+                <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="px-2.5 py-1 rounded-lg bg-cyan-950/70 text-cyan-300 font-bold border border-cyan-500/30">
+                      Board: {board}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 font-bold border border-slate-700">
+                      {board === "WBCHSE" ? `Semester: ${academicLevel}` : `Class ${academicLevel}`}
+                    </span>
+                  </div>
 
-                      return (
-                        <div
-                          key={devKey}
-                          className={`rounded-2xl border transition-all duration-200 overflow-hidden bg-gradient-to-b from-[#0a1726]/90 via-[#07111c]/90 to-[#03080e]/95 ${
-                            isCurrent
-                              ? "border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.1)]"
-                              : "border-cyan-500/20 hover:border-cyan-500/40"
-                          }`}
-                        >
-                          {/* Card Header Row */}
-                          <div
-                            onClick={() => toggleDeviceExpand(devKey)}
-                            className="p-5 sm:p-6 flex items-start justify-between gap-4 cursor-pointer select-none"
-                          >
-                            <div className="flex items-start gap-4">
-                              {/* Device Icon */}
-                              <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/30 text-slate-300 shrink-0 mt-0.5 shadow-sm">
-                                {dev.deviceType === "mobile" ? (
-                                  <Smartphone className="w-5 h-5 text-cyan-400" />
-                                ) : dev.deviceType === "tablet" ? (
-                                  <Tablet className="w-5 h-5 text-cyan-400" />
-                                ) : (
-                                  <Laptop className="w-5 h-5 text-cyan-400" />
-                                )}
-                              </div>
-
-                              <div className="space-y-1">
-                                {/* CURRENT DEVICE Badge */}
-                                {isCurrent && (
-                                  <div className="mb-1.5">
-                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 shadow-sm">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                                      CURRENT DEVICE
-                                    </span>
-                                  </div>
-                                )}
-
-                                {/* Device Name (Netflix style) */}
-                                <h4 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                                  {dev.deviceName || "PC Chrome - Web browser"}
-                                </h4>
-
-                                {/* Activity Line with Clock */}
-                                <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 font-medium pt-0.5">
-                                  <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                  <span>{dev.lastActiveFormatted || formatDateTime24(dev.lastActive || new Date())}</span>
-                                  {(dev.isActiveNow || isCurrent) && (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 ml-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active now
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Expand / Collapse Chevron */}
-                            <button
-                              type="button"
-                              aria-label="Toggle device details"
-                              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-cyan-950/40 transition shrink-0"
-                            >
-                              <ChevronDown
-                                className={`w-5 h-5 transition-transform duration-200 ${
-                                  isExpanded ? "rotate-180 text-cyan-400" : ""
-                                }`}
-                              />
-                            </button>
-                          </div>
-
-                          {/* Accordion Expanded Body */}
-                          {isExpanded && (
-                            <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-cyan-500/15 space-y-4 animate-in fade-in duration-150">
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-xs">
-                                <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/20">
-                                  <span className="text-slate-500 block font-medium">Account Profile</span>
-                                  <span className="text-slate-200 font-mono font-semibold truncate block mt-0.5">
-                                    {student.email}
-                                  </span>
-                                </div>
-
-                                <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/20">
-                                  <span className="text-slate-500 block font-medium">Approximate IP / Network</span>
-                                  <span className="text-slate-200 font-mono font-semibold block mt-0.5">
-                                    {dev.ipAddress || "India"}
-                                  </span>
-                                </div>
-
-                                <div className="p-3 rounded-xl bg-[#061421] border border-cyan-500/20">
-                                  <span className="text-slate-500 block font-medium">Session Registered</span>
-                                  <span className="text-slate-200 font-mono font-semibold block mt-0.5">
-                                    {dev.createdAtFormatted || dev.lastActiveFormatted || "-"}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center justify-between pt-1">
-                                <span className="text-[11px] text-slate-500">
-                                  Device ID: <span className="font-mono">{dev.deviceId ? dev.deviceId.slice(0, 18) + "..." : "dev_current"}</span>
-                                </span>
-
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (isCurrent) {
-                                      handleLogout();
-                                    } else {
-                                      handleSignOutDevice(dev.id || dev.deviceId);
-                                    }
-                                  }}
-                                  disabled={revokingDeviceId === (dev.id || dev.deviceId)}
-                                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/40 text-red-400 hover:text-red-300 text-xs font-bold transition cursor-pointer disabled:opacity-50"
-                                >
-                                  <LogOut className="w-3.5 h-3.5" />
-                                  <span>
-                                    {revokingDeviceId === (dev.id || dev.deviceId)
-                                      ? "Signing out..."
-                                      : isCurrent
-                                      ? "Sign out of this device"
-                                      : "Sign out"}
-                                  </span>
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1">
+                    {isUltra
+                      ? "Your account has full VIP access to all chemistry exam series, 3D molecular spatial models, DPPs, chapter derivations, and instant AI tutoring."
+                      : "You are currently on standard free access. Free tier includes access to baseline practice exams and chapter notes."}
+                  </p>
                 </div>
 
-                {/* Exam Integrity & Security Posture Card */}
-                <div className="p-5 sm:p-6 rounded-2xl border border-cyan-500/20 bg-slate-950/80 space-y-3 mt-6">
-                  <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-cyan-400" />
-                    Exam Integrity & Security Posture
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
-                      <span>Anti-Cheat Proctoring:</span>
-                      <span className="font-bold text-emerald-400">VERIFIED ACTIVE</span>
+                {/* Free Tier Notice (Strictly Admin Upgrade Only — No Payment Links) */}
+                {!isUltra && (
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#180407]/60 via-[#100305]/60 to-black border border-red-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300">
+                        <Lock className="w-3.5 h-3.5 text-red-400" />
+                        <span>⚡ PIE Ultra Exclusive</span>
+                      </div>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        To unlock unlimited test attempts, 3D spatial chemistry simulations, and full NCERT answer bibles, contact your teacher or administrator to upgrade your account to PIE Ultra.
+                      </p>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#061421] border border-cyan-500/20">
-                      <span>Completed Attempts:</span>
-                      <span className="font-mono font-bold text-white">{completedAttempts.length} Submitted</span>
+                    <div className="shrink-0 px-3.5 py-2 rounded-xl bg-red-950/80 border border-red-600/40 text-red-300 text-xs font-bold text-center select-none whitespace-nowrap">
+                      Admin Upgrade Only
                     </div>
+                  </div>
+                )}
+
+                {/* Perks Showcase Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80 text-xs sm:text-sm text-slate-300">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
+                    <span>Live Test Series & Speed Mock Examinations</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
+                    <span>Interactive 3D Spatial Chemistry Simulations</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
+                    <span>Chapter DPPs, Formula Bibles & Solution Sets</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className={`w-4 h-4 shrink-0 ${isUltra ? "text-emerald-400" : "text-slate-600"}`} />
+                    <span>Real-Time State Percentiles & Detailed Analytics</span>
                   </div>
                 </div>
 
               </div>
-            )}
+            </div>
 
+            {/* Quick Action Bento Grid */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-white tracking-tight">Quick Actions</h3>
 
-            {/* VIEW F: CHANGE PLAN TAB (NETFLIX-INSPIRED) */}
-            {activeTab === "change-plan" && (
-              <div className="space-y-8 animate-in fade-in duration-200">
-                {isPaymentPending ? (
-                  <div className="max-w-4xl mx-auto rounded-2xl bg-[#0b131e] border border-amber-500/20 p-6 sm:p-8 space-y-5 shadow-sm">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-                        <Clock className="w-6 h-6 text-amber-500" />
-                      </div>
-                      <div className="space-y-1 flex-1">
-                        <h2 className="text-xl font-bold text-white">Payment Verification In Progress</h2>
-                        <p className="text-sm text-slate-400 leading-relaxed">
-                          Your payment has been submitted and is awaiting verification by the PIECHEM administration team. You cannot change your plan while a payment is being verified.
-                        </p>
-                      </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* 1. Edit Profile */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("profiles")}
+                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
+                >
+                  <div className="space-y-1">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
+                      <User size={20} />
                     </div>
-                    
-                    <div className="bg-[#111a27] rounded-xl p-4 sm:p-5 border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Payment ID</div>
-                        <div className="text-sm text-white font-mono">{upgradeReq.id}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Plan</div>
-                        <div className="text-sm text-white font-medium">{getRequestPlanName(upgradeReq)}</div>
-                      </div>
-                      <div className="sm:col-span-2 pt-2 border-t border-slate-800">
-                        <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Status</div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-wider">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                          <span>Pending Admin Verification</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-800 flex justify-end">
-                      <button
-                        onClick={() => navigateToTab("overview")}
-                        className="px-6 py-3 rounded-xl bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-white font-bold transition-colors cursor-pointer"
-                      >
-                        Return to Overview
-                      </button>
-                    </div>
+                    <h4 className="text-sm font-bold text-white pt-2 group-hover:text-cyan-300 transition">
+                      Edit Student Profile
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Update your avatar, name, phone, education board, and academic cohort.
+                    </p>
                   </div>
-                ) : (
-                  <>
-                {/* Plan Comparison Shelf (Strictly Side-by-Side - Max 5 Plans, No Wrapping to Down, Full Space Utilized) */}
-                <div className="w-full overflow-x-auto pb-8 pt-2 scrollbar-thin scrollbar-thumb-slate-700/80 scrollbar-track-slate-900/40">
-                  <div className="flex flex-row flex-nowrap items-stretch gap-5 sm:gap-6 w-full">
-                    {(plans.length > 0 ? plans : [
-                      {
-                        id: "default-basic",
-                        name: "PIE Basic",
-                        description: "Foundational practice tier for chemistry students",
-                        price: 0,
-                        durationDays: 30,
-                        benefits: [
-                          "Chemistry Exam Tests: Selected tests are free.",
-                          "AI Tutor & Doubt Solver: 5 queries / day",
-                          "Answer Explanations: Standard Answer Key",
-                          "Study Materials: Selected Free Chapters with limited downloading option",
-                          "Ranking & Analytics: Basic Score Summary",
-                          "Supported Devices: 1 Active Device",
-                          "PIE LAB: Not Included"
-                        ]
-                      },
-                      {
-                        id: "default-pro",
-                        name: "PIE Pro",
-                        description: "Full access to all exams, 3D models, Boards & NEET/JEE Contents.",
-                        price: 299,
-                        durationDays: 30,
-                        benefits: [
-                          "Chemistry Exam Tests: Unlimited",
-                          "AI Tutor & Doubt Solver: 20 queries / day",
-                          "Answer Explanations: Full Solutions with PIE AI",
-                          "Study Materials: Complete Digital Library with 5 downloads / day",
-                          "Ranking & Analytics: Proctored National Percentile",
-                          "Supported Devices: 1 active device",
-                          "PIE LAB: Included (Basic Access)"
-                        ]
-                      },
-                      {
-                        id: "default-ultra",
-                        name: "PIE Ultra",
-                        description: "All benifits of PIE Pro along with unlimited access to PIE AI, PIE LAB",
-                        price: 499,
-                        durationDays: 30,
-                        benefits: [
-                          "Chemistry Exam Tests: Unlimited",
-                          "AI Tutor & Doubt Solver: Unlimited",
-                          "Answer Explanations: Full Solutions with PIE AI",
-                          "Study Materials: Complete Digital Library with unlimited downloads",
-                          "Ranking & Analytics: Proctored National Percentile",
-                          "Supported Devices: 1 Active Device",
-                          "PIE LAB: Included (Unlimited Access)"
-                        ]
-                      }
-                    ]).map(plan => {
-                      const isPaid = Number(plan.price) > 0;
-                      const planNameLower = String(plan.name || "").toLowerCase();
-                      const isPlanUltra = planNameLower.includes("ultra") || Number(plan.price) >= 400;
-                      const isPlanPro = !isPlanUltra && (planNameLower.includes("pro") || (Number(plan.price) > 0 && Number(plan.price) < 400));
-                      const isPlanBasic = !isPaid || planNameLower.includes("basic");
+                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
+                </button>
 
-                      // 1. FREE / BASIC TIER CARD
-                      if (isPlanBasic) {
-                        return (
-                          <div key={plan.id} className="flex-1 min-w-[320px] rounded-3xl border border-white/10 bg-gradient-to-b from-[#0a1220]/95 via-[#060c14]/95 to-[#03060a]/98 shadow-[0_15px_50px_rgba(0,0,0,0.6)] flex flex-col justify-between overflow-hidden relative transition-all duration-300 hover:border-cyan-500/40 hover:shadow-[0_20px_60px_rgba(6,182,212,0.15)] hover:-translate-y-1">
-                            {/* Card Head (Obsidian Glass Banner) */}
-                            <div className="p-6 sm:p-7 bg-gradient-to-r from-[#0c1524] via-[#162032] to-[#1e293b] text-white relative border-b border-white/10">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-black tracking-widest uppercase bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-slate-300 border border-white/15">
-                                  FREE TIER
-                                </span>
-                                {!isGold && (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-xs font-black shadow-sm">
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" /> Current plan
-                                  </span>
-                                )}
-                              </div>
-                              <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
-                              <p className="text-xs text-slate-300/90 mt-1">{plan.description}</p>
-                            </div>
+                {/* 2. Security & Password */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("security")}
+                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
+                >
+                  <div className="space-y-1">
+                    <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+                      <KeyRound size={20} />
+                    </div>
+                    <h4 className="text-sm font-bold text-white pt-2 group-hover:text-amber-300 transition">
+                      Change Password
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Send a verification code to your registered email and set a new password.
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
+                </button>
 
-                            {/* Features Comparison Rows */}
-                            <div className="p-6 space-y-3.5 flex-1 text-sm divide-y divide-slate-800/60">
-                              <div className="flex justify-between items-center pt-1">
-                                <span className="text-slate-300 font-medium">Monthly price</span>
-                                <span className="font-bold text-white font-mono text-lg">₹0</span>
-                              </div>
-                              {plan.benefits?.map((benefit: string, i: number) => {
-                                const parts = benefit.split(":");
-                                const label = parts.length > 1 ? parts[0].trim() : benefit;
-                                const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
+                {/* 3. Examination Dashboard */}
+                <Link
+                  href="/dashboard"
+                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
+                >
+                  <div className="space-y-1">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                      <Sparkles size={20} />
+                    </div>
+                    <h4 className="text-sm font-bold text-white pt-2 group-hover:text-emerald-300 transition">
+                      Examination Catalog
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Attempt live MCQ tests, chapter speed exams, and view your detailed scorecards.
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
+                </Link>
 
-                                return (
-                                  <div key={i} className="flex justify-between items-center pt-3 gap-2">
-                                    <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
-                                    <span className="font-semibold text-slate-200 text-right text-xs sm:text-sm">{val || "Included"}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                {/* 4. 3D Spatial Animations */}
+                <Link
+                  href="/3d-animations"
+                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
+                >
+                  <div className="space-y-1">
+                    <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+                      <Shield size={20} />
+                    </div>
+                    <h4 className="text-sm font-bold text-white pt-2 group-hover:text-purple-300 transition">
+                      3D Spatial Chemistry
+                    </h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Explore interactive molecular geometries, reaction mechanisms, and crystal lattices.
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
+                </Link>
 
-                            {/* Card CTA */}
-                            <div className="p-6 pt-0 mt-auto">
-                              {!isGold ? (
-                                <div className="w-full py-4 rounded-xl bg-slate-800/50 border border-slate-700/60 text-cyan-300 font-bold text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-inner">
-                                  <Check className="w-4 h-4 text-cyan-400" />
-                                  <span>Enrolled (Current Plan)</span>
-                                </div>
-                              ) : (
-                                <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs font-semibold text-center select-none">
-                                  Standard Free Tier
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      }
+              </div>
+            </div>
 
-                      // 2. PIE PRO TIER CARD (SAPPHIRE BLUE NETFLIX GRADE)
-                      if (isPlanPro) {
-                        const isStudentCurrentlyPro = effectivePlanTier === "pro";
-                        return (
-                          <div key={plan.id} className="flex-1 min-w-[300px] rounded-2xl border-2 border-blue-500/50 bg-gradient-to-b from-[#061226]/95 via-[#030b18]/95 to-[#02060e]/95 shadow-[0_0_55px_rgba(37,99,235,0.22)] flex flex-col justify-between overflow-hidden relative transition hover:border-blue-400 hover:shadow-[0_0_65px_rgba(37,99,235,0.35)]">
-                            {/* Card Head (Electric Sapphire Blue Banner) */}
-                            <div className="p-6 bg-gradient-to-r from-[#0d2554] via-[#1d4ed8] to-[#2563eb] text-white relative">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-[11px] font-black tracking-widest uppercase bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-full text-blue-200 border border-blue-400/30">
-                                  RECOMMENDED
-                                </span>
-                                {isComplimentary ? (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 text-xs font-black shadow-sm">
-                                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Lifetime Pass
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-blue-200 text-xs font-black shadow-sm">
-                                    <Sparkles className="w-3.5 h-3.5 text-blue-300" /> {plan.durationDays}-Day Pass
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <h3 className="text-2xl font-black text-white tracking-tight">{plan.name}</h3>
-                                <div className="px-2 py-0.5 rounded-full bg-[#0b162c] border border-blue-500/50 text-blue-200 text-[10px] font-bold">
-                                  Pro
-                                </div>
-                              </div>
-                              <p className="text-xs text-blue-100/90 mt-1">{plan.description}</p>
-                            </div>
+          </div>
+        )}
 
-                            {/* Features Comparison Rows */}
-                            <div className="p-6 space-y-3.5 flex-1 text-sm divide-y divide-blue-500/15">
-                              <div className="flex justify-between items-center pt-1">
-                                <span className="text-slate-300 font-medium">Monthly price</span>
-                                <div className="text-right">
-                                  {isComplimentary ? (
-                                    <>
-                                      <span className="text-2xl font-black text-emerald-400 font-mono">₹0</span>
-                                      <span className="text-[10px] font-bold text-emerald-400 block uppercase tracking-wider">Complimentary Active</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span className="text-2xl font-black text-blue-300 font-mono">₹{plan.price}</span>
-                                      <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                              {plan.benefits?.map((benefit: string, i: number) => {
-                                const parts = benefit.split(":");
-                                const label = parts.length > 1 ? parts[0].trim() : benefit;
-                                const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
+        {/* ========================================================= */}
+        {/* VIEW 2: PROFILE & CURRICULUM TAB                          */}
+        {/* ========================================================= */}
+        {activeTab === "profiles" && (
+          <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
+            <div className="rounded-3xl bg-gradient-to-b from-[#0b1424] via-[#060d18] to-black border border-white/10 shadow-2xl p-6 sm:p-9 space-y-7 backdrop-blur-xl">
+              
+              <div className="border-b border-white/10 pb-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest mb-2">
+                  <User className="w-3 h-3 text-cyan-400" />
+                  <span>Personalization</span>
+                </div>
+                <h2 className="text-2xl font-black text-white tracking-tight">Student &amp; Academic Profile</h2>
+                <p className="text-xs sm:text-sm text-slate-300/80 mt-1">
+                  Customize your avatar and curriculum details to ensure test papers match your academic cohort.
+                </p>
+              </div>
 
-                                return (
-                                  <div key={i} className="flex justify-between items-center pt-3 gap-2">
-                                    <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
-                                    <div className="font-bold text-white flex items-center gap-1.5 shrink-0 text-right text-xs sm:text-sm">
-                                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                                      <span>{val || label}</span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
+              {profileMsg && (
+                <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-3 border shadow-md ${
+                  profileMsg.type === "success"
+                    ? "bg-green-950/80 border-green-500/50 text-green-300"
+                    : "bg-red-950/80 border-red-500/50 text-red-300"
+                }`}>
+                  {profileMsg.type === "success" ? (
+                    <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                  )}
+                  <span>{profileMsg.text}</span>
+                </div>
+              )}
 
-                            {/* Card CTA */}
-                            <div className="p-6 pt-0 mt-auto">
-                              {isStudentCurrentlyPro ? (
-                                <div className="w-full py-4 rounded-xl bg-blue-950/60 border border-blue-500/50 text-blue-200 font-black text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.25)]">
-                                  <Check className="w-4 h-4 text-blue-400" />
-                                  <span>{isComplimentary ? "Enrolled • Infinite Lifetime Pass" : "Enrolled (Current Plan)"}</span>
-                                </div>
-                              ) : effectivePlanTier === "ultra" ? (
-                                <div className="w-full py-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 text-slate-400 text-xs font-semibold text-center select-none">
-                                  Included in PIE Ultra
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => handleSelectPlanToCheckout(plan)}
-                                  className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(37,99,235,0.45)] transition cursor-pointer flex items-center justify-center gap-2"
-                                >
-                                  <span>UPGRADE TO {plan.name.toUpperCase()} (₹{plan.price})</span>
-                                  <ChevronRight className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      // 3. PIE ULTRA TIER CARD (NETFLIX CRIMSON RED GRADE)
-                      const isStudentCurrentlyUltra = effectivePlanTier === "ultra";
-                      const canUpgradeFor200 = isComplimentary || effectivePlanTier === "pro";
-                      const ultraPayable = canUpgradeFor200 ? 200 : (Number(plan.price) || 499);
-
+              <form onSubmit={handleProfileSave} className="space-y-6">
+                
+                {/* Avatar Picker */}
+                <div className="space-y-3">
+                  <label className="text-xs font-black text-slate-300 uppercase tracking-widest block">
+                    Choose Avatar Icon
+                  </label>
+                  <div className="grid grid-cols-5 gap-3 max-w-sm">
+                    {AVATAR_OPTIONS.map((av) => {
+                      const isSelected = avatarUrl === av.url;
                       return (
-                        <div key={plan.id} className="flex-1 min-w-[320px] rounded-3xl border-2 border-red-600/70 bg-gradient-to-b from-[#180407]/98 via-[#0e0204]/98 to-[#050102]/99 shadow-[0_20px_70px_rgba(229,9,20,0.35)] flex flex-col justify-between overflow-hidden relative transition-all duration-300 hover:border-red-500 hover:shadow-[0_25px_85px_rgba(229,9,20,0.55)] hover:-translate-y-1">
-                          {/* Ambient Crimson Halo */}
-                          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-red-600/20 blur-3xl pointer-events-none" />
-
-                          {/* Card Head (Netflix Crimson Banner) */}
-                          <div className="p-6 sm:p-7 bg-gradient-to-r from-[#200307] via-[#8f0910] to-[#e50914] text-white relative border-b border-red-500/30">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-[10px] font-black tracking-widest uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-red-100 border border-red-400/40 flex items-center gap-1.5 shadow-sm">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-                                TOP TIER • ULTIMATE
-                              </span>
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-red-100 text-xs font-black shadow-sm">
-                                <Sparkles className="w-3.5 h-3.5 text-red-300" /> {plan.durationDays}-Day Pass
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2.5 mt-1.5">
-                              <div className="px-2.5 py-0.5 rounded-full bg-[#180305] border border-red-500/60 text-red-100 text-[10px] font-black uppercase tracking-wider shadow-sm">
-                                Ultra
-                              </div>
-                              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-md">{plan.name}</h3>
-                            </div>
-                            <p className="text-xs text-red-100/90 mt-1 font-medium">{plan.description}</p>
-                          </div>
-
-                          {/* Features Comparison Rows */}
-                          <div className="p-6 space-y-3.5 flex-1 text-sm divide-y divide-red-600/20">
-                            <div className="flex justify-between items-center pt-1">
-                              <span className="text-slate-300 font-medium">Monthly price</span>
-                              <div className="text-right">
-                                {canUpgradeFor200 ? (
-                                  <>
-                                    <div className="flex items-baseline justify-end gap-1.5">
-                                      <span className="text-xs line-through text-slate-500 font-mono">₹499</span>
-                                      <span className="text-2xl font-black text-red-400 font-mono">₹200</span>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-red-400 block uppercase tracking-wider">
-                                      {isComplimentary ? "Lifetime Pro Credit Applied" : "Pro Tier Upgrade Rate"}
-                                    </span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <span className="text-2xl font-black text-red-400 font-mono">₹{plan.price}</span>
-                                    <span className="text-xs text-slate-400 block">/ {plan.durationDays} days</span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                            {plan.benefits?.map((benefit: string, i: number) => {
-                              const parts = benefit.split(":");
-                              const label = parts.length > 1 ? parts[0].trim() : benefit;
-                              const val = parts.length > 1 ? parts.slice(1).join(":").trim() : null;
-
-                              return (
-                                <div key={i} className="flex justify-between items-center pt-3 gap-2">
-                                  <span className="text-slate-300 font-medium text-xs sm:text-sm">{label}</span>
-                                  <div className="font-bold text-white flex items-center gap-1.5 shrink-0 text-right text-xs sm:text-sm">
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                                    <span>{val || label}</span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {/* Card CTA */}
-                          <div className="p-6 pt-0 mt-auto">
-                            {isStudentCurrentlyUltra ? (
-                              <div className="w-full py-4 rounded-xl bg-red-950/60 border border-red-600/60 text-red-200 font-black text-xs uppercase tracking-wider text-center select-none flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,9,20,0.35)]">
-                                <Check className="w-4 h-4 text-red-400" />
-                                <span>Enrolled (Active Ultra Pass)</span>
-                              </div>
-                            ) : (
-                              <div className="space-y-1.5">
-                                <button
-                                  onClick={() => handleSelectPlanToCheckout(plan)}
-                                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#e50914] via-[#b81d24] to-[#990a12] hover:from-[#f40612] hover:to-[#b81d24] text-white font-black text-sm tracking-wider uppercase shadow-[0_0_40px_rgba(229,9,20,0.55)] transition cursor-pointer flex items-center justify-center gap-2"
-                                >
-                                  <span>UPGRADE TO {plan.name.toUpperCase()} (₹{ultraPayable})</span>
-                                  <ChevronRight className="w-4 h-4" />
-                                </button>
-                                {canUpgradeFor200 && (
-                                  <p className="text-[10px] text-center text-slate-400 leading-tight">
-                                    {isComplimentary 
-                                      ? "30 days of Ultra. Reverts to lifetime Complimentary PIE Pro afterward."
-                                      : "30 days of Ultra. Reverts to Basic if not renewed afterward."}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        <button
+                          key={av.id}
+                          type="button"
+                          onClick={() => setAvatarUrl(av.url)}
+                          className={`relative rounded-2xl overflow-hidden aspect-square border-2 transition-all duration-200 cursor-pointer ${
+                            isSelected
+                              ? "border-cyan-400 ring-2 ring-cyan-500/60 scale-105 shadow-[0_0_20px_rgba(6,182,212,0.6)]"
+                              : "border-white/10 hover:border-cyan-500/40 opacity-70 hover:opacity-100 bg-black/40"
+                          }`}
+                          title={av.name}
+                        >
+                          <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
+                          {isSelected && (
+                            <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-cyan-400 text-slate-950 rounded-full flex items-center justify-center text-[10px] font-black shadow-md">
+                              ✓
+                            </span>
+                          )}
+                        </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Footer Assurance Banner */}
-                <div className="text-center pt-2 space-y-2 text-xs text-slate-400 max-w-2xl mx-auto">
-                  <p className="flex items-center justify-center gap-1.5 font-medium">
-                    <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
-                    Instant activation upon PhonePe, Google Pay, or Paytm UPI verification.
-                  </p>
-                  <p>
-                    Have a promo voucher?{" "}
-                    <button
-                      onClick={() => {
-                        setPromoMsg(null);
-                        setPromoCodeInput("");
-                        openModal("promo");
-                      }}
-                      className="text-cyan-400 underline hover:text-cyan-300 font-semibold cursor-pointer"
-                    >
-                      Redeem gift or promo code
-                    </button>
-                  </p>
-                </div>
-
-                  </>
-                )}
-              </div>
-            )}
-
-      </main>
-      {/* 3. INSTANT UPI QR CODE MODAL (PREMIUM SAAS THEME) */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-[100] bg-[#06101a] text-slate-200 overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
-          
-          {/* Subtle Atmospheric Background Gradients */}
-          <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-cyan-900/10 rounded-full blur-[120px] pointer-events-none" />
-          <div className="fixed bottom-0 right-1/4 w-[400px] h-[400px] bg-violet-900/10 rounded-full blur-[100px] pointer-events-none" />
-
-          {/* Top Navbar */}
-          <header className="sticky top-0 z-40 bg-[#06101a]/80 backdrop-blur-xl border-b border-slate-800/80">
-            <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-[60px] flex items-center justify-between gap-3">
-              
-              {/* Left: Brand Identity */}
-              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="sm" theme="dark" href="/dashboard" isGoldMember={isGold} planTier={effectivePlanTier} />
-              </div>
-
-              {/* Right: Close & Secure */}
-              <div className="flex items-center gap-4">
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-widest border border-emerald-500/20">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Secure Checkout
-                </span>
-                <button
-                  onClick={() => setShowPaymentModal(false)}
-                  className="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-            </div>
-          </header>
-
-          {/* Full Screen Main Content */}
-          <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-10 items-start">
-              
-              {/* LEFT COLUMN: PAYMENT STEPS */}
-              <div className="space-y-6 order-last lg:order-first">
-
-
-            {/* State: INPUT STEP */}
-            {paymentStep === "input" && (
-              <div className="space-y-6">
-                
-                <div className="space-y-1.5">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Payment Method</h2>
-                  <p className="text-sm text-slate-400">Complete your payment securely using UPI.</p>
-                </div>
-                
-                <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 shadow-sm space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   
-                  {/* Board and Class Selection */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Board</label>
-                      <select 
-                        value={purchasedBoard}
-                        onChange={(e) => {
-                          setPurchasedBoard(e.target.value);
-                          if (e.target.value === "WBCHSE") setPurchasedClass("SEM-I");
-                          else setPurchasedClass("11");
-                        }}
-                        className="w-full bg-[#111a27] text-white rounded-xl px-4 py-3 text-sm font-medium border border-slate-700 outline-none focus:border-cyan-500/80"
-                      >
-                        <option value="CBSE">CBSE</option>
-                        <option value="ICSE">ICSE</option>
-                        <option value="WBCHSE">WBCHSE</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Class</label>
-                      <select 
-                        value={purchasedClass}
-                        onChange={(e) => setPurchasedClass(e.target.value)}
-                        className="w-full bg-[#111a27] text-white rounded-xl px-4 py-3 text-sm font-medium border border-slate-700 outline-none focus:border-cyan-500/80"
-                      >
-                        {purchasedBoard === "WBCHSE" ? (
-                          <>
-                            <option value="SEM-I">Semester I</option>
-                            <option value="SEM-II">Semester II</option>
-                            <option value="SEM-III">Semester III</option>
-                            <option value="SEM-IV">Semester IV</option>
-                          </>
-                        ) : (
-                          <>
-                            <option value="11">Class 11</option>
-                            <option value="12">Class 12</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* UPI ID Input Field */}
-                  <div className="space-y-2.5">
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                      <span>UPI ID / VPA</span>
+                  {/* Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Student Name
                     </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={studentUpiId}
-                        onChange={(e) => {
-                          setStudentUpiId(e.target.value.trim().toLowerCase());
-                          if (upgradeMsg) setUpgradeMsg(null);
-                        }}
-                        placeholder="e.g. mobile@upi or name@okbank"
-                        className={"w-full bg-[#111a27] text-white rounded-xl px-4 py-3.5 text-base font-mono outline-none transition border focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/80 " + (
-                          studentUpiId.trim()
-                            ? isValidUpiId(studentUpiId)
-                              ? "border-emerald-500/40"
-                              : "border-rose-500/40"
-                            : "border-slate-700"
-                        )}
-                      />
-                      {studentUpiId.trim().length > 0 && (
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">
-                          {isValidUpiId(studentUpiId) ? (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                          ) : (
-                            <AlertCircle className="w-5 h-5 text-rose-500" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Quick Handle Completion Pills */}
-                    <div className="pt-2">
-                      <div className="text-[11px] text-slate-500 font-medium mb-2">Popular handles</div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {POPULAR_UPI_HANDLES.map((handle) => (
-                          <button
-                            key={handle}
-                            type="button"
-                            onClick={() => {
-                              const base = studentUpiId.includes("@") ? studentUpiId.split("@")[0] : studentUpiId;
-                              setStudentUpiId((base || "") + handle);
-                              if (upgradeMsg) setUpgradeMsg(null);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-[#111a27] border border-slate-800 text-slate-300 text-xs font-mono hover:bg-slate-800 hover:text-white transition cursor-pointer"
-                          >
-                            {handle}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                      className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition"
+                    />
                   </div>
 
-                  {upgradeMsg && (
-                    <div className={"p-3.5 rounded-xl text-sm font-medium flex items-center gap-2 border " + (
-                      upgradeMsg.type === "success"
-                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                        : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-                    )}>
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{upgradeMsg.text}</span>
-                    </div>
-                  )}
+                  {/* Phone */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="10-digit mobile number"
+                      className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white font-mono outline-none transition"
+                    />
+                  </div>
 
-                  <div className="pt-2 border-t border-slate-800">
-                    <button
-                      type="button"
-                      onClick={handleProceedClick}
-                      disabled={requestingUpgrade || !studentUpiId.trim() || !isValidUpiId(studentUpiId)}
-                      className="w-full h-14 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                  {/* Email (Read-only) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Registered Email (Read-only)
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      disabled
+                      className="w-full bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3 text-sm text-slate-400 font-mono cursor-not-allowed select-none"
+                    />
+                  </div>
+
+                  {/* Gender */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Gender
+                    </label>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
                     >
-                      <span>Continue to Payment</span>
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* State: NOTICE STEP */}
-            {paymentStep === "notice" && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                
-                <div className="space-y-1.5">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Confirm Payment & Upgrade</h2>
-                  <p className="text-sm text-slate-400">Review your plan selection before generating your secure UPI QR.</p>
-                </div>
-                
-                <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 shadow-sm space-y-6">
-                  
-                  {/* Payment Details Recap */}
-                  <div className="space-y-4 text-sm">
-                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Selected Tier</span>
-                      <div className="flex items-center gap-2">
-                        {isCheckoutUltra ? (
-                          <div className="px-2 py-0.5 rounded-full bg-[#160406] border border-red-600/60 text-red-100 text-[10px] font-bold">
-                            Ultra
-                          </div>
-                        ) : (
-                          <div className="px-2 py-0.5 rounded-full bg-[#0b162c] border border-blue-500/50 text-blue-100 text-[10px] font-bold">
-                            Pro
-                          </div>
-                        )}
-                        <span className="font-bold text-white">{activePlanName} — 30 Days</span>
-                      </div>
-                    </div>
-
-                    {selectedCheckoutPlan?.isComplimentaryUpgrade && (
-                      <div className="flex justify-between items-center py-2 border-b border-slate-800 text-xs">
-                        <span className="text-emerald-400">Lifetime Complimentary Pro Credit</span>
-                        <span className="font-bold font-mono text-emerald-400">-₹299.00</span>
-                      </div>
-                    )}
-
-                    {selectedCheckoutPlan?.isUpgrade && !selectedCheckoutPlan?.isComplimentaryUpgrade && (
-                      <div className="flex justify-between items-center py-2 border-b border-slate-800 text-xs">
-                        <span className="text-cyan-400">Pro Tier Upgrade Adjustment</span>
-                        <span className="font-bold font-mono text-cyan-400">-₹299.00</span>
-                      </div>
-                    )}
-
-                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Amount Payable</span>
-                      <span className="font-bold text-amber-400 font-mono text-lg">₹{activePayable}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-slate-800">
-                      <span className="text-slate-400">Payer UPI ID</span>
-                      <span className="font-mono font-medium text-white">{studentUpiId}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-slate-400">Verification Timeline</span>
-                      <span className="text-slate-300">Instant upon UTR match or up to 24h</span>
-                    </div>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Others">Others</option>
+                    </select>
                   </div>
 
-                  {selectedCheckoutPlan?.isComplimentaryUpgrade && (
-                    <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs leading-relaxed">
-                      💡 <strong>Complimentary VIP Protection:</strong> After 30 days of PIE Ultra, your account will safely revert back to your infinite lifetime Complimentary PIE Pro access.
-                    </div>
-                  )}
+                  {/* Date of Birth */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Date of Birth
+                    </label>
+                    <input
+                      type="date"
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)}
+                      className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition cursor-pointer"
+                    />
+                  </div>
 
-                  {/* Actions */}
-                  <div className="space-y-3 pt-4 border-t border-slate-800">
-                    <button
-                      type="button"
-                      onClick={handleSendUpgradeRequest}
-                      disabled={requestingUpgrade}
-                      className="w-full h-14 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-amber-950 font-black text-sm uppercase tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-                    >
-                      <span>{requestingUpgrade ? "Initiating..." : `Proceed to Pay ₹${activePayable}`}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPaymentStep("input");
-                        setUpgradeMsg(null);
+                  {/* Board */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Education Board
+                    </label>
+                    <select
+                      value={board}
+                      onChange={(e) => {
+                        const newBoard = e.target.value;
+                        setBoard(newBoard);
+                        if (newBoard === "WBCHSE") {
+                          setAcademicLevel("SEM-I");
+                        } else {
+                          setAcademicLevel("11");
+                        }
                       }}
-                      className="w-full py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer text-center"
+                      className="w-full bg-[#030712]/90 border border-white/10 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm font-bold text-cyan-300 outline-none transition cursor-pointer"
                     >
-                      Change UPI ID / Board
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* State: WAITING / PAYMENT OPTIONS STEP */}
-            {paymentStep === "waiting" && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                
-                <div className="space-y-1.5">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Complete Payment</h2>
-                  <p className="text-sm text-slate-400">Scan or tap to securely pay the exact subscription amount.</p>
-                </div>
-
-                <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 shadow-sm space-y-6">
-                  
-                  {/* Status Banner */}
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#111a27] border border-slate-800/80">
-                    <div>
-                      <span className="text-xs text-slate-400 block font-medium mb-0.5">Payer UPI ID</span>
-                      <span className="text-sm font-semibold text-white font-mono flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        {studentUpiId}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs text-slate-400 block font-medium mb-0.5">Exact Amount</span>
-                      <span className="text-2xl font-black text-amber-400 font-mono">
-                        ₹{activePayable}
-                      </span>
-                    </div>
+                      <option value="CBSE">CBSE</option>
+                      <option value="ICSE">ICSE</option>
+                      <option value="WBCHSE">WBCHSE</option>
+                    </select>
                   </div>
 
-                  {/* Two Payment Options: Responsive Logic */}
-                  <div className="grid grid-cols-1 gap-5">
-                    
-                    {/* OPTION 1: MOBILE APP DIRECT (Only on Mobile) */}
-                    <div className="block md:hidden border border-slate-800 rounded-xl p-5 space-y-4 bg-[#0d1624]">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-bold text-white flex items-center gap-2">
-                          <MonitorSmartphone className="w-4 h-4 text-slate-400" />
-                          Pay via Mobile UPI App
-                        </div>
-                        <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                          Recommended
-                        </span>
-                      </div>
-                      
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        Tap below to launch GPay, PhonePe, or Paytm with ₹{activePayable} pre-filled.
-                      </p>
-
-                      <a
-                        href={"upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + activePayable + "&cu=INR&tn=" + encodeURIComponent("PIECHEM " + activePlanName + " - " + (student.name || "Student"))}
-                        className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-amber-950 font-bold text-sm transition-all text-center shadow-lg shadow-amber-500/20"
+                  {/* Academic Level */}
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
+                      {board === "WBCHSE" ? "Semester (WBCHSE Curriculum)" : `Class (${board})`}
+                    </label>
+                    {board === "WBCHSE" ? (
+                      <select
+                        value={academicLevel}
+                        onChange={(e) => setAcademicLevel(e.target.value)}
+                        className="w-full bg-[#030712]/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm font-bold text-cyan-300 outline-none transition cursor-pointer"
                       >
-                        <Sparkles className="w-4 h-4 shrink-0" />
-                        <span>Pay ₹{activePayable} via UPI App</span>
-                      </a>
-                    </div>
-
-                    {/* OPTION 2: COMPUTER BROWSER (DYNAMIC QR) */}
-                    <div className="border border-slate-800 rounded-xl p-6 text-center space-y-4 bg-[#0d1624]/60">
-                      <div className="flex items-center justify-center gap-2 text-sm font-bold text-white mb-1">
-                        <Monitor className="w-4 h-4 text-slate-400" />
-                        Scan Dynamic UPI QR (₹{activePayable})
-                      </div>
-                      <p className="text-xs text-slate-400">
-                        Scan with any phone UPI app (GPay, PhonePe, Paytm, CRED).
-                      </p>
-
-                      {/* QR Code Container */}
-                      <div className="inline-block p-4 bg-white rounded-2xl shadow-xl border border-slate-200 relative group">
-                        <img
-                          src={"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent("upi://pay?pa=" + (paymentSettings?.upiId || "9830507435@upi") + "&pn=" + encodeURIComponent(paymentSettings?.payeeName || "Arghyadeep Roy") + "&am=" + activePayable + "&cu=INR&tn=" + encodeURIComponent("PIECHEM " + activePlanName + " - " + (student.name || "Student")))}
-                          alt="Dynamic UPI Payment QR"
-                          className="w-44 h-44 mx-auto object-contain"
-                        />
-                        <div className="text-[11px] font-mono font-bold text-slate-700 mt-2 bg-slate-100 py-1 px-2 rounded">
-                          Pay ₹{activePayable} to 9830507435@upi
-                        </div>
-                      </div>
-                    </div>
-
+                        <option value="SEM-I">SEM-I</option>
+                        <option value="SEM-II">SEM-II</option>
+                        <option value="SEM-III">SEM-III</option>
+                        <option value="SEM-IV">SEM-IV</option>
+                      </select>
+                    ) : (
+                      <select
+                        value={academicLevel}
+                        onChange={(e) => setAcademicLevel(e.target.value)}
+                        className="w-full bg-[#030712]/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm font-bold text-cyan-300 outline-none transition cursor-pointer"
+                      >
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                      </select>
+                    )}
                   </div>
-
-                  {/* Student Action: Optional UTR & PAYMENT DONE */}
-                  {!paymentDoneAcknowledged ? (
-                    <div className="pt-4 border-t border-slate-800 text-center space-y-4">
-                      <p className="text-xs text-slate-400">
-                        After transferring in your UPI app, click below to confirm your payment.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentDoneAcknowledged(true);
-                          openModal("payment-done");
-                        }}
-                        className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-                        <span>I have completed the payment (₹{activePayable})</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="pt-4 border-t border-slate-800 space-y-2 animate-in fade-in duration-300">
-                      <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm mb-1">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Payment Confirmation Recorded</span>
-                      </div>
-                      <p className="text-xs text-slate-300">
-                        Your payment submission has been recorded. Admin verification usually takes up to 24 hours.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => openModal("payment-done")}
-                        className="text-xs text-cyan-400 hover:text-cyan-300 font-medium underline mt-2 block"
-                      >
-                        View confirmation notice
-                      </button>
-                    </div>
-                  )}
-
-                </div>
-              </div>
-            )}
-
-            {/* State: SUCCESS / CONFIRMED STEP */}
-            {paymentStep === "success" && (
-              <div className="bg-[#0b131e] border border-emerald-500/30 p-8 rounded-3xl text-center shadow-sm animate-in zoom-in-95 duration-300 mt-10">
-                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center mb-6">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                 </div>
 
-                <div className="space-y-2 mb-8">
-                  <h3 className="text-2xl font-bold text-white">Payment Verified</h3>
-                  <p className="text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
-                    Your ₹{activePayable} payment has been confirmed. All {activePlanName} features and analytics are now active!
-                  </p>
-                </div>
-
-                <div className="max-w-xs mx-auto">
+                <div className="flex justify-end pt-3 border-t border-white/10">
                   <button
-                    type="button"
-                    onClick={() => {
-                      setShowPaymentModal(false);
-                      setPaymentStep("input");
-                      window.location.reload();
-                    }}
-                    className="w-full h-12 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold text-sm transition-colors cursor-pointer"
+                    type="submit"
+                    disabled={profileLoading}
+                    className="px-8 py-3.5 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-600 hover:brightness-110 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-[0_0_25px_rgba(6,182,212,0.4)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                   >
-                    Return to Dashboard
+                    {profileLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                    <span>{profileLoading ? "Saving..." : "Save Profile Details"}</span>
                   </button>
                 </div>
-              </div>
-            )}
-              </div>
 
-              {/* RIGHT COLUMN: ORDER SUMMARY */}
-              <div className="order-first lg:order-last space-y-6 lg:sticky lg:top-24">
-                {/* Plan & Pricing Box */}
-                <div className={"border rounded-2xl p-6 shadow-xl relative overflow-hidden " + (
-                  isCheckoutUltra 
-                    ? "bg-gradient-to-b from-[#180407] to-[#0b0203] border-red-600/50 shadow-[0_0_40px_rgba(229,9,20,0.25)]" 
-                    : "bg-gradient-to-b from-[#08152e] to-[#040914] border-blue-500/50 shadow-[0_0_40px_rgba(37,99,235,0.2)]"
-                )}>
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        {isCheckoutUltra ? (
-                          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-red-100 uppercase tracking-widest bg-[#160406] border border-red-600/60 px-2.5 py-1 rounded-full shadow-sm">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                            Ultra All-Access Pass
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-100 uppercase tracking-widest bg-[#0b162c] border border-blue-500/50 px-2.5 py-1 rounded-full shadow-sm">
-                            <Sparkles className="w-3 h-3 text-blue-400" />
-                            Pro All-Access Pass
-                          </div>
-                        )}
-                        <span className="text-xs text-slate-400 font-mono">30 Days</span>
-                      </div>
+              </form>
 
-                      <h3 className="text-xl font-black text-white tracking-tight">{activePlanName}</h3>
-                      <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                        {isCheckoutUltra 
-                          ? "Unlimited Chemistry Exams, Unlimited PIE AI queries, 3D Molecular Models, Full Solutions & Unlimited Material Downloads with PIE LAB."
-                          : "Full access to Chemistry Exams, 3D Models, 20 AI queries/day & Proctored Percentile Analytics."}
-                      </p>
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-800/80 space-y-2">
-                      {selectedCheckoutPlan?.isComplimentaryUpgrade ? (
-                        <>
-                          <div className="flex justify-between items-center text-xs text-slate-400">
-                            <span>Standard 30-Day Rate</span>
-                            <span className="line-through font-mono">₹499.00</span>
-                          </div>
-                          <div className="flex justify-between items-center text-xs text-emerald-400 font-semibold">
-                            <span>Complimentary Pro Credit</span>
-                            <span className="font-mono">-₹299.00</span>
-                          </div>
-                          <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline">
-                            <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Payable</span>
-                            <div className="text-right">
-                              <span className="text-3xl font-black text-red-400 font-mono tracking-tight">₹200</span>
-                              <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
-                            </div>
-                          </div>
-                        </>
-                      ) : selectedCheckoutPlan?.isUpgrade ? (
-                        <>
-                          <div className="flex justify-between items-center text-xs text-slate-400">
-                            <span>Standard 30-Day Rate</span>
-                            <span className="line-through font-mono">₹499.00</span>
-                          </div>
-                          <div className="flex justify-between items-center text-xs text-cyan-400 font-semibold">
-                            <span>Pro Member Upgrade Credit</span>
-                            <span className="font-mono">-₹299.00</span>
-                          </div>
-                          <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline">
-                            <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Payable</span>
-                            <div className="text-right">
-                              <span className="text-3xl font-black text-red-400 font-mono tracking-tight">₹200</span>
-                              <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex justify-between items-baseline">
-                          <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Payable</span>
-                          <div className="text-right">
-                            <span className="text-3xl font-black text-amber-400 font-mono tracking-tight">₹{activePayable}</span>
-                            <span className="text-xs text-slate-400 block font-normal">/ 30 Days</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Support Contact */}
-                <div className="pt-2 text-xs text-slate-500 text-center">
-                  <span>Need assistance? Contact Support: </span>
-                  <a href="tel:9830507435" className="font-mono font-medium text-slate-300 hover:text-white transition-colors block mt-1">
-                    9830507435
-                  </a>
-                </div>
-              </div>
             </div>
-          </main>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* 3.1 PAYMENT DONE CONFIRMATION DIALOG (PREMIUM SAAS THEME) */}
-      {showPaymentDoneDialog && (
-        <div className="fixed inset-0 z-[100] bg-[#06101a] text-slate-200 overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
-          
-          <header className="sticky top-0 z-40 bg-[#06101a]/80 backdrop-blur-xl border-b border-slate-800/80">
-            <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] flex items-center justify-between gap-3">
-              <div className="flex items-center min-w-0">
-                <PiechemLogo size="sm" theme="dark" href="/dashboard" isGoldMember={isGold} planTier={effectivePlanTier} />
-              </div>
-              <span className="text-xs font-semibold text-slate-400">Confirmation</span>
-            </div>
-          </header>
-
-          <main className="flex-1 w-full max-w-lg mx-auto px-4 sm:px-8 py-12 flex flex-col items-center justify-center text-center">
-            
-            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400" />
-            </div>
-
-            <div className="space-y-2 mb-8">
-              <h3 className="text-2xl font-bold text-white tracking-tight">Payment Submitted</h3>
-              <p className="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto">
-                Your payment is currently awaiting administrative confirmation. This process may take up to 24 hours.
-              </p>
-            </div>
-
-            <div className="w-full bg-[#0b131e] border border-slate-800 rounded-xl p-6 text-left space-y-4 mb-6">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-400">Payer UPI ID</span>
-                <span className="font-mono font-medium text-white">{studentUpiId || rawPayerUpi}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-400">Status</span>
-                <span className="font-medium text-amber-400">Awaiting Confirmation</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-400">Review Window</span>
-                <span className="font-medium text-slate-200">Up to 24 Hours</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleCloseModal("change-plan")}
-              className="w-full h-12 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold text-sm transition-colors cursor-pointer"
-            >
-              Return to Account
-            </button>
-
-          </main>
-        </div>
-      )}
-
-      {/* 5. REDEEM GIFT OR PROMO CODE MODAL */}
-      {showPromoModal && (
-        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
-          
-          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+        {/* ========================================================= */}
+        {/* VIEW 3: SECURITY & PASSWORD TAB                           */}
+        {/* ========================================================= */}
+        {activeTab === "security" && (
+          <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
+            <div className="rounded-3xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-black border border-cyan-500/30 shadow-2xl p-6 sm:p-8 space-y-6">
               
-              {/* Left: Brand Identity & Designer Attribution */}
-              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} planTier={effectivePlanTier} />
+              <div className="border-b border-white/10 pb-4">
+                <h2 className="text-xl font-bold text-white">Security &amp; Password</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Update your account password with email verification to protect your test records.
+                </p>
               </div>
 
-              {/* Right: Promo Voucher Badge */}
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-black uppercase tracking-wider shadow-sm">
-                  <Tag className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Promo Voucher</span>
-                </span>
+              {/* Email OTP Verification Section */}
+              <div className="bg-slate-950/80 p-4 sm:p-5 rounded-2xl border border-cyan-500/30 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider">
+                      Email OTP Verification Required
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      To change your password, send a 6-digit verification code to <strong className="text-white font-mono">{email}</strong>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSendPasswordOtp}
+                    disabled={sendingOtp || resendCooldown > 0}
+                    className="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 hover:text-white rounded-xl text-xs font-bold transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+                  >
+                    {sendingOtp ? "Sending Code..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Send Email OTP"}
+                  </button>
+                </div>
+
+                {otpSentMsg && (
+                  <div className="p-3 rounded-xl bg-green-950/80 border border-green-600/50 text-green-300 text-xs font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+                    <span>{otpSentMsg}</span>
+                  </div>
+                )}
               </div>
 
-            </div>
-          </header>
-
-          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-8 py-10 flex flex-col justify-center space-y-6 my-auto">
-            
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-full bg-[#0b131e] border border-slate-800 flex items-center justify-center text-slate-400">
-                <Tag className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-white tracking-tight">
-                Apply Voucher or Promo Code
-              </h3>
-              <p className="text-sm text-slate-400">
-                Enter your voucher or discount code provided by administration.
-              </p>
-            </div>
-
-            <div className="bg-[#0b131e] p-6 rounded-2xl border border-slate-800 space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Voucher / Promo Code:
-                </label>
-                <input
-                  type="text"
-                  value={promoCodeInput}
-                  onChange={(e) => {
-                    setPromoCodeInput(e.target.value.toUpperCase());
-                    if (promoMsg) setPromoMsg(null);
-                  }}
-                  placeholder="e.g. PIECHEM2026 or GOLD30"
-                  className="w-full bg-[#111a27] text-white rounded-xl px-5 py-4 text-base font-mono tracking-widest outline-none transition border border-slate-700 focus:border-slate-500 uppercase"
-                />
-              </div>
-
-              {promoMsg && (
-                <div className={"p-4 rounded-xl text-sm font-medium flex items-center gap-2 border " + (
-                  promoMsg.type === "success"
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                    : "bg-red-500/10 border-red-500/20 text-red-400"
-                )}>
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{promoMsg.text}</span>
+              {passMsg && (
+                <div className={`p-4 rounded-xl text-xs font-semibold flex items-center gap-3 border ${
+                  passMsg.type === "success"
+                    ? "bg-green-950/80 border-green-600/60 text-green-300"
+                    : "bg-red-950/80 border-red-600/60 text-red-300"
+                }`}>
+                  {passMsg.type === "success" ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  )}
+                  <span>{passMsg.text}</span>
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (!promoCodeInput.trim()) {
-                    setPromoMsg({ type: "error", text: "Please enter a voucher or promo code." });
-                    return;
-                  }
-                  setPromoMsg({ type: "error", text: "Invalid or expired promo code. Please check with administrator." });
-                }}
-                className="w-full h-14 rounded-xl bg-slate-100 hover:bg-white text-slate-900 font-bold text-sm transition-colors cursor-pointer"
-              >
-                Apply Code
-              </button>
-            </div>
+              <form onSubmit={handlePasswordChange} className="space-y-5">
+                
+                {/* OTP Input */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
+                    <span>Verification OTP *</span>
+                    <span className="text-[11px] text-slate-500 font-normal">6 digits</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={passwordOtp}
+                    onChange={(e) => setPasswordOtp(e.target.value)}
+                    placeholder="Enter 6-digit code"
+                    className="w-full bg-slate-950/90 border border-cyan-500/40 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white font-mono tracking-wider outline-none transition"
+                  />
+                </div>
 
-          </main>
-        </div>
-      )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* New Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      New Password *
+                    </label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition"
+                    />
+                  </div>
 
-      {/* 6. PAYMENT HISTORY MODAL (NETFLIX STYLE) */}
-      {showHistoryModal && (
-        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
-          
-          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-              
-              {/* Left: Brand Identity & Designer Attribution */}
-              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} planTier={effectivePlanTier} />
-              </div>
-
-              {/* Right: Payment History Badge */}
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-black uppercase tracking-wider shadow-sm">
-                  <Receipt className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Payment History</span>
-                </span>
-              </div>
-
-            </div>
-          </header>
-
-          <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-6">
-            
-            <div className="bg-[#0b131e] rounded-2xl border border-slate-800 overflow-hidden shadow-sm p-4 sm:p-6">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
-                      <th className="pb-4 px-4">Date</th>
-                      <th className="pb-4 px-4">Description</th>
-                      <th className="pb-4 px-4">Payer UPI ID</th>
-                      <th className="pb-4 px-4">Amount</th>
-                      <th className="pb-4 px-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/50">
-                    {allUpgradeReqs && allUpgradeReqs.length > 0 ? (
-                      allUpgradeReqs.map((req: any) => (
-                        <tr key={req.id} className="hover:bg-[#111a27] transition-colors">
-                          <td className="py-4 px-4 text-slate-300 font-mono text-xs">
-                            {formatDateTime24(req.createdAt)}
-                          </td>
-                          <td className="py-4 px-4 text-white font-medium">
-                            {getRequestPlanName(req)}
-                          </td>
-                          <td className="py-4 px-4 text-slate-400 font-mono text-xs">
-                            {req.utrNumber || "-"}
-                          </td>
-                          <td className="py-4 px-4 text-amber-500 font-bold font-mono">
-                            ₹{req.amount || paymentSettings?.monthlyFee || 199}
-                          </td>
-                          <td className="py-4 px-4">
-                            <span className={"inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold " + (
-                              req.status === "APPROVED"
-                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                : req.status === "PENDING"
-                                ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                : "bg-red-500/10 text-red-400 border border-red-500/20"
-                            )}>
-                              {req.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-12 text-center text-slate-500 text-sm">
-                          No previous payment records found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-400 px-1">
-              We only show 24 months of payment history
-            </p>
-
-          </main>
-        </div>
-      )}
-
-      {/* 4. HIGHEST ENROLLED PLAN MODAL */}
-      {showHighestPlanModal && (
-        <div className="fixed inset-0 z-[100] bg-[#030910]/95 backdrop-blur-3xl text-white overflow-y-auto no-scrollbar flex flex-col animate-in fade-in duration-300">
-          
-          {/* Top Navbar - Piechem Logo at Far Left Visible as Always, Back & Close Terminated */}
-          <header className="sticky top-0 z-40 bg-[#030910]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-            <div className="w-full px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-              
-              {/* Left: Brand Identity & Designer Attribution */}
-              <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
-                <PiechemLogo size="md" theme="dark" href="/dashboard" isGoldMember={isGold} planTier={effectivePlanTier} />
-              </div>
-
-              {/* Right: Top Tier Badge */}
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Top Tier Enrolled</span>
-                </span>
-              </div>
-
-            </div>
-          </header>
-
-          <main className="flex-1 w-full max-w-xl mx-auto px-4 sm:px-6 py-12 flex flex-col items-center justify-center text-center my-auto relative">
-            
-            {/* Ambient Background Glow behind card */}
-            <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-tr from-red-600/20 via-amber-500/15 to-transparent blur-[120px]" />
-
-            {/* Premium Card Frame */}
-            <div className="relative w-full rounded-3xl bg-gradient-to-b from-[#121824]/90 via-[#0a0f18]/95 to-[#05080f]/98 border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.85)] p-6 sm:p-9 space-y-7 backdrop-blur-2xl">
-              
-              {/* Emblem / Crown Badge */}
-              <div className="relative mx-auto flex items-center justify-center w-20 h-20">
-                <div className="absolute inset-0 rounded-2xl rotate-45 bg-gradient-to-tr from-amber-500/40 via-red-500/30 to-amber-300/20 blur-md animate-pulse" />
-                <div className="relative w-full h-full rounded-2xl rotate-45 flex items-center justify-center bg-gradient-to-b from-[#221808] to-[#0c0802] border border-amber-400/50 shadow-[0_0_25px_rgba(245,158,11,0.35)]">
-                  <div className="-rotate-45">
-                    <Sparkles className="w-9 h-9 text-amber-300 fill-amber-400/30 drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]" />
+                  {/* Confirm Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
+                      <span>Confirm New Password *</span>
+                      {confirmPassword && (
+                        <span className={`text-[11px] font-bold ${newPassword === confirmPassword ? "text-emerald-400" : "text-red-400"}`}>
+                          {newPassword === confirmPassword ? "✓ Match" : "✗ Mismatch"}
+                        </span>
+                      )}
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Repeat new password"
+                      className="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-3 text-sm text-white outline-none transition"
+                    />
                   </div>
                 </div>
-              </div>
 
-              {/* Top Tier Badge & Heading */}
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-950/80 border border-amber-400/40 text-amber-300 text-[11px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span>Top Tier Enrolled</span>
-                </div>
-
-                <h3 className="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
-                  Highest Plan Active
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed max-w-md mx-auto font-normal">
-                  You are currently enrolled in the highest possible tier on <span className="text-white font-bold">PIECHEM</span>. All premium resources and exam simulators are fully unlocked for you.
-                </p>
-              </div>
-
-              {/* Current Plan Card Display */}
-              <div className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 sm:p-6 text-left space-y-3.5 shadow-inner backdrop-blur-md relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400 uppercase font-black tracking-wider">Active Membership</span>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/40">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                {/* Password Policy Checklist */}
+                <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Security Requirements:
                   </span>
-                </div>
-                
-                <div className="flex items-center gap-2.5 pt-0.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                    <div className={`flex items-center gap-1.5 ${reqLength ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqLength ? "✓" : "○"}</span> 8+ Characters
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${reqUpper ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqUpper ? "✓" : "○"}</span> 1 Uppercase (A-Z)
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${reqLower ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqLower ? "✓" : "○"}</span> 1 Lowercase (a-z)
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${reqNumber ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqNumber ? "✓" : "○"}</span> 1 Number (0-9)
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${reqSpecial ? "text-emerald-400 font-bold" : "text-slate-500"}`}>
+                      <span>{reqSpecial ? "✓" : "○"}</span> 1 Special Char
+                    </div>
                   </div>
-                  <span className="text-xl font-black text-white tracking-tight">
-                    {effectivePlanTier === "ultra" ? "PIE Ultra" : isComplimentary ? "PIE Pro (Lifetime Complimentary)" : "PIE Pro"}
-                  </span>
                 </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed font-light pt-1">
-                  You already have full, unrestricted access to all 50+ exams, 3D molecular models, step-by-step AI solutions, and national proctored rankings.
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="w-full space-y-3 pt-1">
-                <button
-                  type="button"
-                  onClick={() => handleCloseModal()}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white font-black text-xs uppercase tracking-widest shadow-[0_0_35px_rgba(229,9,20,0.45)] hover:brightness-110 active:scale-98 cursor-pointer transition-all"
-                >
-                  GOT IT, THANK YOU!
-                </button>
-
-                {is30Day && (
+                <div className="flex justify-end pt-2">
                   <button
-                    type="button"
-                    onClick={() => {
-                      openModal("pay");
-                    }}
-                    className="text-xs text-slate-400 hover:text-white transition underline cursor-pointer block mx-auto pt-1"
+                    type="submit"
+                    disabled={passLoading || !passwordOtp || !allReqsMet || newPassword !== confirmPassword}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 text-slate-950 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-[0_0_25px_rgba(6,182,212,0.4)] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    Need to renew or extend your 30-day pass instead?
+                    {passLoading ? "Updating Password..." : "Update Password"}
                   </button>
-                )}
-              </div>
+                </div>
+
+              </form>
 
             </div>
-          </main>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Footer Support */}
-      
-          <GlobalFooter />
+      </main>
+
+      <GlobalFooter />
     </div>
   );
 }

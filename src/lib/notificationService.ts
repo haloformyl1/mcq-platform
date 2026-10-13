@@ -40,7 +40,7 @@ export interface CreateNotificationInput {
 export interface AnnouncementAudienceFilter {
   targetBoard?: string;
   targetAcademicLevel?: string;
-  targetSubscription?: "ALL" | "PAID" | "FREE";
+  targetSubscription?: "ALL" | "PAID" | "FREE" | "ULTRA";
 }
 
 export interface AdminAnnouncementInput {
@@ -480,9 +480,9 @@ function buildAudienceQuery(filter?: AnnouncementAudienceFilter): { sql: string;
   }
 
   // 3. Subscription Status Filter
-  if (targetSub === "PAID") {
-    params.push("PAID", "COMPLIMENTARY");
-    query += ` AND "subscriptionStatus" IN ($${params.length - 1}, $${params.length})`;
+  if (targetSub === "PAID" || targetSub === "ULTRA") {
+    params.push("PAID", "COMPLIMENTARY", "ULTRA");
+    query += ` AND "subscriptionStatus" IN ($${params.length - 2}, $${params.length - 1}, $${params.length})`;
   } else if (targetSub === "FREE") {
     params.push("FREE");
     query += ` AND (COALESCE("subscriptionStatus", 'FREE') = $${params.length})`;
@@ -1112,7 +1112,7 @@ export async function seedContextualNotificationsForStudent(studentId: string) {
   if (!student) return;
 
   const isPaid = student.subscriptionStatus === "PAID";
-  const isComp = Boolean(student.isComplimentary || student.subscriptionStatus === "COMPLIMENTARY");
+  const isComp = Boolean(student.isComplimentary || student.subscriptionStatus === "COMPLIMENTARY" || student.subscriptionStatus === "ULTRA");
   const latestReq = student.upgradeRequests?.[0];
 
   if (latestReq && latestReq.status === "PENDING") {

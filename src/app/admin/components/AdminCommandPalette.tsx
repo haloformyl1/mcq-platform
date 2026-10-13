@@ -98,20 +98,6 @@ export default function AdminCommandPalette({
       href: "/admin/students",
     },
     {
-      id: "subs",
-      title: "PIE Ultra Subscriptions Review Queue",
-      category: "Navigation",
-      icon: CreditCard,
-      href: "/admin/subscriptions",
-    },
-    {
-      id: "payments",
-      title: "Payment Hub & Plan Manager",
-      category: "Navigation",
-      icon: Wallet,
-      href: "/admin/payments",
-    },
-    {
       id: "notifs",
       title: "Broadcast Notification Center",
       category: "Navigation",
@@ -131,13 +117,6 @@ export default function AdminCommandPalette({
       category: "System Control",
       icon: Shield,
       action: onOpenProctoringModal,
-    },
-    {
-      id: "upi",
-      title: "Configure Live UPI VPA & QR Code",
-      category: "System Control",
-      icon: QrCode,
-      action: onOpenPaymentModal,
     },
     {
       id: "creds",

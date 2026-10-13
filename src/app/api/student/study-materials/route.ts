@@ -30,7 +30,7 @@ export async function GET(req: Request) {
         });
         if (student) {
           studentProfile = { board: student.board, academicLevel: student.academicLevel };
-          const isComp = student.subscriptionStatus === "COMPLIMENTARY";
+          const isComp = student.subscriptionStatus === "COMPLIMENTARY" || student.subscriptionStatus === "ULTRA";
           const isPaid = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > Date.now());
           isSubscribed = isComp || isPaid;
         }

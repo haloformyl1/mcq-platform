@@ -161,11 +161,11 @@ export default function AdminStudents() {
       const res = await fetch(`/api/admin/students/${complimentaryModalStudent.id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscriptionStatus: "COMPLIMENTARY", board, academicLevel })
+        body: JSON.stringify({ subscriptionStatus: "ULTRA", board, academicLevel })
       });
       const resData = await res.json();
       if (res.ok) {
-        setStudents(prev => prev.map(s => s.id === complimentaryModalStudent.id ? { ...s, subscriptionStatus: "COMPLIMENTARY", subscriptionExpiresAt: null, hasActiveUpi: false } : s));
+        setStudents(prev => prev.map(s => s.id === complimentaryModalStudent.id ? { ...s, subscriptionStatus: "ULTRA", subscriptionExpiresAt: null, hasActiveUpi: false } : s));
         setComplimentaryModalStudent(null);
       } else {
         alert(resData.error || "Failed to update subscription");
@@ -259,24 +259,25 @@ export default function AdminStudents() {
                   <div className="pt-2 border-t border-[#333] flex flex-col gap-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-gray-400">Subscription:</span>
-                      {student.hasActiveUpi ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-extrabold bg-blue-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/50">
-                          ⭐ GOLD (UPI)
-                        </span>
-                      ) : (
-                        <select
-                          value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : "FREE"}
-                          onChange={(e) => { const newSub = e.target.value; if (newSub === "COMPLIMENTARY") { setComplimentaryModalStudent(student); } else { handleUpdateSubscription(student.id, newSub); } }}
-                          className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
-                            student.subscriptionStatus === "COMPLIMENTARY"
-                              ? "bg-blue-950 text-blue-300 border-blue-500/60"
-                              : "bg-slate-900 text-slate-400 border-slate-700"
-                          }`}
-                        >
-                          <option value="FREE">FREE</option>
-                          <option value="COMPLIMENTARY">COMPLIMENTARY</option>
-                        </select>
-                      )}
+                      <select
+                        value={student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY" ? "ULTRA" : "FREE"}
+                        onChange={(e) => { 
+                          const newSub = e.target.value; 
+                          if (newSub === "ULTRA") { 
+                            setComplimentaryModalStudent(student); 
+                          } else { 
+                            handleUpdateSubscription(student.id, newSub); 
+                          } 
+                        }}
+                        className={`text-xs font-bold px-2.5 py-1 rounded-lg border outline-none cursor-pointer transition ${
+                          student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY"
+                            ? "bg-gradient-to-r from-red-950 via-[#1c0407] to-black text-red-300 border-red-500/60 shadow-[0_0_12px_rgba(229,9,20,0.3)]"
+                            : "bg-slate-900 text-slate-400 border-slate-700"
+                        }`}
+                      >
+                        <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE</option>
+                        <option value="ULTRA" className="bg-red-950 text-red-300 font-bold">⚡ PIE ULTRA</option>
+                      </select>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-gray-400">
@@ -330,28 +331,25 @@ export default function AdminStudents() {
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      {student.hasActiveUpi ? (
-                        <div 
-                          className="inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-950 via-cyan-950 to-black px-2.5 py-1.5 rounded-lg border border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.35)] text-cyan-300 text-xs font-bold cursor-not-allowed select-none"
-                          title={`Locked: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(student.subscriptionExpiresAt)}. Automatically reverts to FREE after expiry, after which admin can edit.`}
-                        >
-                          <span className="text-xs">🔒</span>
-                          <span className="font-extrabold tracking-wide">PAID SUBSCRIPTION (UPI)</span>
-                        </div>
-                      ) : (
-                        <select
-                          value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : "FREE"}
-                          onChange={(e) => { const newSub = e.target.value; if (newSub === "COMPLIMENTARY") { setComplimentaryModalStudent(student); } else { handleUpdateSubscription(student.id, newSub); } }}
-                          className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition ${
-                            student.subscriptionStatus === "COMPLIMENTARY"
-                              ? "bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border-blue-500/60 shadow-[0_0_14px_rgba(59,130,246,0.35)]"
-                              : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500"
-                          }`}
-                        >
-                          <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE</option>
-                          <option value="COMPLIMENTARY" className="bg-blue-950 text-blue-300 font-bold">💎 COMPLIMENTARY</option>
-                        </select>
-                      )}
+                      <select
+                        value={student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY" ? "ULTRA" : "FREE"}
+                        onChange={(e) => { 
+                          const newSub = e.target.value; 
+                          if (newSub === "ULTRA") { 
+                            setComplimentaryModalStudent(student); 
+                          } else { 
+                            handleUpdateSubscription(student.id, newSub); 
+                          } 
+                        }}
+                        className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition ${
+                          student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY"
+                            ? "bg-gradient-to-r from-red-950 via-[#1e0508] to-black text-red-300 border-red-500/60 shadow-[0_0_14px_rgba(229,9,20,0.35)]"
+                            : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500"
+                        }`}
+                      >
+                        <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE</option>
+                        <option value="ULTRA" className="bg-red-950 text-red-300 font-bold">⚡ PIE ULTRA</option>
+                      </select>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="text-gray-200">{new Date(student.createdAt).toLocaleDateString()}</div>

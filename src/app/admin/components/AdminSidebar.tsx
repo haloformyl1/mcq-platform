@@ -59,7 +59,16 @@ export default function AdminSidebar({
     return pathname === href || pathname.startsWith(href + "/");
   };
 
-  const navGroups = [
+  const navGroups: {
+    group: string;
+    items: {
+      name: string;
+      href: string;
+      icon: any;
+      badge: string | number | null;
+      badgeColor?: string;
+    }[];
+  }[] = [
     {
       group: "Overview",
       items: [
@@ -101,24 +110,6 @@ export default function AdminSidebar({
       ],
     },
     {
-      group: "PIE Ultra & Commerce",
-      items: [
-        {
-          name: "Subscriptions Queue",
-          href: "/admin/subscriptions",
-          icon: CreditCard,
-          badge: pendingPaymentCount > 0 ? pendingPaymentCount : null,
-          badgeColor: "bg-red-600 text-white shadow-[0_0_8px_rgba(229,9,20,0.6)]",
-        },
-        {
-          name: "Payment Hub",
-          href: "/admin/payments",
-          icon: Wallet,
-          badge: null,
-        },
-      ],
-    },
-    {
       group: "Communications",
       items: [
         {
@@ -144,13 +135,6 @@ export default function AdminSidebar({
       icon: Shield,
       accent: "text-red-400 group-hover:text-red-300",
       description: "Exam anti-cheat rules",
-    },
-    {
-      name: "UPI & QR Settings",
-      action: onOpenPaymentModal,
-      icon: QrCode,
-      accent: "text-emerald-400 group-hover:text-emerald-300",
-      description: "Admin VPA & fee rate",
     },
     {
       name: "Admin Credentials",

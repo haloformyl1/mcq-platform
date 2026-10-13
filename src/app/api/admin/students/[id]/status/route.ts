@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
-import { autoExpireSubscriptions, formatDateTime24 } from "@/lib/subscription";
+import { autoExpireSubscriptions } from "@/lib/subscription";
+import { notifyMembershipActivated } from "@/lib/notificationService";
 
 export const dynamic = 'force-dynamic';
 
@@ -33,45 +34,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     if (subscriptionStatus) {
-      const validStatuses = ["FREE", "COMPLIMENTARY", "PAID"];
-      if (!validStatuses.includes(subscriptionStatus)) {
-        return NextResponse.json({ error: "Invalid subscription status" }, { status: 400 });
+      const normalizedStatus = String(subscriptionStatus).trim().toUpperCase();
+      const validStatuses = ["FREE", "ULTRA", "COMPLIMENTARY"];
+      if (!validStatuses.includes(normalizedStatus)) {
+        return NextResponse.json({ error: "Invalid subscription status. Choose FREE or ULTRA." }, { status: 400 });
       }
 
-      // Check if student has an active paid subscription validated by UPI UTR
-      const currentStudent = await prisma.student.findUnique({
-        where: { id },
-        include: {
-          upgradeRequests: {
-            where: { status: "APPROVED", utrNumber: { not: null } },
-            orderBy: { createdAt: "desc" },
-            take: 1
-          }
-        }
-      });
-
-      const hasActiveUpi = currentStudent?.subscriptionStatus === "PAID" &&
-        currentStudent?.subscriptionExpiresAt &&
-        new Date(currentStudent.subscriptionExpiresAt) > new Date() &&
-        currentStudent.upgradeRequests &&
-        currentStudent.upgradeRequests.length > 0;
-
-      if (hasActiveUpi) {
-        return NextResponse.json({
-          error: `Cannot manually change status: Student has an active paid subscription validated by UPI UTR until ${formatDateTime24(currentStudent.subscriptionExpiresAt)}. It will automatically downgrade to FREE after their 30-day cycle ends.`
-        }, { status: 403 });
-      }
-
-      updateData.subscriptionStatus = subscriptionStatus;
-
-      if (subscriptionStatus === "COMPLIMENTARY") {
-        // Admin Manual Upgrade: Full Premium Access for Free, NEVER EXPIRES!
+      if (normalizedStatus === "ULTRA" || normalizedStatus === "COMPLIMENTARY") {
+        // Admin Privilege: Promote to PIE Ultra (Permanent VIP access until admin revokes)
+        updateData.subscriptionStatus = "ULTRA";
         updateData.isComplimentary = true;
         updateData.subscriptionStartedAt = new Date();
         updateData.subscriptionExpiresAt = null;
         if (board) updateData.board = board;
         if (academicLevel) updateData.academicLevel = academicLevel;
-      } else if (subscriptionStatus === "FREE") {
+      } else if (normalizedStatus === "FREE") {
+        updateData.subscriptionStatus = "FREE";
         updateData.isComplimentary = false;
         updateData.subscriptionStartedAt = null;
         updateData.subscriptionExpiresAt = null;
@@ -82,6 +60,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       where: { id },
       data: updateData
     });
+
+    if (updateData.subscriptionStatus === "ULTRA") {
+      try {
+        await notifyMembershipActivated({
+          studentId: id,
+          planTier: "ultra",
+          isComplimentary: true,
+          expiresAt: null
+        });
+      } catch (notifyErr) {
+        console.error("Failed to send Ultra activation notification:", notifyErr);
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 

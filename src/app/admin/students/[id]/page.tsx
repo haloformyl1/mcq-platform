@@ -262,7 +262,7 @@ export default function AdminStudentDetails() {
       const res = await fetch(`/api/admin/students/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscriptionStatus: "COMPLIMENTARY", board, academicLevel })
+        body: JSON.stringify({ subscriptionStatus: "ULTRA", board, academicLevel })
       });
       const resData = await res.json();
       if (res.ok) {
@@ -550,22 +550,23 @@ export default function AdminStudentDetails() {
             <div className="flex justify-between items-center">
               <span className="text-gray-500">Subscription Plan</span>
               <select
-                value={student.subscriptionStatus === "COMPLIMENTARY" ? "COMPLIMENTARY" : student.subscriptionStatus === "PAID" ? "PAID" : "FREE"}
-                onChange={(e) => { const newSub = e.target.value; if (newSub === 'COMPLIMENTARY') { setComplimentaryModalOpen(true); } else { handleUpdateSubscription(newSub); } }}
-                disabled={student.subscriptionStatus === "PAID" && !!student.subscriptionExpiresAt && new Date(student.subscriptionExpiresAt) > new Date()}
-                className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none transition ${
-                  student.subscriptionStatus === "COMPLIMENTARY"
-                    ? "bg-gradient-to-r from-blue-950 via-blue-900 to-black text-blue-300 border-blue-500/60 shadow-[0_0_14px_rgba(59,130,246,0.35)] cursor-pointer"
-                    : student.subscriptionStatus === "PAID"
-                    ? "bg-gradient-to-r from-blue-950 via-cyan-950 to-black text-cyan-300 border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.35)] cursor-not-allowed"
-                    : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500 cursor-pointer"
+                value={student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY" ? "ULTRA" : "FREE"}
+                onChange={(e) => { 
+                  const newSub = e.target.value; 
+                  if (newSub === 'ULTRA') { 
+                    setComplimentaryModalOpen(true); 
+                  } else { 
+                    handleUpdateSubscription(newSub); 
+                  } 
+                }}
+                className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition ${
+                  student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY"
+                    ? "bg-gradient-to-r from-red-950 via-[#1e0508] to-black text-red-300 border-red-500/60 shadow-[0_0_14px_rgba(229,9,20,0.35)]"
+                    : "bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-500"
                 }`}
               >
                 <option value="FREE" className="bg-slate-900 text-slate-300">🔓 FREE</option>
-                <option value="COMPLIMENTARY" className="bg-blue-950 text-blue-300 font-bold">💎 COMPLIMENTARY</option>
-                {student.subscriptionStatus === "PAID" && (
-                  <option value="PAID" className="bg-cyan-950 text-cyan-300 font-bold">🔒 PAID (UPI)</option>
-                )}
+                <option value="ULTRA" className="bg-red-950 text-red-300 font-bold">⚡ PIE ULTRA</option>
               </select>
             </div>
             <div className="flex justify-between">

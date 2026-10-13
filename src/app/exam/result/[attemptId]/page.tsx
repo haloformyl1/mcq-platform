@@ -70,6 +70,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
         <div className="mcq-panel flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4">
           <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
             <PiechemLogo size="sm" isGoldMember={
+                result?.student?.subscriptionStatus === "ULTRA" ||
                 result?.student?.subscriptionStatus === "COMPLIMENTARY" ||
                 (result?.student?.subscriptionStatus === "PAID" && (!result?.student?.subscriptionExpiresAt || new Date(result.student.subscriptionExpiresAt).getTime() > Date.now()))
               } />

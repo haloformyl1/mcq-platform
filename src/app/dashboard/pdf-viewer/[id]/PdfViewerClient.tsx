@@ -107,7 +107,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
             <PiechemLogo 
               size="sm" 
               href="/dashboard" 
-              isGoldMember={student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
+              isGoldMember={student?.subscriptionStatus === "ULTRA" || student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
             />
           </div>
         </div>

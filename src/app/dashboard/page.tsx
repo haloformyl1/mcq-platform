@@ -136,15 +136,15 @@ export default function StudentDashboard() {
   // Keep localStorage reactive to real-time subscription status & expiration
   useEffect(() => {
     if (!data?.student) return;
-    const isComp = data.student.subscriptionStatus === "COMPLIMENTARY";
+    const isUltra = data.student.subscriptionStatus === "ULTRA" || data.student.subscriptionStatus === "COMPLIMENTARY";
     const isPaid = data.student.subscriptionStatus === "PAID" && (!data.student.subscriptionExpiresAt || new Date(data.student.subscriptionExpiresAt).getTime() > now.getTime());
-    const isGold = isComp || isPaid;
+    const isGold = isUltra || isPaid;
 
     if (typeof window !== "undefined") {
       try {
         if (isGold) {
           localStorage.setItem("piechem_is_gold", "true");
-          if (isComp) {
+          if (isUltra) {
             localStorage.setItem("piechem_is_complimentary", "true");
             localStorage.removeItem("piechem_gold_expires_at");
           } else if (data.student.subscriptionExpiresAt) {
@@ -328,6 +328,7 @@ export default function StudentDashboard() {
         onCurriculumChange={handleCurriculumChange}
         updatingCurriculum={updatingCurriculum}
         isGoldMember={
+          student.subscriptionStatus === "ULTRA" ||
           student.subscriptionStatus === "COMPLIMENTARY" || 
           (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
         }
@@ -475,6 +476,7 @@ export default function StudentDashboard() {
               <div className="flex justify-between items-start">
                 <div className="p-3 rounded-xl bg-green-950 border border-green-600/50 shadow group-hover:scale-110 transition-transform">
                   <PiechemLogo size="sm" showText={false} isGoldMember={
+                      student.subscriptionStatus === "ULTRA" ||
                       student.subscriptionStatus === "COMPLIMENTARY" || 
                       (student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime()))
                     } />

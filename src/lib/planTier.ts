@@ -18,45 +18,16 @@ export function resolveEffectivePlanTier(
   if (explicitPlanTier) return explicitPlanTier;
   if (!student) return null;
 
-  const status = student?.subscriptionStatus;
+  const status = student?.subscriptionStatus ? String(student.subscriptionStatus).trim().toUpperCase() : "";
+  const isUltra = status === "ULTRA";
   const isComp = Boolean(student?.isComplimentary || status === "COMPLIMENTARY");
   const isPaidActive =
     status === "PAID" &&
     (!student?.subscriptionExpiresAt ||
       new Date(student.subscriptionExpiresAt).getTime() > Date.now());
 
-  if (!isComp && !isPaidActive) return null;
+  if (!isUltra && !isComp && !isPaidActive) return null;
 
-  // Rule A: Complimentary student upgraded to 30-day Ultra
-  if (isComp && isPaidActive && Boolean(student?.subscriptionExpiresAt)) {
-    return "ultra";
-  }
-
-  // Rule B: Check upgrade request details (passed directly or in student.upgradeRequests)
-  const req =
-    upgradeReq ||
-    (Array.isArray(student?.upgradeRequests) ? student.upgradeRequests[0] : null);
-
-  const planText = (
-    student?.subscriptionPlanName ||
-    student?.planName ||
-    student?.plan ||
-    req?.note ||
-    req?.purchasedClass ||
-    req?.planName ||
-    ""
-  ).toLowerCase();
-
-  const amount = Number(req?.amount) || 0;
-
-  if (
-    planText.includes("ultra") ||
-    amount === 200 ||
-    amount === 499 ||
-    amount >= 400
-  ) {
-    return "ultra";
-  }
-
-  return "pro";
+  // In the streamlined Free / Ultra system, all active subscribers enjoy Ultra VIP tier
+  return "ultra";
 }

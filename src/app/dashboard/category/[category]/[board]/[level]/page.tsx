@@ -65,9 +65,9 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
   };
 
   const { student, availableTests = [], allAttempts = [] } = data;
-    const isComplimentary = student?.subscriptionStatus === "COMPLIMENTARY";
+  const isUltra = student?.subscriptionStatus === "ULTRA" || student?.subscriptionStatus === "COMPLIMENTARY";
   const isPaidActive = student?.subscriptionStatus === "PAID" && (!student?.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > now.getTime());
-  const isGoldActive = isComplimentary || isPaidActive;
+  const isGoldActive = isUltra || isPaidActive;
 
   const currentAvailableTests: any[] = [];
   const upcomingTests: any[] = [];
@@ -375,14 +375,12 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
                 </div>
               );
             })()
-          ) : test.isPremium && (student?.subscriptionStatus !== "PAID" && student?.subscriptionStatus !== "COMPLIMENTARY") ? (
-              <Link
-                href="/dashboard/account"
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] text-sm font-bold text-black bg-gradient-to-r from-amber-200 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 transition-colors shadow-lg"
+          ) : test.isPremium && !isGoldActive ? (
+              <div
+                className="w-full text-center py-3 px-4 rounded-[14px] text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/40 border border-amber-500/30 tracking-wide select-none"
               >
-                <Lock className="w-4 h-4" />
-                <span>Unlock Premium</span>
-              </Link>
+                🔒 PIE Ultra Exclusive — Contact your teacher or admin to upgrade your account
+              </div>
             ) : (
               <div className="flex flex-col gap-2 w-full">
                 <Link 

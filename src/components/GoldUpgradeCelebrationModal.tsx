@@ -33,12 +33,9 @@ export default function GoldUpgradeCelebrationModal({
   const status = (student?.subscriptionStatus || "").trim().toUpperCase();
   const isComp = Boolean(student?.isComplimentary || status === "COMPLIMENTARY");
   const isPaid = status === "PAID";
-  const hasAccess = isPaid || isComp;
-
+  const isUltra = status === "ULTRA" || (planName || "").toLowerCase().includes("ultra") || (!planName && Boolean(student?.subscriptionExpiresAt && !isComp));
+  const hasAccess = status === "ULTRA" || isPaid || isComp;
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-
-  // Determine if Ultra or Pro
-  const isUltra = (planName || "").toLowerCase().includes("ultra") || (!planName && Boolean(student?.subscriptionExpiresAt && !isComp));
 
   // Calculate remaining days
   const now = new Date();

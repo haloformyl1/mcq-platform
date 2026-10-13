@@ -60,7 +60,6 @@ export default function SubscriptionExpiredModal({ student }: SubscriptionExpire
 
   const handleRenew = () => {
     handleIgnore();
-    router.push("/dashboard/account#renew");
   };
 
   if (!isOpen || isDismissed) {
@@ -100,26 +99,17 @@ export default function SubscriptionExpiredModal({ student }: SubscriptionExpire
             </strong>.
           </p>
           <p className="text-xs text-slate-400 leading-relaxed pt-1">
-            Renew your subscription now to restore unlimited exam attempts, full step-by-step solutions, and detailed chapter analytics.
+            To restore full unlimited mock exam attempts, 3D simulations, and answer explanations, please contact your teacher or administrator to upgrade your account to PIE Ultra.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-2.5 pt-2">
-          <button
-            onClick={handleRenew}
-            className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-slate-950 font-black text-sm tracking-wide uppercase hover:brightness-110 active:scale-98 transition shadow-[0_0_25px_rgba(245,158,11,0.4)] flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 fill-slate-950" />
-            <span>Renew PIE Subscription Now</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-
+        <div className="pt-2">
           <button
             onClick={handleIgnore}
-            className="w-full py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-200 transition cursor-pointer"
+            className="w-full py-3 px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer"
           >
-            Ignore
+            I Understand
           </button>
         </div>
       </div>

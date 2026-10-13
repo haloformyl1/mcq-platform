@@ -96,10 +96,9 @@ export default function AdminDashboardPage() {
     setError(null);
 
     try {
-      const [testsRes, studentsRes, subsRes, resultsRes] = await Promise.allSettled([
+      const [testsRes, studentsRes, resultsRes] = await Promise.allSettled([
         fetch("/api/admin/tests"),
         fetch("/api/admin/students"),
-        fetch("/api/admin/subscriptions"),
         fetch("/api/admin/results"),
       ]);
 
@@ -151,22 +150,9 @@ export default function AdminDashboardPage() {
         }
       }
 
-      // 3. Process Subscriptions
-      let activeSubsCount = 0;
-      let pendingRequests: PendingSubscriptionRequestItem[] = [];
-      let feeRate = 199.0;
-      if (subsRes.status === "fulfilled" && subsRes.value.ok) {
-        const json = await subsRes.value.json();
-        if (Array.isArray(json.activeStudents)) {
-          activeSubsCount = json.activeStudents.length;
-        }
-        if (Array.isArray(json.requests)) {
-          pendingRequests = json.requests.filter((r: PendingSubscriptionRequestItem) => r.status === "PENDING");
-        }
-        if (json.paymentSettings?.monthlyFee) {
-          feeRate = Number(json.paymentSettings.monthlyFee) || 199.0;
-        }
-      }
+      const activeSubsCount = 0;
+      const pendingRequests: PendingSubscriptionRequestItem[] = [];
+      const feeRate = 199.0;
 
       // 4. Process Results (Real attempts stream)
       let recentAttemptsList: RecentAttemptItem[] = [];
@@ -351,20 +337,15 @@ export default function AdminDashboardPage() {
           </Link>
 
           <Link
-            href="/admin/subscriptions"
+            href="/admin/students"
             className="group flex flex-col items-center text-center p-3.5 bg-[#0f1422] hover:bg-[#172033] border border-slate-800 hover:border-amber-500/50 rounded-2xl transition duration-150 shadow-md space-y-2 relative"
           >
-            {stats && stats.pendingUpgradesCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            )}
             <div className="p-2.5 rounded-xl bg-amber-950/60 group-hover:bg-amber-900/80 text-amber-400 border border-amber-500/40 transition">
-              <CreditCard size={20} />
+              <Users size={20} />
             </div>
             <div>
-              <div className="text-xs font-bold text-white group-hover:text-amber-200">PIE Ultra Queue</div>
-              <div className="text-[10px] text-slate-400">
-                {stats?.pendingUpgradesCount ? `${stats.pendingUpgradesCount} pending` : "Verify payments"}
-              </div>
+              <div className="text-xs font-bold text-white group-hover:text-amber-200">Students Directory</div>
+              <div className="text-[10px] text-slate-400">Manage Free & Ultra</div>
             </div>
           </Link>
 
@@ -569,65 +550,55 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Pending PIE Ultra Subscriptions Queue */}
+        {/* Right Column: Student Tier & Access Management */}
         <div className="bg-[#0b0f19] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
           <div className="flex justify-between items-center border-b border-slate-800/80 pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-amber-950/60 border border-amber-500/40 rounded-xl text-amber-400">
-                <CreditCard size={18} />
+              <div className="p-2 bg-red-950/60 border border-red-500/40 rounded-xl text-red-400">
+                <Users size={18} />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Pending UPI Verification Queue</h3>
-                <p className="text-[11px] text-slate-400">Student payment submissions awaiting approval</p>
+                <h3 className="text-sm font-bold text-white">Student Tier Management</h3>
+                <p className="text-[11px] text-slate-400">Promote or demote students between Free and Ultra</p>
               </div>
             </div>
             <Link
-              href="/admin/subscriptions"
-              className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              href="/admin/students"
+              className="text-xs font-bold text-red-400 hover:text-red-300 flex items-center gap-1"
             >
-              <span>Manage Queue</span>
+              <span>Manage Tiers</span>
               <ChevronRight size={14} />
             </Link>
           </div>
 
-          <div className="space-y-2.5">
-            {stats && stats.pendingRequests.length > 0 ? (
-              stats.pendingRequests.map((req: PendingSubscriptionRequestItem) => (
-                <div
-                  key={req.id}
-                  className="bg-[#18140c] border border-amber-500/30 p-3.5 rounded-2xl flex items-center justify-between gap-3"
-                >
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold text-white truncate">
-                      {req.student?.name || req.student?.email || "Student"}
-                    </div>
-                    <div className="text-[11px] text-amber-300 font-mono mt-0.5 truncate">
-                      UTR: {req.utrNumber || "NOT PROVIDED"}
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                      Submitted: {formatTimestamp(req.createdAt)}
-                    </div>
-                  </div>
-
-                  <div className="text-right shrink-0">
-                    <div className="text-xs font-extrabold font-mono text-emerald-400">
-                      ₹{req.amount || stats.monthlyFee || 199}
-                    </div>
-                    <Link
-                      href="/admin/subscriptions"
-                      className="inline-block mt-1 px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-lg text-[10px] transition uppercase tracking-wider"
-                    >
-                      Review
-                    </Link>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-12 text-center text-xs text-slate-500">
-                <CheckCircle2 size={24} className="text-emerald-500/60 mx-auto mb-1.5" />
-                <span>Verification queue is all caught up! No pending payments.</span>
+          <div className="space-y-3">
+            <div className="bg-[#121826] border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+              <div>
+                <div className="text-xs text-slate-400">Total Enrolled Students</div>
+                <div className="text-2xl font-bold font-mono text-white mt-0.5">{stats?.totalStudents || 0}</div>
               </div>
-            )}
+              <div className="text-right">
+                <div className="text-xs text-emerald-400 font-semibold">Active Accounts</div>
+                <div className="text-2xl font-bold font-mono text-emerald-300 mt-0.5">{stats?.activeStudents || 0}</div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-[#1a0609] to-black border border-red-500/30 p-4 rounded-2xl space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-bold text-red-300">
+                <span>⚡ Admin-Exclusive Privilege</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Only the administrator has the privilege to change a student from Free to Ultra. Public student payment checkout systems have been fully scrapped.
+              </p>
+              <div className="pt-1">
+                <Link
+                  href="/admin/students"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition shadow-[0_0_15px_rgba(229,9,20,0.4)]"
+                >
+                  <span>Open Students Directory →</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

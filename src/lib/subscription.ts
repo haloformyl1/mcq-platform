@@ -75,7 +75,7 @@ export function hasPremiumAccess(
 ): boolean {
   if (!subscriptionStatus) return false;
   const status = subscriptionStatus.trim().toUpperCase();
-  if (status === "COMPLIMENTARY") return true;
+  if (status === "ULTRA" || status === "COMPLIMENTARY") return true;
   if (status === "PAID") {
     if (!subscriptionExpiresAt) return true;
     const expiry = new Date(subscriptionExpiresAt).getTime();

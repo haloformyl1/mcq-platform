@@ -129,9 +129,9 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
           </div>
 
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-blue-500/15 border border-blue-500/40 text-blue-300">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-red-500/15 border border-red-500/40 text-red-300">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>PIE PRO & PIE ULTRA EXCLUSIVE</span>
+              <span>PIE ULTRA EXCLUSIVE</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -139,7 +139,7 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              This chapter master resource is reserved exclusively for enrolled PIE Pro and PIE Ultra students. Upgrade your subscription or request complimentary batch access.
+              This chapter master resource is reserved exclusively for enrolled PIE Ultra students. Contact your teacher or administrator to upgrade your account.
             </p>
           </div>
 
@@ -166,14 +166,9 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
 
           {/* CTA Actions */}
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-            <Link
-              href="/dashboard/account"
-              className="flex-1 w-full py-3.5 px-6 rounded-xl text-sm font-black text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition shadow-lg shadow-amber-500/30 uppercase tracking-wider flex items-center justify-center gap-2 group"
-            >
-              <Sparkles className="w-4 h-4 shrink-0" />
-              <span>Upgrade to Gold Now</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+            <div className="flex-1 w-full py-3.5 px-6 rounded-xl text-xs sm:text-sm font-bold text-amber-300 bg-amber-950/60 border border-amber-500/40 text-center select-none">
+              🔒 Contact teacher or admin to upgrade to Ultra
+            </div>
 
             <button
               type="button"

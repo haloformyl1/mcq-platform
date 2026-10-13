@@ -28,8 +28,8 @@ export async function POST(req: Request) {
 
     await autoExpireSubscriptions();
     // Check Subscription Limit for FREE students (Lifetime max 2 tests)
-    const isPaidSubscriber = student.subscriptionStatus === "PAID" || student.subscriptionStatus === "COMPLIMENTARY";
-    if (!isPaidSubscriber) {
+    const isUltraSubscriber = student.subscriptionStatus === "ULTRA" || student.subscriptionStatus === "COMPLIMENTARY" || student.subscriptionStatus === "PAID";
+    if (!isUltraSubscriber) {
       const totalSubmittedAttempts = await prisma.testAttempt.count({
         where: { studentId: student.id, status: "SUBMITTED" }
       });
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
       if (totalSubmittedAttempts >= 2 && !activeAttemptForThisTest) {
         return NextResponse.json({ 
-          error: "Free Limit Reached! You have completed 2 free tests. Please upgrade to a Paid Subscription to unlock unlimited test access.",
+          error: "Free Limit Reached! You have completed 2 free tests. Please contact your teacher or administrator to upgrade your account to PIE Ultra for unlimited test access.",
           requiresSubscription: true 
         }, { status: 403 });
       }
@@ -65,9 +65,9 @@ export async function POST(req: Request) {
     }
 
     // Premium Test Verification: Free students cannot start Premium tests unless specifically overridden
-    if (test.isPremium && !isPaidSubscriber && !override) {
+    if (test.isPremium && !isUltraSubscriber && !override) {
       return NextResponse.json({
-        error: "This test is a Premium Resource and requires an active PIE Pro or PIE Ultra subscription to access.",
+        error: "This test is a PIE Ultra Exclusive Resource. Please contact your teacher or administrator to upgrade your account.",
         requiresSubscription: true
       }, { status: 403 });
     }

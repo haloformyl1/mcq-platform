@@ -1,5 +1,5 @@
 import { touchOrCreateStudentSession, getActiveStudentSessions } from "@/lib/sessionService";
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { recalculateStudentAttempts } from "@/lib/recalculate";
 import { decrypt } from "@/lib/auth";
