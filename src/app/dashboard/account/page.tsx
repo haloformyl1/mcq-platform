@@ -1202,56 +1202,7 @@ export default function StudentAccountPage() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* 1. Change Plan */}
-                    {!isPaymentPending && (
-                      <button
-                        onClick={handleChangePlanClick}
-                        className="group p-5 sm:p-6 rounded-2xl bg-[#0b131e] hover:bg-[#111a27] border border-slate-800 transition-colors cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="text-slate-400 group-hover:text-amber-400 transition-colors">
-                            <Layers className="w-5 h-5" />
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            {isAtHighestPlan ? "MAX TIER" : "UPGRADE"}
-                          </span>
-                        </div>
 
-                        <div className="pt-4">
-                          <div className="flex items-center justify-between text-base font-bold text-white">
-                            <span>Change plan</span>
-                            <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                          </div>
-                          <p className="text-sm text-slate-400 mt-1">
-                            {isAtHighestPlan 
-                              ? "You are currently enrolled in the highest possible plan"
-                              : "Explore available plans and upgrade to Premium"}
-                          </p>
-                        </div>
-                      </button>
-                    )}
-
-                    {/* 2. Manage Access and Devices */}
-                    <button
-                      onClick={() => navigateToTab("devices")}
-                      className="group p-5 sm:p-6 rounded-2xl bg-[#0b131e] hover:bg-[#111a27] border border-slate-800 transition-colors cursor-pointer text-left flex flex-col justify-between min-h-[140px]"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="text-slate-400 group-hover:text-amber-400 transition-colors">
-                          <MonitorSmartphone className="w-5 h-5" />
-                        </div>
-                      </div>
-
-                      <div className="pt-4">
-                        <div className="flex items-center justify-between text-base font-bold text-white">
-                          <span>Manage access and devices</span>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                        <p className="text-sm text-slate-400 mt-1">
-                          View active sessions & signed-in browsers
-                        </p>
-                      </div>
-                    </button>
 
                     {/* 3. Edit Student Profile & Curriculum */}
                     <button
