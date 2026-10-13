@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
-  User, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertCircle, Sparkles, 
-  RefreshCw, ChevronRight, Shield, Phone, Calendar, Lock
+  User, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertCircle, 
+  RefreshCw, ChevronRight, Phone, Calendar, Lock
 } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
@@ -339,9 +339,11 @@ export default function StudentAccountPage() {
 
                   <div>
                     {isUltra ? (
-                      <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-950 via-[#26050a] to-black border border-red-500/60 text-red-200 text-xs font-extrabold uppercase tracking-wider shadow-[0_0_20px_rgba(229,9,20,0.35)]">
-                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                        <span>⚡ PIE ULTRA (ACTIVE VIP)</span>
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-950/80 via-[#26050a]/90 to-black border border-red-500/60 shadow-[0_0_20px_rgba(229,9,20,0.35)]">
+                        <span className="text-white font-black tracking-wider text-xs">PIE</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#160406] text-red-100 text-[10px] sm:text-[11px] font-bold tracking-wide border border-red-600/60 shadow-[0_2px_12px_rgba(229,9,20,0.4)] leading-none">
+                          ultra
+                        </span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider">
@@ -455,44 +457,6 @@ export default function StudentAccountPage() {
                   </div>
                   <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-amber-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
                 </button>
-
-                {/* 3. Examination Dashboard */}
-                <Link
-                  href="/dashboard"
-                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
-                >
-                  <div className="space-y-1">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
-                      <Sparkles size={20} />
-                    </div>
-                    <h4 className="text-sm font-bold text-white pt-2 group-hover:text-emerald-300 transition">
-                      Examination Catalog
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Attempt live MCQ tests, chapter speed exams, and view your detailed scorecards.
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
-                </Link>
-
-                {/* 4. 3D Spatial Animations */}
-                <Link
-                  href="/3d-animations"
-                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
-                >
-                  <div className="space-y-1">
-                    <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
-                      <Shield size={20} />
-                    </div>
-                    <h4 className="text-sm font-bold text-white pt-2 group-hover:text-purple-300 transition">
-                      3D Spatial Chemistry
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Explore interactive molecular geometries, reaction mechanisms, and crystal lattices.
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-transform shrink-0 mt-2" />
-                </Link>
 
               </div>
             </div>
