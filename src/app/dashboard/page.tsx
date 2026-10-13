@@ -20,7 +20,6 @@ import PiechemAiLogo from "@/components/ai/PiechemAiLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import SubscriptionExpiredModal from "@/components/SubscriptionExpiredModal";
 import GoldUpgradeCelebrationModal from "@/components/GoldUpgradeCelebrationModal";
-import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 import ChemistryLibraryVault from "@/components/ChemistryLibraryVault";
 
 export default function StudentDashboard() {
@@ -367,7 +366,7 @@ export default function StudentDashboard() {
       {/* ========================================================= */}
       {/* 3. FEATURED 3D ANIMATIONS SPOTLIGHT (GATEWAY HERO)       */}
       {/* ========================================================= */}
-      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent !pt-2.5 sm:!pt-3.5 pb-6 sm:pb-8 transition-all duration-300 group">
+      <section id="overview" className="dashboard-hero relative w-full overflow-hidden bg-transparent !pt-12 sm:!pt-14 pb-6 sm:pb-8 transition-all duration-300 group">
         {/* Content Container - Far Left Aligned */}
         <div className="relative z-10 w-full px-3 sm:px-6 lg:px-8 flex flex-col justify-between">
           

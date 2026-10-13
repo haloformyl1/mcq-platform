@@ -11,7 +11,6 @@ import {
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
-import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 
 export default function CategoryCurriculumTestsPage({ params }: { params: Promise<{ category: string, board: string, level: string }> }) {
   const resolvedParams = use(params);
@@ -419,23 +418,21 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
               <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} student={student} upgradeReq={data?.upgradeReq} />
             </div>
 
-            {/* Right: Notifications + Account Button matching Front Page */}
+            {/* Right: Account Button */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              <NotificationCenterDropdown student={student} upgradeReq={data?.upgradeReq} />
-
               <Link 
                 href="/dashboard/account"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 border border-cyan-500/40 text-xs font-bold text-cyan-300 hover:text-white transition shadow-sm shrink-0 cursor-pointer"
+                className="flex items-center gap-2.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#111c2e] hover:bg-[#182740] border border-slate-700/80 hover:border-cyan-500/50 text-xs sm:text-sm font-bold text-slate-200 hover:text-white transition-all shadow-md shrink-0 group cursor-pointer"
                 title="My Account"
               >
-                <div className="w-5 h-5 rounded-full overflow-hidden bg-cyan-600 flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600 group-hover:border-cyan-400/60 transition-colors">
                   <img
                     src={student?.avatarUrl || "/avatars/atom.jpg"}
                     alt="Profile"
                     className="w-full h-full object-cover"
                     onError={(e: any) => { e.target.style.display = 'none'; }}
                   />
-                  <User className="w-3 h-3 text-white" />
+                  <User className="w-3.5 h-3.5 text-white" />
                 </div>
                 <span className="hidden sm:inline">My Account</span>
               </Link>

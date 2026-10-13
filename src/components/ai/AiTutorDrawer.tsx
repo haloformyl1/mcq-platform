@@ -5,7 +5,6 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import FormattedAiMessage from "./FormattedAiMessage";
 import PiechemAiLogo from "./PiechemAiLogo";
 import PiechemLogo from "@/components/PiechemLogo";
-import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 import { 
   X, Send, User, ArrowRight, LogOut,
   Atom, BookOpen, Dna, 

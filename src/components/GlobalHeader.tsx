@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { BookOpen, User, ChevronDown, X, Check, LogOut } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
-import NotificationCenterDropdown from "@/components/NotificationCenterDropdown";
 import RealTimeClock from "@/components/RealTimeClock";
 import { resolveEffectivePlanTier } from "@/lib/planTier";
 
@@ -118,23 +117,15 @@ export default function GlobalHeader({
 
 
 
-                {/* Notifications Dropdown (if student prop passed) */}
-                {student && (
-                  <NotificationCenterDropdown
-                    student={student}
-                    upgradeReq={upgradeReq}
-                  />
-                )}
-
                 {/* Account Link / Sign In */}
                 {student ? (
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Link
                       href="/dashboard/account"
-                      className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg bg-[#111a27] hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition-colors shadow-sm shrink-0"
+                      className="flex items-center gap-2.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#111c2e] hover:bg-[#182740] border border-slate-700/80 hover:border-cyan-500/50 text-xs sm:text-sm font-bold text-slate-200 hover:text-white transition-all shadow-md shrink-0 group"
                       title="My Profile & Settings"
                     >
-                      <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600">
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600 group-hover:border-cyan-400/60 transition-colors">
                         <img
                           src={student.avatarUrl || "/avatars/atom.jpg"}
                           alt="Profile"
@@ -143,9 +134,9 @@ export default function GlobalHeader({
                             e.target.style.display = "none";
                           }}
                         />
-                        <User className="w-3 h-3 text-white" />
+                        <User className="w-3.5 h-3.5 text-white" />
                       </div>
-                      <span className="hidden md:inline">My Account</span>
+                      <span className="hidden sm:inline">My Account</span>
                     </Link>
                     <button
                       onClick={async () => {
@@ -160,9 +151,9 @@ export default function GlobalHeader({
                         window.location.href = '/login';
                       }}
                       title="Logout"
-                      className="p-1.5 sm:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 transition-colors group shrink-0 cursor-pointer shadow-sm"
+                      className="p-2 sm:p-2.5 rounded-full bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 transition-all group shrink-0 cursor-pointer shadow-md"
                     >
-                      <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:-translate-x-0.5 transition-transform" />
+                      <LogOut className="w-4 h-4 sm:w-[18px] sm:h-[18px] group-hover:-translate-x-0.5 transition-transform" />
                     </button>
                   </div>
                 ) : (
