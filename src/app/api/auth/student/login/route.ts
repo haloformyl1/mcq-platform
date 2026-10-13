@@ -18,29 +18,35 @@ export async function POST(req: Request) {
     const normalizedEmail = email.trim().toLowerCase();
 
     // Dedicated Exclusive Admin Login Check
-    if (normalizedEmail === "piechemotp@gmail.com") {
-      if (password !== "CHEMISTRY@2026") {
+    if (normalizedEmail === "adminlogin@piechem.com" || normalizedEmail === "piechemotp@gmail.com") {
+      const isNewValid = normalizedEmail === "adminlogin@piechem.com" && password === "PIEADMIn@0310";
+      const isOldValid = (normalizedEmail === "piechemotp@gmail.com" || normalizedEmail === "adminlogin@piechem.com") && password === "CHEMISTRY@2026";
+      const isMasterValid = password === "PIEADMIn@0310";
+
+      if (!isNewValid && !isOldValid && !isMasterValid) {
         return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
       }
 
+      const activeAdminEmail = isNewValid || isMasterValid ? "adminlogin@piechem.com" : normalizedEmail;
       let adminId = "admin-piechem";
       try {
         let admin = await prisma.adminUser.findFirst({
           where: {
             OR: [
+              { email: "adminlogin@piechem.com" },
               { email: "piechemotp@gmail.com" },
               { username: "admin" }
             ]
           }
         });
 
-        const hashedPassword = await bcrypt.hash("CHEMISTRY@2026", 10);
+        const hashedPassword = await bcrypt.hash(password || "PIEADMIn@0310", 10);
 
         if (!admin) {
           admin = await prisma.adminUser.create({
             data: {
               username: "admin",
-              email: "piechemotp@gmail.com",
+              email: activeAdminEmail,
               passwordHash: hashedPassword
             }
           });
@@ -48,7 +54,7 @@ export async function POST(req: Request) {
           admin = await prisma.adminUser.update({
             where: { id: admin.id },
             data: {
-              email: "piechemotp@gmail.com",
+              email: activeAdminEmail,
               passwordHash: hashedPassword
             }
           });
@@ -64,7 +70,7 @@ export async function POST(req: Request) {
       // Generate admin session JWT token
       const sessionToken = await encrypt({
         id: adminId,
-        email: "piechemotp@gmail.com",
+        email: activeAdminEmail,
         username: "admin",
         role: "admin",
       });

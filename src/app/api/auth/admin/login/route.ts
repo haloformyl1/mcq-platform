@@ -12,30 +12,31 @@ export async function POST(req: Request) {
     const password = body.password || body.passcode;
 
     const isOldCreds = (identifier === "piechemotp@gmail.com" || identifier === "admin") && password === "CHEMISTRY@2026";
-    const isNewCreds = identifier === "adminlogin@piechem.com" && password === "PIEADMIn@0310";
+    const isNewCreds = (identifier === "adminlogin@piechem.com" || identifier === "adminlogin" || identifier === "admin") && password === "PIEADMIn@0310";
 
     if (!isOldCreds && !isNewCreds) {
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
     let adminId = "admin-piechem";
+    const activeAdminEmail = isNewCreds ? "adminlogin@piechem.com" : (identifier === "admin" ? "adminlogin@piechem.com" : identifier);
     try {
       let admin = await prisma.adminUser.findFirst({
         where: {
           OR: [
-            { email: "piechemotp@gmail.com" },
             { email: "adminlogin@piechem.com" },
+            { email: "piechemotp@gmail.com" },
             { username: "admin" }
           ]
         }
       });
 
-      const hashedPassword = await bcrypt.hash("CHEMISTRY@2026", 10);
+      const hashedPassword = await bcrypt.hash(password || "PIEADMIn@0310", 10);
       if (!admin) {
         admin = await prisma.adminUser.create({
           data: {
             username: "admin",
-            email: "piechemotp@gmail.com",
+            email: activeAdminEmail,
             passwordHash: hashedPassword
           }
         });
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
         admin = await prisma.adminUser.update({
           where: { id: admin.id },
           data: {
-            email: "piechemotp@gmail.com",
+            email: activeAdminEmail,
             passwordHash: hashedPassword
           }
         });
@@ -57,11 +58,11 @@ export async function POST(req: Request) {
     const sessionToken = await encrypt({
       id: adminId,
       username: "admin",
-      email: "piechemotp@gmail.com",
+      email: activeAdminEmail,
       role: "admin",
     });
 
-    const res = NextResponse.json({ success: true, username: "admin" });
+    const res = NextResponse.json({ success: true, username: "admin", email: activeAdminEmail });
     res.cookies.set({
       name: 'admin_session',
       value: sessionToken,

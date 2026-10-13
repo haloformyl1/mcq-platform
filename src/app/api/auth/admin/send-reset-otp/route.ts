@@ -40,11 +40,12 @@ export async function POST(req: Request) {
         });
 
         if (!admin) {
-          const defaultPasscode = process.env.ADMIN_PASSCODE || "CHEMISTRY@2026";
+          const defaultPasscode = process.env.ADMIN_PASSCODE || "PIEADMIn@0310";
           const hashedPassword = await bcrypt.hash(defaultPasscode, 10);
           admin = await prisma.adminUser.create({
             data: {
               username: "admin",
+              email: "adminlogin@piechem.com",
               passwordHash: hashedPassword,
             },
           });

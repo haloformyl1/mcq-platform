@@ -119,7 +119,7 @@ export default function StudentLogin() {
       return;
     }
     
-    if (email.trim().toLowerCase() === "adminlogin@piechem.com") {
+    if (email.trim().toLowerCase() === "adminlogin@piechem.com" || email.trim().toLowerCase() === "piechemotp@gmail.com") {
       setStep("EXISTING_PASSWORD_LOGIN");
       return;
     }
@@ -198,26 +198,22 @@ export default function StudentLogin() {
     setLoading(true);
     setError("");
     
-    if (email.trim().toLowerCase() === "adminlogin@piechem.com") {
-      if (password === "PIEADMIn@0310") {
-        try {
-          const res = await fetch("/api/auth/admin/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
-          });
-          if (res.ok) {
-            router.push("/admin");
-          } else {
-            setError("Incorrect email or password.");
-            setLoading(false);
-          }
-        } catch (err) {
-          setError("Network error. Try again.");
+    if (email.trim().toLowerCase() === "adminlogin@piechem.com" || email.trim().toLowerCase() === "piechemotp@gmail.com") {
+      try {
+        const res = await fetch("/api/auth/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          router.push("/admin");
+        } else {
+          setError(data.error || "Incorrect email or password.");
           setLoading(false);
         }
-      } else {
-        setError("Incorrect email or password.");
+      } catch {
+        setError("Network error. Try again.");
         setLoading(false);
       }
       return;

@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const normalizedEmail = email.trim().toLowerCase();
 
     // Dedicated Admin Email Check
-    if (normalizedEmail === "piechemotp@gmail.com") {
+    if (normalizedEmail === "adminlogin@piechem.com" || normalizedEmail === "piechemotp@gmail.com") {
       return NextResponse.json({ accountStatus: "ACTIVE", name: "Administrator", isAdmin: true });
     }
 
