@@ -794,7 +794,7 @@ export default function AiTutorDrawer({
         )}
 
                 {/* SIDEBAR */}
-        <div className={`absolute lg:relative z-40 lg:z-auto ${isDesktopSidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden lg:border-none' : 'lg:w-72'} w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-all duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className={`ai-sidebar absolute lg:relative z-40 lg:z-auto ${isDesktopSidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden lg:border-none' : 'lg:w-72'} w-72 h-full bg-black lg:bg-black border-r border-white/5 flex flex-col transition-all duration-300 ease-in-out ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <div className="flex items-center justify-between p-4 pt-5 pl-4 border-b border-white/5 lg:border-none">
             <Link href="/dashboard" className="flex flex-col min-w-0 pr-2 hover:opacity-95 transition-opacity group">
               <div className="flex items-center gap-2 select-none">
@@ -1106,7 +1106,7 @@ export default function AiTutorDrawer({
                   <div className="mb-6 md:hidden">
                     <PiechemAiLogo size="lg" animated />
                   </div>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 mb-8 tracking-tight text-center">
+                  <h1 className="ai-welcome-heading text-3xl sm:text-4xl md:text-5xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 mb-8 tracking-tight text-center">
                     Hi {studentName.split(' ')[0] || 'Scholar'}, what&apos;s the plan?
                   </h1>
                   
@@ -1433,11 +1433,11 @@ export default function AiTutorDrawer({
             </div>
           )}
 
-          <div className="shrink-0 px-3 sm:px-4 md:px-8 pb-3 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
+          <div className="ai-input-dock shrink-0 px-3 sm:px-4 md:px-8 pb-3 pt-1 bg-gradient-to-t from-black via-black/95 to-transparent z-20 ai-input-area">
             <div className="max-w-4xl mx-auto w-full">
               
               {/* Main Rounded Input Console Container */}
-              <div className="relative rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-2 backdrop-blur-xl focus-within:border-zinc-600 focus-within:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all">
+              <div className="ai-input-capsule relative rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-2 backdrop-blur-xl focus-within:border-zinc-600 focus-within:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all">
                 
                 {/* Embedded Context Pills (Subject & Difficulty) */}
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 px-1">

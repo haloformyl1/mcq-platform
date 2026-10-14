@@ -27,7 +27,7 @@ export default function RealTimeClock() {
   }).replace(/,/g, '');
 
   return (
-    <div className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 font-mono text-[13px] sm:text-[14px] font-semibold tracking-wider drop-shadow-[0_0_8px_rgba(34,211,238,0.3)] select-none">
+    <div className="real-time-clock text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 font-mono text-[13px] sm:text-[14px] font-semibold tracking-wider drop-shadow-[0_0_8px_rgba(34,211,238,0.3)] select-none">
       {formattedString}
     </div>
   );

@@ -230,7 +230,7 @@ export default function StudentAccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#02050a] text-slate-100 flex flex-col font-sans selection:bg-red-500/30 selection:text-red-200">
+    <div className="account-page-root min-h-screen bg-[#02050a] text-slate-100 flex flex-col font-sans selection:bg-red-500/30 selection:text-red-200">
       <AdminPreviewBanner />
       
       <GlobalHeader
@@ -319,7 +319,7 @@ export default function StudentAccountPage() {
           <div className="space-y-8 animate-in fade-in duration-200">
             
             {/* VIP Passport Card */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0b131e] via-[#070c14] to-black border border-slate-800/90 p-6 sm:p-9 shadow-xl">
+            <div className="account-overview-card relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#0b131e] via-[#070c14] to-black border border-slate-800/90 p-6 sm:p-9 shadow-xl">
               <div className="relative z-10 space-y-6">
                 
                 {/* Top Meta: Avatar + Status Badge */}
@@ -388,7 +388,7 @@ export default function StudentAccountPage() {
 
                 {/* Free Tier Notice (Strictly Admin Upgrade Only — No Payment Links) */}
                 {!isUltra && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#180407]/60 via-[#100305]/60 to-black border border-red-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="account-promo-banner p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#180407]/60 via-[#100305]/60 to-black border border-red-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300">
                         <Lock className="w-3.5 h-3.5 text-red-400" />
@@ -422,7 +422,7 @@ export default function StudentAccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("profiles")}
-                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
+                  className="account-action-card p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
                 >
                   <div className="space-y-1">
                     <div className="w-10 h-10 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
@@ -442,7 +442,7 @@ export default function StudentAccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("security")}
-                  className="p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
+                  className="account-action-card p-5 rounded-2xl bg-[#08101a] hover:bg-[#0c1828] border border-slate-800 hover:border-cyan-500/50 text-left transition duration-200 group flex items-start justify-between cursor-pointer shadow-md"
                 >
                   <div className="space-y-1">
                     <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
@@ -469,7 +469,7 @@ export default function StudentAccountPage() {
         {/* ========================================================= */}
         {activeTab === "profiles" && (
           <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
-            <div className="rounded-3xl bg-gradient-to-b from-[#0b1424] via-[#060d18] to-black border border-white/10 shadow-2xl p-6 sm:p-9 space-y-7 backdrop-blur-xl">
+            <div className="account-form-card rounded-3xl bg-gradient-to-b from-[#0b1424] via-[#060d18] to-black border border-white/10 shadow-2xl p-6 sm:p-9 space-y-7 backdrop-blur-xl">
               
               <div className="border-b border-white/10 pb-5">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase tracking-widest mb-2">
@@ -678,7 +678,7 @@ export default function StudentAccountPage() {
         {/* ========================================================= */}
         {activeTab === "security" && (
           <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
-            <div className="rounded-3xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-black border border-cyan-500/30 shadow-2xl p-6 sm:p-8 space-y-6">
+            <div className="account-form-card rounded-3xl bg-gradient-to-b from-[#0a1726] via-[#07111c] to-black border border-cyan-500/30 shadow-2xl p-6 sm:p-8 space-y-6">
               
               <div className="border-b border-white/10 pb-4">
                 <h2 className="text-xl font-bold text-white">Security &amp; Password</h2>

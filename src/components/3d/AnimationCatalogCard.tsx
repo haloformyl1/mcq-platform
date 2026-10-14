@@ -63,7 +63,7 @@ export default function AnimationCatalogCard({
 
   return (
     <article 
-      className={`group relative rounded-2xl overflow-hidden flex flex-col justify-between
+      className={`animation-catalog-card group relative rounded-2xl overflow-hidden flex flex-col justify-between
         bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm
         border transition-all duration-300 ease-out
         ${item.isPremium 
@@ -82,7 +82,7 @@ export default function AnimationCatalogCard({
       {/* ========================================================= */}
       {/* A. LARGE VISUAL PREVIEW AREA (55-60% of top card)         */}
       {/* ========================================================= */}
-      <div className="relative w-full h-48 sm:h-52 bg-gradient-to-b from-[#050e1c] to-[#00070d] overflow-hidden flex items-center justify-center">
+      <div className="animation-card-preview relative w-full h-48 sm:h-52 bg-gradient-to-b from-[#050e1c] to-[#00070d] overflow-hidden flex items-center justify-center">
         
         {/* Atmospheric Radial Glow */}
         <div 
@@ -238,10 +238,10 @@ export default function AnimationCatalogCard({
           </p>
 
           <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px] font-mono text-slate-400">
-            <span className="px-2 py-0.5 rounded bg-slate-900/70 border border-slate-800">
+            <span className="animation-card-pill px-2 py-0.5 rounded bg-slate-900/70 border border-slate-800">
               {academicLevel}
             </span>
-            <span className="px-2 py-0.5 rounded bg-slate-900/70 border border-slate-800">
+            <span className="animation-card-pill px-2 py-0.5 rounded bg-slate-900/70 border border-slate-800">
               3D Controls
             </span>
           </div>

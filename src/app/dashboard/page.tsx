@@ -625,7 +625,7 @@ export default function StudentDashboard() {
 
           {testsTaken === 0 ? (
             /* Premium Full-Width Performance Onboarding Hero */
-            <div className="relative w-full rounded-3xl bg-gradient-to-b from-[#091524]/90 via-[#050c18]/90 to-[#02050a]/98 border border-white/10 p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-xl">
+            <div className="dashboard-performance-banner relative w-full rounded-3xl bg-gradient-to-b from-[#091524]/90 via-[#050c18]/90 to-[#02050a]/98 border border-white/10 p-6 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-xl">
               {/* Ambient Radial Backlight */}
               <div className="pointer-events-none absolute -top-16 -right-16 w-80 h-80 rounded-full bg-cyan-500/10 blur-3xl" />
               <div className="pointer-events-none absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-blue-600/10 blur-3xl" />
