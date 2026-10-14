@@ -11,6 +11,7 @@ import {
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function CategoryTestsPage({ params }: { params: Promise<{ category: string }> }) {
   const resolvedParams = use(params);
@@ -420,6 +421,7 @@ export default function CategoryTestsPage({ params }: { params: Promise<{ catego
 
             {/* Right: Account Button */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <ThemeToggle />
               <Link 
                 href="/dashboard/account"
                 className="flex items-center gap-2.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#111c2e] hover:bg-[#182740] border border-slate-700/80 hover:border-cyan-500/50 text-xs sm:text-sm font-bold text-slate-200 hover:text-white transition-all shadow-md shrink-0 group cursor-pointer"

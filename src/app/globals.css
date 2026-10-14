@@ -1249,3 +1249,670 @@ button:active:not(:disabled),
     min-height: 44px;
   }
 }
+
+/* ================================================================
+   LIGHT MODE DESIGN SYSTEM (PhysicsWallah Aesthetic - Image 1)
+   ================================================================ */
+html.light {
+  color-scheme: light !important;
+  background-color: #f8fafc !important;
+}
+
+html.light,
+html.light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light .global-background {
+  background-color: #f8fafc !important;
+}
+
+/* --- LOGO IN LIGHT MODE --- */
+html.light .piechem-logo-chem {
+  color: #0f172a !important;
+}
+
+html.light .piechem-logo-text-only {
+  color: #0f172a !important;
+}
+
+html.light .piechem-logo-sub span {
+  color: #64748b !important;
+}
+
+html.light .piechem-logo-sub span span {
+  color: #0f172a !important;
+}
+
+/* --- HEADER IN LIGHT MODE --- */
+html.light .dashboard-header,
+html.light header.sticky,
+html.light .site-header-inner {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+html.light .site-header-actions a[href="/dashboard/account"] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .site-header-actions a[href="/dashboard/account"]:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+}
+
+html.light .site-header-actions a[href="/dashboard/account"] div {
+  border-color: #cbd5e1 !important;
+  background-color: #e2e8f0 !important;
+}
+
+html.light .site-header-actions a[href="/dashboard/account"] span {
+  color: #0f172a !important;
+}
+
+html.light .site-header-actions button[title="Logout"] {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08) !important;
+}
+
+html.light .site-header-actions button[title="Logout"]:hover {
+  background-color: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #b91c1c !important;
+}
+
+/* --- 3D ANIMATIONS HERO SECTION (#overview) --- */
+html.light #overview h1,
+html.light .dashboard-hero h1 {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+html.light #overview p,
+html.light .dashboard-hero p {
+  color: #475569 !important;
+  text-shadow: none !important;
+}
+
+html.light #overview .text-cyan-400 {
+  color: #2563eb !important;
+}
+
+html.light #overview .bg-cyan-950\/60 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+html.light #overview .text-cyan-300 {
+  color: #1d4ed8 !important;
+}
+
+html.light #overview .bg-gradient-to-b.from-\[\#0e172a\].to-black {
+  background: linear-gradient(to bottom, #eff6ff, #dbeafe) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* "Explore All Animations" Button - Matching PW Image 1 "Get Started" */
+html.light a[href="/3d-animations"].group\/cta {
+  background-color: #5a4bda !important;
+  border-color: #4f46e5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(90, 75, 218, 0.35) !important;
+}
+
+html.light a[href="/3d-animations"].group\/cta:hover {
+  background-color: #4d3dc9 !important;
+  box-shadow: 0 10px 28px rgba(90, 75, 218, 0.45) !important;
+}
+
+html.light a[href="/3d-animations"].group\/cta span,
+html.light a[href="/3d-animations"].group\/cta svg {
+  color: #ffffff !important;
+}
+
+/* --- EXAMINATION ARENA & CATEGORY CARDS --- */
+html.light #tests h1,
+html.light #tests h2,
+html.light #tests h3 {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+html.light #tests p {
+  color: #475569 !important;
+  text-shadow: none !important;
+}
+
+html.light #tests .bg-gradient-to-b.from-\[\#0e172a\].to-black {
+  background: linear-gradient(to bottom, #fef3c7, #fde68a) !important;
+  border-color: #fcd34d !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2) !important;
+}
+
+html.light #tests .text-cyan-400 {
+  color: #d97706 !important;
+}
+
+html.light #tests .bg-cyan-950\/60 {
+  background-color: #fef3c7 !important;
+  border-color: #fde68a !important;
+  color: #b45309 !important;
+}
+
+html.light #tests .text-cyan-300 {
+  color: #b45309 !important;
+}
+
+/* Category Folders Grid (Available, Upcoming, Expired) */
+html.light a[href="/dashboard/category/available"] {
+  background-color: #ffffff !important;
+  border-color: #a7f3d0 !important;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.08) !important;
+}
+html.light a[href="/dashboard/category/available"]:hover {
+  background-color: #f0fdf4 !important;
+  border-color: #34d399 !important;
+}
+html.light a[href="/dashboard/category/available"] .bg-green-950 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+html.light a[href="/dashboard/category/available"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/dashboard/category/available"]:hover h3 {
+  color: #059669 !important;
+}
+html.light a[href="/dashboard/category/available"] p {
+  color: #64748b !important;
+}
+
+html.light a[href="/dashboard/category/upcoming"] {
+  background-color: #ffffff !important;
+  border-color: #fde68a !important;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.08) !important;
+}
+html.light a[href="/dashboard/category/upcoming"]:hover {
+  background-color: #fffbeb !important;
+  border-color: #fbbf24 !important;
+}
+html.light a[href="/dashboard/category/upcoming"] .bg-amber-950 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+html.light a[href="/dashboard/category/upcoming"] .text-amber-300 {
+  color: #d97706 !important;
+}
+html.light a[href="/dashboard/category/upcoming"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/dashboard/category/upcoming"]:hover h3 {
+  color: #d97706 !important;
+}
+html.light a[href="/dashboard/category/upcoming"] p {
+  color: #64748b !important;
+}
+
+html.light a[href="/dashboard/category/expired"] {
+  background-color: #ffffff !important;
+  border-color: #fecdd3 !important;
+  box-shadow: 0 4px 18px rgba(244, 63, 94, 0.08) !important;
+}
+html.light a[href="/dashboard/category/expired"]:hover {
+  background-color: #fff1f2 !important;
+  border-color: #fb7185 !important;
+}
+html.light a[href="/dashboard/category/expired"] .bg-red-950 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+}
+html.light a[href="/dashboard/category/expired"] .text-red-400 {
+  color: #e11d48 !important;
+}
+html.light a[href="/dashboard/category/expired"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/dashboard/category/expired"]:hover h3 {
+  color: #e11d48 !important;
+}
+html.light a[href="/dashboard/category/expired"] p {
+  color: #64748b !important;
+}
+
+/* --- TEST ALERT BANNER --- */
+html.light .bg-amber-950\/20 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+html.light .bg-amber-950\/20 .animate-marquee span {
+  color: #92400e !important;
+}
+
+html.light .bg-amber-950\/20 .bg-amber-500 {
+  background-color: #d97706 !important;
+  color: #ffffff !important;
+}
+
+/* --- STUDY MATERIALS & VAULT (#materials) --- */
+html.light #materials,
+html.light #materials section,
+html.light #materials > div {
+  color: #0f172a !important;
+}
+
+html.light #materials h1,
+html.light #materials h2,
+html.light #materials h3,
+html.light #materials h4 {
+  color: #0f172a !important;
+}
+
+html.light #materials p {
+  color: #475569 !important;
+}
+
+html.light #materials .bg-white\/\[0\.02\],
+html.light #materials .bg-white\/\[0\.03\],
+html.light #materials .bg-white\/\[0\.04\],
+html.light #materials .bg-white\/\[0\.05\],
+html.light #materials .bg-slate-900\/60,
+html.light #materials .bg-slate-950\/80,
+html.light #materials .bg-\[\#0a0a0a\],
+html.light #materials .bg-\[\#050e18\] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light #materials input[type="text"] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light #materials input[type="text"]::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light #materials .border-white\/\[0\.08\],
+html.light #materials .border-white\/10,
+html.light #materials .border-slate-800,
+html.light #materials .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+/* --- CATEGORY SUBPAGES & CURRICULUM BOARDS --- */
+html.light a[href*="/dashboard/category/"][class*="rounded-\[24px\]"] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light a[href*="/dashboard/category/"][class*="rounded-\[24px\]"]:hover {
+  background-color: #f8fafc !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light a[href*="/dashboard/category/"][class*="rounded-\[24px\]"] h2,
+html.light a[href*="/dashboard/category/"][class*="rounded-\[24px\]"] h3 {
+  color: #0f172a !important;
+}
+
+html.light a[href*="/dashboard/category/"][class*="rounded-\[24px\]"] p {
+  color: #64748b !important;
+}
+
+/* --- ACCOUNT PAGE CARDS --- */
+html.light div[class*="rounded-3xl bg-slate-900"],
+html.light div[class*="rounded-3xl bg-neutral-950"],
+html.light div[class*="rounded-3xl bg-[#0a0a0a]"],
+html.light div[class*="rounded-2xl bg-slate-900"] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.light div[class*="bg-slate-950"],
+html.light div[class*="bg-slate-900\/80"],
+html.light div[class*="bg-[#050e18]"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* --- 3D ANIMATIONS GALLERY --- */
+html.light div[class*="min-h-screen bg-black"] {
+  background-color: #f8fafc !important;
+}
+
+/* --- COMPREHENSIVE UTILITIES IN LIGHT MODE --- */
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.light .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Preserve bright white text inside explicitly colored accent buttons / badges */
+html.light button.bg-red-600,
+html.light button.bg-red-500,
+html.light a.bg-red-600,
+html.light button.bg-emerald-600,
+html.light button.bg-emerald-500,
+html.light a.bg-emerald-600,
+html.light button.bg-cyan-600,
+html.light a.bg-cyan-600,
+html.light button.bg-blue-600,
+html.light a.bg-blue-600,
+html.light button.bg-indigo-600,
+html.light a.bg-indigo-600,
+html.light .bg-\[\#5a4bda\],
+html.light .bg-primary,
+html.light .btn-primary,
+html.light .badge-solid {
+  color: #ffffff !important;
+}
+
+html.light button.bg-red-600 *,
+html.light a.bg-red-600 *,
+html.light .bg-\[\#5a4bda\] * {
+  color: #ffffff !important;
+}
+
+/* Background utilities in light mode */
+html.light .bg-black {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-\[\#0a0a0a\],
+html.light .bg-\[\#050e18\],
+html.light .bg-\[\#0e172a\],
+html.light .bg-\[\#060e1a\],
+html.light .bg-\[\#081524\],
+html.light .bg-\[\#040e1b\],
+html.light .bg-\[\#02060b\],
+html.light .bg-\[\#030911\] {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/\[0\.05\],
+html.light .bg-white\/\[0\.08\] {
+  background-color: #ffffff !important;
+}
+
+/* Border utilities in light mode */
+html.light .border-white\/10,
+html.light .border-white\/20,
+html.light .border-white\/\[0\.06\],
+html.light .border-white\/\[0\.08\],
+html.light .border-white\/\[0\.1\],
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/90,
+html.light .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Form inputs */
+html.light input:not([type="checkbox"]):not([type="radio"]),
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Modals & Dialogs in Light Mode */
+html.light .modal-sheet {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+  color: #0f172a !important;
+}
+
+/* --- CURRICULUM PORTAL CARDS IN LIGHT MODE --- */
+html.light a[href^="/study-material/"] {
+  background: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light a[href^="/study-material/"]:hover {
+  background: #ffffff !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* CBSE Card */
+html.light a[href="/study-material/cbse"] {
+  border-color: #bfdbfe !important;
+}
+html.light a[href="/study-material/cbse"]:hover {
+  border-color: #3b82f6 !important;
+}
+html.light a[href="/study-material/cbse"] .bg-cyan-950\/80 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+html.light a[href="/study-material/cbse"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/study-material/cbse"]:hover h3 {
+  color: #2563eb !important;
+}
+
+/* ICSE Card */
+html.light a[href="/study-material/icse"] {
+  border-color: #fde68a !important;
+}
+html.light a[href="/study-material/icse"]:hover {
+  border-color: #f59e0b !important;
+}
+html.light a[href="/study-material/icse"] .bg-amber-950\/80 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #b45309 !important;
+}
+html.light a[href="/study-material/icse"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/study-material/icse"]:hover h3 {
+  color: #d97706 !important;
+}
+
+/* WBCHSE Card */
+html.light a[href="/study-material/wbchse"] {
+  border-color: #a7f3d0 !important;
+}
+html.light a[href="/study-material/wbchse"]:hover {
+  border-color: #10b981 !important;
+}
+html.light a[href="/study-material/wbchse"] .bg-emerald-950\/80 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+html.light a[href="/study-material/wbchse"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/study-material/wbchse"]:hover h3 {
+  color: #059669 !important;
+}
+
+/* Entrance Card */
+html.light a[href="/study-material/entrance"] {
+  border-color: #fecdd3 !important;
+}
+html.light a[href="/study-material/entrance"]:hover {
+  border-color: #f43f5e !important;
+}
+html.light a[href="/study-material/entrance"] .bg-rose-950\/80 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #be123c !important;
+}
+html.light a[href="/study-material/entrance"] h3 {
+  color: #0f172a !important;
+}
+html.light a[href="/study-material/entrance"]:hover h3 {
+  color: #e11d48 !important;
+}
+
+/* Curriculum card pill highlights & footer */
+html.light a[href^="/study-material/"] .bg-white\/\[0\.04\] {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+html.light a[href^="/study-material/"] p {
+  color: #475569 !important;
+}
+
+html.light a[href^="/study-material/"] .border-t {
+  border-top-color: #f1f5f9 !important;
+}
+
+html.light a[href^="/study-material/"] .border-t span {
+  color: #64748b !important;
+}
+
+/* Study Materials Header Badge & Icon */
+html.light #materials .bg-gradient-to-b.from-\[\#0e172a\].to-black,
+html.light div[id="materials"] .bg-gradient-to-b {
+  background: linear-gradient(to bottom, #eff6ff, #dbeafe) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2) !important;
+}
+
+html.light #materials .bg-cyan-950\/60,
+html.light #materials .bg-cyan-950\/80 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+html.light #materials .border-b.border-white\/5 {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light #materials h2 {
+  color: #64748b !important;
+}
+
+html.light #materials .bg-white\/5 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+html.light #materials .bg-cyan-950\/40 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+/* --- 3D ANIMATIONS GALLERY FILTERS & TIERS --- */
+html.light .bg-\[\#061524\] {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+html.light .bg-\[\#050e18\]\/90 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light input[placeholder*="Search simulations"] {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light input[placeholder*="Search simulations"]::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light .bg-slate-950\/80 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light .bg-slate-800 {
+  background-color: #5a4bda !important;
+  color: #ffffff !important;
+}
+
+html.light button.bg-slate-900\/60 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+html.light button.bg-slate-900\/60:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+html.light button.bg-cyan-950 {
+  background-color: #5a4bda !important;
+  border-color: #4d3dc9 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(90, 75, 218, 0.25) !important;
+}
+
+html.light select.bg-slate-950\/80 {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300\/90,
+html.light .text-slate-300\/80,
+html.light .text-slate-400\/90,
+html.light .text-slate-200\/95 {
+  color: #475569 !important;
+}
+
+html.light .border-b.border-slate-800\/80,
+html.light .border-slate-800\/80 {
+  border-color: #e2e8f0 !important;
+}
+
+
+
+

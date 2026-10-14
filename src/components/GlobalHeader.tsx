@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen, User, ChevronDown, X, Check, LogOut } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 import RealTimeClock from "@/components/RealTimeClock";
+import ThemeToggle from "@/components/ThemeToggle";
 import { resolveEffectivePlanTier } from "@/lib/planTier";
 
 export interface GlobalHeaderProps {
@@ -115,7 +116,8 @@ export default function GlobalHeader({
                 {/* Custom actions slot if provided */}
                 {actions}
 
-
+                {/* Theme Toggle (Light / Dark) */}
+                <ThemeToggle />
 
                 {/* Account Link / Sign In */}
                 {student ? (
