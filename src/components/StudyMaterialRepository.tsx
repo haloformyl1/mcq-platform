@@ -1088,26 +1088,20 @@ export default function StudyMaterialRepository({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {activeCategoryItems.map((item) => {
                 const eligibility = isStudentEligibleForMaterial(student, item.section, item.classSem);
-                const isEntranceContent = item.section?.toUpperCase().includes("ENTRANCE") || item.section?.toUpperCase().includes("NEET") || item.section?.toUpperCase().includes("JEE");
-                const is3D = item.category === '3D animations' || item.type === 'LINK';
                 const isFree = !item.isPremium;
-                const isLevelRestricted = (isEntranceContent || is3D || isFree) ? false : (student ? !eligibility.eligible : Boolean(item.isLevelRestricted));
+                const isLevelRestricted = false;
                 const restrictionReason = eligibility.reason || item.restrictionReason;
-                const badgeLabel = eligibility.badgeLabel || item.badgeLabel || (item.classSem === 'ALL' ? (item.section || 'RESTRICTED') : `${item.classSem} ONLY`);
-                const buttonLabel = eligibility.buttonLabel || item.buttonLabel || `Restricted (${item.classSem === 'ALL' ? (item.section || 'Curriculum') : item.classSem})`;
+                const badgeLabel = item.section && item.section !== 'ALL' ? item.section : (item.classSem !== 'ALL' ? item.classSem : 'CURRICULUM');
+                const buttonLabel = "View Resource";
                 const targetLabel = eligibility.targetLabel || item.targetLabel;
                 const policyTitle = eligibility.policyTitle || item.policyTitle;
                 const policyNote = eligibility.policyNote || item.policyNote;
-                const canAccess = !isLevelRestricted && (!item.isPremium || isGold);
+                const canAccess = isFree || isGold;
 
                 return (
                   <div
                     key={item.id}
-                    className={`group relative select-none rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-sm touch-manipulation ${
-                      isLevelRestricted
-                        ? "border-rose-500/35 hover:border-rose-400/60 shadow-[0_0_16px_rgba(244,63,94,0.12)]"
-                        : "border-white/[0.08] hover:border-cyan-500/40 hover:shadow-[0_10px_25px_rgba(0,217,255,0.1)]"
-                    }`}
+                    className="group relative select-none rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] hover:border-cyan-500/40 hover:shadow-[0_10px_25px_rgba(0,217,255,0.1)] p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-sm touch-manipulation"
                   >
                     <div className="space-y-3">
                       {/* Top Badges: Category + Premium / Free */}
@@ -1143,16 +1137,14 @@ export default function StudyMaterialRepository({
                       <div>
                         <h3 
                           onClick={() => {
-                            if (isLevelRestricted) {
-                              setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote });
-                            } else if (!canAccess) {
+                            if (!canAccess) {
                               setUpgradeItem(item);
                             } else {
                               router.push(`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`);
                             }
                           }}
                           className={`text-base sm:text-lg font-bold text-white transition-colors leading-snug cursor-pointer ${
-                            !canAccess ? "hover:text-rose-200" : "hover:text-cyan-300"
+                            !canAccess ? "hover:text-amber-200" : "hover:text-cyan-300"
                           }`}
                         >
                           {item.title}
@@ -1186,24 +1178,14 @@ export default function StudyMaterialRepository({
                             <span>Read</span>
                           </Link>
                         </div>
-                      ) : isLevelRestricted ? (
-                        <button
-                          type="button"
-                          onClick={() => setUpgradeItem({ ...item, isLevelRestricted: true, restrictionReason, badgeLabel, buttonLabel, targetLabel, policyTitle, policyNote })}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/50 text-rose-300 font-bold text-xs transition-colors cursor-pointer shadow-sm group/btn"
-                        >
-                          <Lock className="w-3.5 h-3.5 text-rose-400" />
-                          <span>{buttonLabel}</span>
-                          <ArrowRight className="w-3 h-3 text-rose-400/80 transition-transform group-hover/btn:translate-x-0.5" />
-                        </button>
                       ) : (
                         <button
                           type="button"
                           onClick={() => setUpgradeItem(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-xs font-bold transition-colors"
                         >
                           <Lock className="w-3.5 h-3.5" />
-                          <span>Unlock</span>
+                          <span>Unlock with Ultra</span>
                         </button>
                       )}
                     </div>

@@ -139,7 +139,7 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              This chapter master resource is reserved exclusively for enrolled PIE Ultra students. Contact your teacher or administrator to upgrade your account.
+              This chapter master resource is reserved exclusively for enrolled PIE Ultra students. Ultra grants full access to all chemistry resources across all boards and classes.
             </p>
           </div>
 
@@ -149,6 +149,10 @@ export default function UpgradeModal({ item, onClose }: UpgradeModalProps) {
               Unlock the Complete Learning Suite:
             </p>
             <ul className="space-y-2.5 text-xs text-slate-300">
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span><strong className="text-white">Universal Cross-Board Access:</strong> Unlimited access to all CBSE, ICSE, WBCHSE, and Entrance materials across all classes.</span>
+              </li>
               <li className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <span><strong className="text-white">Full Chapter Bibles & Notes:</strong> Handcrafted NCERT derivations, concept maps, and high-yield summaries.</span>

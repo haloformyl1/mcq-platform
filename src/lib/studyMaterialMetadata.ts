@@ -297,143 +297,23 @@ export function getTailoredRestrictionDetails(
   policyTitle: string;
   policyNote: string;
 } {
-  const studentBoard = (student?.board || "").toUpperCase().trim();
-  const studentLevel = (student?.academicLevel || "").toUpperCase().trim();
-  const isWbchseStudent = studentBoard === "WBCHSE";
-  const isCbseStudent = studentBoard === "CBSE";
-  const isIcseStudent = studentBoard === "ICSE" || studentBoard === "ISC";
-
   const rawSec = (materialSection || "ALL").toUpperCase().trim();
   const rawClassSem = (materialClassSem || "ALL").toUpperCase().trim();
   const normClassSem = normalizeAcademicLevel(rawClassSem);
-  const normStudentLevel = normalizeAcademicLevel(studentLevel);
 
-  const isClass11Content = normClassSem === "SEM-I" || normClassSem === "SEM-II" || normClassSem === "11";
-  const isClass12Content = normClassSem === "SEM-III" || normClassSem === "SEM-IV" || normClassSem === "12";
-
-  // Board mismatch check
-  const isWbchseSec = rawSec === "WBCHSE";
-  const isCbseSec = rawSec === "CBSE";
-  const isIcseSec = rawSec === "ICSE" || rawSec === "ISC";
-
-  if (isWbchseSec && !isWbchseStudent) {
-    return {
-      badgeLabel: "WBCHSE ONLY",
-      buttonLabel: "Restricted (WBCHSE)",
-      targetLabel: "WBCHSE Curriculum",
-      reason: `Exclusive to WBCHSE curriculum (Your board: ${studentBoard || "CBSE/ICSE"})`,
-      policyTitle: "Board Exclusive",
-      policyNote: "This content is prepared exclusively for the West Bengal Higher Secondary Council syllabus."
-    };
+  let label = rawSec === "ALL" ? "" : rawSec;
+  if (normClassSem !== "ALL") {
+    label = label ? `${label} · ${normClassSem}` : normClassSem;
   }
-
-  if (isCbseSec && !isCbseStudent) {
-    return {
-      badgeLabel: "CBSE ONLY",
-      buttonLabel: "Restricted (CBSE)",
-      targetLabel: "CBSE Curriculum",
-      reason: `Exclusive to CBSE curriculum (Your board: ${studentBoard || "WBCHSE"})`,
-      policyTitle: "Board Exclusive",
-      policyNote: "This content is prepared exclusively for the Central Board of Secondary Education syllabus."
-    };
-  }
-
-  if (isIcseSec && !isIcseStudent) {
-    return {
-      badgeLabel: "ICSE ONLY",
-      buttonLabel: "Restricted (ICSE)",
-      targetLabel: "ICSE/ISC Curriculum",
-      reason: `Exclusive to ICSE/ISC curriculum (Your board: ${studentBoard || "WBCHSE"})`,
-      policyTitle: "Board Exclusive",
-      policyNote: "This content is prepared exclusively for the ICSE / ISC board syllabus."
-    };
-  }
-
-  // 1. If viewing student is CBSE or ICSE: ALWAYS show Class nomenclature
-  if (isCbseStudent || isIcseStudent) {
-    const boardName = isCbseStudent ? "CBSE" : "ICSE";
-    const userClass = normStudentLevel === "12" ? "Class 12" : "Class 11";
-
-    if (isClass11Content) {
-      return {
-        badgeLabel: "CLASS 11 ONLY",
-        buttonLabel: "Restricted (Class 11)",
-        targetLabel: `Class 11 (${boardName})`,
-        reason: `Reserved for Class 11 students (Your profile: ${userClass})`,
-        policyTitle: "Curriculum Policy",
-        policyNote: `In accordance with ${boardName} curriculum guidelines, this material is curated exclusively for Class 11 students.`
-      };
-    }
-
-    if (isClass12Content) {
-      return {
-        badgeLabel: "CLASS 12 ONLY",
-        buttonLabel: "Restricted (Class 12)",
-        targetLabel: `Class 12 (${boardName})`,
-        reason: `Reserved for Class 12 students (Your profile: ${userClass})`,
-        policyTitle: "Curriculum Policy",
-        policyNote: `In accordance with ${boardName} curriculum guidelines, this material is curated exclusively for Class 12 students.`
-      };
-    }
-
-    return {
-      badgeLabel: `${rawClassSem} ONLY`,
-      buttonLabel: `Restricted (${rawClassSem})`,
-      targetLabel: `Class ${rawClassSem}`,
-      reason: `Not available for your current class (Your profile: ${userClass})`,
-      policyTitle: "Curriculum Policy",
-      policyNote: "This resource is mapped to a specific academic level."
-    };
-  }
-
-  // 2. If viewing student is WBCHSE: ALWAYS show Semester nomenclature
-  if (isWbchseStudent) {
-    const userSem = normStudentLevel.startsWith("SEM-") ? normStudentLevel : `Sem ${normStudentLevel}`;
-
-    let targetSem = normClassSem;
-    if (rawClassSem === "11") targetSem = "SEM-I & II";
-    else if (rawClassSem === "12") targetSem = "SEM-III & IV";
-
-    return {
-      badgeLabel: `${targetSem} ONLY`,
-      buttonLabel: `Restricted (${targetSem})`,
-      targetLabel: `WBCHSE ${targetSem}`,
-      reason: `Reserved for ${targetSem} students (Your semester: ${userSem})`,
-      policyTitle: "Semester Policy",
-      policyNote: `In accordance with WBCHSE semester regulations, this material is curated exclusively for ${targetSem} students.`
-    };
-  }
-
-  // 3. Fallback / Guest / Unknown: Show dual nomenclature if Semester
-  if (normClassSem === "SEM-I" || normClassSem === "SEM-II") {
-    return {
-      badgeLabel: `CLASS 11 / ${normClassSem}`,
-      buttonLabel: `Restricted (Class 11 / ${normClassSem})`,
-      targetLabel: `Class 11 & WBCHSE ${normClassSem}`,
-      reason: `Available for Class 11 and WBCHSE ${normClassSem} students`,
-      policyTitle: "Curriculum Policy",
-      policyNote: `This content is assigned to Class 11 (CBSE/ICSE) and WBCHSE ${normClassSem}.`
-    };
-  }
-
-  if (normClassSem === "SEM-III" || normClassSem === "SEM-IV") {
-    return {
-      badgeLabel: `CLASS 12 / ${normClassSem}`,
-      buttonLabel: `Restricted (Class 12 / ${normClassSem})`,
-      targetLabel: `Class 12 & WBCHSE ${normClassSem}`,
-      reason: `Available for Class 12 and WBCHSE ${normClassSem} students`,
-      policyTitle: "Curriculum Policy",
-      policyNote: `This content is assigned to Class 12 (CBSE/ICSE) and WBCHSE ${normClassSem}.`
-    };
-  }
+  if (!label) label = "ALL CURRICULUMS";
 
   return {
-    badgeLabel: `${rawClassSem} ONLY`,
-    buttonLabel: `Restricted (${rawClassSem})`,
-    targetLabel: rawClassSem,
-    reason: `Reserved for ${rawClassSem} students`,
-    policyTitle: "Curriculum Policy",
-    policyNote: `This content is restricted to ${rawClassSem}.`
+    badgeLabel: label,
+    buttonLabel: "View Resource",
+    targetLabel: label,
+    reason: "",
+    policyTitle: "Universal Chemistry Access",
+    policyNote: "This study resource is available across all boards and academic levels."
   };
 }
 
@@ -444,85 +324,18 @@ export function isStudentEligibleForMaterial(
 ): MaterialEligibilityResult {
   const tailored = getTailoredRestrictionDetails(student, materialSection || "ALL", materialClassSem || "ALL");
 
-  if (!student || !student.board || !student.academicLevel) {
+  if (!student) {
     return { 
       eligible: false, 
       ...tailored,
-      reason: "Please sign in or complete profile onboarding to access this curriculum material."
+      reason: "Please sign in to access this curriculum material."
     };
   }
 
-  const studentBoard = (student.board || "").toUpperCase().trim();
-  const studentLevel = (student.academicLevel || "").toUpperCase().trim();
-
-  const isWbchseStudent = studentBoard === "WBCHSE";
-  const isCbseStudent = studentBoard === "CBSE";
-  const isIcseStudent = studentBoard === "ICSE" || studentBoard === "ISC";
-
-  const normStudentLevel = normalizeAcademicLevel(studentLevel);
-
-  const rawSec = (materialSection || "ALL").toUpperCase().trim();
-  const isAllSec = rawSec === "ALL" || rawSec === "ALL CURRICULUMS";
-  const isEntranceSec = rawSec.includes("NEET") || rawSec.includes("JEE") || rawSec.includes("ENTRANCE");
-  const isWbchseSec = rawSec === "WBCHSE";
-  const isCbseSec = rawSec === "CBSE";
-  const isIcseSec = rawSec === "ICSE" || rawSec === "ISC";
-
-  // Bypassing class/semester restrictions for competitive content!
-  if (isEntranceSec) {
-    return { eligible: true, ...tailored };
-  }
-
-  if (!isAllSec && !isEntranceSec) {
-    if (isWbchseSec && !isWbchseStudent) {
-      return { eligible: false, ...tailored };
-    }
-    if (isCbseSec && !isCbseStudent) {
-      return { eligible: false, ...tailored };
-    }
-    if (isIcseSec && !isIcseStudent) {
-      return { eligible: false, ...tailored };
-    }
-  }
-
-  const rawClassSem = (materialClassSem || "ALL").toUpperCase().trim();
-  const normClassSem = normalizeAcademicLevel(rawClassSem);
-
-  if (rawClassSem === "ALL" || normClassSem === "ALL") {
-    return { eligible: true, ...tailored };
-  }
-
-  // WBCHSE Student checks
-  if (isWbchseStudent) {
-    if (normClassSem === "SEM-I" && normStudentLevel === "SEM-I") return { eligible: true, ...tailored };
-    if (normClassSem === "SEM-II" && normStudentLevel === "SEM-II") return { eligible: true, ...tailored };
-    if (normClassSem === "SEM-III" && normStudentLevel === "SEM-III") return { eligible: true, ...tailored };
-    if (normClassSem === "SEM-IV" && normStudentLevel === "SEM-IV") return { eligible: true, ...tailored };
-
-    if (normClassSem === "11" && (normStudentLevel === "SEM-I" || normStudentLevel === "SEM-II" || normStudentLevel === "11")) return { eligible: true, ...tailored };
-    if (normClassSem === "12" && (normStudentLevel === "SEM-III" || normStudentLevel === "SEM-IV" || normStudentLevel === "12")) return { eligible: true, ...tailored };
-
-    return { eligible: false, ...tailored };
-  }
-
-  // CBSE & ICSE Student checks
-  if (isCbseStudent || isIcseStudent) {
-    const isClass11Student = normStudentLevel === "11" || normStudentLevel === "SEM-I" || normStudentLevel === "SEM-II";
-    const isClass12Student = normStudentLevel === "12" || normStudentLevel === "SEM-III" || normStudentLevel === "SEM-IV";
-
-    if (normClassSem === "SEM-I" || normClassSem === "SEM-II" || normClassSem === "11") {
-      if (isClass11Student) return { eligible: true, ...tailored };
-      return { eligible: false, ...tailored };
-    }
-
-    if (normClassSem === "SEM-III" || normClassSem === "SEM-IV" || normClassSem === "12") {
-      if (isClass12Student) return { eligible: true, ...tailored };
-      return { eligible: false, ...tailored };
-    }
-
-    return { eligible: false, ...tailored };
-  }
-
-  if (normClassSem === normStudentLevel) return { eligible: true, ...tailored };
-  return { eligible: false, ...tailored };
+  // Universal curriculum access: All free and premium contents are cross-accessible to all boards and classes!
+  return {
+    eligible: true,
+    ...tailored,
+    reason: undefined
+  };
 }

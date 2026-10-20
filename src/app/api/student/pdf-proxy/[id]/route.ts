@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/auth";
 import { hasPremiumAccess } from "@/lib/subscription";
 import { validateStudentSession } from "@/lib/sessionService";
-import { parseMaterialMetadata, isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
+import { parseMaterialMetadata } from "@/lib/studyMaterialMetadata";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { r2Client, R2_BUCKET, R2_PUBLIC_DOMAIN } from "@/lib/r2";
 
@@ -78,15 +78,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       return new NextResponse("Document not found", { status: 404 });
     }
 
-    // Enforce academic curriculum eligibility (e.g. SEM-II only for SEM-II WBCHSE & Class 11 CBSE/ICSE)
-    const meta = parseMaterialMetadata(material.description, material.title, material.type);
-    const eligibility = isStudentEligibleForMaterial(student, meta.section, meta.classSem);
-    if (!eligibility.eligible) {
-      return new NextResponse(
-        `Forbidden: Access restricted to ${eligibility.targetLabel || "assigned class/semester"}. ${eligibility.reason || ""}`, 
-        { status: 403 }
-      );
-    }
+    // Verify access tier for premium materials (Free is open to all boards/classes; Premium requires Ultra)
 
     // Verify access tier
     if (material.isPremium) {
