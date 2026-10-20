@@ -36,8 +36,8 @@ export default function PiechemLogo({
   // Ultra plan badge appears after the logo in Netflix reddish-black bracket, replacing the Pro badge.
   // Pro plan badge appears after the logo in dark blue bracket.
   const effectiveTier = resolveEffectivePlanTier(student, upgradeReq, planTier);
-  const isUltra = effectiveTier === "ultra";
-  const isPro = !isUltra && (effectiveTier === "pro" || (planTier === "pro") || Boolean(isGoldMember));
+  const isUltra = effectiveTier === "ultra" || (!planTier && !student && Boolean(isGoldMember));
+  const isPro = !isUltra && (effectiveTier === "pro" || planTier === "pro");
   const isGold = false;
 
   const dimensions = {

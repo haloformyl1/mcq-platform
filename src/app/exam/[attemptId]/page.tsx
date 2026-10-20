@@ -346,11 +346,11 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       <AdminPreviewBanner />
       <header className="exam-session-header mcq-panel rounded-none border-t-0 border-x-0 p-2.5 sm:p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 sm:gap-3 shrink-0 shadow-md">
         <div className="flex items-center justify-between w-full md:w-auto gap-2 sm:gap-4">
-          <PiechemLogo size="sm" showText={false} isGoldMember={
-            examData?.student?.subscriptionStatus === "ULTRA" ||
-            examData?.student?.subscriptionStatus === "COMPLIMENTARY" ||
-            (examData?.student?.subscriptionStatus === "PAID" && (!examData?.student?.subscriptionExpiresAt || new Date(examData.student.subscriptionExpiresAt).getTime() > Date.now()))
-          } />
+          <PiechemLogo 
+            size="sm" 
+            showText={false} 
+            student={examData?.student} 
+          />
           <div className="min-w-0 flex-1 px-1">
             <h1 className="text-sm sm:text-lg md:text-xl font-bold tracking-wide truncate" title={examData.test.title}>{examData.test.title}</h1>
             <p className="text-[11px] sm:text-xs text-[#a6a6a6] mt-0.5">Q {currentQ + 1} of {questions.length}</p>

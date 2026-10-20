@@ -24,6 +24,8 @@ interface PdfViewerClientProps {
     email: string;
     name?: string | null;
     subscriptionStatus: string;
+    subscriptionExpiresAt?: Date | string | null;
+    [key: string]: any;
   };
 }
 
@@ -107,7 +109,7 @@ export default function PdfViewerClient({ material, student }: PdfViewerClientPr
             <PiechemLogo 
               size="sm" 
               href="/dashboard" 
-              isGoldMember={student?.subscriptionStatus === "ULTRA" || student?.subscriptionStatus === "PAID" || student?.subscriptionStatus === "COMPLIMENTARY"}
+              student={student}
             />
           </div>
         </div>
