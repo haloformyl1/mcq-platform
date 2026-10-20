@@ -213,7 +213,7 @@ export default function PiechemLogo({
         <div className="flex flex-col justify-center leading-none">
           <div className={"font-black tracking-wider font-sans uppercase flex items-center " + current.text}>
             {textWhiteOnly ? (
-              <span className="piechem-logo-text-only drop-shadow-sm text-white">
+              <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' drop-shadow-sm'}>
                 PIECHEM
               </span>
             ) : (
@@ -221,7 +221,7 @@ export default function PiechemLogo({
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,242,254,0.3)]">
                   PIE
                 </span>
-                <span className="piechem-logo-chem text-white tracking-tight ml-0.5">
+                <span className={(theme === 'light' ? 'text-neutral-900' : 'text-white') + ' tracking-tight ml-0.5'}>
                   CHEM
                 </span>
               </>
@@ -249,7 +249,7 @@ export default function PiechemLogo({
           </div>
           
           {/* Attribution Subtitle */}
-          <div className="piechem-logo-sub flex items-center mt-0.5 select-none leading-none overflow-hidden">
+          <div className="flex items-center mt-0.5 select-none leading-none overflow-hidden">
             <span
               className={
                 (size === 'sm'
@@ -257,13 +257,14 @@ export default function PiechemLogo({
                   : size === 'lg' || size === 'xl'
                   ? "text-[10px] sm:text-[12px] tracking-[0.06em] sm:tracking-[0.08em] "
                   : "text-[8.5px] sm:text-[10.5px] tracking-[0.05em] sm:tracking-[0.07em] ") +
-                "font-sans font-medium whitespace-nowrap truncate max-w-[180px] sm:max-w-none text-slate-400"
+                "font-sans font-medium whitespace-nowrap truncate max-w-[180px] sm:max-w-none " +
+                (theme === 'light' ? 'text-slate-600' : 'text-slate-400')
               }
             >
               {subtitle !== undefined ? subtitle : (
                 <>
                   An initiative by{" "}
-                  <span className="text-slate-200 font-semibold">
+                  <span className={theme === 'light' ? 'text-slate-900 font-semibold' : 'text-slate-200 font-semibold'}>
                     Arghyadeep Roy.
                   </span>
                 </>

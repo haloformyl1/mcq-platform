@@ -213,7 +213,7 @@ function ThreeDAnimationsContent() {
   };
 
   return (
-    <div className="three-d-page-root min-h-screen bg-black text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       
       {/* ========================================================= */}
       {/* 1. GLOBAL UNIFIED HEADER (PERMANENTLY ANCHORED LEFT LOGO) */}
@@ -272,14 +272,14 @@ function ThreeDAnimationsContent() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="three-d-counter-badge px-3 py-1 rounded-lg bg-[#061524] border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold">
+            <span className="px-3 py-1 rounded-lg bg-[#061524] border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold">
               {filteredAnimations.length} {filteredAnimations.length === 1 ? "Experience" : "Experiences"} Available
             </span>
           </div>
         </div>
 
         {/* Discovery & Filter Bar */}
-        <div className="three-d-filter-bar bg-[#050e18]/90 border border-white/[0.08] rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg backdrop-blur-md">
+        <div className="bg-[#050e18]/90 border border-white/[0.08] rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg backdrop-blur-md">
           
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             
@@ -296,7 +296,7 @@ function ThreeDAnimationsContent() {
             </div>
 
             {/* Access Tier Toggle Chips */}
-            <div className="three-d-tier-group flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-slate-800/90 shrink-0">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-slate-800/90 shrink-0">
               <button
                 type="button"
                 onClick={() => setAccessFilter("ALL")}
@@ -360,7 +360,7 @@ function ThreeDAnimationsContent() {
                 key={cat.id}
                 type="button"
                 onClick={() => setActiveCategory(cat.id)}
-                className={`three-d-category-pill px-4 py-2.5 min-h-[38px] rounded-xl text-xs font-medium whitespace-nowrap transition border active:scale-95 ${
+                className={`px-4 py-2.5 min-h-[38px] rounded-xl text-xs font-medium whitespace-nowrap transition border active:scale-95 ${
                   activeCategory === cat.id
                     ? "bg-cyan-950 border-cyan-400/50 text-cyan-300 font-bold shadow-[0_0_12px_rgba(0,217,255,0.15)]"
                     : "bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"

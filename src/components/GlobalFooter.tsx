@@ -64,7 +64,7 @@ export default function GlobalFooter() {
   }
 
   return (
-    <footer className="global-footer relative z-20 w-full bg-[#0b131e] text-slate-400 border-t border-slate-800 mt-auto font-sans">
+    <footer className="relative z-20 w-full bg-[#0b131e] text-slate-400 border-t border-slate-800 mt-auto font-sans">
 
       {/* Main Container - Aligns with the site's content container */}
       <div className="relative w-full px-4 sm:px-8 lg:px-12 2xl:px-16 py-3 sm:py-3">
@@ -82,7 +82,7 @@ export default function GlobalFooter() {
             <div className="flex flex-col items-center md:items-end">
 
             {/* Single Source of Contact / Support Block */}
-            <div className="global-footer-support p-3 sm:p-4 rounded-xl bg-[#111a27] border border-slate-800 shadow-sm">
+            <div className="p-3 sm:p-4 rounded-xl bg-[#111a27] border border-slate-800 shadow-sm">
               <div className="text-xs text-slate-400 font-medium">
                 {SUPPORT_INFO.tagline}
               </div>
