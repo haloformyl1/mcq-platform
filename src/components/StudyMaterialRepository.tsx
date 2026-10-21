@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useDownloadTracker } from "@/hooks/useDownloadTracker";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
+import { hasUltraSubscription } from "@/lib/planTier";
 import UpgradeModal from "./curriculum/UpgradeModal";
 import { 
   BookOpen, 
@@ -150,11 +151,7 @@ export default function StudyMaterialRepository({
   // Download Limit Modal State
 
   // Check Subscription Status
-  const isComp = student?.subscriptionStatus === "COMPLIMENTARY" || student?.subscriptionStatus === "ULTRA";
-  const isPaid = student?.subscriptionStatus === "PAID" && (
-    !student?.subscriptionExpiresAt || new Date(student?.subscriptionExpiresAt).getTime() > Date.now()
-  );
-  const isGold = isComp || isPaid;
+  const isGold = hasUltraSubscription(student);
 
   // Sync state with URL search params if inside dashboard or standalone
   useEffect(() => {

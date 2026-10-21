@@ -25,6 +25,7 @@ import {
 } from "./curriculumData";
 import UpgradeModal from "./UpgradeModal";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
+import { hasUltraSubscription } from "@/lib/planTier";
 
 interface CurriculumLevelPageProps {
   board: string;
@@ -45,11 +46,7 @@ export default function CurriculumLevelPage({
   const { handleDownload, isProcessing } = useDownloadTracker();
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
-  const isPaid = student?.subscriptionStatus === "PAID" && (
-    !student?.subscriptionExpiresAt || new Date(student?.subscriptionExpiresAt).getTime() > Date.now()
-  );
-  const isGold = isComp || isPaid;
+  const isGold = hasUltraSubscription(student);
 
   const boardUpper = board.toUpperCase();
   const theme = useMemo(() => {

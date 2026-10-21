@@ -31,3 +31,19 @@ export function resolveEffectivePlanTier(
   // In the streamlined Free / Ultra system, all active subscribers enjoy Ultra VIP tier
   return "ultra";
 }
+
+/**
+ * Checks if a student has an active Ultra subscription (ULTRA, COMPLIMENTARY, or active PAID).
+ */
+export function hasUltraSubscription(student?: any): boolean {
+  if (!student) return false;
+  const status = student?.subscriptionStatus ? String(student.subscriptionStatus).trim().toUpperCase() : "";
+  const isUltra = status === "ULTRA";
+  const isComp = Boolean(student?.isComplimentary || status === "COMPLIMENTARY");
+  const isPaidActive =
+    status === "PAID" &&
+    (!student?.subscriptionExpiresAt ||
+      new Date(student.subscriptionExpiresAt).getTime() > Date.now());
+
+  return isUltra || isComp || isPaidActive;
+}

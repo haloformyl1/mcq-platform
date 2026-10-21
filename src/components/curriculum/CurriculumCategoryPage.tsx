@@ -23,6 +23,7 @@ import {
 } from "./curriculumData";
 import UpgradeModal from "./UpgradeModal";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
+import { hasUltraSubscription } from "@/lib/planTier";
 
 interface CurriculumCategoryPageProps {
   board: string;
@@ -46,12 +47,7 @@ export default function CurriculumCategoryPage({
   const [upgradeItem, setUpgradeItem] = useState<StudyMaterialItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"CHAPTER" | "AZ">("CHAPTER");
-
-  const isComp = student?.subscriptionStatus === "COMPLIMENTARY";
-  const isPaid = student?.subscriptionStatus === "PAID" && (
-    !student?.subscriptionExpiresAt || new Date(student?.subscriptionExpiresAt).getTime() > Date.now()
-  );
-  const isGold = isComp || isPaid;
+  const isGold = hasUltraSubscription(student);
 
   const categoryObj = useMemo(() => {
     return RESOURCE_CATEGORIES.find(c => c.id.toLowerCase() === category.toLowerCase() || c.name.toLowerCase().includes(category.toLowerCase())) || RESOURCE_CATEGORIES[0];

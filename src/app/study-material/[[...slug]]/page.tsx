@@ -40,36 +40,44 @@ export default function StudyMaterialPage({ params, searchParams }: PageProps) {
   const slug = resolvedParams.slug || [];
 
   useEffect(() => {
-    // If not cached yet, fetch student session
+    let isMounted = true;
+    const promises: Promise<any>[] = [];
+
     if (!cachedStudent) {
-      fetch("/api/student/dashboard")
-        .then(res => res.json())
-        .then(dashData => {
-          if (!dashData.error) {
-            cachedStudent = dashData.student;
-            setStudent(dashData.student);
-          }
-        })
-        .catch(() => {});
+      promises.push(
+        fetch("/api/student/dashboard")
+          .then(res => res.json())
+          .then(dashData => {
+            if (!dashData.error && dashData.student && isMounted) {
+              cachedStudent = dashData.student;
+              setStudent(dashData.student);
+            }
+          })
+          .catch(() => {})
+      );
     }
 
-    // If not cached yet, fetch materials
     if (!cachedStudyMaterials) {
-      fetch("/api/student/study-materials")
-        .then(res => res.json())
-        .then(mats => {
-          if (Array.isArray(mats)) {
-            cachedStudyMaterials = mats;
-            setStudyMaterials(mats);
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
+      promises.push(
+        fetch("/api/student/study-materials")
+          .then(res => res.json())
+          .then(mats => {
+            if (Array.isArray(mats) && isMounted) {
+              cachedStudyMaterials = mats;
+              setStudyMaterials(mats);
+            }
+          })
+          .catch(() => {})
+      );
     }
+
+    Promise.all(promises).then(() => {
+      if (isMounted) setLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const sanitized = React.useMemo(() => {
