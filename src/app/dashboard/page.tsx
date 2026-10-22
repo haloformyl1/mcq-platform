@@ -189,7 +189,7 @@ export default function StudentDashboard() {
     );
   }
 
-  const { student, availableTests = [], allAttempts = [], lastExamTopStudents = [], lastExamTitle = "" } = data;
+  const { student, availableTests = [], allAttempts = [] } = data;
   const completedAttempts = allAttempts.filter((a: any) => a.status === 'SUBMITTED');
   
   // Analytics Calculations
@@ -541,76 +541,8 @@ export default function StudentDashboard() {
       {/* Main Container */}
       <main className="mcq-shell space-y-6 sm:space-y-10 pt-6 sm:pt-10 flex-1">
 
-                {/* ========================================================= */}
-        {/* 6. CONTENT ROW 3: HALL OF FAME / TOP PERFORMERS          */}
         {/* ========================================================= */}
-        {lastExamTopStudents && lastExamTopStudents.length > 0 && (
-          <section id="leaderboard" className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-amber-400 animate-pulse" />
-                  <span>Top Performers — {lastExamTitle || "Recent Benchmark Test"}</span>
-                </h2>
-                <p className="text-xs text-slate-400">Honour roll ranked by aggregate score, speed and accuracy</p>
-              </div>
-              <span className="text-xs bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full border border-amber-500/30 font-bold">
-                Hall of Fame
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {lastExamTopStudents.map((st: any) => (
-                <div
-                  key={st.rank}
-                  className={`p-5 rounded-2xl border flex items-center justify-between gap-4 transition-all shadow-xl ${
-                    st.rank === 1
-                      ? "bg-amber-950/20 border-amber-500/30 backdrop-blur-sm shadow-lg"
-                      : "bg-white/[0.02] border-white/10 backdrop-blur-sm shadow-lg"
-                  }`}
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 border shadow-md ${
-                        st.rank === 1
-                          ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300"
-                          : "bg-gradient-to-br from-slate-200 to-slate-400 text-black border-slate-100"
-                      }`}
-                    >
-                      #{st.rank}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-bold text-white text-base truncate flex items-center gap-2">
-                        <span>{st.name}</span>
-                        {st.rank === 1 && (
-                          <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold uppercase">
-                            🥇 1st Rank
-                          </span>
-                        )}
-                        {st.rank === 2 && (
-                          <span className="text-[10px] bg-slate-400/20 text-slate-300 px-2 py-0.5 rounded font-bold uppercase">
-                            🥈 2nd Rank
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                        <span>Accuracy: <strong className="text-cyan-300 font-bold">{st.accuracy}%</strong></span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-right shrink-0">
-                    <div className="text-2xl font-black text-white">{st.score} <span className="text-xs font-normal text-slate-400">pts</span></div>
-                    <div className="text-xs font-bold text-cyan-400">{st.percentage != null ? `${Number(st.percentage).toFixed(1)}%` : '-'}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================= */}
-        {/* 7. CONTENT ROW 4: PERFORMANCE JOURNEY & RESULT TRACKER    */}
+        {/* 6. CONTENT ROW 3: PERFORMANCE JOURNEY & RESULT TRACKER    */}
         {/* ========================================================= */}
         <section id="performance" className="space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
@@ -643,7 +575,7 @@ export default function StudentDashboard() {
                   </h3>
 
                   <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed font-light">
-                    You haven't completed any exams yet. Attempt your first test from <Link href="/dashboard/category/available" className="text-cyan-300 font-bold hover:underline">Available Tests</Link> to unlock AI-powered accuracy trajectory, speed percentiles, score distribution, and leaderboard ranking!
+                    You haven't completed any exams yet. Attempt your first test from <Link href="/dashboard/category/available" className="text-cyan-300 font-bold hover:underline">Available Tests</Link> to unlock AI-powered accuracy trajectory, speed percentiles, score distribution, and comprehensive performance analysis!
                   </p>
 
                   <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">

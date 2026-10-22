@@ -630,14 +630,6 @@ div {
   padding: clamp(16px, 3vw, 36px) clamp(12px, 3vw, 32px);
 }
 
-/* Dashboard leaderboard table scroll */
-.dashboard-leaderboard-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.dashboard-leaderboard-wrap table {
-  min-width: 500px;
-}
 
 /* Dashboard tests grid improvement */
 .dashboard-tests-grid {
