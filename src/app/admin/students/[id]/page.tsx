@@ -17,6 +17,8 @@ interface StudentDetails {
     subscriptionExpiresAt?: string | null;
     createdAt: string;
     lastLogin: string | null;
+    lastAiClickAt?: string | null;
+    lastAiQueryAt?: string | null;
   };
   statistics: {
     totalAttempted: number;
@@ -577,6 +579,8 @@ export default function AdminStudentDetails() {
             </div>
             <div className="flex justify-between"><span className="text-gray-500">Registered</span> <span className="text-gray-300">{new Date(student.createdAt).toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Last Seen</span> <span className="text-[#00e5ff] font-medium">{formatWhatsAppLastSeen(student.lastLogin)}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Last PIE AI Click</span> <span className="text-purple-400 font-medium">{formatWhatsAppLastSeen(student.lastAiClickAt)}</span></div>
+            <div className="flex justify-between"><span className="text-gray-500">Last PIE AI Query</span> <span className="text-fuchsia-400 font-medium">{formatWhatsAppLastSeen(student.lastAiQueryAt)}</span></div>
             <div className="pt-2 border-t border-[#333] flex justify-between items-center">
               <span className="text-gray-400 text-xs">Security & Password:</span>
               <button

@@ -36,6 +36,7 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
         id: true, 
         email: true, 
         name: true, 
+        status: true,
         subscriptionStatus: true, 
         subscriptionExpiresAt: true,
         board: true,
@@ -45,6 +46,10 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
 
     if (!student) {
       return new NextResponse("Student profile not found", { status: 404 });
+    }
+
+    if (student.status === "SUSPENDED") {
+      return new NextResponse("Forbidden: Account suspended", { status: 403 });
     }
 
     const isTest = cleanId.startsWith("test-");

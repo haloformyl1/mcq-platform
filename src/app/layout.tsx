@@ -3,8 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 
+import { cookies } from "next/headers";
+import { decrypt } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import GlobalBackground from "@/components/GlobalBackground";
 import GlobalSecurity from "@/components/GlobalSecurity";
+import SuspendedAccountScreen from "@/components/SuspendedAccountScreen";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,19 +44,48 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let isSuspended = false;
+
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("session")?.value;
+    const adminSession = cookieStore.get("admin_session")?.value;
+
+    // Only verify student suspension if there is no active admin session
+    if (session && !adminSession) {
+      const payload = await decrypt(session);
+      if (payload?.id && payload.role === "student") {
+        const student = await prisma.student.findUnique({
+          where: { id: payload.id },
+          select: { status: true },
+        });
+        if (student?.status === "SUSPENDED") {
+          isSuspended = true;
+        }
+      }
+    }
+  } catch {
+    // Fail safely if database or token check fails
+  }
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-black`}
     >
       <body className="dark min-h-full flex flex-col bg-black text-slate-100 relative selection:bg-cyan-500/30 selection:text-cyan-200">
-        <GlobalSecurity />
-        <GlobalBackground />
-        <div className="relative z-10 flex flex-col flex-1 min-h-full">
-          {children}
-        </div>
-        
+        {isSuspended ? (
+          <SuspendedAccountScreen />
+        ) : (
+          <>
+            <GlobalSecurity />
+            <GlobalBackground />
+            <div className="relative z-10 flex flex-col flex-1 min-h-full">
+              {children}
+            </div>
+          </>
+        )}
       </body>
     </html>
   );

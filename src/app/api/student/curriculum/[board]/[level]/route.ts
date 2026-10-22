@@ -71,6 +71,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ board: s
         createdAt: true 
       }
     });
+    
+    if (student.status === "SUSPENDED") {
+      return NextResponse.json(
+        { 
+          error: "ACCOUNT_SUSPENDED", 
+          message: "Your account has been suspended by the administration team. Please contact 9830507435 or email mailarghyadeeproy@gmail.com to restore access." 
+        }, 
+        { status: 403 }
+      );
+    }
 
     const availableTests = await prisma.test.findMany({
       where: { 

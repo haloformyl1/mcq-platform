@@ -90,13 +90,21 @@ export async function consumeAiQuota(
   // Check if subscriber is PAID or COMPLIMENTARY
   const isPaid = hasPremiumAccess(student.subscriptionStatus, student.subscriptionExpiresAt);
   if (isPaid) {
+    await prisma.student.update({
+      where: { id: studentId },
+      data: {
+        lastAiQueryAt: new Date(),
+        aiQueriesToday: { increment: 1 }
+      }
+    }).catch(() => {});
+
     return {
       allowed: true,
       isUnlimited: true,
       remaining: 999,
       totalLimit: 999,
       dailyLimit: 999,
-      queriesUsed: student.aiQueriesToday || 0
+      queriesUsed: (student.aiQueriesToday || 0) + 1
     };
   }
 
@@ -123,7 +131,8 @@ export async function consumeAiQuota(
     where: { id: studentId },
     data: {
       aiQueriesToday: shouldReset ? 1 : { increment: 1 },
-      aiLastResetDate: new Date()
+      aiLastResetDate: new Date(),
+      lastAiQueryAt: new Date()
     }
   });
 

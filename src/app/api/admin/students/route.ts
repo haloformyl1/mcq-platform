@@ -48,6 +48,8 @@ export async function GET(req: Request) {
         subscriptionExpiresAt: true,
         createdAt: true,
         lastLogin: true,
+        lastAiClickAt: true,
+        lastAiQueryAt: true,
         _count: {
           select: { attempts: true }
         },

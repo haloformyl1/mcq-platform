@@ -33,7 +33,14 @@ export async function POST(req: Request) {
     }
 
     if (student.status === "SUSPENDED") {
-      return NextResponse.json({ accountStatus: "SUSPENDED", name: student.name, error: "Your account has been suspended. Please contact the administrator for assistance." });
+      return NextResponse.json(
+        { 
+          accountStatus: "SUSPENDED", 
+          name: student.name, 
+          error: "Your account has been suspended by the administration team. Please contact +91 9830507435 or email mailarghyadeeproy@gmail.com to restore access." 
+        }, 
+        { status: 403 }
+      );
     }
 
     if (student.passwordHash) {

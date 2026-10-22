@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import PiechemLogo from "@/components/PiechemLogo";
 import GlobalFooter from "@/components/GlobalFooter";
+import SuspendedAccountScreen from "@/components/SuspendedAccountScreen";
 import { formatStudentName, validateStudentName } from "@/lib/nameValidation";
 import {
   Atom,
@@ -51,6 +52,7 @@ export default function StudentLogin() {
   const [successMsg, setSuccessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [isSuspended, setIsSuspended] = useState(false);
 
   // If user visits /login directly without viewing the landing intro first, redirect to landing page
   useEffect(() => {
@@ -82,11 +84,22 @@ export default function StudentLogin() {
 
     fetch("/api/student/dashboard")
       .then((res) => {
+        if (res.status === 403) {
+          return res.json().then((data) => {
+            if (data?.error === "ACCOUNT_SUSPENDED") {
+              setIsSuspended(true);
+            }
+          });
+        }
         if (!res.ok) return null;
         return res.json();
       })
       .then((data) => {
         if (data && data.student && !data.error) {
+          if (data.student.status === "SUSPENDED") {
+            setIsSuspended(true);
+            return;
+          }
           if (data.student.board && data.student.academicLevel) {
             router.replace("/dashboard");
           } else {
@@ -137,6 +150,11 @@ export default function StudentLogin() {
       });
       const data = await res.json();
       
+      if (res.status === 403 || data.accountStatus === "SUSPENDED" || data.error?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error);
 
       if (data.accountStatus === "ACTIVE") {
@@ -148,7 +166,11 @@ export default function StudentLogin() {
         setStep("NEW_ACCOUNT_DETAILS");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to identify account");
+      if (err.message?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+      } else {
+        setError(err.message || "Failed to identify account");
+      }
     } finally {
       setLoading(false);
     }
@@ -226,6 +248,12 @@ export default function StudentLogin() {
         body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
       const data = await res.json();
+
+      if (res.status === 403 || data.error?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error);
       
       if (data.isAdmin || data.redirectUrl) {
@@ -236,7 +264,11 @@ export default function StudentLogin() {
         router.push("/onboarding");
       }
     } catch (err: any) {
-      setError("Incorrect email or password.");
+      if (err.message?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+      } else {
+        setError(err.message || "Incorrect email or password.");
+      }
     } finally {
       setLoading(false);
     }
@@ -313,6 +345,10 @@ export default function StudentLogin() {
       setLoading(false);
     }
   };
+
+  if (isSuspended) {
+    return <SuspendedAccountScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500/30 selection:text-cyan-200 flex flex-col justify-between overflow-x-hidden">

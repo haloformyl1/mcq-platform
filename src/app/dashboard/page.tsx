@@ -50,6 +50,7 @@ export default function StudentDashboard() {
   }, [router]);
 
   const handleOpenAiTutor = (mode: string = "tutor", ctx?: any) => {
+    fetch("/api/ai/track-click", { method: "POST" }).catch(() => {});
     const params = new URLSearchParams();
     if (mode && mode !== "tutor") params.set("mode", mode);
     if (ctx?.subject) params.set("subject", ctx.subject);

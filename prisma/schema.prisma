@@ -26,6 +26,8 @@ model Student {
   subscriptionExpiresAt DateTime?
   aiQueriesToday        Int       @default(0)
   aiLastResetDate       DateTime? @default(now())
+  lastAiClickAt         DateTime?
+  lastAiQueryAt         DateTime?
   avatarUrl String?  @default("/avatars/atom.jpg")
   lastLogin DateTime?
   createdAt DateTime @default(now())

@@ -40,6 +40,8 @@ interface Student {
   hasActiveUpi?: boolean;
   createdAt: string;
   lastLogin: string | null;
+  lastAiClickAt?: string | null;
+  lastAiQueryAt?: string | null;
   _count: {
     attempts: number;
   }
@@ -289,6 +291,17 @@ export default function AdminStudents() {
                       <span>Last Seen:</span>
                       <span className="text-[#00e5ff] font-medium">{formatWhatsAppLastSeen(student.lastLogin)}</span>
                     </div>
+
+                    <div className="pt-2 border-t border-[#262626] space-y-1 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-purple-400 font-medium">Last AI Click:</span>
+                        <span className="text-purple-300 font-mono text-[11px]">{formatWhatsAppLastSeen(student.lastAiClickAt)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-fuchsia-400 font-medium">Last AI Query:</span>
+                        <span className="text-fuchsia-300 font-mono text-[11px]">{formatWhatsAppLastSeen(student.lastAiQueryAt)}</span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pt-2 border-t border-[#333] flex justify-end">
@@ -315,6 +328,7 @@ export default function AdminStudents() {
                   <th className="px-4 py-3">Subscription</th>
                   <th className="px-4 py-3">Registered</th>
                   <th className="px-4 py-3">Last Seen</th>
+                  <th className="px-4 py-3 text-purple-300">Last AI Usage</th>
                   <th className="px-4 py-3">Tests</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
@@ -358,6 +372,22 @@ export default function AdminStudents() {
                     <td className="px-4 py-3 whitespace-nowrap text-[#00e5ff] font-medium text-xs">
                       {formatWhatsAppLastSeen(student.lastLogin)}
                     </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-xs">
+                      {student.lastAiClickAt || student.lastAiQueryAt ? (
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5 text-purple-300">
+                            <span className="text-[10px] uppercase font-mono text-purple-400/80 font-bold">Clicked:</span>
+                            <span className="font-medium">{formatWhatsAppLastSeen(student.lastAiClickAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-fuchsia-300">
+                            <span className="text-[10px] uppercase font-mono text-fuchsia-400/80 font-bold">Query:</span>
+                            <span className="font-medium">{formatWhatsAppLastSeen(student.lastAiQueryAt)}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-600 text-xs italic">No AI activity</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">{student._count.attempts}</td>
                     <td className="px-4 py-3">
                       <Link href={`/admin/students/${student.id}`} className="text-blue-400 hover:text-blue-300">
@@ -368,7 +398,7 @@ export default function AdminStudents() {
                 ))}
                 {students.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="text-center py-6">No students found.</td>
+                    <td colSpan={9} className="text-center py-6">No students found.</td>
                   </tr>
                 )}
               </tbody>

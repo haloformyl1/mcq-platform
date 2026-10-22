@@ -38,11 +38,16 @@ export async function GET(req: NextRequest) {
 
     const [quota, studentRecord] = await Promise.all([
       getAiQuotaStatus(student.id),
-      prisma.student.findUnique({
+      prisma.student.update({
         where: { id: student.id },
-        select: { name: true, email: true }
+        data: { lastAiClickAt: new Date() },
+        select: { name: true, email: true, status: true }
       })
     ]);
+
+    if (studentRecord?.status === "SUSPENDED") {
+      return NextResponse.json({ error: "ACCOUNT_SUSPENDED", message: "Your account is suspended." }, { status: 403 });
+    }
 
     // Extract student's given name (first name)
     let givenName = 'Scholar';

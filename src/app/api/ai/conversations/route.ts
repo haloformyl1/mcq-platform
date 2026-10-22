@@ -122,6 +122,11 @@ export async function POST(req: NextRequest) {
             }
           });
 
+          await prisma.student.update({
+            where: { id: student.id },
+            data: { lastAiQueryAt: new Date() }
+          }).catch(() => {});
+
           return NextResponse.json({
             success: true,
             conversation: {
@@ -151,6 +156,11 @@ export async function POST(req: NextRequest) {
         messages: initialTaggedMessages,
       }
     });
+
+    await prisma.student.update({
+      where: { id: student.id },
+      data: { lastAiQueryAt: new Date() }
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

@@ -55,6 +55,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         subscriptionStatus: student.subscriptionStatus,
         createdAt: student.createdAt,
         lastLogin: student.lastLogin,
+        lastAiClickAt: student.lastAiClickAt,
+        lastAiQueryAt: student.lastAiQueryAt,
       },
       statistics: {
         totalAttempted,

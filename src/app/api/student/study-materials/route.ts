@@ -22,6 +22,7 @@ export async function GET(req: Request) {
         const student = await prisma.student.findUnique({
           where: { id: payload.id },
           select: { 
+            status: true,
             subscriptionStatus: true, 
             subscriptionExpiresAt: true,
             board: true,
@@ -29,6 +30,9 @@ export async function GET(req: Request) {
           }
         });
         if (student) {
+          if (student.status === "SUSPENDED") {
+            return NextResponse.json({ error: "ACCOUNT_SUSPENDED", message: "Your account is suspended." }, { status: 403 });
+          }
           studentProfile = { board: student.board, academicLevel: student.academicLevel };
           const isComp = student.subscriptionStatus === "COMPLIMENTARY" || student.subscriptionStatus === "ULTRA";
           const isPaid = student.subscriptionStatus === "PAID" && (!student.subscriptionExpiresAt || new Date(student.subscriptionExpiresAt).getTime() > Date.now());

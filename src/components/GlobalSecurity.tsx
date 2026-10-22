@@ -100,11 +100,30 @@ export default function GlobalSecurity() {
       }["constructor"]("debugger")["call"]());
     }, 100);
 
+    // Global fetch interceptor to immediately lock screen if account gets suspended
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (response.status === 403) {
+        try {
+          const clone = response.clone();
+          const data = await clone.json();
+          if (data?.error === "ACCOUNT_SUSPENDED" || data?.accountStatus === "SUSPENDED" || (typeof data?.error === "string" && data.error.toLowerCase().includes("suspended"))) {
+            window.location.reload();
+          }
+        } catch {
+          // non-json response
+        }
+      }
+      return response;
+    };
+
     return () => {
       window.removeEventListener("contextmenu", handleContextMenu);
       window.removeEventListener("copy", handleCopy);
       window.removeEventListener("keydown", handleKeyDown);
       clearInterval(devtoolsTrap);
+      window.fetch = originalFetch;
     };
   }, [pathname]);
 
