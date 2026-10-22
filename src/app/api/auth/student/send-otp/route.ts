@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { sendOTP } from "@/lib/email";
 import { validateStudentName, verifyNameWithAI } from "@/lib/nameValidation";
+import { isDeviceSuspended } from "@/lib/sessionService";
+import { cookies } from "next/headers";
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,34 @@ export async function POST(req: Request) {
     const { email, name } = await req.json();
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check device restriction: If this device was used by a suspended account, block OTP / registration
+    const cookieStore = await cookies();
+    const deviceId = cookieStore.get("piechem_device_id")?.value;
+    if (deviceId && await isDeviceSuspended(deviceId)) {
+      return NextResponse.json(
+        {
+          error: "Your device is restricted because an account associated with this device has been suspended. Please contact +91 9830507435 or email mailarghyadeeproy@gmail.com for assistance.",
+          deviceSuspended: true,
+        },
+        { status: 403 }
+      );
+    }
+
+    const existingStudent = await prisma.student.findUnique({ where: { email: normalizedEmail } });
+
+    // Cannot create or verify account if this email is suspended
+    if (existingStudent?.status === "SUSPENDED") {
+      return NextResponse.json(
+        {
+          error: "This student account is suspended. You cannot register or log in until your suspension is revoked. Contact +91 9830507435 or email mailarghyadeeproy@gmail.com.",
+          accountSuspended: true,
+        },
+        { status: 403 }
+      );
     }
 
     let sanitizedName = name;
@@ -32,11 +62,9 @@ export async function POST(req: Request) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    const existingStudent = await prisma.student.findUnique({ where: { email } });
-
     if (existingStudent) {
       await prisma.student.update({
-        where: { email },
+        where: { email: normalizedEmail },
         data: { 
           otp, 
           otpExpiry: expiry,
@@ -48,11 +76,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Name is required for new students" }, { status: 400 });
       }
       await prisma.student.create({
-        data: { email, name: sanitizedName, otp, otpExpiry: expiry, board: null, academicLevel: null },
+        data: { email: normalizedEmail, name: sanitizedName, otp, otpExpiry: expiry, board: null, academicLevel: null },
       });
     }
 
-    await sendOTP(email, otp);
+    await sendOTP(normalizedEmail, otp);
 
     return NextResponse.json({ message: "OTP sent successfully" });
   } catch (error) {
@@ -60,3 +88,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
   }
 }
+

@@ -376,3 +376,27 @@ export async function revokeAllStudentSessions(studentId: string) {
     return false;
   }
 }
+
+/**
+ * Checks whether a given deviceId is associated with any student account that is currently SUSPENDED.
+ * If suspended, any signup, OTP request, or account creation from this device is restricted.
+ */
+export async function isDeviceSuspended(deviceId: string | null | undefined): Promise<boolean> {
+  if (!deviceId) return false;
+  await ensureSessionTable();
+  try {
+    const suspendedSession = await prisma.studentSession.findFirst({
+      where: {
+        deviceId,
+        student: {
+          status: "SUSPENDED",
+        },
+      },
+      select: { id: true },
+    });
+    return Boolean(suspendedSession);
+  } catch (error) {
+    console.error("Error in isDeviceSuspended:", error);
+    return false;
+  }
+}

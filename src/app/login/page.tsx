@@ -200,6 +200,12 @@ export default function StudentLogin() {
         body: JSON.stringify({ email: email.trim().toLowerCase(), name: formatStudentName(name) }),
       });
       const data = await res.json();
+
+      if (res.status === 403 || data.deviceSuspended || data.accountSuspended || data.error?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error);
       
       setResendCooldown(30);
@@ -209,7 +215,11 @@ export default function StudentLogin() {
         setStep("OTP_VERIFICATION");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to send OTP");
+      if (err.message?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+      } else {
+        setError(err.message || "Failed to send OTP");
+      }
     } finally {
       setLoading(false);
     }
@@ -299,6 +309,12 @@ export default function StudentLogin() {
         body: JSON.stringify({ email: email.trim().toLowerCase(), otp, name, password }),
       });
       const data = await res.json();
+
+      if (res.status === 403 || data.deviceSuspended || data.accountSuspended || data.error?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error);
       
       if (data.isOnboarded) {
@@ -307,7 +323,11 @@ export default function StudentLogin() {
         router.push("/onboarding");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to setup account");
+      if (err.message?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+      } else {
+        setError(err.message || "Failed to setup account");
+      }
     } finally {
       setLoading(false);
     }
@@ -333,6 +353,12 @@ export default function StudentLogin() {
         body: JSON.stringify({ email: email.trim().toLowerCase(), otp, newPassword: password }),
       });
       const data = await res.json();
+
+      if (res.status === 403 || data.deviceSuspended || data.accountSuspended || data.error?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error);
       
       setSuccessMsg("Your password has been updated successfully.");
@@ -340,7 +366,11 @@ export default function StudentLogin() {
       setPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setError(err.message || "Failed to reset password");
+      if (err.message?.toLowerCase().includes("suspended")) {
+        setIsSuspended(true);
+      } else {
+        setError(err.message || "Failed to reset password");
+      }
     } finally {
       setLoading(false);
     }

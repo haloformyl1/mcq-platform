@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { encrypt } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { isDeviceSuspended } from "@/lib/sessionService";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,9 +15,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const cookieStore = await cookies();
+    const deviceId = cookieStore.get("piechem_device_id")?.value;
+    if (deviceId && await isDeviceSuspended(deviceId)) {
+      return NextResponse.json(
+        { 
+          error: "Your device is restricted because an account associated with this device has been suspended. Please contact +91 9830507435 or email mailarghyadeeproy@gmail.com for assistance.",
+          deviceSuspended: true,
+        }, 
+        { status: 403 }
+      );
+    }
+
     const student = await prisma.student.findUnique({
       where: { email },
     });
+
+    if (student?.status === "SUSPENDED") {
+      return NextResponse.json(
+        { 
+          error: "This student account is suspended. Password reset is not permitted while suspended. Contact +91 9830507435 or email mailarghyadeeproy@gmail.com.",
+          accountSuspended: true,
+        }, 
+        { status: 403 }
+      );
+    }
 
     if (!student || student.otp !== otp || !student.otpExpiry) {
       return NextResponse.json({ error: "Invalid verification code. Please try again." }, { status: 401 });
@@ -44,7 +67,6 @@ export async function POST(req: Request) {
       role: "student",
     });
 
-    const cookieStore = await cookies();
     cookieStore.set("session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

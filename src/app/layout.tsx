@@ -52,16 +52,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     const session = cookieStore.get("session")?.value;
     const adminSession = cookieStore.get("admin_session")?.value;
 
-    // Only verify student suspension if there is no active admin session
-    if (session && !adminSession) {
-      const payload = await decrypt(session);
-      if (payload?.id && payload.role === "student") {
-        const student = await prisma.student.findUnique({
-          where: { id: payload.id },
-          select: { status: true },
+    // Check device restriction or student session suspension (if not admin)
+    if (!adminSession) {
+      const deviceId = cookieStore.get("piechem_device_id")?.value;
+      if (deviceId) {
+        const suspendedDevice = await prisma.studentSession.findFirst({
+          where: {
+            deviceId,
+            student: { status: "SUSPENDED" },
+          },
+          select: { id: true },
         });
-        if (student?.status === "SUSPENDED") {
+        if (suspendedDevice) {
           isSuspended = true;
+        }
+      }
+
+      if (!isSuspended && session) {
+        const payload = await decrypt(session);
+        if (payload?.id && payload.role === "student") {
+          const student = await prisma.student.findUnique({
+            where: { id: payload.id },
+            select: { status: true },
+          });
+          if (student?.status === "SUSPENDED") {
+            isSuspended = true;
+          }
         }
       }
     }

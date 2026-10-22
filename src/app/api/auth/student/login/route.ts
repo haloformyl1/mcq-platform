@@ -1,4 +1,4 @@
-import { registerStudentLoginSession } from "@/lib/sessionService";
+import { registerStudentLoginSession, isDeviceSuspended } from "@/lib/sessionService";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -87,6 +87,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, isAdmin: true, redirectUrl: "/admin" });
     }
 
+    const cookieStore = await cookies();
+    const deviceId = cookieStore.get("piechem_device_id")?.value;
+    if (deviceId && await isDeviceSuspended(deviceId)) {
+      return NextResponse.json({
+        error: "Your device is restricted because an account associated with this device has been suspended. Please contact +91 9830507435 or email mailarghyadeeproy@gmail.com for assistance.",
+        deviceSuspended: true,
+      }, { status: 403 });
+    }
+
     // Regular Student Login (strictly student role, no admin privileges)
     const student = await prisma.student.findUnique({
       where: { email: normalizedEmail },
@@ -113,7 +122,6 @@ export async function POST(req: Request) {
       role: "student",
     });
 
-    const cookieStore = await cookies();
     cookieStore.set("session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

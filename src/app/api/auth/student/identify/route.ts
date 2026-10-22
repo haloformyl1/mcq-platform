@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { isDeviceSuspended } from "@/lib/sessionService";
+import { cookies } from "next/headers";
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +14,20 @@ export async function POST(req: Request) {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+
+    // Check device restriction: If this device was used by a suspended account, block immediately
+    const cookieStore = await cookies();
+    const deviceId = cookieStore.get("piechem_device_id")?.value;
+    if (deviceId && await isDeviceSuspended(deviceId)) {
+      return NextResponse.json(
+        { 
+          accountStatus: "SUSPENDED", 
+          error: "Your device is restricted because an account associated with this device has been suspended. Please contact +91 9830507435 or email mailarghyadeeproy@gmail.com for assistance.",
+          deviceSuspended: true,
+        }, 
+        { status: 403 }
+      );
+    }
 
     // Dedicated Admin Email Check
     if (normalizedEmail === "adminlogin@piechem.com" || normalizedEmail === "piechemotp@gmail.com") {
