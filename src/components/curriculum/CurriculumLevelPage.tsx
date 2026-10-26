@@ -179,9 +179,6 @@ export default function CurriculumLevelPage({
             </Link>
           </div>
         </div>
-
-        {/* Daily Content Upload Notification */}
-        <ContentUpdateNotice variant={theme.accent as any} />
       </div>
 
 
@@ -211,6 +208,9 @@ export default function CurriculumLevelPage({
             </div>
           </div>
         </div>
+
+        {/* Daily Content Upload Notification - strictly above materials */}
+        <ContentUpdateNotice variant={theme.accent as any} />
 
         {filteredList.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">            {filteredList.map(item => {

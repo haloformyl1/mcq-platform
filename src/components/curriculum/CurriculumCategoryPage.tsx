@@ -141,7 +141,7 @@ export default function CurriculumCategoryPage({
       </div>
 
       {/* Sibling Category Switcher Tabs */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-4">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-mono">
           {RESOURCE_CATEGORIES.map(cat => {
             const isActive = cat.id.toLowerCase() === category.toLowerCase();
@@ -160,9 +160,6 @@ export default function CurriculumCategoryPage({
             );
           })}
         </div>
-
-        {/* Professional Daily Content Update Notification */}
-        <ContentUpdateNotice variant="cyan" />
       </div>
 
       {/* Search, Discipline & Sort Filters */}
@@ -197,6 +194,9 @@ export default function CurriculumCategoryPage({
             </div>
           </div>
         </div>
+
+        {/* Daily Content Upload Notification - strictly above study materials */}
+        <ContentUpdateNotice variant={board === "ENTRANCE" ? "rose" : board === "WBCHSE" ? "emerald" : board === "ICSE" ? "amber" : "cyan"} />
 
         {/* Documents Grid */}
         {categoryItems.length > 0 ? (

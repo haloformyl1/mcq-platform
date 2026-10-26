@@ -523,9 +523,6 @@ export default function StudyMaterialRepository({
         <section className="w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
 
           <div className="pt-2 relative z-10 space-y-6">
-            {/* Professional Daily Content Update Notification */}
-            <ContentUpdateNotice variant="cyan" />
-
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/5 pb-4">
               <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-slate-400 uppercase text-center sm:text-left">
                 Step 1: Choose your curriculum
@@ -1084,6 +1081,9 @@ export default function StudyMaterialRepository({
               </select>
             </div>
           </div>
+
+          {/* Banner notification strictly above study materials */}
+          <ContentUpdateNotice variant={selectedBoard === "ENTRANCE" ? "rose" : selectedBoard === "WBCHSE" ? "emerald" : selectedBoard === "ICSE" ? "amber" : "cyan"} />
 
           {/* Resource Document Cards Grid */}
           {activeCategoryItems.length > 0 ? (
