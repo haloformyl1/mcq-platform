@@ -7,6 +7,8 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 import { hasUltraSubscription } from "@/lib/planTier";
 import UpgradeModal from "./curriculum/UpgradeModal";
+import ContentUpdateNotice from "./curriculum/ContentUpdateNotice";
+import { formatUploadDate } from "./curriculum/curriculumData";
 import { 
   BookOpen, 
   FileText, 
@@ -521,6 +523,9 @@ export default function StudyMaterialRepository({
         <section className="w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8 animate-in fade-in zoom-in-98 duration-400 relative">
 
           <div className="pt-2 relative z-10 space-y-6">
+            {/* Professional Daily Content Update Notification */}
+            <ContentUpdateNotice variant="cyan" />
+
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-white/5 pb-4">
               <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-slate-400 uppercase text-center sm:text-left">
                 Step 1: Choose your curriculum
@@ -1158,18 +1163,24 @@ export default function StudyMaterialRepository({
                     </div>
 
                     {/* Card Footer: Metadata + Primary Action */}
-                    <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between">
-                      <div className="text-[10px] font-mono text-slate-400 flex items-center gap-2">
-                        <span>PDF</span>
-                        <span>•</span>
-                        <span>{item.fileSize || "Verified"}</span>
+                    <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between gap-2">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="text-[10px] font-mono text-slate-400 flex items-center gap-1.5">
+                          <span>PDF</span>
+                          <span>•</span>
+                          <span>{item.fileSize || "Verified"}</span>
+                        </div>
+                        <div className="text-[10px] font-mono text-cyan-400/80 flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-cyan-400/70 shrink-0" />
+                          <span>Uploaded: {formatUploadDate(item.createdAt)}</span>
+                        </div>
                       </div>
 
                       {canAccess ? (
                         <div className="flex items-center gap-2">
                           <Link
                             href={`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-xs transition-all shadow-[0_0_12px_rgba(0,217,255,0.25)]"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-xs transition-all shadow-[0_0_12px_rgba(0,217,255,0.25)] shrink-0"
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>Read</span>
@@ -1179,7 +1190,7 @@ export default function StudyMaterialRepository({
                         <button
                           type="button"
                           onClick={() => setUpgradeItem(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-xs font-bold transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-xs font-bold transition-colors shrink-0"
                         >
                           <Lock className="w-3.5 h-3.5" />
                           <span>Unlock with Ultra</span>

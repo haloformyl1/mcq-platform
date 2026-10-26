@@ -29,6 +29,7 @@ import {
   RESOURCE_CATEGORIES, 
   filterMaterialsForContext 
 } from "./curriculumData";
+import ContentUpdateNotice from "./ContentUpdateNotice";
 
 interface CbseCurriculumPageProps {
   materials: StudyMaterialItem[];
@@ -53,8 +54,11 @@ export default function CbseCurriculumPage({
     <div className="w-full min-h-[calc(100vh-14rem)] flex flex-col items-center justify-center text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-200 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
       {/* STEP 2: Dedicated Dual Portals for Class XI & Class XII */}
-      <div className="w-full max-w-4xl mx-auto space-y-8 flex flex-col items-center">
-        <div className="text-center">
+      <div className="w-full max-w-4xl mx-auto space-y-6 flex flex-col items-center">
+        {/* Daily Content Upload Notification */}
+        <ContentUpdateNotice variant="cyan" />
+
+        <div className="text-center pt-2">
           <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-cyan-400 uppercase">
             Step 2: Choose Academic Class
           </h2>

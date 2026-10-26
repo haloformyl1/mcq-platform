@@ -29,6 +29,7 @@ import {
   RESOURCE_CATEGORIES, 
   filterMaterialsForContext 
 } from "./curriculumData";
+import ContentUpdateNotice from "./ContentUpdateNotice";
 
 interface EntranceCurriculumPageProps {
   materials: StudyMaterialItem[];
@@ -45,8 +46,11 @@ export default function EntranceCurriculumPage({
     <div className="w-full min-h-[calc(100vh-14rem)] flex flex-col items-center justify-center text-slate-100 font-sans selection:bg-rose-500/20 selection:text-rose-200 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
       {/* STEP 2: The 4 Exam Stream Portals */}
-      <div className="w-full max-w-6xl mx-auto space-y-8 flex flex-col items-center">
-        <div className="text-center">
+      <div className="w-full max-w-6xl mx-auto space-y-6 flex flex-col items-center">
+        {/* Daily Content Upload Notification */}
+        <ContentUpdateNotice variant="rose" />
+
+        <div className="text-center pt-2">
           <h2 className="text-xs sm:text-sm font-mono tracking-[0.25em] text-rose-400 uppercase">
             Step 2: Choose Target Examination
           </h2>

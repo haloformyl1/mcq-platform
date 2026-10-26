@@ -14,16 +14,19 @@ import {
   Sparkle, 
   Check, 
   BookOpen,
-  FolderOpen
+  FolderOpen,
+  Calendar
 } from "lucide-react";
 import { 
   StudyMaterialItem, 
   RESOURCE_CATEGORIES, 
   filterMaterialsForContext, 
   formatLevelLabel,
+  formatUploadDate,
   BoardType
 } from "./curriculumData";
 import UpgradeModal from "./UpgradeModal";
+import ContentUpdateNotice from "./ContentUpdateNotice";
 import { isStudentEligibleForMaterial } from "@/lib/studyMaterialMetadata";
 import { hasUltraSubscription } from "@/lib/planTier";
 
@@ -145,7 +148,7 @@ export default function CurriculumLevelPage({
       </div>
 
       {/* Hero Context Banner */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
         <div className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border ${theme.border} backdrop-blur-md shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -176,6 +179,9 @@ export default function CurriculumLevelPage({
             </Link>
           </div>
         </div>
+
+        {/* Daily Content Upload Notification */}
+        <ContentUpdateNotice variant={theme.accent as any} />
       </div>
 
 
@@ -255,16 +261,22 @@ export default function CurriculumLevelPage({
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {item.category}
-                    </span>
+                  <div className="pt-4 mt-4 border-t border-white/[0.06] flex items-center justify-between gap-2">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {item.category}
+                      </span>
+                      <span className="text-[10px] font-mono text-cyan-400/80 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-cyan-400/70 shrink-0" />
+                        <span>Uploaded: {formatUploadDate(item.createdAt)}</span>
+                      </span>
+                    </div>
 
                     {canAccess ? (
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/dashboard/pdf-viewer/${item.id.replace("db-", "")}`}
-                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg ${theme.btn} font-bold text-xs transition-colors`}
+                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg ${theme.btn} font-bold text-xs transition-colors shrink-0`}
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Read</span>
@@ -274,7 +286,7 @@ export default function CurriculumLevelPage({
                       <button
                         type="button"
                         onClick={() => setUpgradeItem(item)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-xs font-bold transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-xs font-bold transition-colors shrink-0"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>Unlock with Ultra</span>
