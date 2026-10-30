@@ -487,12 +487,12 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       <AdminPreviewBanner />
 
       {/* ============================================================ */}
-      {/* 1. TOP HEADER (Royal Deep Navy Blue: #204ecf)                 */}
+      {/* 1. TOP HEADER (Royal Deep Blue: #2354c4)                     */}
       {/* ============================================================ */}
-      <header className="bg-[#204ecf] text-white px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-md z-30 shrink-0">
+      <header className="bg-[#2452c9] text-white px-4 sm:px-6 py-2.5 flex items-center justify-between shrink-0 shadow-sm z-30">
         {/* Left: Candidate Profile Avatar & Name */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 max-w-[260px] sm:max-w-xs md:max-w-sm">
-          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-indigo-300 via-purple-300 to-pink-300 p-0.5 shrink-0 shadow-inner flex items-center justify-center overflow-hidden border border-white/40">
+        <div className="flex items-center gap-3 min-w-0 max-w-[280px] sm:max-w-sm">
+          <div className="w-10 h-10 rounded-full bg-[#fde047] p-0.5 shrink-0 flex items-center justify-center overflow-hidden border-2 border-white/60 shadow-xs">
             {student?.avatarUrl ? (
               <img 
                 src={student.avatarUrl} 
@@ -503,30 +503,31 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                 }}
               />
             ) : (
-              <User className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-900" />
+              <div className="w-full h-full rounded-full bg-[#fcd34d] flex items-center justify-center text-[#4338ca]">
+                <User className="w-6 h-6 fill-[#6366f1] text-[#6366f1]" />
+              </div>
             )}
           </div>
-          <span className="text-xs sm:text-sm md:text-base font-bold tracking-wider uppercase text-white truncate drop-shadow-sm">
+          <span className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-white truncate">
             {student?.name || "STUDENT CANDIDATE"}
           </span>
         </div>
 
         {/* Center: Test Title */}
-        <div className="hidden lg:flex flex-1 justify-center px-4 text-center">
-          <h1 className="text-sm md:text-base font-bold text-white max-w-2xl line-clamp-2 leading-snug drop-shadow-sm">
+        <div className="hidden lg:flex flex-1 justify-center px-6 text-center">
+          <h1 className="text-sm md:text-base font-bold text-white max-w-3xl line-clamp-2 leading-snug">
             {testInfo.title || "Examination Assessment"}
           </h1>
         </div>
 
         {/* Right: Time Remaining Box + Finish (Submit) Button */}
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] sm:text-[11px] font-medium text-blue-100/90 tracking-wide uppercase">
+            <span className="text-[10px] font-semibold text-blue-100 tracking-tight">
               Time Remaining
             </span>
-            <div className="bg-[#688bf5] border border-blue-200/40 rounded-lg px-2.5 sm:px-4 py-0.5 sm:py-1 font-mono text-sm sm:text-lg font-bold text-white shadow-inner tracking-widest flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 hidden sm:inline-block opacity-80" />
-              <span>{timeLeft}</span>
+            <div className="bg-[#6b8ff0] rounded px-3 sm:px-4 py-0.5 font-sans text-sm sm:text-base font-bold text-white text-center min-w-[70px]">
+              {timeLeft}
             </div>
           </div>
 
@@ -534,7 +535,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             type="button"
             onClick={handleManualSubmit}
             disabled={isSubmitting}
-            className="bg-[#22863a] hover:bg-[#1f7b35] active:bg-[#1a662c] text-white font-extrabold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg shadow-md transition-all hover:shadow-lg active:scale-95 disabled:opacity-50"
+            className="bg-[#218838] hover:bg-[#1e7e34] active:bg-[#19692c] text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-2 rounded-md shadow-xs transition-colors active:scale-98 disabled:opacity-50 cursor-pointer"
           >
             Finish
           </button>
@@ -552,42 +553,42 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       </header>
 
       {/* ============================================================ */}
-      {/* 2. SUB-BAR: Question [X / Y] + Refresh + Reset + Report Issue */}
+      {/* 2. SUB-BAR: Question [X / Y] + Refresh + Note + Report Issue */}
       {/* ============================================================ */}
-      <div className="bg-white border-b border-[#e2e8f0] px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0">
-        <div className="flex items-center gap-2.5">
-          <span className="text-sm sm:text-base font-medium text-[#475569]">
+      <div className="bg-white px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="flex items-center gap-3">
+          <span className="text-sm sm:text-base font-medium text-[#1e293b]">
             Question
           </span>
-          <div className="bg-[#1546bd] text-white px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-md text-xs sm:text-sm font-bold tracking-wider font-mono shadow-sm">
+          <div className="bg-[#0b5cbe] text-white px-3 py-0.5 rounded text-sm font-bold tracking-wider">
             {currentQ + 1} / {questions.length}
           </div>
           <button
             type="button"
             onClick={() => handleClearAnswer(currentQuestion.id)}
-            title="Clear option selection for current question"
-            className="p-1.5 rounded-full hover:bg-slate-100 text-[#475569] hover:text-[#0f172a] transition-colors"
+            title="Refresh / reset selection"
+            className="p-1 text-[#334155] hover:text-[#0f172a] transition-colors"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Note icon button */}
+          {/* Note pencil button */}
           <button
             type="button"
             onClick={() => setShowReportModal(true)}
-            className="p-1.5 sm:p-2 rounded-lg bg-[#5d55fa] hover:bg-[#4d44f7] text-white transition-colors shadow-sm"
-            title="Feedback / Notes"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#635bff] hover:bg-[#5349f7] text-white flex items-center justify-center transition-colors shadow-2xs"
+            title="Notes / Issue"
           >
-            <Edit3 className="w-4 h-4" />
+            <Edit3 className="w-4 h-4 fill-white/20" />
           </button>
 
           {/* Report Issue button */}
           <button
             type="button"
             onClick={() => setShowReportModal(true)}
-            className="px-3 sm:px-4 py-1.5 rounded-lg border border-[#cbd5e1] hover:border-[#94a3b8] bg-white hover:bg-slate-50 text-[#334155] text-xs sm:text-sm font-bold tracking-wider uppercase transition-colors shadow-2xs"
+            className="px-3 sm:px-3.5 py-1 rounded border border-[#cbd5e1] hover:border-[#94a3b8] bg-white hover:bg-slate-50 text-[#334155] text-xs font-bold tracking-wider uppercase transition-colors"
           >
             REPORT ISSUE
           </button>
@@ -595,14 +596,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       </div>
 
       {/* ============================================================ */}
-      {/* 3. MARKING SCHEME STRIP                                      */}
+      {/* 3. MARKING SCHEME STRIP (Royal Blue: #2655cc)                */}
       {/* ============================================================ */}
-      <div className="bg-[#244bb5] text-white px-3 sm:px-6 py-1.5 flex items-center justify-end gap-2 text-xs font-semibold shadow-xs shrink-0">
-        <span className="tracking-wide">Marking Scheme</span>
-        <span className="bg-white text-[#244bb5] font-bold font-mono px-2 py-0.5 rounded text-[11px] shadow-2xs">
+      <div className="bg-[#2452c9] text-white px-4 sm:px-6 py-1 flex items-center justify-end gap-2 text-xs font-semibold shrink-0">
+        <span className="tracking-normal font-medium">Marking Scheme</span>
+        <span className="bg-white text-[#2452c9] font-bold px-2 py-0.5 rounded text-xs leading-none">
           +{positiveMarks}
         </span>
-        <span className="bg-white text-[#244bb5] font-bold font-mono px-2 py-0.5 rounded text-[11px] shadow-2xs">
+        <span className="bg-white text-[#2452c9] font-bold px-2 py-0.5 rounded text-xs leading-none">
           {negativeMarks > 0 ? `-${negativeMarks}` : "0"}
         </span>
       </div>
@@ -610,42 +611,42 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       {/* ============================================================ */}
       {/* 4. MAIN EXAM STAGE: QUESTION AREA (LEFT) + PALETTE (RIGHT)   */}
       {/* ============================================================ */}
-      <div className="flex flex-1 overflow-hidden relative min-h-0">
+      <div className="flex flex-1 overflow-hidden relative min-h-0 bg-white">
         
         {/* LEFT COLUMN: Question Box + Direction + Choices + Bottom Bar */}
         <div className="flex-1 flex flex-col overflow-y-auto bg-white min-h-0">
           
-          {/* Direction / Section Instruction Ribbon */}
-          <div className="bg-[#e4e7fb] border-b border-[#cbd5e1] px-4 sm:px-8 py-2 text-xs sm:text-sm font-medium text-[#1e293b]">
-            <span className="font-semibold text-[#1e293b]">
+          {/* Direction / Section Instruction Ribbon (Light lavender #dbe4f6) */}
+          <div className="bg-[#dbe4f6] px-4 sm:px-6 py-1.5 text-xs sm:text-sm text-[#1e293b]">
+            <span className="font-bold text-[#1e293b]">
               Direction:
             </span>{" "}
-            Choose the single correct option for the given chemistry problem.
+            Fill in the blank space with a grammatically correct choice.
           </div>
 
           {/* Question Text & Media Container */}
-          <div className="flex-1 p-4 sm:p-8 md:p-10 w-full space-y-6">
+          <div className="flex-1 p-4 sm:p-6 md:p-8 w-full space-y-6">
             
             {/* Question Text */}
-            <div className="text-base sm:text-lg md:text-xl font-medium text-[#0f172a] leading-relaxed break-words whitespace-pre-line">
+            <div className="text-base sm:text-lg font-medium text-[#1e293b] leading-relaxed break-words whitespace-pre-line">
               {currentQuestion.questionText}
             </div>
 
             {/* Optional Question Image / Diagram */}
             {currentQuestion.imageUrl && (
-              <div className="my-4 flex justify-start">
-                <div className="relative max-w-full rounded-xl overflow-hidden border border-[#cbd5e1] bg-slate-50 p-2 shadow-sm">
+              <div className="my-3 flex justify-start">
+                <div className="relative max-w-full rounded-lg overflow-hidden border border-[#cbd5e1] bg-slate-50 p-2">
                   <img
                     src={currentQuestion.imageUrl}
                     alt="Question Diagram"
-                    className="max-h-80 sm:max-h-96 w-auto object-contain rounded-lg"
+                    className="max-h-80 sm:max-h-96 w-auto object-contain rounded-md"
                   />
                 </div>
               </div>
             )}
 
             {/* MCQ Options with Round Circle Letter Badges: A, B, C, D */}
-            <div className="space-y-3 sm:space-y-4 pt-2">
+            <div className="space-y-3 sm:space-y-3.5 pt-1">
               {['A', 'B', 'C', 'D'].map((opt) => {
                 const optKey = `option${opt}` as keyof typeof currentQuestion;
                 const optText = currentQuestion[optKey];
@@ -655,25 +656,23 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   <div
                     key={opt}
                     onClick={() => handleOptionSelect(currentQuestion.id, opt)}
-                    className={`group flex items-center gap-3.5 sm:gap-4 p-3 sm:p-3.5 rounded-xl cursor-pointer transition-all border text-sm sm:text-base ${
-                      isSelected
-                        ? "bg-[#eef2ff] border-[#2563eb] text-[#1e3a8a] shadow-xs"
-                        : "bg-white hover:bg-[#f8fafc] border-[#e2e8f0] text-[#1e293b] hover:border-[#cbd5e1]"
-                    }`}
+                    className="flex items-center gap-3.5 sm:gap-4 py-1.5 cursor-pointer text-sm sm:text-base group select-none"
                   >
                     {/* Circle Letter Badge */}
                     <div
-                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm border transition-all shrink-0 ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm border transition-colors shrink-0 ${
                         isSelected
-                          ? "bg-[#2563eb] text-white border-[#2563eb] shadow-sm"
-                          : "bg-white text-[#334155] border-[#3b82f6] group-hover:border-[#2563eb] group-hover:text-[#2563eb]"
+                          ? "bg-[#2563eb] text-white border-[#2563eb]"
+                          : "bg-white text-[#2563eb] border-[#3b82f6] group-hover:border-[#1d4ed8]"
                       }`}
                     >
                       {opt}
                     </div>
 
                     {/* Option Text */}
-                    <span className="flex-1 font-medium leading-relaxed break-words">
+                    <span className={`flex-1 font-medium leading-relaxed break-words ${
+                      isSelected ? "text-[#1d4ed8] font-bold" : "text-[#1e293b]"
+                    }`}>
                       {optText}
                     </span>
                   </div>
@@ -685,14 +684,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           {/* ============================================================ */}
           {/* 5. BOTTOM ACTION TOOLBAR                                     */}
           {/* ============================================================ */}
-          <div className="bg-[#f1f5f9] border-t border-[#cbd5e1] px-3 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 shrink-0">
+          <div className="bg-transparent px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
             {/* Left Controls: Clear | Mark For Review & Next | Save & Mark For Review */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => handleClearAnswer(currentQuestion.id)}
                 disabled={!answers[currentQuestion.id]}
-                className="bg-[#78541e] hover:bg-[#634516] active:bg-[#4d350f] text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-md shadow-xs transition-colors disabled:opacity-40"
+                className="bg-[#6b4712] hover:bg-[#57390d] active:bg-[#432b09] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 rounded shadow-2xs transition-colors disabled:opacity-40 cursor-pointer"
               >
                 Clear
               </button>
@@ -700,7 +699,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button
                 type="button"
                 onClick={handleMarkForReviewAndNext}
-                className="bg-[#1797c2] hover:bg-[#1281a6] active:bg-[#0e6e8e] text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-md shadow-xs transition-colors"
+                className="bg-[#24a0bd] hover:bg-[#1e89a3] active:bg-[#187288] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 rounded shadow-2xs transition-colors cursor-pointer"
               >
                 Mark For Review &amp; Next
               </button>
@@ -708,19 +707,19 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button
                 type="button"
                 onClick={handleSaveAndMarkForReview}
-                className="bg-[#1569b3] hover:bg-[#115897] active:bg-[#0c4475] text-white font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-md shadow-xs transition-colors"
+                className="bg-[#1266af] hover:bg-[#0f5491] active:bg-[#0c4273] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 rounded shadow-2xs transition-colors cursor-pointer"
               >
                 Save &amp; Mark For Review
               </button>
             </div>
 
             {/* Right Controls: Previous | Save and Next */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentQ === 0}
-                className="bg-[#eb4f47] hover:bg-[#d43f37] active:bg-[#b8332c] text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-md shadow-xs transition-colors disabled:opacity-40"
+                className="bg-[#e74c3c] hover:bg-[#d63031] active:bg-[#c0392b] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2 rounded shadow-2xs transition-colors disabled:opacity-40 cursor-pointer"
               >
                 Previous
               </button>
@@ -728,7 +727,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button
                 type="button"
                 onClick={handleSaveAndNext}
-                className="bg-[#126f37] hover:bg-[#0f5c2e] active:bg-[#0b4723] text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-md shadow-xs transition-colors"
+                className="bg-[#0f7938] hover:bg-[#0d6730] active:bg-[#0a5226] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2 rounded shadow-2xs transition-colors cursor-pointer"
               >
                 Save and Next
               </button>
@@ -747,7 +746,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               onClick={() => setShowPalette(false)}
             />
 
-            <aside className="fixed inset-y-0 right-0 z-50 w-[85vw] max-w-sm lg:max-w-xs xl:max-w-sm lg:relative lg:z-10 lg:block bg-white border-l border-[#cbd5e1] overflow-y-auto flex flex-col shadow-xl lg:shadow-none">
+            <aside className="fixed inset-y-0 right-0 z-50 w-[85vw] max-w-sm lg:w-[380px] xl:w-[420px] lg:relative lg:z-10 lg:block bg-white border-l border-[#e2e8f0] overflow-y-auto flex flex-col shadow-xl lg:shadow-none">
               
               {/* Mobile Header in Drawer */}
               <div className="lg:hidden flex items-center justify-between p-3.5 border-b border-[#e2e8f0] bg-slate-50">
@@ -762,45 +761,45 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               </div>
 
               {/* 4 Summary Status Badges Grid */}
-              <div className="p-4 grid grid-cols-2 gap-3 border-b border-[#e2e8f0] bg-[#f8fafc]">
+              <div className="p-4 sm:p-5 grid grid-cols-2 gap-x-4 gap-y-3.5 border-b border-[#e2e8f0] bg-white">
                 
                 {/* 1. Unattempted (Coral Red: #eb5757) */}
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#eb5757] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded bg-[#ef5350] text-white font-bold text-sm flex items-center justify-center shrink-0">
                     {unattemptedCount}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-semibold text-[#334155] leading-tight">
+                  <span className="text-xs font-bold text-[#1e293b] leading-tight">
                     Unattempted
                   </span>
                 </div>
 
-                {/* 2. Marked for Review (Cobalt Blue: #1976d2) */}
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#1976d2] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                {/* 2. Marked for Review (Cobalt Blue: #0288d1) */}
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded bg-[#0288d1] text-white font-bold text-sm flex items-center justify-center shrink-0">
                     {markedForReviewCount}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-semibold text-[#334155] leading-tight">
+                  <span className="text-xs font-bold text-[#1e293b] leading-tight">
                     Marked for Review
                   </span>
                 </div>
 
-                {/* 3. Answered (Vibrant Emerald Green: #1dbf73) */}
-                <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#1dbf73] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                {/* 3. Answered (Vibrant Emerald Green: #00c853) */}
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded bg-[#00c853] text-white font-bold text-sm flex items-center justify-center shrink-0">
                     {answeredCount}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-semibold text-[#334155] leading-tight">
+                  <span className="text-xs font-bold text-[#1e293b] leading-tight">
                     Answered
                   </span>
                 </div>
 
                 {/* 4. Answered and Marked for review (Cobalt Blue with Green Pin Dot) */}
-                <div className="flex items-center gap-2.5">
-                  <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#1976d2] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-8 h-8 rounded bg-[#0288d1] text-white font-bold text-sm flex items-center justify-center shrink-0">
                     {answeredAndMarkedCount}
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#1dbf73] border-2 border-white" />
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#00e676] border border-white" />
                   </div>
-                  <span className="text-[11px] sm:text-xs font-semibold text-[#334155] leading-tight">
+                  <span className="text-xs font-bold text-[#1e293b] leading-tight">
                     Answered and Marked for review
                   </span>
                 </div>
@@ -818,37 +817,37 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                       <button
                         type="button"
                         onClick={() => toggleSectionCollapse(sectionName)}
-                        className="w-full px-4 py-3 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-[#1e293b] hover:bg-slate-50 transition-colors"
+                        className="w-full px-5 py-3 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-[#1e293b] hover:bg-slate-50 transition-colors"
                       >
                         <span className="truncate pr-2">{sectionName}</span>
                         {isCollapsed ? (
-                          <ChevronDown size={16} className="text-[#64748b] shrink-0" />
+                          <ChevronDown size={18} className="text-[#334155] shrink-0" />
                         ) : (
-                          <ChevronUp size={16} className="text-[#64748b] shrink-0" />
+                          <ChevronUp size={18} className="text-[#334155] shrink-0" />
                         )}
                       </button>
 
                       {/* Section Number Badges Grid */}
                       {!isCollapsed && (
-                        <div className="px-4 pb-4 pt-1 flex flex-wrap gap-2.5">
+                        <div className="px-5 pb-5 pt-1 flex flex-wrap gap-2.5">
                           {sectionData.indices.map((qIdx) => {
                             const q = questions[qIdx];
                             const hasAnswer = !!answers[q.id];
                             const isMarked = !!markedForReview[q.id];
                             const isCurrent = qIdx === currentQ;
 
-                            let bgClass = "bg-[#f1f5f9] text-[#334155] border border-[#cbd5e1]"; // default unvisited / unattempted neutral
+                            let bgClass = "bg-[#f1f5f9] text-[#334155]"; // default unvisited / unattempted neutral
                             let showGreenDot = false;
 
                             if (hasAnswer && isMarked) {
-                              bgClass = "bg-[#1976d2] text-white border-[#1976d2]";
+                              bgClass = "bg-[#0288d1] text-white";
                               showGreenDot = true;
                             } else if (isMarked) {
-                              bgClass = "bg-[#1976d2] text-white border-[#1976d2]";
+                              bgClass = "bg-[#0288d1] text-white";
                             } else if (hasAnswer) {
-                              bgClass = "bg-[#1dbf73] text-white border-[#1dbf73]";
-                            } else if (visitedQuestions[q.id]) {
-                              bgClass = "bg-[#eb5757] text-white border-[#eb5757]";
+                              bgClass = "bg-[#00c853] text-white";
+                            } else if (visitedQuestions[q.id] || isCurrent) {
+                              bgClass = "bg-[#ef5350] text-white";
                             }
 
                             return (
@@ -859,13 +858,13 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                                   setCurrentQ(qIdx);
                                   if (window.innerWidth < 1024) setShowPalette(false);
                                 }}
-                                className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-md font-bold text-xs sm:text-sm flex items-center justify-center transition-all shadow-2xs hover:opacity-90 active:scale-95 ${bgClass} ${
-                                  isCurrent ? "ring-2 ring-[#2563eb] ring-offset-2 ring-offset-white font-extrabold scale-105" : ""
+                                className={`relative w-8 h-8 rounded font-bold text-xs flex items-center justify-center transition-all ${bgClass} ${
+                                  isCurrent ? "ring-2 ring-[#0288d1] ring-offset-1 font-extrabold" : ""
                                 }`}
                               >
                                 {qIdx + 1}
                                 {showGreenDot && (
-                                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#1dbf73] border-2 border-white" />
+                                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#00e676] border border-white" />
                                 )}
                               </button>
                             );
@@ -880,6 +879,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </>
         )}
       </div>
+
 
       {/* ============================================================ */}
       {/* 6. REPORT ISSUE MODAL                                        */}
