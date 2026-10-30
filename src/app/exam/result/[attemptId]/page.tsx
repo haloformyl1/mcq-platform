@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, MinusCircle, ArrowLeft, Clock, User, Award, HelpCircle, Phone } from "lucide-react";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import GlobalHeader from "@/components/GlobalHeader";
+import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 
 export default function ExamResult({ params }: { params: Promise<{ attemptId: string }> }) {
   const resolvedParams = use(params);
@@ -62,22 +64,25 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
     return true;
   });
 
+  const isUltra = result.student?.subscriptionStatus === "ULTRA" || result.student?.subscriptionStatus === "COMPLIMENTARY" || result.student?.subscriptionStatus === "PAID";
+
   return (
-    <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 lg:px-8 text-white">
-      <div className="mcq-shell space-y-5 sm:space-y-6 pb-20 md:pb-8">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+      <AdminPreviewBanner />
+
+      {/* Top Navbar: Constant throughout website */}
+      <GlobalHeader
+        student={result.student}
+        isGoldMember={isUltra}
+      />
+
+      <div className="max-w-7xl w-full mx-auto py-6 sm:py-10 px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-6 pb-20 md:pb-8 flex-1">
         
-        {/* Top Header & Logo */}
+        {/* Action Header Strip */}
         <div className="mcq-panel flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4">
-          <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
-            <PiechemLogo 
-              size="sm" 
-              href="/dashboard" 
-              student={result?.student} 
-            />
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] sm:text-xs font-semibold text-blue-400 uppercase tracking-widest truncate">Exam Scrutiny & Performance</div>
-              <h1 className="text-base sm:text-lg font-bold text-white break-words line-clamp-2 leading-tight">{result.test.title}</h1>
-            </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] sm:text-xs font-semibold text-blue-400 uppercase tracking-widest truncate">Exam Scrutiny & Performance</div>
+            <h1 className="text-base sm:text-lg font-bold text-white break-words line-clamp-2 leading-tight">{result.test.title}</h1>
           </div>
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
@@ -89,7 +94,7 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
               <span>Analyze with PIECHEM AI</span>
             </button>
             <Link href="/dashboard" className="mcq-button mcq-button-secondary w-full sm:w-auto">
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+              <ArrowLeft className="w-4 h-4" /> Back to Dashboard
             </Link>
           </div>
         </div>

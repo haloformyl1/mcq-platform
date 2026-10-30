@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
+import GlobalHeader from "@/components/GlobalHeader";
 import {
   Clock,
   HelpCircle,
@@ -39,6 +40,7 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
   const [error, setError] = useState("");
   const [requiresSub, setRequiresSub] = useState(false);
   const [testDetails, setTestDetails] = useState<TestDetails | null>(null);
+  const [student, setStudent] = useState<any>(null);
   const [fetchingTest, setFetchingTest] = useState(true);
 
   useEffect(() => {
@@ -48,8 +50,9 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
         const res = await fetch(`/api/exam/start?testId=${resolvedParams.testId}`);
         if (res.ok) {
           const data = await res.json();
-          if (isMounted && data.test) {
-            setTestDetails(data.test);
+          if (isMounted) {
+            if (data.test) setTestDetails(data.test);
+            if (data.student) setStudent(data.student);
           }
         }
       } catch (e) {
@@ -107,33 +110,17 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
   const duration = testDetails?.durationMinutes ?? 0;
   const totalMarks = totalQuestions > 0 ? totalQuestions * positiveMarks : null;
 
+  const isUltra = student?.subscriptionStatus === "ULTRA" || student?.subscriptionStatus === "COMPLIMENTARY" || student?.subscriptionStatus === "PAID";
+
   return (
-    <div className="min-h-screen bg-[#070d14] text-white flex flex-col justify-between selection:bg-sky-500/30">
+    <div className="min-h-screen bg-black text-white flex flex-col justify-between selection:bg-cyan-500/30 selection:text-cyan-200">
       <AdminPreviewBanner />
 
-      {/* Top Navigation / Breadcrumb Header */}
-      <header className="w-full border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-colors py-1 px-2.5 rounded-lg hover:bg-slate-800/60"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Dashboard</span>
-          </button>
-          <span className="text-slate-600">/</span>
-          <span className="text-xs sm:text-sm font-semibold text-sky-400 flex items-center gap-1">
-            Exam Readiness
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Live Portal Ready
-          </span>
-        </div>
-      </header>
+      {/* Top Navbar: Constant throughout the entire website */}
+      <GlobalHeader
+        student={student}
+        isGoldMember={isUltra}
+      />
 
       {/* Main Expansive Container - uses available screen real estate */}
       <main className="flex-1 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 flex flex-col justify-center">

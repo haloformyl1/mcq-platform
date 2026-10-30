@@ -338,7 +338,22 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Test not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ test });
+    let student = null;
+    try {
+      const cookieStore = await cookies();
+      const session = cookieStore.get("session")?.value;
+      if (session) {
+        const payload = await decrypt(session);
+        if (payload?.id) {
+          student = await prisma.student.findUnique({
+            where: { id: payload.id as string },
+            select: { id: true, name: true, email: true, avatarUrl: true, subscriptionStatus: true, subscriptionExpiresAt: true }
+          });
+        }
+      }
+    } catch {}
+
+    return NextResponse.json({ test, student });
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch test info" }, { status: 500 });
   }

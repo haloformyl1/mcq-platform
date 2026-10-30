@@ -11,6 +11,7 @@ import {
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
+import GlobalHeader from "@/components/GlobalHeader";
 
 export default function CategoryCurriculumTestsPage({ params }: { params: Promise<{ category: string, board: string, level: string }> }) {
   const resolvedParams = use(params);
@@ -410,36 +411,11 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
       <AdminPreviewBanner />
 
       {/* Top Header matching Front Page / Dashboard / Account */}
-      <header className="sticky top-0 z-40 bg-black/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.7)]">
-        <div className="w-full py-2.5 sm:py-3 px-3 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center gap-2 min-w-0">
-            {/* Left: Logo & Attribution */}
-            <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">
-              <PiechemLogo size="md" href="/dashboard" isGoldMember={isGoldActive} student={student} upgradeReq={data?.upgradeReq} />
-            </div>
-
-            {/* Right: Account Button */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              <Link 
-                href="/dashboard/account"
-                className="flex items-center gap-2.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#111c2e] hover:bg-[#182740] border border-slate-700/80 hover:border-cyan-500/50 text-xs sm:text-sm font-bold text-slate-200 hover:text-white transition-all shadow-md shrink-0 group cursor-pointer"
-                title="My Account"
-              >
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center shrink-0 border border-slate-600 group-hover:border-cyan-400/60 transition-colors">
-                  <img
-                    src={student?.avatarUrl || "/avatars/atom.jpg"}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                    onError={(e: any) => { e.target.style.display = 'none'; }}
-                  />
-                  <User className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span className="hidden sm:inline">My Account</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <GlobalHeader
+        student={student}
+        upgradeReq={data?.upgradeReq}
+        isGoldMember={isGoldActive}
+      />
 
       <main className="w-full max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6 flex-1">
         {/* Top Action Row: Back Button + Announcement Ticker Banner */}
