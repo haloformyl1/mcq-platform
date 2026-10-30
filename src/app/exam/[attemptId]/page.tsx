@@ -598,33 +598,12 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       </div>
 
       {/* ============================================================ */}
-      {/* 3. MARKING SCHEME STRIP (Royal Blue: #2655cc)                */}
-      {/* ============================================================ */}
-      <div className="bg-[#2452c9] text-white px-4 sm:px-6 py-1 flex items-center justify-end gap-2 text-xs font-semibold shrink-0">
-        <span className="tracking-normal font-medium">Marking Scheme</span>
-        <span className="bg-white text-[#2452c9] font-bold px-2 py-0.5 rounded text-xs leading-none">
-          +{positiveMarks}
-        </span>
-        <span className="bg-white text-[#2452c9] font-bold px-2 py-0.5 rounded text-xs leading-none">
-          {negativeMarks > 0 ? `-${negativeMarks}` : "0"}
-        </span>
-      </div>
-
-      {/* ============================================================ */}
-      {/* 4. MAIN EXAM STAGE: QUESTION AREA (LEFT) + PALETTE (RIGHT)   */}
+      {/* MAIN EXAM STAGE: QUESTION AREA (LEFT) + PALETTE (RIGHT)      */}
       {/* ============================================================ */}
       <div className="flex flex-1 overflow-hidden relative min-h-0 bg-white">
         
-        {/* LEFT COLUMN: Question Box + Direction + Choices + Bottom Bar */}
+        {/* LEFT COLUMN: Question Box + Choices + Bottom Bar */}
         <div className="flex-1 flex flex-col overflow-y-auto bg-white min-h-0">
-          
-          {/* Direction / Section Instruction Ribbon (Light lavender #dbe4f6) */}
-          <div className="bg-[#dbe4f6] px-4 sm:px-6 py-1.5 text-xs sm:text-sm text-[#1e293b]">
-            <span className="font-bold text-[#1e293b]">
-              Direction:
-            </span>{" "}
-            Fill in the blank space with a grammatically correct choice.
-          </div>
 
           {/* Question Text & Media Container */}
           <div className="flex-1 p-4 sm:p-6 md:p-8 w-full space-y-6">
