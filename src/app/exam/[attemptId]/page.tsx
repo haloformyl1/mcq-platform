@@ -312,11 +312,18 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       }
     };
 
-    const handleFullscreenChange = () => {
+    const handleFullscreenChange = async () => {
       if (!hasInitializedRef.current) return;
       if (!isFullscreenActive()) {
         // Instant auto-submit without asking or showing any warning
         submitTest("FULLSCREEN_BREACH_INSTANT_SUBMIT");
+      } else {
+        // Try locking Escape and other keys via Keyboard Lock API
+        try {
+          if (typeof navigator !== "undefined" && "keyboard" in navigator && (navigator as any).keyboard?.lock) {
+            await (navigator as any).keyboard.lock(["Escape"]);
+          }
+        } catch (_) {}
       }
     };
 
