@@ -30,7 +30,6 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const [visitedQuestions, setVisitedQuestions] = useState<Record<string, boolean>>({});
   const [timeLeft, setTimeLeft] = useState<string>("--:--");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
@@ -265,37 +264,133 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       isPermissionPromptingRef.current = false;
     }, 5000);
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState !== "visible") {
-        if (proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current) return;
-        submitTest("TAB_SWITCH");
-      }
-    };
-    
-    const handleBlur = () => {
-      if (isMobileDevice || proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current) return;
-      if (document.visibilityState !== "visible") {
-        submitTest("TAB_SWITCH");
-      }
+
+
+    const isFullscreenActive = () => {
+      return !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
     };
 
-    const handleFullscreenChange = () => {
-      const isFullscreen = document.fullscreenElement || (document as any).webkitFullscreenElement;
-      if (!isFullscreen) {
-        setShowFullscreenWarning(true);
-        const docEl = document.documentElement as any;
+    // Auto-enter fullscreen whenever user clicks anywhere if not already in fullscreen
+    const requestFullScreenMode = () => {
+      const docEl = document.documentElement as any;
+      if (!isFullscreenActive()) {
         if (docEl.requestFullscreen) {
           docEl.requestFullscreen().catch(() => {});
         } else if (docEl.webkitRequestFullscreen) {
           docEl.webkitRequestFullscreen();
+        } else if (docEl.mozRequestFullScreen) {
+          docEl.mozRequestFullScreen();
+        } else if (docEl.msRequestFullscreen) {
+          docEl.msRequestFullscreen();
         }
-      } else {
-        setShowFullscreenWarning(false);
       }
     };
 
-    handleFullscreenChange();
+    // Give a 3s grace window upon initial mount for browser fullscreen permission / transitions
+    const hasInitializedRef = { current: false };
+    const initTimer = setTimeout(() => {
+      hasInitializedRef.current = true;
+      requestFullScreenMode();
+    }, 2500);
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") {
+        if (proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current || !hasInitializedRef.current) return;
+        submitTest("TAB_SWITCH_FORCE_AUTO_SUBMIT");
+      }
+    };
+    
+    const handleBlur = () => {
+      if (isMobileDevice || proctoringSettings.tabSwitchAction === "ALLOW" || isPermissionPromptingRef.current || !hasInitializedRef.current) return;
+      if (document.visibilityState !== "visible") {
+        submitTest("TAB_SWITCH_FORCE_AUTO_SUBMIT");
+      }
+    };
+
+    const handleFullscreenChange = () => {
+      if (!hasInitializedRef.current) return;
+      if (!isFullscreenActive()) {
+        // Instant auto-submit without asking or showing any warning
+        submitTest("FULLSCREEN_BREACH_INSTANT_SUBMIT");
+      }
+    };
+
+    // Strict keyboard blocker: Block ESC, Function keys (F1-F12), sound/volume keys, printscreen, screenshots, devtools
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key;
+      const code = e.code;
+      const lowerKey = key.toLowerCase();
+
+      // 1. Block Escape key completely so user cannot exit full view
+      if (key === "Escape" || code === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        requestFullScreenMode();
+        return false;
+      }
+
+      // 2. Block Volume / Sound Control Keys
+      const soundKeys = [
+        "AudioVolumeUp", "AudioVolumeDown", "AudioVolumeMute",
+        "VolumeUp", "VolumeDown", "VolumeMute"
+      ];
+      if (soundKeys.includes(key) || soundKeys.includes(code)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+
+      // 3. Block Function Keys (F1 - F12)
+      if (/^F[1-9]$|^F1[0-2]$/i.test(key) || /^F[1-9]$|^F1[0-2]$/i.test(code)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+
+      // 4. Block PrintScreen & Screenshot Shortcuts
+      if (
+        key === "PrintScreen" ||
+        code === "PrintScreen" ||
+        ((e.metaKey || e.ctrlKey) && e.shiftKey && (lowerKey === "s" || lowerKey === "3" || lowerKey === "4" || lowerKey === "5")) ||
+        (e.altKey && (key === "PrintScreen" || code === "PrintScreen"))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+
+      // 5. Block DevTools, Inspect, View Source, Save, Print (Ctrl/Cmd + Shift + I/J/C, Ctrl+U, Ctrl+S, Ctrl+P, Ctrl+C, Ctrl+V)
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        ["i", "j", "c", "u", "s", "p", "a", "x"].includes(lowerKey)
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+
+      updateActivity();
+    };
+
+    // Strict Right-Click (Context Menu) Blocker
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    };
+
+    // User activity tracker
     const updateActivity = () => {
       lastActivityTime.current = Date.now();
     };
@@ -303,22 +398,33 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
     document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
     window.addEventListener("blur", handleBlur);
-    
+
+    // Capture phase for maximum priority event trapping
+    window.addEventListener("keydown", handleKeyDown, true);
+    window.addEventListener("contextmenu", handleContextMenu, true);
+    document.addEventListener("contextmenu", handleContextMenu, true);
+
     window.addEventListener("mousemove", updateActivity);
-    window.addEventListener("keydown", updateActivity);
     window.addEventListener("click", updateActivity);
     window.addEventListener("scroll", updateActivity);
 
     return () => {
       clearTimeout(permissionTimer);
+      clearTimeout(initTimer);
       clearInterval(timerInterval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
       window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("keydown", handleKeyDown, true);
+      window.removeEventListener("contextmenu", handleContextMenu, true);
+      document.removeEventListener("contextmenu", handleContextMenu, true);
       window.removeEventListener("mousemove", updateActivity);
-      window.removeEventListener("keydown", updateActivity);
       window.removeEventListener("click", updateActivity);
       window.removeEventListener("scroll", updateActivity);
     };
@@ -483,7 +589,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
   const negativeMarks = testInfo.negativeMarking ? (testInfo.negativeMarks ?? 0) : 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f0f2f7] text-[#1e293b] select-none font-sans" style={{ minHeight: "100dvh" }}>
+    <div 
+      className="min-h-screen flex flex-col bg-[#f0f2f7] text-[#1e293b] select-none font-sans" 
+      style={{ minHeight: "100dvh" }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        return false;
+      }}
+    >
       <AdminPreviewBanner />
 
       {/* ============================================================ */}
@@ -933,56 +1046,9 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       )}
 
       {/* ============================================================ */}
-      {/* 7. FULLSCREEN ENFORCEMENT WARNING MODAL                      */}
+      {/* 7. SUBMIT (FINISH) CONFIRMATION MODAL                        */}
       {/* ============================================================ */}
-      {showFullscreenWarning && (
-        <div className="fixed inset-0 bg-black/95 z-[110] flex items-center justify-center p-4">
-          <div className="bg-[#1e293b] rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center border border-red-500/50 text-white">
-            <div className="w-16 h-16 bg-red-500/10 text-red-500 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8 animate-bounce" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">CRITICAL WARNING: Fullscreen Exited!</h2>
-            <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-              You have exited Fullscreen Mode or switched context. PIECHEM Security Rules require all exams to remain in Fullscreen Mode continuously.
-            </p>
-            <div className="bg-red-950/40 border border-red-500/30 rounded-lg p-3 mb-6">
-              <p className="text-red-400 font-bold text-xs">
-                ⚠️ Returning to normal view, switching tabs, or using other apps will result in IMMEDIATE AUTOMATIC SUBMISSION of your test!
-              </p>
-            </div>
-            <div className="flex space-x-4">
-              <button 
-                type="button"
-                onClick={() => submitTest("EXITED_FULLSCREEN")}
-                disabled={isSubmitting}
-                className="flex-1 bg-[#262626] hover:bg-red-900/60 text-red-300 font-medium py-3 rounded-lg border border-red-900/40 text-xs"
-              >
-                Submit &amp; Exit Test
-              </button>
-              <button 
-                type="button"
-                onClick={() => {
-                  if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(console.error);
-                  } else if ((document.documentElement as any).webkitRequestFullscreen) {
-                    (document.documentElement as any).webkitRequestFullscreen();
-                  }
-                  setShowFullscreenWarning(false);
-                }}
-                disabled={isSubmitting}
-                className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg text-xs shadow-lg"
-              >
-                Return to Fullscreen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* 8. SUBMIT (FINISH) CONFIRMATION MODAL                        */}
-      {/* ============================================================ */}
-      {showSubmitConfirm && !showFullscreenWarning && (
+      {showSubmitConfirm && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full text-center border border-slate-200 text-slate-800">
             <div className="w-14 h-14 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center justify-center mx-auto mb-5">
