@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 import {
   Clock,
   HelpCircle,
@@ -393,10 +394,8 @@ export default function ExamInstructions({ params }: { params: Promise<{ testId:
 
       </main>
 
-      {/* Footer Info Strip */}
-      <footer className="w-full border-t border-slate-900 bg-slate-950/80 px-4 sm:px-8 py-3 text-center text-xs text-slate-500 shrink-0">
-        PIECHEM Secure Online Examination Portal &bull; All sessions are digitally monitored
-      </footer>
+      {/* Global Constant Footer */}
+      <GlobalFooter />
     </div>
   );
 }

@@ -55,11 +55,14 @@ const SUPPORT_INFO = {
 export default function GlobalFooter() {
   const pathname = usePathname();
 
-  // Do not render footer during active fullscreen proctored exams or admin panel
-  if (pathname?.startsWith("/exam/") && !pathname?.includes("/result")) {
-    return null;
-  }
-  if (pathname?.startsWith("/admin")) {
+  // Hide footer ONLY during active fullscreen live exam session (/exam/[attemptId])
+  // Keep it visible everywhere else (including /exam/start/[testId] and /exam/result/[attemptId])
+  const isLiveExamSession =
+    pathname?.startsWith("/exam/") &&
+    !pathname?.startsWith("/exam/start") &&
+    !pathname?.startsWith("/exam/result");
+
+  if (isLiveExamSession || pathname?.startsWith("/admin")) {
     return null;
   }
 

@@ -12,6 +12,7 @@ import { CheckCircle2, XCircle, MinusCircle, ArrowLeft, Clock, User, Award, Help
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 
 export default function ExamResult({ params }: { params: Promise<{ attemptId: string }> }) {
@@ -365,6 +366,8 @@ export default function ExamResult({ params }: { params: Promise<{ attemptId: st
           testTitle={result?.test?.title}
         />
       </div>
+
+      <GlobalFooter />
     </div>
   );
 }

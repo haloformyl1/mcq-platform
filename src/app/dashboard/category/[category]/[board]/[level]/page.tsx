@@ -12,6 +12,7 @@ import AdminPreviewBanner from "@/components/AdminPreviewBanner";
 import PiechemLogo from "@/components/PiechemLogo";
 import PiFiringLoader from "@/components/PiFiringLoader";
 import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 
 export default function CategoryCurriculumTestsPage({ params }: { params: Promise<{ category: string, board: string, level: string }> }) {
   const resolvedParams = use(params);
@@ -534,6 +535,8 @@ export default function CategoryCurriculumTestsPage({ params }: { params: Promis
           </div>
         )}
       </main>
+
+      <GlobalFooter />
     </div>
   );
 }
