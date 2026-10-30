@@ -492,7 +492,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       <header className="bg-[#2452c9] text-white px-4 sm:px-6 py-2.5 flex items-center justify-between shrink-0 shadow-sm z-30">
         {/* Left: Candidate Profile Avatar & Name */}
         <div className="flex items-center gap-3 min-w-0 max-w-[280px] sm:max-w-sm">
-          <div className="w-10 h-10 rounded-full bg-[#fde047] p-0.5 shrink-0 flex items-center justify-center overflow-hidden border-2 border-white/60 shadow-xs">
+          <div className="w-10 h-10 rounded-full bg-[#fce786] p-0.5 shrink-0 flex items-center justify-center overflow-hidden border-2 border-white/80 shadow-xs">
             {student?.avatarUrl ? (
               <img 
                 src={student.avatarUrl} 
@@ -503,12 +503,14 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                 }}
               />
             ) : (
-              <div className="w-full h-full rounded-full bg-[#fcd34d] flex items-center justify-center text-[#4338ca]">
-                <User className="w-6 h-6 fill-[#6366f1] text-[#6366f1]" />
+              <div className="w-full h-full rounded-full bg-[#fed7aa] flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#ea580c] fill-[#ea580c]" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
               </div>
             )}
           </div>
-          <span className="text-xs sm:text-sm font-extrabold tracking-wider uppercase text-white truncate">
+          <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white truncate">
             {student?.name || "STUDENT CANDIDATE"}
           </span>
         </div>
@@ -526,7 +528,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             <span className="text-[10px] font-semibold text-blue-100 tracking-tight">
               Time Remaining
             </span>
-            <div className="bg-[#6b8ff0] rounded px-3 sm:px-4 py-0.5 font-sans text-sm sm:text-base font-bold text-white text-center min-w-[70px]">
+            <div className="bg-[#6b8ff0] rounded px-3.5 sm:px-4 py-0.5 font-sans text-sm sm:text-base font-bold text-white text-center min-w-[70px]">
               {timeLeft}
             </div>
           </div>
@@ -535,7 +537,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             type="button"
             onClick={handleManualSubmit}
             disabled={isSubmitting}
-            className="bg-[#218838] hover:bg-[#1e7e34] active:bg-[#19692c] text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-2 rounded-md shadow-xs transition-colors active:scale-98 disabled:opacity-50 cursor-pointer"
+            className="bg-[#22863a] hover:bg-[#1e7e34] active:bg-[#19692c] text-white font-bold text-sm sm:text-base px-6 sm:px-7 py-2 rounded-md shadow-xs transition-colors active:scale-98 disabled:opacity-50 cursor-pointer"
           >
             Finish
           </button>
@@ -555,7 +557,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
       {/* ============================================================ */}
       {/* 2. SUB-BAR: Question [X / Y] + Refresh + Note + Report Issue */}
       {/* ============================================================ */}
-      <div className="bg-white px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 shrink-0">
+      <div className="bg-white px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 shrink-0 border-b border-[#e2e8f0]">
         <div className="flex items-center gap-3">
           <span className="text-sm sm:text-base font-medium text-[#1e293b]">
             Question
@@ -567,7 +569,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
             type="button"
             onClick={() => handleClearAnswer(currentQuestion.id)}
             title="Refresh / reset selection"
-            className="p-1 text-[#334155] hover:text-[#0f172a] transition-colors"
+            className="p-1 text-[#334155] hover:text-[#0f172a] transition-colors cursor-pointer"
           >
             <RotateCcw className="w-4 h-4 stroke-[2.5]" />
           </button>
@@ -578,7 +580,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           <button
             type="button"
             onClick={() => setShowReportModal(true)}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#635bff] hover:bg-[#5349f7] text-white flex items-center justify-center transition-colors shadow-2xs"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#5c53f5] hover:bg-[#4d44f7] text-white flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
             title="Notes / Issue"
           >
             <Edit3 className="w-4 h-4 fill-white/20" />
@@ -588,7 +590,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           <button
             type="button"
             onClick={() => setShowReportModal(true)}
-            className="px-3 sm:px-3.5 py-1 rounded border border-[#cbd5e1] hover:border-[#94a3b8] bg-white hover:bg-slate-50 text-[#334155] text-xs font-bold tracking-wider uppercase transition-colors"
+            className="px-3 sm:px-3.5 py-1 rounded border border-[#cbd5e1] hover:border-[#94a3b8] bg-white hover:bg-slate-50 text-[#334155] text-xs font-bold tracking-wider uppercase transition-colors cursor-pointer"
           >
             REPORT ISSUE
           </button>
@@ -660,7 +662,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                   >
                     {/* Circle Letter Badge */}
                     <div
-                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm border transition-colors shrink-0 ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-normal text-xs sm:text-sm border transition-colors shrink-0 ${
                         isSelected
                           ? "bg-[#2563eb] text-white border-[#2563eb]"
                           : "bg-white text-[#2563eb] border-[#3b82f6] group-hover:border-[#1d4ed8]"
@@ -690,8 +692,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
               <button
                 type="button"
                 onClick={() => handleClearAnswer(currentQuestion.id)}
-                disabled={!answers[currentQuestion.id]}
-                className="bg-[#6b4712] hover:bg-[#57390d] active:bg-[#432b09] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 rounded shadow-2xs transition-colors disabled:opacity-40 cursor-pointer"
+                className="bg-[#735118] hover:bg-[#604211] active:bg-[#4d340b] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 rounded shadow-2xs transition-colors cursor-pointer"
               >
                 Clear
               </button>
@@ -719,7 +720,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentQ === 0}
-                className="bg-[#e74c3c] hover:bg-[#d63031] active:bg-[#c0392b] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2 rounded shadow-2xs transition-colors disabled:opacity-40 cursor-pointer"
+                className="bg-[#e74c3c] hover:bg-[#d63031] active:bg-[#c0392b] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2 rounded shadow-2xs transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -817,7 +818,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                       <button
                         type="button"
                         onClick={() => toggleSectionCollapse(sectionName)}
-                        className="w-full px-5 py-3 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-[#1e293b] hover:bg-slate-50 transition-colors"
+                        className="w-full px-5 py-3 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-[#1e293b] hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <span className="truncate pr-2">{sectionName}</span>
                         {isCollapsed ? (
@@ -836,7 +837,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                             const isMarked = !!markedForReview[q.id];
                             const isCurrent = qIdx === currentQ;
 
-                            let bgClass = "bg-[#f1f5f9] text-[#334155]"; // default unvisited / unattempted neutral
+                            let bgClass = "bg-[#f8fafc] text-[#1e293b]"; // default unvisited neutral soft pill
                             let showGreenDot = false;
 
                             if (hasAnswer && isMarked) {
@@ -847,7 +848,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                             } else if (hasAnswer) {
                               bgClass = "bg-[#00c853] text-white";
                             } else if (visitedQuestions[q.id] || isCurrent) {
-                              bgClass = "bg-[#ef5350] text-white";
+                              bgClass = "bg-[#ef5350] text-white"; // current/visited unattempted turns coral red
                             }
 
                             return (
@@ -858,9 +859,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
                                   setCurrentQ(qIdx);
                                   if (window.innerWidth < 1024) setShowPalette(false);
                                 }}
-                                className={`relative w-8 h-8 rounded font-bold text-xs flex items-center justify-center transition-all ${bgClass} ${
-                                  isCurrent ? "ring-2 ring-[#0288d1] ring-offset-1 font-extrabold" : ""
-                                }`}
+                                className={`relative w-8 h-8 rounded-sm font-bold text-xs flex items-center justify-center transition-all cursor-pointer ${bgClass}`}
                               >
                                 {qIdx + 1}
                                 {showGreenDot && (
