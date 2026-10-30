@@ -24,6 +24,8 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
         student: {
           select: {
             id: true,
+            name: true,
+            avatarUrl: true,
             subscriptionStatus: true,
             subscriptionExpiresAt: true
           }
@@ -130,7 +132,9 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
         optionB,
         optionC,
         optionD,
-        imageUrl: q.imageUrl
+        imageUrl: q.imageUrl,
+        category: q.category || "General",
+        difficulty: q.difficulty || "Moderate"
       };
     });
 
@@ -158,7 +162,10 @@ export async function GET(req: Request, context: { params: Promise<{ attemptId: 
       test: {
         title: test.title,
         durationMinutes: test.durationMinutes,
-        totalQuestions: test.totalQuestions
+        totalQuestions: test.totalQuestions,
+        marksPerQuestion: test.marksPerQuestion ?? 1,
+        negativeMarking: test.negativeMarking ?? false,
+        negativeMarks: test.negativeMarks ?? 0
       },
       questions: displayQuestions,
       savedAnswers,

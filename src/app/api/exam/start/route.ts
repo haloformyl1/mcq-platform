@@ -133,6 +133,8 @@ export async function POST(req: Request) {
       optionC: q.optionC,
       optionD: q.optionD,
       imageUrl: q.imageUrl,
+      category: q.category || "General",
+      difficulty: q.difficulty || "Moderate",
     }));
 
     const existingShufflings = activeAttempt?.questionShufflings as Record<string, any> | null;
@@ -281,10 +283,19 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       attemptId,
+      student: {
+        id: student.id,
+        name: student.name,
+        avatarUrl: student.avatarUrl,
+        subscriptionStatus: student.subscriptionStatus,
+      },
       test: {
         title: test.title,
         durationMinutes: test.durationMinutes,
         totalQuestions: test.totalQuestions,
+        marksPerQuestion: test.marksPerQuestion ?? 1,
+        negativeMarking: test.negativeMarking ?? false,
+        negativeMarks: test.negativeMarks ?? 0,
       },
       questions: displayQuestions,
       savedAnswers,
