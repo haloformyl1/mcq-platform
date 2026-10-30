@@ -624,7 +624,7 @@ export default function ExamSession({ params }: { params: Promise<{ attemptId: s
           </div>
 
           {/* Question Text & Media Container */}
-          <div className="flex-1 p-4 sm:p-8 md:p-10 max-w-5xl space-y-6">
+          <div className="flex-1 p-4 sm:p-8 md:p-10 w-full space-y-6">
             
             {/* Question Text */}
             <div className="text-base sm:text-lg md:text-xl font-medium text-[#0f172a] leading-relaxed break-words whitespace-pre-line">

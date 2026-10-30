@@ -307,3 +307,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to start test" }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const testId = searchParams.get("testId");
+    if (!testId) {
+      return NextResponse.json({ error: "Missing testId" }, { status: 400 });
+    }
+
+    const test = await prisma.test.findUnique({
+      where: { id: testId },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        durationMinutes: true,
+        totalQuestions: true,
+        marksPerQuestion: true,
+        negativeMarking: true,
+        negativeMarks: true,
+        targetBoard: true,
+        targetAcademicLevel: true,
+        isPremium: true,
+        maximumAttempts: true,
+      }
+    });
+
+    if (!test) {
+      return NextResponse.json({ error: "Test not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ test });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to fetch test info" }, { status: 500 });
+  }
+}
+
